@@ -10,17 +10,27 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "dad [args] [COMMAND]",
-	Run: run,
+	Use: "dad",
+	Run: rootRun,
 }
 
 func init() {
-	rootCmd.PersistentFlags().Bool("init", false, "Shell initialization")
+	rootCmd.PersistentFlags().Bool("shell-init", false, "Shell initialization")
+	// rootCmd.PersistentFlags().MarkHidden("shell-init")
+	rootCmd.PersistentFlags().Bool("shell-completion", false, "Shell completion")
+	// rootCmd.PersistentFlags().MarkHidden("shell-completion")
+
+	rootCmd.AddCommand(cloneCmd)
 }
 
-func run(cmd *cobra.Command, args []string) {
-	if GetFlagBool(cmd, "init") {
+func rootRun(cmd *cobra.Command, args []string) {
+	if GetFlagBool(cmd, "shell-init") {
 		integration.Print()
+		os.Exit(0)
+	}
+
+	if GetFlagBool(cmd, "shell-completion") {
+		fmt.Println("complete-me complete-me-again")
 		os.Exit(0)
 	}
 

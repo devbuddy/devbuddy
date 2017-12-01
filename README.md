@@ -1,20 +1,28 @@
-# Dad (prototype) - Open implementation of Shopify Dev
-
-## Current state
-
-Simple prototype which purpose is to help me define the minimal set of features
-needed to build a useful tool.
+# Dad - Open implementation of Shopify Dev
 
 ## Install
 
+Releases will be available from Github in the future. For the initial development
+period, the Go compilation will
+
 Clone the repository:
 ```bash
-$ git clone git@github.com:pior/dad-proto.git ~/.dad
+~ $ mkdir -p ~/src/github.com/pior
+
+~ $ cd ~/src/github.com/pior
+
+~/src/github.com/pior $ git clone git@github.com:pior/dad.git
+...
 ```
 
-Source `dad.sh` in your profile (`~/.bash_profile`):
+Install the go executable somewhere in your PATH:
 ```bash
-[[ -f ~/.dad/dad.sh ]] && [[ $- == *i* ]] && source ~/.dad/dad.sh
+~/src/github.com/pior $ make install
+```
+
+Install the shell integration (in `~/.bash_profile`):
+```bash
+type dad > /dev/null 2> /dev/null && [[ $- == *i* ]] && eval "$(dad --shell-init)"
 ```
 
 ## Usage

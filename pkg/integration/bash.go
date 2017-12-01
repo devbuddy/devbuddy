@@ -4,8 +4,6 @@ var bash_source = `
 # Mask the command dad with this shell function
 # This let us mutate the current shell
 dad() {
-    [ -n "${DAD_DEBUG}" ] && echo "DAD_DEBUG: called with integration enabled"
-
     # Prepare a file to pass the finalize actions
     local finalizer_file
     finalizer_file="$(mktemp /tmp/dad-finalize-XXXXXX)"
