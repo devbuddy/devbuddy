@@ -1,19 +1,19 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/cobra"
 
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/integration"
 	"github.com/pior/dad/pkg/project"
 )
 
 var cloneCmd = &cobra.Command{
-	Use:  "clone [REMOTE-PROJECT]",
+	Use:  "clone [REMOTE]",
 	Run:  cloneRun,
-	Args: cobra.ExactArgs(1),
+	Args: OnlyOneArg,
 }
 
 func cloneRun(cmd *cobra.Command, args []string) {
@@ -24,10 +24,14 @@ func cloneRun(cmd *cobra.Command, args []string) {
 
 	conf := config.Load()
 
-	path, err := proj.Clone(conf)
-	if err != nil {
-		log.Fatalln(err)
+	proj.InferPath(conf)
+
+	if !proj.Exists() {
+		err := proj.Clone()
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 
-	fmt.Printf("cd %s\n", path)
+	integration.AddFinalizerCd(proj.Path)
 }

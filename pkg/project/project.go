@@ -14,6 +14,7 @@ type Project struct {
 	HostingPlatform  string
 	OrganisationName string
 	RepositoryName   string
+	Path             string
 }
 
 func NewFromIdentifier(id string) (p *Project, err error) {
@@ -37,16 +38,22 @@ func (p *Project) GetRemoteUrl() (url string, err error) {
 	return
 }
 
-func (p *Project) Clone(conf *config.Config) (path string, err error) {
-	parentDir := filepath.Join(conf.SourceDir, p.HostingPlatform, p.OrganisationName)
-	path = filepath.Join(parentDir, p.RepositoryName)
+func (p *Project) InferPath(conf *config.Config) {
+	p.Path = filepath.Join(conf.SourceDir, p.HostingPlatform, p.OrganisationName, p.RepositoryName)
+}
 
-	// Just return the path if the project is already cloned
-	if _, err = os.Stat(path); err == nil {
-		return
+func (p *Project) Exists() bool {
+	if p.Path == "" {
+		panic("Project path can't be null")
 	}
+	if _, err := os.Stat(p.Path); err == nil {
+		return true
+	}
+	return false
+}
 
-	err = os.MkdirAll(parentDir, 0755)
+func (p *Project) Clone() (err error) {
+	err = os.MkdirAll(filepath.Dir(p.Path), 0755)
 	if err != nil {
 		return
 	}
@@ -55,6 +62,6 @@ func (p *Project) Clone(conf *config.Config) (path string, err error) {
 	if err != nil {
 		return
 	}
-	err = executor.Run("git", "clone", url, path)
+	err = executor.Run("git", "clone", url, p.Path)
 	return
 }
