@@ -33,7 +33,5 @@ dad() {
     return ${return_code}
 }
 
-complete -C 'dad --completion' dad
-
 [ -n "${DAD_DEBUG}" ] && echo "DAD_DEBUG: Dad is now enabled..."
 `

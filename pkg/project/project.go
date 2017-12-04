@@ -17,16 +17,26 @@ type Project struct {
 	Path             string
 }
 
-func NewFromIdentifier(id string) (p *Project, err error) {
-	p = &Project{HostingPlatform: "github.com"}
+func New(id string, conf *config.Config) (p *Project, err error) {
+	reGithubFull := regexp.MustCompile(`([^/]+)/([^/]+)`)
 
-	if match := regexp.MustCompile(`([^/]+)/([^/]+)`).FindStringSubmatch(id); match != nil {
-		p.OrganisationName = match[1]
-		p.RepositoryName = match[2]
+	if match := reGithubFull.FindStringSubmatch(id); match != nil {
+		p = &Project{
+			HostingPlatform:  "github.com",
+			OrganisationName: match[1],
+			RepositoryName:   match[2],
+		}
+	} else {
+		err = fmt.Errorf("Unrecognized remote project: %s", id)
 		return
 	}
 
+	p.Path = filepath.Join(conf.SourceDir, p.HostingPlatform, p.OrganisationName, p.RepositoryName)
 	return
+}
+
+func (p *Project) FullName() string {
+	return fmt.Sprintf("%s:%s/%s", p.HostingPlatform, p.OrganisationName, p.RepositoryName)
 }
 
 func (p *Project) GetRemoteUrl() (url string, err error) {
@@ -38,9 +48,9 @@ func (p *Project) GetRemoteUrl() (url string, err error) {
 	return
 }
 
-func (p *Project) InferPath(conf *config.Config) {
-	p.Path = filepath.Join(conf.SourceDir, p.HostingPlatform, p.OrganisationName, p.RepositoryName)
-}
+// func (p *Project) InferPath(conf *config.Config) {
+// 	p.Path = filepath.Join(conf.SourceDir, p.HostingPlatform, p.OrganisationName, p.RepositoryName)
+// }
 
 func (p *Project) Exists() bool {
 	if p.Path == "" {

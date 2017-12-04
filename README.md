@@ -2,44 +2,44 @@
 
 ## Install
 
-Releases will be available from Github in the future. For the initial development
-period, the Go compilation will
+Binaries releases will be available from Github in the future.
+During the alpha development period, users will need to compile the Go binary
+themselves.
 
-Clone the repository:
+★ Clone the repository:
 ```bash
-~ $ mkdir -p ~/src/github.com/pior
-
-~ $ cd ~/src/github.com/pior
-
+~ $ mkdir -p ~/src/github.com/pior && cd ~/src/github.com/pior
 ~/src/github.com/pior $ git clone git@github.com:pior/dad.git
 ...
 ```
 
-Install the go executable somewhere in your PATH:
+★ Install the go executable somewhere in your PATH:
 ```bash
 ~/src/github.com/pior $ make install
 ```
 
-Install the shell integration (in `~/.bash_profile`):
+★ Install the shell integration (in `~/.bash_profile`):
 ```bash
-type dad > /dev/null 2> /dev/null && [[ $- == *i* ]] && eval "$(dad --shell-init)"
+type dad > /dev/null 2> /dev/null && eval "$(dad --shell-init --with-completion)"
 ```
 
 ## Usage
 
 ```bash
 $ dad
-Usage: dad [command] ...
+Usage:
+  dad [flags]
+  dad [command]
 
-Commands:
+Available Commands:
+  cd          Jump to a local project
+  clone       Clone a project from github.com
+  help        Help about any command
 
-  new NAME          Create a new project
+Flags:
+  -h, --help              help for dad
+      --shell-init        Shell initialization
+      --with-completion   Enable completion during initialization
 
-  cd NAME           Go to a project and activate environment
-
-  up                Prepare your development environment
-
-  test              Run the test suite (alias: t)
-
-  server            Run the server
+Use "dad [command] --help" for more information about a command.
 ```

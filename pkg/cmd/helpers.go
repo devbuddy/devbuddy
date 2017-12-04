@@ -3,7 +3,9 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
 
+	. "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
@@ -20,4 +22,11 @@ func OnlyOneArg(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("expecting 1 argument")
 	}
 	return nil
+}
+
+func checkError(err error) {
+	if err != nil {
+		fmt.Println(Red("Error:"), err)
+		os.Exit(-1)
+	}
 }
