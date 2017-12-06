@@ -1,0 +1,12 @@
+up:
+  # - python: 3.6.3
+  - pip:
+    - requirements.txt
+    - requirements-dev.txt
+  - custom:
+      met?: "false"
+      meet: echo POIPOI POIPOI
+
+commands:
+  test:
+    run: pytest

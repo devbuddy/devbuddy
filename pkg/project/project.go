@@ -8,6 +8,7 @@ import (
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
+	"github.com/pior/dad/pkg/manifest"
 )
 
 type Project struct {
@@ -15,9 +16,10 @@ type Project struct {
 	OrganisationName string
 	RepositoryName   string
 	Path             string
+	Manifest         *manifest.Manifest
 }
 
-func New(id string, conf *config.Config) (p *Project, err error) {
+func NewFromId(id string, conf *config.Config) (p *Project, err error) {
 	reGithubFull := regexp.MustCompile(`([^/]+)/([^/]+)`)
 
 	if match := reGithubFull.FindStringSubmatch(id); match != nil {
@@ -47,10 +49,6 @@ func (p *Project) GetRemoteUrl() (url string, err error) {
 	err = fmt.Errorf("Unknown project hosting platform: %s", p.HostingPlatform)
 	return
 }
-
-// func (p *Project) InferPath(conf *config.Config) {
-// 	p.Path = filepath.Join(conf.SourceDir, p.HostingPlatform, p.OrganisationName, p.RepositoryName)
-// }
 
 func (p *Project) Exists() bool {
 	if p.Path == "" {

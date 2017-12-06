@@ -10,7 +10,7 @@ import (
 
 var rootCmd *cobra.Command
 
-func init() {
+func build() {
 	rootCmd = &cobra.Command{
 		Use: "dad",
 		Run: rootRun,
@@ -23,6 +23,11 @@ func init() {
 
 	rootCmd.AddCommand(cloneCmd)
 	rootCmd.AddCommand(cdCmd)
+	rootCmd.AddCommand(upCmd)
+}
+
+func buildTaskCommands() {
+
 }
 
 func rootRun(cmd *cobra.Command, args []string) {
@@ -38,6 +43,9 @@ func rootRun(cmd *cobra.Command, args []string) {
 }
 
 func Execute() {
+	build()
+	buildTaskCommands()
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
