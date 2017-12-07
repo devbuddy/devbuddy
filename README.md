@@ -13,6 +13,11 @@ themselves.
 ...
 ```
 
+★ Fetch the dependencies in `vendor`
+```bash
+dep ensure
+```
+
 ★ Install the go executable somewhere in your PATH:
 ```bash
 ~/src/github.com/pior $ make install
