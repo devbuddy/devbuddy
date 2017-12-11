@@ -1,5 +1,7 @@
 # Dad - Open implementation of Shopify Dev
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/pior/dad)](https://goreportcard.com/report/github.com/pior/dad)
+
 ## Install
 
 Binaries releases will be available from Github in the future.
