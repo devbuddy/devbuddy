@@ -1,5 +1,14 @@
+PKGS=$(shell go list ./... | grep -vF /vendor/)
+
 build:
 	go build
+
+test:
+	go test $(PKGS)
+
+lint:
+	go vet $(PKGS)
+	golint $(PKGS)
 
 run: build
 	./dad
