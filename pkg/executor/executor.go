@@ -31,18 +31,21 @@ func makeError(cmd *exec.Cmd, err error) error {
 }
 
 func Run(program string, args ...string) error {
-	fmt.Println("Running: ", color.Bold(color.Cyan(program)), color.Cyan(strings.Join(args, " ")))
+	fmt.Println("Running:", color.Bold(color.Cyan(program)), color.Cyan(strings.Join(args, " ")))
+	return call(program, args...)
+}
 
+func RunShell(cmdline string) error {
+	fmt.Println("Running:", color.Cyan(cmdline))
+	return call("sh", "-c", cmdline)
+}
+
+func call(program string, args ...string) error {
 	cmd := exec.Command(program, args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	err := cmd.Run()
-	err = makeError(cmd, err)
-	return err
-}
-
-func RunShell(cmdline string) error {
-	return Run("sh", "-c", cmdline)
+	return makeError(cmd, err)
 }
