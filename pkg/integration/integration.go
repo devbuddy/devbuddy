@@ -8,7 +8,7 @@ import (
 )
 
 func Print() {
-	fmt.Println(bash_source)
+	fmt.Println(bashSource)
 }
 
 func AddFinalizerCd(path string) error {

@@ -19,7 +19,7 @@ type Project struct {
 	Manifest         *manifest.Manifest
 }
 
-func NewFromId(id string, conf *config.Config) (p *Project, err error) {
+func NewFromID(id string, conf *config.Config) (p *Project, err error) {
 	reGithubFull := regexp.MustCompile(`([^/]+)/([^/]+)`)
 
 	if match := reGithubFull.FindStringSubmatch(id); match != nil {
@@ -41,7 +41,7 @@ func (p *Project) FullName() string {
 	return fmt.Sprintf("%s:%s/%s", p.HostingPlatform, p.OrganisationName, p.RepositoryName)
 }
 
-func (p *Project) GetRemoteUrl() (url string, err error) {
+func (p *Project) GetRemoteURL() (url string, err error) {
 	if p.HostingPlatform == "github.com" {
 		url = fmt.Sprintf("git@github.com:%s/%s.git", p.OrganisationName, p.RepositoryName)
 		return
@@ -66,7 +66,7 @@ func (p *Project) Clone() (err error) {
 		return
 	}
 
-	url, err := p.GetRemoteUrl()
+	url, err := p.GetRemoteURL()
 	if err != nil {
 		return
 	}

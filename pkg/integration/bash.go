@@ -1,6 +1,6 @@
 package integration
 
-var bash_source = `
+var bashSource = `
 # Mask the command dad with this shell function
 # This let us mutate the current shell
 dad() {
