@@ -9,4 +9,9 @@ up:
 
 commands:
   test:
-    run: pytest
+    desc: Run tests
+    run:
+      make test
+
+  lint:
+    run: make lint

@@ -13,6 +13,10 @@ lint:
 		--exclude=".*should have comment or be unexported.*" \
 		./...
 
+docserve:
+	@echo "Starting GoDoc server on http://0.0.0.0:6060"
+	godoc -http=:6060
+
 run: build
 	./dad
 
