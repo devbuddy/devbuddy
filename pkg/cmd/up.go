@@ -31,11 +31,9 @@ func upRun(cmd *cobra.Command, args []string) {
 	var task tasks.Task
 
 	for _, taskdef := range proj.Manifest.Up {
-		// fmt.Printf("taskdef: %+v\n", taskdef)
 		task, err = tasks.BuildFromDefinition(taskdef)
 		checkError(err)
 		taskList = append(taskList, task)
-		// fmt.Printf("task: %+v\n", task)
 	}
 
 	for _, task := range taskList {
