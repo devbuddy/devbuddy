@@ -25,10 +25,11 @@ func cloneRun(cmd *cobra.Command, args []string) {
 	checkError(err)
 
 	if !proj.Exists() {
-		err := proj.Clone()
+		err = proj.Clone()
 		checkError(err)
 	}
 
 	fmt.Println(color.Brown("💡  Jumping to"), color.Green(proj.FullName()))
-	integration.AddFinalizerCd(proj.Path)
+	err = integration.AddFinalizerCd(proj.Path)
+	checkError(err)
 }

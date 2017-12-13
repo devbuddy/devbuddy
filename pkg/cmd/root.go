@@ -31,15 +31,19 @@ func buildTaskCommands() {
 }
 
 func rootRun(cmd *cobra.Command, args []string) {
+	var err error
+
 	if GetFlagBool(cmd, "shell-init") {
 		if GetFlagBool(cmd, "with-completion") {
-			rootCmd.GenBashCompletion(os.Stdout)
+			err = rootCmd.GenBashCompletion(os.Stdout)
+			checkError(err)
 		}
 		integration.Print()
 		os.Exit(0)
 	}
 
-	cmd.Help()
+	err = cmd.Help()
+	checkError(err)
 }
 
 func Execute() {

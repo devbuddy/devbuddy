@@ -26,5 +26,6 @@ func cdRun(cmd *cobra.Command, args []string) {
 
 	fmt.Println(color.Brown("💡  Jumping to"), color.Green(proj.FullName()))
 
-	integration.AddFinalizerCd(proj.Path)
+	err = integration.AddFinalizerCd(proj.Path)
+	checkError(err)
 }
