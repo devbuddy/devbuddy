@@ -29,7 +29,12 @@ func addFinalizer(action, arg string) (err error) {
 	if err != nil {
 		return
 	}
-	defer f.Close()
+	defer func() {
+		cerr := f.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
 
 	_, err = f.WriteString(content)
 	if err != nil {
