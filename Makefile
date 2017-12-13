@@ -4,11 +4,14 @@ build:
 	go build
 
 test:
-	go test $(PKGS)
+	@go test $(PKGS)
 
 lint:
-	go vet $(PKGS)
-	golint $(PKGS)
+	@gometalinter.v1 --vendor \
+		--disable=gotype \
+		--disable=gas \
+		--exclude=".*should have comment or be unexported.*" \
+		./...
 
 run: build
 	./dad
@@ -19,3 +22,8 @@ install:
 build-release:
 	go build -ldflags "-s -w"
 	upx dad  # brew install upx
+
+devup:
+	go get -u github.com/golang/dep/cmd/dep
+	go get -u gopkg.in/alecthomas/gometalinter.v1
+	dep ensure
