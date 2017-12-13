@@ -7,7 +7,7 @@ import (
 	"strings"
 	"syscall"
 
-	. "github.com/logrusorgru/aurora"
+	color "github.com/logrusorgru/aurora"
 )
 
 const defaultFailedCode = 1
@@ -33,7 +33,7 @@ func makeError(cmd *exec.Cmd, err error) error {
 }
 
 func Run(program string, args ...string) error {
-	fmt.Println("Running: ", Bold(Cyan(program)), Cyan(strings.Join(args, " ")))
+	fmt.Println("Running: ", color.Bold(color.Cyan(program)), color.Cyan(strings.Join(args, " ")))
 
 	cmd := exec.Command(program, args...)
 	cmd.Stdin = os.Stdin

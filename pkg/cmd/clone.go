@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	. "github.com/logrusorgru/aurora"
+	color "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 
 	"github.com/pior/dad/pkg/config"
@@ -29,6 +29,6 @@ func cloneRun(cmd *cobra.Command, args []string) {
 		checkError(err)
 	}
 
-	fmt.Println(Brown("💡  Jumping to"), Green(proj.FullName()))
+	fmt.Println(color.Brown("💡  Jumping to"), color.Green(proj.FullName()))
 	integration.AddFinalizerCd(proj.Path)
 }

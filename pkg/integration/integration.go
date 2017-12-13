@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	. "github.com/logrusorgru/aurora"
+	color "github.com/logrusorgru/aurora"
 )
 
 func Print() {
@@ -21,7 +21,7 @@ func addFinalizer(action, arg string) (err error) {
 	finalizerPath := os.Getenv("DAD_FINALIZER_FILE")
 
 	if finalizerPath == "" {
-		fmt.Println(Red("Shell integration error:"), "can't run a finalizer action:", Brown(content))
+		fmt.Println(color.Red("Shell integration error:"), "can't run a finalizer action:", color.Brown(content))
 		return nil
 	}
 
