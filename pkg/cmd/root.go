@@ -26,10 +26,6 @@ func build() {
 	rootCmd.AddCommand(upCmd)
 }
 
-func buildTaskCommands() {
-
-}
-
 func rootRun(cmd *cobra.Command, args []string) {
 	var err error
 
@@ -48,7 +44,7 @@ func rootRun(cmd *cobra.Command, args []string) {
 
 func Execute() {
 	build()
-	buildTaskCommands()
+	buildCustomCommands()
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)

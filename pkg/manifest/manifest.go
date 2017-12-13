@@ -12,7 +12,13 @@ type Manifest struct {
 }
 
 type Content struct {
-	Up []map[interface{}]interface{} `yaml:"up"`
+	Up       []map[interface{}]interface{} `yaml:"up"`
+	Commands map[string]Command            `yaml:"commands"`
+}
+
+type Command struct {
+	Run         string `yaml:"run"`
+	Description string `yaml:"desc"`
 }
 
 func Load(path string) (m *Manifest, err error) {

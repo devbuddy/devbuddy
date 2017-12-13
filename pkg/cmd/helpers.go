@@ -26,7 +26,11 @@ func OnlyOneArg(cmd *cobra.Command, args []string) error {
 
 func checkError(err error) {
 	if err != nil {
-		fmt.Println(color.Red("Error:"), err)
-		os.Exit(-1)
+		exitWithMessage(err.Error())
 	}
+}
+
+func exitWithMessage(msg string) {
+	fmt.Println(color.Red("Error:"), msg)
+	os.Exit(-1)
 }
