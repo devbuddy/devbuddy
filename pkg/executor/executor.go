@@ -10,8 +10,6 @@ import (
 	color "github.com/logrusorgru/aurora"
 )
 
-const defaultFailedCode = 1
-
 func makeError(cmd *exec.Cmd, err error) error {
 	var exitCode int
 	// if err == nil {
@@ -27,7 +25,7 @@ func makeError(cmd *exec.Cmd, err error) error {
 	exitCode = cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
 
 	if exitCode != 0 {
-		err = fmt.Errorf("command failed with code %i", exitCode)
+		err = fmt.Errorf("command failed with code %d", exitCode)
 	}
 	return err
 }

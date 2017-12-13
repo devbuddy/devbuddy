@@ -22,9 +22,9 @@ func (p *Pip) Load(definition map[interface{}]interface{}) (bool, error) {
 		}
 		if len(p.files) > 0 {
 			return true, nil
-		} else {
-			return false, fmt.Errorf("no pip files specified")
 		}
+
+		return false, fmt.Errorf("no pip files specified")
 	}
 	return false, nil
 }

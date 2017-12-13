@@ -16,7 +16,7 @@ func FindBestMatch(id string, conf *config.Config) (proj *Project, err error) {
 	}
 
 	if len(projects) == 0 {
-		err = fmt.Errorf("no projects found at all! Try cloning one first.")
+		err = fmt.Errorf("no projects found at all! Try cloning one first")
 		return
 	}
 
@@ -78,7 +78,7 @@ func GetAllProjects(sourceDir string) ([]*Project, error) {
 func listChildDir(path string) (paths []string, err error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		err = fmt.Errorf("Error listing files in %s: %s", path, err)
+		err = fmt.Errorf("error listing files in %s: %s", path, err)
 		return
 	}
 
