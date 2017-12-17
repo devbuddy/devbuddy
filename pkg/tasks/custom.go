@@ -3,6 +3,8 @@ package tasks
 import (
 	"fmt"
 
+	color "github.com/logrusorgru/aurora"
+
 	"github.com/pior/dad/pkg/executor"
 )
 
@@ -25,13 +27,31 @@ func (c *Custom) Load(definition map[interface{}]interface{}) (bool, error) {
 }
 
 func (c *Custom) Perform() error {
-	fmt.Printf("Task custom: command=\"%s\" condition=\"%s\"\n", c.command, c.condition)
-	err := executor.RunShell(c.condition)
+	fmt.Printf("%s Custom: %s\n", color.Brown("★"), color.Cyan(c.command))
+
+	code, err := executor.RunShellSilent(c.condition)
 	if err != nil {
-		err = executor.RunShell(c.command)
-		if err != nil {
-			fmt.Printf("Command failed: %s", err)
-		}
+		fmt.Printf("Failed to run the condition command: %s", err)
+		return taskFailed
 	}
+	if code == 0 {
+		fmt.Println(color.Green("  Already good!"))
+		return nil
+	}
+
+	// The condition command was run and returned a non-zero exit code.
+	// It means we should run this custom task
+
+	// fmt.Println(color.Brown("  Running"))
+	code, err = executor.RunShellSilent(c.command)
+	if err != nil {
+		fmt.Printf("Command failed: %s", err)
+		return taskFailed
+	}
+	if code != 0 {
+		fmt.Println(color.Sprintf(color.Red("  Command exited with code %d"), code))
+		return nil
+	}
+	fmt.Println(color.Green("  Done!"))
 	return nil
 }

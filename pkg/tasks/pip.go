@@ -31,7 +31,7 @@ func (p *Pip) Load(definition map[interface{}]interface{}) (bool, error) {
 
 func (p *Pip) Perform() (err error) {
 	for _, file := range p.files {
-		err = executor.Run("pip", "install", "-r", file)
+		_, err = executor.Run("pip", "install", "-r", file)
 		if err != nil {
 			return
 		}

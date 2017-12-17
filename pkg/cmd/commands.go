@@ -27,7 +27,7 @@ func customCommandRun(cmd *cobra.Command, args []string) {
 		exitWithMessage(fmt.Sprintf("custom command is not found: %s", name))
 	}
 
-	err = executor.RunShell(spec.Run)
+	_, err = executor.RunShell(spec.Run)
 	if err != nil {
 		fmt.Printf("Command failed: %s", err)
 	}

@@ -10,42 +10,34 @@ import (
 	color "github.com/logrusorgru/aurora"
 )
 
-func makeError(cmd *exec.Cmd, err error) error {
-	var exitCode int
-	// if err == nil {
-	// 	ws := cmd.ProcessState.Sys().(syscall.WaitStatus)
-	// 	exitCode = ws.ExitStatus()
-	// } else {
-	// 	if exitError, ok := err.(*exec.ExitError); ok {
-	// 		ws := exitError.Sys().(syscall.WaitStatus)
-	// 		exitCode = ws.ExitStatus()
-	// 	}
-	// }
-
-	exitCode = cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
-
-	if exitCode != 0 {
-		err = fmt.Errorf("command failed with code %d", exitCode)
-	}
-	return err
-}
-
-func Run(program string, args ...string) error {
+func Run(program string, args ...string) (int, error) {
 	fmt.Println("Running:", color.Bold(color.Cyan(program)), color.Cyan(strings.Join(args, " ")))
-	return call(program, args...)
+	return RunSilent(program, args...)
 }
 
-func RunShell(cmdline string) error {
+func RunShell(cmdline string) (int, error) {
 	fmt.Println("Running:", color.Cyan(cmdline))
-	return call("sh", "-c", cmdline)
+	return RunShellSilent(cmdline)
 }
 
-func call(program string, args ...string) error {
+func RunSilent(program string, args ...string) (int, error) {
 	cmd := exec.Command(program, args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	err := cmd.Run()
-	return makeError(cmd, err)
+
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
+			return code, nil
+		}
+	}
+	code := cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
+	return code, err
+}
+
+func RunShellSilent(cmdline string) (int, error) {
+	return RunSilent("sh", "-c", cmdline)
 }

@@ -1,8 +1,15 @@
 package tasks
 
 import (
+	"errors"
 	"fmt"
 )
+
+var taskFailed error
+
+func init() {
+	taskFailed = errors.New("task failed")
+}
 
 type Task interface {
 	Load(map[interface{}]interface{}) (bool, error)

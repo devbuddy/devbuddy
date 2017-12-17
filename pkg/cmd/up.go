@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -37,9 +36,7 @@ func upRun(cmd *cobra.Command, args []string) {
 	}
 
 	for _, task := range taskList {
-		fmt.Printf("Running task: %+v\n", task)
 		err = task.Perform()
 		checkError(err)
 	}
-
 }
