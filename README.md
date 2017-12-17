@@ -37,14 +37,14 @@ In the mean time, you will need to compile/install the Go binary yourself:
 
 ★ Clone the repository:
 ```bash
-~ $ mkdir -p ~/src/github.com/pior && cd ~/src/github.com/pior
+~ $ mkdir -p ~/src/github.com/pior
+~ $ cd ~/src/github.com/pior
 ~/src/github.com/pior $ git clone git@github.com:pior/dad.git
-...
 ```
 
-★ Fetch the dependencies in `vendor`
+★ Fetch the dependencies (in `vendor`)
 ```bash
-dep ensure
+~/src/github.com/pior $ dep ensure
 ```
 
 ★ Install the go executable somewhere in your PATH:
@@ -52,7 +52,14 @@ dep ensure
 ~/src/github.com/pior $ make install
 ```
 
+## Setup
+
 ★ Install the shell integration (in `~/.bash_profile`):
+```bash
+eval "$(dad --shell-init --with-completion)"
+```
+
+A safer version:
 ```bash
 type dad > /dev/null 2> /dev/null && eval "$(dad --shell-init --with-completion)"
 ```
