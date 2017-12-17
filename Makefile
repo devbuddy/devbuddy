@@ -1,15 +1,13 @@
-PKGS=$(shell go list ./... | grep -vF /vendor/)
-
 build:
 	go build
 
 test:
-	@go test $(PKGS)
+	@go test `go list ./... | grep -vF /vendor/`
 
 lint:
 	@gometalinter.v1 \
 		--vendor \
-		--deadline=60s \
+		--deadline=120s \
 		--disable=gotype \
 		--disable=gas \
 		--exclude=".*should have comment or be unexported.*" \
