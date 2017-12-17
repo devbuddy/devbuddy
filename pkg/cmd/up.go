@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -31,8 +32,11 @@ func upRun(cmd *cobra.Command, args []string) {
 
 	for _, taskdef := range proj.Manifest.Up {
 		task, err = tasks.BuildFromDefinition(taskdef)
-		checkError(err)
-		taskList = append(taskList, task)
+		if err != nil {
+			fmt.Printf("Warning: %s\n", err)
+		} else {
+			taskList = append(taskList, task)
+		}
 	}
 
 	for _, task := range taskList {
