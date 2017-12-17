@@ -5,7 +5,7 @@ test:
 	@go test `go list ./... | grep -vF /vendor/`
 
 lint:
-	@gometalinter.v1 \
+	@gometalinter.v2 \
 		--vendor \
 		--deadline=120s \
 		--disable=gotype \
@@ -29,6 +29,6 @@ build-release:
 
 devup:
 	go get -u github.com/golang/dep/cmd/dep
-	go get -u gopkg.in/alecthomas/gometalinter.v1
-	gometalinter.v1 --install --update
+	go get -u gopkg.in/alecthomas/gometalinter.v2
+	gometalinter.v2 --install --update
 	dep ensure
