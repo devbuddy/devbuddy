@@ -21,6 +21,9 @@ func build() {
 	rootCmd.PersistentFlags().Bool("with-completion", false, "Enable completion during initialization")
 	// rootCmd.PersistentFlags().MarkHidden("shell-completion")
 
+	rootCmd.PersistentFlags().Bool("shell-hook", false, "Shell prompt hook")
+	rootCmd.PersistentFlags().MarkHidden("shell-hook")
+
 	rootCmd.AddCommand(cloneCmd)
 	rootCmd.AddCommand(cdCmd)
 	rootCmd.AddCommand(upCmd)
@@ -35,6 +38,11 @@ func rootRun(cmd *cobra.Command, args []string) {
 			checkError(err)
 		}
 		integration.Print()
+		os.Exit(0)
+	}
+
+	if GetFlagBool(cmd, "shell-hook") {
+		integration.Hook()
 		os.Exit(0)
 	}
 
