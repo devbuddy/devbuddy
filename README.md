@@ -1,13 +1,39 @@
-# Dad - Open implementation of Shopify Dev
+# Dad
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/pior/dad)](https://goreportcard.com/report/github.com/pior/dad)
 [![Build Status](https://travis-ci.org/pior/dad.svg?branch=master)](https://travis-ci.org/pior/dad)
 
+## What is this?
+
+**Dad** is an open-source implementation of an amazing internal tool developed at
+[Shopify](https://engineering.shopify.com) called "**Dev**".
+
+The first goal of this tools is to automate the **setup** tasks required to work on a project.
+
+With **Dad**, pushing a change on a project you never touched look like this:
+
+- `dad clone Shopify/sarama`
+- `dad up`
+- **Commit your changes**
+- `dad test`
+- `git push`
+
+## Scope and Status
+
+**Dad** will start as a highly compatible implementation of **Dev** (when possible).
+
+**Dad** is currently a _working prototype_. Core features are being implemented.
+
+Current limitations:
+
+- Github is the only _hosting platform_ implemented
+- Bash is the only shell supported
+
 ## Install
 
-Binaries releases will be available from Github in the future.
-During the alpha development period, users will need to compile the Go binary
-themselves.
+Binaries releases will be available from Github soon.
+
+In the mean time, you will need to compile/install the Go binary yourself:
 
 ★ Clone the repository:
 ```bash
