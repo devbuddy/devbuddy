@@ -10,8 +10,13 @@ type Pip struct {
 	files []string
 }
 
-func (p *Pip) Load(definition map[interface{}]interface{}) (bool, error) {
-	if payload, ok := definition["pip"]; ok {
+func (p *Pip) Load(definition interface{}) (bool, error) {
+	def, ok := definition.(map[interface{}]interface{})
+	if !ok {
+		return false, nil
+	}
+
+	if payload, ok := def["pip"]; ok {
 		for _, value := range payload.([]interface{}) {
 			if v, ok := value.(string); ok {
 				p.files = append(p.files, v)

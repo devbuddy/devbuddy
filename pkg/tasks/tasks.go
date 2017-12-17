@@ -12,11 +12,11 @@ func init() {
 }
 
 type Task interface {
-	Load(map[interface{}]interface{}) (bool, error)
+	Load(interface{}) (bool, error)
 	Perform() error
 }
 
-func BuildFromDefinition(definition map[interface{}]interface{}) (task Task, err error) {
+func BuildFromDefinition(definition interface{}) (task Task, err error) {
 	task = &Custom{}
 	ok, err := task.Load(definition)
 	if err != nil {

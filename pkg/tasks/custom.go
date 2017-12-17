@@ -13,8 +13,13 @@ type Custom struct {
 	command   string
 }
 
-func (c *Custom) Load(definition map[interface{}]interface{}) (bool, error) {
-	if payload, ok := definition["custom"]; ok {
+func (c *Custom) Load(definition interface{}) (bool, error) {
+	def, ok := definition.(map[interface{}]interface{})
+	if !ok {
+		return false, nil
+	}
+
+	if payload, ok := def["custom"]; ok {
 		properties := payload.(map[interface{}]interface{})
 
 		command, ok := properties["meet"]

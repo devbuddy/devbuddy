@@ -12,8 +12,8 @@ type Manifest struct {
 }
 
 type Content struct {
-	Up       []map[interface{}]interface{} `yaml:"up"`
-	Commands map[string]Command            `yaml:"commands"`
+	Up       []interface{}      `yaml:"up"`
+	Commands map[string]Command `yaml:"commands"`
 }
 
 type Command struct {
