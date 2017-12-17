@@ -17,8 +17,14 @@ func (c *Custom) Load(definition map[interface{}]interface{}) (bool, error) {
 	if payload, ok := definition["custom"]; ok {
 		properties := payload.(map[interface{}]interface{})
 
-		command, _ := properties["meet"]
-		condition, _ := properties["met?"]
+		command, ok := properties["meet"]
+		if !ok {
+			return false, nil
+		}
+		condition, ok := properties["met?"]
+		if !ok {
+			return false, nil
+		}
 		c.command = command.(string)
 		c.condition = condition.(string)
 		return true, nil
