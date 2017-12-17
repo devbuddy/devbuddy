@@ -32,6 +32,23 @@ type dad > /dev/null 2> /dev/null && eval "$(dad --shell-init --with-completion)
 
 ## Usage
 
+★ Add a `dev.yml` file in your project:
+```yaml
+up:
+  - custom:
+      met?: brew info upx 2> /dev/null > /dev/null
+      meet: brew install upx
+
+commands:
+  test:
+    run:
+      make test
+
+  lint:
+    run: make lint
+```
+See Dad own [dev.yml](dev.yml)
+
 ```bash
 $ dad
 Usage:
@@ -42,6 +59,9 @@ Available Commands:
   cd          Jump to a local project
   clone       Clone a project from github.com
   help        Help about any command
+  lint        Custom
+  test        Custom: Run tests
+  up          Ensure the project is up and running
 
 Flags:
   -h, --help              help for dad
