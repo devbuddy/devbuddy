@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 
@@ -21,10 +20,7 @@ var upCmd = &cobra.Command{
 func upRun(cmd *cobra.Command, args []string) {
 	// conf := config.Load()
 
-	path, err := os.Getwd()
-	checkError(err)
-
-	proj, err := project.FindCurrent(path)
+	proj, err := project.FindCurrent()
 	checkError(err)
 
 	var taskList []tasks.Task

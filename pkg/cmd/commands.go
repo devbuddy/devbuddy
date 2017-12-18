@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 
@@ -10,15 +9,8 @@ import (
 	"github.com/pior/dad/pkg/project"
 )
 
-func findProject() (*project.Project, error) {
-	path, err := os.Getwd()
-	checkError(err)
-
-	return project.FindCurrent(path)
-}
-
 func customCommandRun(cmd *cobra.Command, args []string) {
-	proj, err := findProject()
+	proj, err := project.FindCurrent()
 	checkError(err)
 
 	name := cmd.Annotations["name"]
@@ -34,7 +26,7 @@ func customCommandRun(cmd *cobra.Command, args []string) {
 }
 
 func buildCustomCommands() {
-	proj, err := findProject()
+	proj, err := project.FindCurrent()
 	if err != nil {
 		return
 	}

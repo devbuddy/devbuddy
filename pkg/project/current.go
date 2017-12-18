@@ -12,7 +12,15 @@ const maxDirLevel = 10
 
 var ManifestFilename = "dev.yml"
 
-func FindCurrent(path string) (*Project, error) {
+func FindCurrent() (*Project, error) {
+	path, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	return findByPath(path)
+}
+
+func findByPath(path string) (*Project, error) {
 	for i := 0; i < maxDirLevel; i++ {
 		manifestPath := filepath.Join(path, ManifestFilename)
 		if exists(manifestPath) {
