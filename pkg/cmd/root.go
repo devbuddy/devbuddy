@@ -17,12 +17,11 @@ func build() {
 	}
 
 	rootCmd.PersistentFlags().Bool("shell-init", false, "Shell initialization")
-	// rootCmd.PersistentFlags().MarkHidden("shell-init")
 	rootCmd.PersistentFlags().Bool("with-completion", false, "Enable completion during initialization")
-	// rootCmd.PersistentFlags().MarkHidden("shell-completion")
 
 	rootCmd.PersistentFlags().Bool("shell-hook", false, "Shell prompt hook")
-	rootCmd.PersistentFlags().MarkHidden("shell-hook")
+	err := rootCmd.PersistentFlags().MarkHidden("shell-hook")
+	checkError(err)
 
 	rootCmd.AddCommand(cloneCmd)
 	rootCmd.AddCommand(cdCmd)
