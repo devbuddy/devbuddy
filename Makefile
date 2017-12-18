@@ -23,9 +23,15 @@ run: build
 install:
 	go install
 
-build-release:
-	go build -ldflags "-s -w"
-	upx dad  # brew install upx
+releases:
+	GOARCH=amd64 GOOS=darwin CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-s -w " -o dist/dad-darwin-amd64
+	shasum -a 256 dist/dad-darwin-amd64 > dist/dad-darwin-amd64.sha256
+
+	GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-s -w " -o dist/dad-linux-amd64
+	shasum -a 256 dist/dad-linux-amd64 > dist/dad-linux-amd64.sha256
+
+	GOARCH=amd64 GOOS=windows CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-s -w " -o dist/dad-windows-amd64.exe
+	shasum -a 256 dist/dad-windows-amd64.exe > dist/dad-windows-amd64.exe.sha256
 
 devup:
 	go get -u github.com/golang/dep/cmd/dep
