@@ -16,7 +16,9 @@ func Hook() {
 		return
 	}
 
-	// notify(fmt.Sprintf("Active project: %s", proj.Path))
+	if false {
+		notify(fmt.Sprintf("Active project: %s", proj.Path))
+	}
 }
 
 func notify(msg string) {
