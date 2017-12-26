@@ -42,3 +42,12 @@ pip:
 
 	require.Equal(t, task.(*Pip).files, []string{"file1", "file2"})
 }
+
+func TestPython(t *testing.T) {
+	data := loadTestData(t, `python: 3.6.3`)
+
+	task, err := BuildFromDefinition(data)
+	require.NoError(t, err, "BuildFromDefinition() failed")
+
+	require.Equal(t, task.(*Python).version, "3.6.3")
+}
