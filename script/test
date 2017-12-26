@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+
+go test `go list ./... | grep -vF /vendor/`
