@@ -42,8 +42,6 @@ jobs:
           - dist/dad-linux-amd64.sha256
           - dist/dad-darwin-amd64
           - dist/dad-darwin-amd64.sha256
-          - dist/dad-windows-amd64.exe
-          - dist/dad-windows-amd64.exe.sha256
           skip_cleanup: true
           on:
             repo: pior/dad
