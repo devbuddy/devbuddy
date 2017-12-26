@@ -8,12 +8,12 @@ jobs:
       stage: test
       go_import_path: github.com/pior/dad
       install:
-        - make devup
+        - script/setup-ci
       os: linux
       go: 1.9.x
       script:
-        - make lint
-        - make test
+        - script/lint
+        - script/test
 
     - <<: *testsection
       go: 1.8.x
@@ -29,10 +29,10 @@ jobs:
       go: 1.9.x
       go_import_path: github.com/pior/dad
       install:
-        - make devup
+        - script/setup-ci
       script: skip
       before_deploy:
-        - make releases
+        - script/buildall
       deploy:
         - provider: releases
           api_key:

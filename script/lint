@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+
+gometalinter.v2 \
+    --vendor \
+    --deadline=120s \
+    --disable=gotype \
+    --disable=gas \
+    --exclude=".*should have comment or be unexported.*" \
+    ./...

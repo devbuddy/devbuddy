@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+GOARCH=amd64 GOOS=darwin CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-s -w" -o dist/dad-darwin-amd64
+shasum -a 256 dist/dad-darwin-amd64 > dist/dad-darwin-amd64.sha256
+
+GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-s -w" -o dist/dad-linux-amd64
+shasum -a 256 dist/dad-linux-amd64 > dist/dad-linux-amd64.sha256

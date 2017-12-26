@@ -18,10 +18,18 @@ up:
       meet: 'false'
 
 commands:
+  testup:
+    desc: Build, install and run the development version
+    run: go install && dad up
+
   test:
-    desc: Run tests
-    run:
-      make test
+    desc: Run the tests
+    run: script/test
 
   lint:
-    run: make lint
+    desc: Lint the project
+    run: script/lint
+
+  docserve:
+    desc: Starting GoDoc server on http://0.0.0.0:6060
+    run: godoc -http=:6060
