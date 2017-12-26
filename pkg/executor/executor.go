@@ -10,6 +10,17 @@ import (
 	color "github.com/logrusorgru/aurora"
 )
 
+func GetExitCode(err error, cmd *exec.Cmd) (int, error) {
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
+			return code, nil
+		}
+	}
+	code := cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
+	return code, err
+}
+
 func Run(program string, args ...string) (int, error) {
 	fmt.Println("Running:", color.Bold(color.Cyan(program)), color.Cyan(strings.Join(args, " ")))
 	return RunSilent(program, args...)
@@ -27,17 +38,20 @@ func RunSilent(program string, args ...string) (int, error) {
 	cmd.Stderr = os.Stderr
 
 	err := cmd.Run()
+	code, err := GetExitCode(err, cmd)
 
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
-			return code, nil
-		}
-	}
-	code := cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
 	return code, err
 }
 
 func RunShellSilent(cmdline string) (int, error) {
 	return RunSilent("sh", "-c", cmdline)
+}
+
+func Capture(program string, args ...string) (string, int, error) {
+	cmd := exec.Command(program, args...)
+
+	output, err := cmd.Output()
+	code, err := GetExitCode(err, cmd)
+
+	return string(output), code, err
 }
