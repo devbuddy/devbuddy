@@ -111,6 +111,11 @@ Use "dad [command] --help" for more information about a command.
 
 ### Release
 
+```bash
+$ script/release v1.0.0
+```
+
+The big idea:
 1. Push the release code to the `master` branch
 2. Tag the commit: `git tag v1.2.3 && git push --tags`
 3. Admire the release on [Github](https://github.com/pior/dad/releases)
