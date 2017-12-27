@@ -23,7 +23,7 @@ func BuildFromDefinition(definition interface{}) (task Task, err error) {
 		return nil, err
 	}
 	if ok {
-		return task, nil
+		return
 	}
 
 	task = &Pip{}
@@ -32,7 +32,16 @@ func BuildFromDefinition(definition interface{}) (task Task, err error) {
 		return nil, err
 	}
 	if ok {
-		return task, nil
+		return
+	}
+
+	task = &Python{}
+	ok, err = task.Load(definition)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		return
 	}
 
 	return nil, fmt.Errorf("unknown task: %+v", definition)
