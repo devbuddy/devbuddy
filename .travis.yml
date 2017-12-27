@@ -8,7 +8,7 @@ jobs:
       stage: test
       go_import_path: github.com/pior/dad
       install:
-        - script/setup-ci
+        - script/setup-ci test
       os: linux
       go: 1.9.x
       script:
