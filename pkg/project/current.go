@@ -1,6 +1,7 @@
 package project
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,6 +10,8 @@ import (
 )
 
 var ManifestFilename = "dev.yml"
+
+var ErrProjectNotFound = errors.New("project not found")
 
 func FindCurrent() (*Project, error) {
 	path, err := os.Getwd()
@@ -35,7 +38,7 @@ func findByPath(path string) (*Project, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("project not found (no manifest)")
+	return nil, ErrProjectNotFound
 }
 
 // exists checks if a file or directory exists.
