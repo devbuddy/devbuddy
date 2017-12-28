@@ -44,5 +44,14 @@ func BuildFromDefinition(definition interface{}) (task Task, err error) {
 		return
 	}
 
-	return nil, fmt.Errorf("unknown task: %+v", definition)
+	task = &Unknown{}
+	ok, err = task.Load(definition)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		return
+	}
+
+	return nil, fmt.Errorf("error parsing tasks: %+v", definition)
 }
