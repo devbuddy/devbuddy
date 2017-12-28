@@ -27,5 +27,4 @@ echo " ✭ create tag"
 git tag  -a "${VERSION}" -m "Release ${VERSION}"
 
 echo " ✭ push to origin"
-git push
 git push --follow-tags
