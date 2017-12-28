@@ -10,10 +10,11 @@ import (
 
 var rootCmd *cobra.Command
 
-func build() {
+func build(version string) {
 	rootCmd = &cobra.Command{
-		Use: "dad",
-		Run: rootRun,
+		Use:     "dad",
+		Run:     rootRun,
+		Version: version,
 	}
 
 	rootCmd.PersistentFlags().Bool("shell-init", false, "Shell initialization")
@@ -49,8 +50,8 @@ func rootRun(cmd *cobra.Command, args []string) {
 	checkError(err)
 }
 
-func Execute() {
-	build()
+func Execute(version string) {
+	build(version)
 	buildCustomCommands()
 
 	if err := rootCmd.Execute(); err != nil {
