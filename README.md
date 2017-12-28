@@ -33,25 +33,8 @@ Current limitations:
 
 ## Install
 
-Binaries releases will be available from Github soon.
-
-In the mean time, you will need to compile/install the Go binary yourself:
-
-★ Clone the repository:
 ```bash
-~ $ mkdir -p ~/src/github.com/pior
-~ $ cd ~/src/github.com/pior
-~/src/github.com/pior $ git clone git@github.com:pior/dad.git
-```
-
-★ Fetch the dependencies (in `vendor`)
-```bash
-~/src/github.com/pior $ dep ensure
-```
-
-★ Install the go executable somewhere in your PATH:
-```bash
-~/src/github.com/pior $ make install
+$ bash -c "$(curl -L https://raw.githubusercontent.com/pior/dad/master/install.sh)"
 ```
 
 ## Setup
@@ -108,6 +91,23 @@ Use "dad [command] --help" for more information about a command.
 ```
 
 ## Development
+
+★ Clone the repository:
+```bash
+~ $ mkdir -p ~/src/github.com/pior
+~ $ cd ~/src/github.com/pior
+~/src/github.com/pior $ git clone git@github.com:pior/dad.git
+```
+
+★ Fetch the dependencies (in `vendor`)
+```bash
+~/src/github.com/pior $ dep ensure
+```
+
+★ Install the go executable somewhere in your PATH:
+```bash
+~/src/github.com/pior $ go install
+```
 
 ### Release
 
