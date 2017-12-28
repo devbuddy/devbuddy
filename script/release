@@ -24,8 +24,8 @@ echo " ✭ create release commit"
 git commit --allow-empty -m "Release ${VERSION}"
 
 echo " ✭ create tag"
-git tag "${VERSION}"
+git tag  -a "${VERSION}" -m "Release ${VERSION}"
 
 echo " ✭ push to origin"
-git push origin master
-git push origin master --tags
+git push
+git push --follow-tags
