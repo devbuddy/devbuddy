@@ -8,8 +8,6 @@ import (
 	"github.com/pior/dad/pkg/manifest"
 )
 
-const maxDirLevel = 10
-
 var ManifestFilename = "dev.yml"
 
 func FindCurrent() (*Project, error) {
@@ -21,7 +19,7 @@ func FindCurrent() (*Project, error) {
 }
 
 func findByPath(path string) (*Project, error) {
-	for i := 0; i < maxDirLevel; i++ {
+	for {
 		manifestPath := filepath.Join(path, ManifestFilename)
 		if exists(manifestPath) {
 			man, err := manifest.Load(manifestPath)
