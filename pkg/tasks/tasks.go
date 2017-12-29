@@ -16,6 +16,11 @@ type Task interface {
 	Perform() error
 }
 
+type TaskWithFeature interface {
+	Task
+	Features() map[string]string
+}
+
 func BuildFromDefinition(definition interface{}) (task Task, err error) {
 	task = &Custom{}
 	ok, err := task.Load(definition)

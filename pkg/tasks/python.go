@@ -57,3 +57,7 @@ func (p *Python) Perform() (err error) {
 
 	return nil
 }
+
+func (p *Python) Features() map[string]string {
+	return map[string]string{"python": p.version}
+}
