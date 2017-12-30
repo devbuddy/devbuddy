@@ -1,6 +1,9 @@
 package features
 
 import (
+	"fmt"
+
+	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/termui"
 )
@@ -17,16 +20,23 @@ func NewPython(param string) Feature {
 	return Python{Version: param}
 }
 
-func (p Python) Enable(proj *project.Project, env *Env, ui *termui.UI) {
-	// ui.Debug("Initial VIRTUAL_ENV=%s", env.Get("VIRTUAL_ENV"))
+func (p Python) Enable(proj *project.Project, env *Env, ui *termui.UI) error {
+	path := fmt.Sprintf("~/.pyenv/virtualenvs/%s-%s", proj.Slug(), p.Version)
+	path = config.ExpandDir(path)
 
-	// - Elect a virtualenv path (following dev choice of ~/.pyenv/virtualenvs/... ?)
-	// - Warn and exit if virtualenv doesn't exist
+	if !config.PathExists(path) {
+		return DevUpNeeded
+	}
+
 	// - Add venv bin path to PATH
-	// - Set the VIRTUAL_ENV variable
+
+	env.Set("VIRTUAL_ENV", path)
+
+	return nil
 }
 
 func (p Python) Disable(proj *project.Project, env *Env, ui *termui.UI) {
-	// - Unset VIRTUAL_ENV
+	env.Unset("VIRTUAL_ENV")
+
 	// - Remove virtualenv bin path from PATH
 }

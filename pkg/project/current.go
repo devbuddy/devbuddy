@@ -29,7 +29,12 @@ func findByPath(path string) (*Project, error) {
 			if err != nil {
 				return nil, err
 			}
-			return &Project{Path: path, Manifest: man}, nil
+			p := &Project{
+				RepositoryName: filepath.Base(path),
+				Path:           path,
+				Manifest:       man,
+			}
+			return p, nil
 		}
 
 		path = filepath.Dir(path)

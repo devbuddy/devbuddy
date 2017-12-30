@@ -47,13 +47,21 @@ func handleFeatures(proj *project.Project, ui *termui.UI) {
 
 		if want {
 			if !active || wantVersion != activeVersion {
-				ui.HookFeature("activate %s %s", name, wantVersion)
-				feature.Enable(proj, env, ui)
+				err = feature.Enable(proj, env, ui)
+				if err != nil {
+					if err == features.DevUpNeeded {
+						ui.HookWarning("failed to activate %s(%s). Try running dad up first!", name, wantVersion)
+					} else {
+						ui.Debug("failed: %s", err)
+					}
+				} else {
+					ui.HookFeatureActivated(name, wantVersion)
+				}
 			}
 		} else {
 			if active {
-				ui.HookFeature("deactivate %s", name)
 				feature.Disable(proj, env, ui)
+				ui.Debug("%s deactivated", name)
 			}
 		}
 	}

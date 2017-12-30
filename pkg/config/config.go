@@ -35,3 +35,10 @@ func GetHomeDir() string {
 	}
 	return u.HomeDir
 }
+
+func PathExists(path string) (exists bool) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
