@@ -2,6 +2,7 @@ package project
 
 import (
 	"fmt"
+	"hash/adler32"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -40,6 +41,11 @@ func NewFromID(id string, conf *config.Config) (p *Project, err error) {
 
 func (p *Project) FullName() string {
 	return fmt.Sprintf("%s:%s/%s", p.HostingPlatform, p.OrganisationName, p.RepositoryName)
+}
+
+func (p *Project) Slug() string {
+	locationToken := adler32.Checksum([]byte(filepath.Clean(p.Path)))
+	return fmt.Sprintf("%s-%d", p.RepositoryName, locationToken)
 }
 
 func (p *Project) GetRemoteURL() (url string, err error) {
