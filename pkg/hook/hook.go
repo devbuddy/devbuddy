@@ -48,12 +48,12 @@ func handleFeatures(proj *project.Project, ui *termui.UI) {
 		if want {
 			if !active || wantVersion != activeVersion {
 				ui.HookFeature("activate %s %s", name, wantVersion)
-				feature.Enable(env, ui)
+				feature.Enable(proj, env, ui)
 			}
 		} else {
 			if active {
 				ui.HookFeature("deactivate %s", name)
-				feature.Disable(env, ui)
+				feature.Disable(proj, env, ui)
 			}
 		}
 	}

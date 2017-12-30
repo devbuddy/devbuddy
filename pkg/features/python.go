@@ -1,6 +1,7 @@
 package features
 
 import (
+	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/termui"
 )
 
@@ -16,7 +17,7 @@ func NewPython(param string) Feature {
 	return Python{Version: param}
 }
 
-func (p Python) Enable(env *Env, ui *termui.UI) {
+func (p Python) Enable(proj *project.Project, env *Env, ui *termui.UI) {
 	// ui.Debug("Initial VIRTUAL_ENV=%s", env.Get("VIRTUAL_ENV"))
 
 	// - Elect a virtualenv path (following dev choice of ~/.pyenv/virtualenvs/... ?)
@@ -25,7 +26,7 @@ func (p Python) Enable(env *Env, ui *termui.UI) {
 	// - Set the VIRTUAL_ENV variable
 }
 
-func (p Python) Disable(env *Env, ui *termui.UI) {
+func (p Python) Disable(proj *project.Project, env *Env, ui *termui.UI) {
 	// - Unset VIRTUAL_ENV
 	// - Remove virtualenv bin path from PATH
 }
