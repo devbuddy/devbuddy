@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	FeatureMap["python"] = NewPython
+	allFeatures["python"] = NewPython
 }
 
 type Python struct {

@@ -20,4 +20,4 @@ type Feature interface {
 
 type FeatureBuilder func(param string) Feature
 
-var FeatureMap = make(map[string]FeatureBuilder)
+var allFeatures = make(map[string]FeatureBuilder)

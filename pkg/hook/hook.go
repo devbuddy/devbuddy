@@ -28,45 +28,8 @@ func Hook() {
 func handleFeatures(proj *project.Project, ui *termui.UI) {
 	env := features.NewEnv(os.Environ())
 
-	var err error
-	wantedFeatures := map[string]string{}
-
-	if proj != nil {
-		wantedFeatures, err = proj.GetFeatures()
-		if err != nil {
-			ui.Debug("failed to get project tasks: %s", err)
-		}
-	}
-
-	activeFeatures := env.GetActiveFeatures()
-
-	for name, featureBuilder := range features.FeatureMap {
-		activeVersion, active := activeFeatures[name]
-		wantVersion, want := wantedFeatures[name]
-		feature := featureBuilder(wantVersion)
-
-		if want {
-			if !active || wantVersion != activeVersion {
-				err = feature.Enable(proj, env, ui)
-				if err != nil {
-					if err == features.DevUpNeeded {
-						ui.HookWarning("failed to activate %s(%s). Try running dad up first!", name, wantVersion)
-					} else {
-						ui.Debug("failed: %s", err)
-					}
-				} else {
-					ui.HookFeatureActivated(name, wantVersion)
-				}
-			}
-		} else {
-			if active {
-				feature.Disable(proj, env, ui)
-				ui.Debug("%s deactivated", name)
-			}
-		}
-	}
-
-	env.SetActiveFeatures(wantedFeatures)
+	runner := features.NewRunner(proj, ui, env)
+	runner.Run()
 
 	envChanges := env.Changed()
 	for _, change := range envChanges {
