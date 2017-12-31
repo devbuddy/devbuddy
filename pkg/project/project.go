@@ -2,6 +2,7 @@ package project
 
 import (
 	"fmt"
+	"hash/adler32"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -40,6 +41,11 @@ func NewFromID(id string, conf *config.Config) (p *Project, err error) {
 
 func (p *Project) FullName() string {
 	return fmt.Sprintf("%s:%s/%s", p.HostingPlatform, p.OrganisationName, p.RepositoryName)
+}
+
+func (p *Project) Slug() string {
+	locationToken := adler32.Checksum([]byte(filepath.Clean(p.Path)))
+	return fmt.Sprintf("%s-%d", p.RepositoryName, locationToken)
 }
 
 func (p *Project) GetRemoteURL() (url string, err error) {
@@ -82,11 +88,25 @@ func (p *Project) GetTasks() (taskList []tasks.Task, err error) {
 		task, err = tasks.BuildFromDefinition(taskdef)
 		if err != nil {
 			return nil, err
-			// fmt.Printf("Warning: %s\n", err)
-		} else {
-			taskList = append(taskList, task)
 		}
+		taskList = append(taskList, task)
 	}
 
 	return taskList, nil
+}
+
+func (p *Project) GetFeatures() (map[string]string, error) {
+	featureList := map[string]string{}
+	taskList, err := p.GetTasks()
+	if err != nil {
+		return nil, err
+	}
+	for _, task := range taskList {
+		if t, ok := task.(tasks.TaskWithFeature); ok {
+			for f, p := range t.Features() {
+				featureList[f] = p
+			}
+		}
+	}
+	return featureList, nil
 }
