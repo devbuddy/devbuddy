@@ -5,15 +5,19 @@ import (
 	"os"
 
 	color "github.com/logrusorgru/aurora"
+
+	"github.com/pior/dad/pkg/config"
 )
 
 type UI struct {
-	out *os.File
+	out          *os.File
+	debugEnabled bool
 }
 
 func NewHookUI() *UI {
 	return &UI{
-		out: os.Stderr,
+		out:          os.Stderr,
+		debugEnabled: config.DebugEnabled(),
 	}
 }
 
@@ -28,6 +32,8 @@ func (u *UI) HookFeatureFailure(name string, version string) {
 }
 
 func (u *UI) Debug(format string, params ...interface{}) {
-	msg := fmt.Sprintf(format, params...)
-	fmt.Fprintf(u.out, "DEBUG: %s\n", color.Gray(msg))
+	if u.debugEnabled {
+		msg := fmt.Sprintf(format, params...)
+		fmt.Fprintf(u.out, "DEBUG: %s\n", color.Gray(msg))
+	}
 }

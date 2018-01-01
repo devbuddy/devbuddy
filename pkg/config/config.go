@@ -17,6 +17,13 @@ func Load() *Config {
 	}
 }
 
+func DebugEnabled() bool {
+	if os.Getenv("DAD_DEBUG") != "" {
+		return true
+	}
+	return false
+}
+
 func ExpandDir(path string) string {
 	if strings.HasPrefix(path, "~/") {
 		return filepath.Join(GetHomeDir(), path[2:])

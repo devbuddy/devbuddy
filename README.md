@@ -109,6 +109,13 @@ Use "dad [command] --help" for more information about a command.
 ~/src/github.com/pior $ go install
 ```
 
+### Debugging
+
+To show the debug messages, add this before in your environment:
+```bash
+export DAD_DEBUG=1
+```
+
 ### Release
 
 ```bash

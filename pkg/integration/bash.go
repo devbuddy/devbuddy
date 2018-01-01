@@ -34,8 +34,6 @@ dad() {
 }
 
 __dad_prompt_command() {
-    [ -n "${DAD_DEBUG}" ] && echo "DAD_DEBUG: calling prompt hook"
-
     # In shell hook mode, the command will use stderr to print in the console
     # and stdout to mutate the shell (like activating a Python virtualenv)
     eval "$(dad --shell-hook)"
