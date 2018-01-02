@@ -6,8 +6,16 @@ import (
 	"github.com/pior/dad/pkg/executor"
 )
 
+func init() {
+	allTasks["pip"] = NewPip
+}
+
 type Pip struct {
 	files []string
+}
+
+func NewPip() Task {
+	return &Pip{}
 }
 
 func (p *Pip) Load(definition interface{}) (bool, error) {

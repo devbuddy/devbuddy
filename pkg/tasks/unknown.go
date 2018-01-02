@@ -10,6 +10,10 @@ type Unknown struct {
 	definition interface{}
 }
 
+func NewUnknown() Task {
+	return &Unknown{}
+}
+
 func (u *Unknown) Load(definition interface{}) (bool, error) {
 	u.definition = definition
 	return true, nil

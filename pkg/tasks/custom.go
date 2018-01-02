@@ -8,9 +8,17 @@ import (
 	"github.com/pior/dad/pkg/executor"
 )
 
+func init() {
+	allTasks["custom"] = NewCustom
+}
+
 type Custom struct {
 	condition string
 	command   string
+}
+
+func NewCustom() Task {
+	return &Custom{}
 }
 
 func (c *Custom) Load(definition interface{}) (bool, error) {

@@ -9,8 +9,16 @@ import (
 	"github.com/pior/dad/pkg/executor"
 )
 
+func init() {
+	allTasks["python"] = NewPython
+}
+
 type Python struct {
 	version string
+}
+
+func NewPython() Task {
+	return &Python{}
 }
 
 func (p *Python) Load(definition interface{}) (bool, error) {
