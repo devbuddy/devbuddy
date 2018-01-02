@@ -20,7 +20,7 @@ func NewPython(param string) Feature {
 	return Python{Version: param}
 }
 
-func (p Python) Enable(proj *project.Project, env *Env, ui *termui.UI) error {
+func (p Python) Enable(proj *project.Project, env *Env, ui *termui.HookUI) error {
 	path := fmt.Sprintf("~/.pyenv/virtualenvs/%s-%s", proj.Slug(), p.Version)
 	path = config.ExpandDir(path)
 
@@ -35,7 +35,7 @@ func (p Python) Enable(proj *project.Project, env *Env, ui *termui.UI) error {
 	return nil
 }
 
-func (p Python) Disable(proj *project.Project, env *Env, ui *termui.UI) {
+func (p Python) Disable(proj *project.Project, env *Env, ui *termui.HookUI) {
 	env.Unset("VIRTUAL_ENV")
 
 	// - Remove virtualenv bin path from PATH

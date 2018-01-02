@@ -7,11 +7,11 @@ import (
 
 type Runner struct {
 	proj *project.Project
-	ui   *termui.UI
+	ui   *termui.HookUI
 	env  *Env
 }
 
-func NewRunner(proj *project.Project, ui *termui.UI, env *Env) *Runner {
+func NewRunner(proj *project.Project, ui *termui.HookUI, env *Env) *Runner {
 	return &Runner{proj: proj, ui: ui, env: env}
 }
 

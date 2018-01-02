@@ -25,7 +25,7 @@ func Hook() {
 	handleFeatures(proj, ui)
 }
 
-func handleFeatures(proj *project.Project, ui *termui.UI) {
+func handleFeatures(proj *project.Project, ui *termui.HookUI) {
 	env := features.NewEnv(os.Environ())
 
 	runner := features.NewRunner(proj, ui, env)

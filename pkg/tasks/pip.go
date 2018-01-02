@@ -2,8 +2,10 @@ package tasks
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pior/dad/pkg/executor"
+	"github.com/pior/dad/pkg/termui"
 )
 
 func init() {
@@ -42,9 +44,11 @@ func (p *Pip) Load(definition interface{}) (bool, error) {
 	return false, nil
 }
 
-func (p *Pip) Perform() (err error) {
+func (p *Pip) Perform(ui *termui.UI) (err error) {
+	ui.TaskHeader("Pip", strings.Join(p.files, ", "))
+
 	for _, file := range p.files {
-		_, err = executor.Run("pip", "install", "-r", file)
+		_, err = executor.RunSilent("pip", "install", "-r", file)
 		if err != nil {
 			return
 		}

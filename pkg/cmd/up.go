@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	// "github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/termui"
 )
 
 var upCmd = &cobra.Command{
@@ -15,7 +15,7 @@ var upCmd = &cobra.Command{
 }
 
 func upRun(cmd *cobra.Command, args []string) {
-	// conf := config.Load()
+	ui := termui.NewUI()
 
 	proj, err := project.FindCurrent()
 	checkError(err)
@@ -24,7 +24,7 @@ func upRun(cmd *cobra.Command, args []string) {
 	checkError(err)
 
 	for _, task := range taskList {
-		err = task.Perform()
+		err = task.Perform(ui)
 		checkError(err)
 	}
 }

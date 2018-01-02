@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+
+	"github.com/pior/dad/pkg/termui"
 )
 
 var taskFailed error
@@ -15,7 +17,7 @@ func init() {
 
 type Task interface {
 	Load(interface{}) (bool, error)
-	Perform() error
+	Perform(*termui.UI) error
 }
 
 type TaskWithFeature interface {

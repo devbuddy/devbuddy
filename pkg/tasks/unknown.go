@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	color "github.com/logrusorgru/aurora"
+
+	"github.com/pior/dad/pkg/termui"
 )
 
 type Unknown struct {
@@ -19,7 +21,7 @@ func (u *Unknown) Load(definition interface{}) (bool, error) {
 	return true, nil
 }
 
-func (u *Unknown) Perform() (err error) {
+func (u *Unknown) Perform(ui *termui.UI) (err error) {
 	fmt.Printf("%s %s: %+v\n", color.Brown("★"), color.Red("Unknown"), color.Brown(u.definition))
 	return nil
 }
