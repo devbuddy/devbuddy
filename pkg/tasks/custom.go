@@ -6,6 +6,7 @@ import (
 	color "github.com/logrusorgru/aurora"
 
 	"github.com/pior/dad/pkg/executor"
+	"github.com/pior/dad/pkg/termui"
 )
 
 func init() {
@@ -45,8 +46,8 @@ func (c *Custom) Load(definition interface{}) (bool, error) {
 	return false, nil
 }
 
-func (c *Custom) Perform() error {
-	fmt.Printf("%s Custom: %s\n", color.Brown("★"), color.Cyan(c.command))
+func (c *Custom) Perform(ui *termui.UI) error {
+	ui.TaskHeader("Custom", c.command)
 
 	code, err := executor.RunShellSilent(c.condition)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	color "github.com/logrusorgru/aurora"
 
 	"github.com/pior/dad/pkg/executor"
+	"github.com/pior/dad/pkg/termui"
 )
 
 func init() {
@@ -37,8 +38,8 @@ func (p *Python) Load(definition interface{}) (bool, error) {
 	return false, nil
 }
 
-func (p *Python) Perform() (err error) {
-	fmt.Printf("%s Python: %s\n", color.Brown("★"), color.Cyan(p.version))
+func (p *Python) Perform(ui *termui.UI) (err error) {
+	ui.TaskHeader("Python", p.version)
 
 	output, code, err := executor.Capture("pyenv", "versions", "--bare", "--skip-aliases")
 	if err != nil {

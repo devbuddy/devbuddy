@@ -18,10 +18,7 @@ func Load() *Config {
 }
 
 func DebugEnabled() bool {
-	if os.Getenv("DAD_DEBUG") != "" {
-		return true
-	}
-	return false
+	return os.Getenv("DAD_DEBUG") != ""
 }
 
 func ExpandDir(path string) string {
