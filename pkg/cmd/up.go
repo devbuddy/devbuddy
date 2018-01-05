@@ -5,6 +5,7 @@ import (
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/tasks"
 	"github.com/pior/dad/pkg/termui"
 )
 
@@ -24,13 +25,6 @@ func upRun(cmd *cobra.Command, args []string) {
 	proj, err := project.FindCurrent()
 	checkError(err)
 
-	taskList, err := proj.GetTasks()
+	err = tasks.RunAll(cfg, proj, ui)
 	checkError(err)
-
-	for _, task := range taskList {
-		err = task.Perform(ui)
-		if err != nil {
-			break
-		}
-	}
 }

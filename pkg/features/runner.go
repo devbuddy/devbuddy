@@ -3,6 +3,7 @@ package features
 import (
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/tasks"
 	"github.com/pior/dad/pkg/termui"
 )
 
@@ -48,12 +49,28 @@ func (r *Runner) getWantedFeatures() map[string]string {
 	wantedFeatures := map[string]string{}
 
 	if r.proj != nil {
-		wantedFeatures, err = r.proj.GetFeatures()
+		wantedFeatures, err = getFeaturesFromProject(r.proj)
 		if err != nil {
 			r.ui.Debug("failed to get project tasks: %s", err)
 		}
 	}
 	return wantedFeatures
+}
+
+func getFeaturesFromProject(proj *project.Project) (map[string]string, error) {
+	featureList := map[string]string{}
+	taskList, err := tasks.GetTasksFromProject(proj)
+	if err != nil {
+		return nil, err
+	}
+	for _, task := range taskList {
+		if t, ok := task.(tasks.TaskWithFeature); ok {
+			for f, p := range t.Features() {
+				featureList[f] = p
+			}
+		}
+	}
+	return featureList, nil
 }
 
 func (r *Runner) activateFeature(name string, version string) {
