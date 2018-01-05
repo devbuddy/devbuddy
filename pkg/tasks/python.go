@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	color "github.com/logrusorgru/aurora"
-
 	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/termui"
 )
@@ -41,19 +39,38 @@ func (p *Python) Load(definition interface{}) (bool, error) {
 func (p *Python) Perform(ui *termui.UI) (err error) {
 	ui.TaskHeader("Python", p.version)
 
+	installed, err := p.InstallPython(ui)
+	if err != nil {
+		ui.TaskError(err)
+		return err
+	}
+	created, err := p.CreateVirtualEnv(ui)
+	if err != nil {
+		ui.TaskError(err)
+		return err
+	}
+	if installed || created {
+		ui.TaskActed()
+	} else {
+		ui.TaskAlreadyOk()
+	}
+
+	return nil
+}
+
+func (p *Python) InstallPython(ui *termui.UI) (acted bool, err error) {
 	output, code, err := executor.Capture("pyenv", "versions", "--bare", "--skip-aliases")
 	if err != nil {
 		return
 	}
 	if code != 0 {
-		return fmt.Errorf("failed to run pyenv versions. exit code: %d", code)
+		return false, fmt.Errorf("failed to run pyenv versions. exit code: %d", code)
 	}
 
 	installedVersions := strings.Split(strings.TrimSpace(output), "\n")
 
 	if stringInSlice(p.version, installedVersions) {
-		fmt.Println(color.Green("  Already good!"))
-		return nil
+		return
 	}
 
 	code, err = executor.Run("pyenv", "install", p.version)
@@ -61,10 +78,14 @@ func (p *Python) Perform(ui *termui.UI) (err error) {
 		return
 	}
 	if code != 0 {
-		return fmt.Errorf("failed to install the required python version. exit code: %d", code)
+		return false, fmt.Errorf("failed to install the required python version. exit code: %d", code)
 	}
 
-	return nil
+	return true, nil
+}
+
+func (p *Python) CreateVirtualEnv(ui *termui.UI) (acted bool, err error) {
+	return false, nil
 }
 
 func (p *Python) Features() map[string]string {

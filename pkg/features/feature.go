@@ -3,6 +3,7 @@ package features
 import (
 	"errors"
 
+	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/termui"
 )
@@ -14,8 +15,8 @@ func init() {
 }
 
 type Feature interface {
-	Enable(*project.Project, *Env, *termui.HookUI) error
-	Disable(*project.Project, *Env, *termui.HookUI)
+	Enable(*config.Config, *project.Project, *Env, *termui.HookUI) error
+	Disable(*config.Config, *project.Project, *Env, *termui.HookUI)
 }
 
 type FeatureBuilder func(param string) Feature

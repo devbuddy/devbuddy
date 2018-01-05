@@ -2,6 +2,7 @@ package features
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
@@ -20,9 +21,9 @@ func NewPython(param string) Feature {
 	return Python{Version: param}
 }
 
-func (p Python) Enable(proj *project.Project, env *Env, ui *termui.HookUI) error {
-	path := fmt.Sprintf("~/.pyenv/virtualenvs/%s-%s", proj.Slug(), p.Version)
-	path = config.ExpandDir(path)
+func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) error {
+	name := fmt.Sprintf("%s-%s", proj.Slug(), p.Version)
+	path := filepath.Join(cfg.DataDir, "virtualenvs", name)
 
 	if !config.PathExists(path) {
 		return DevUpNeeded
@@ -35,7 +36,7 @@ func (p Python) Enable(proj *project.Project, env *Env, ui *termui.HookUI) error
 	return nil
 }
 
-func (p Python) Disable(proj *project.Project, env *Env, ui *termui.HookUI) {
+func (p Python) Disable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) {
 	env.Unset("VIRTUAL_ENV")
 
 	// - Remove virtualenv bin path from PATH

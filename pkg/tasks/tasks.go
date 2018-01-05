@@ -1,19 +1,13 @@
 package tasks
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 
 	"github.com/pior/dad/pkg/termui"
 )
 
-var taskFailed error
 var allTasks = make(map[string]TaskBuilder)
-
-func init() {
-	taskFailed = errors.New("task failed")
-}
 
 type Task interface {
 	Load(interface{}) (bool, error)

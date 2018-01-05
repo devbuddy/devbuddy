@@ -4,40 +4,55 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
-	"strings"
 )
 
 type Config struct {
-	SourceDir string
+	homeDir      string
+	DebugEnabled bool
+	SourceDir    string
+	DataDir      string
 }
 
-func Load() *Config {
-	return &Config{
-		SourceDir: ExpandDir("~/src"),
+func Load() (*Config, error) {
+	homedir, err := getHomeDir()
+	if err != nil {
+		return nil, err
 	}
+
+	userDataDir := getXdgUserDataDir(homedir)
+
+	c := Config{
+		homeDir:      homedir,
+		DebugEnabled: debugEnabled(),
+		SourceDir:    filepath.Join(homedir, "src"),
+		DataDir:      filepath.Join(userDataDir, "dad"),
+	}
+	return &c, nil
 }
 
-func DebugEnabled() bool {
+func debugEnabled() bool {
 	return os.Getenv("DAD_DEBUG") != ""
 }
 
-func ExpandDir(path string) string {
-	if strings.HasPrefix(path, "~/") {
-		return filepath.Join(GetHomeDir(), path[2:])
-	}
-	return path
-}
-
-func GetHomeDir() string {
+func getHomeDir() (string, error) {
 	home := os.Getenv("HOME")
 	if home != "" {
-		return home
+		return home, nil
 	}
 	u, err := user.Current()
 	if err != nil {
-		panic("failed to determine the home dir")
+		return "", err
 	}
-	return u.HomeDir
+	return u.HomeDir, nil
+}
+
+func getXdgUserDataDir(homedir string) string {
+	dir := os.Getenv("XDG_DATA_HOME")
+	if dir != "" {
+		return dir
+	}
+	return filepath.Join(homedir, ".local/share")
+
 }
 
 func PathExists(path string) (exists bool) {

@@ -14,10 +14,10 @@ type baseUI struct {
 	debugEnabled bool
 }
 
-func newBaseUI() baseUI {
+func newBaseUI(cfg *config.Config) baseUI {
 	return baseUI{
 		out:          os.Stderr,
-		debugEnabled: config.DebugEnabled(),
+		debugEnabled: cfg.DebugEnabled,
 	}
 }
 
