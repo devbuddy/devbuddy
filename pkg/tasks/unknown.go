@@ -18,8 +18,8 @@ func (u *Unknown) Load(definition interface{}) (bool, error) {
 }
 
 func (u *Unknown) Perform(ctx *Context) (err error) {
-	taskError := fmt.Errorf("invalid task definition: %+v", u.definition)
-	ctx.ui.TaskError(taskError)
+	ctx.ui.TaskHeader("Unknown task", "")
 
+	ctx.ui.TaskError(fmt.Errorf("invalid task definition: %+v", u.definition))
 	return nil
 }

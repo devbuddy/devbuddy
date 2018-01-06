@@ -19,7 +19,10 @@ func NewUI(cfg *config.Config) *UI {
 }
 
 func (u *UI) TaskHeader(name string, param string) {
-	fmt.Fprintf(u.out, "%s %s (%s)\n", color.Brown("★"), color.Magenta(name), color.Gray(param))
+	if param != "" {
+		param = fmt.Sprintf(" (%s)", color.Blue(param))
+	}
+	fmt.Fprintf(u.out, "%s %s%s\n", color.Brown("◼︎"), color.Magenta(name), param)
 }
 
 func (u *UI) TaskActed() {
@@ -31,5 +34,5 @@ func (u *UI) TaskAlreadyOk() {
 }
 
 func (u *UI) TaskError(err error) {
-	fmt.Fprintf(u.out, "  %s %s\n", color.Red("Error:"), color.Brown(err.Error()))
+	fmt.Fprintf(u.out, "  %s\n", color.Red(err.Error()))
 }
