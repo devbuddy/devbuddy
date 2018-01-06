@@ -21,7 +21,7 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) error {
 	}
 
 	for _, task := range taskList {
-		err = task.Perform(ctx.ui)
+		err = task.Perform(&ctx)
 		if err != nil {
 			break
 		}

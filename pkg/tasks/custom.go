@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/termui"
 )
 
 func init() {
@@ -44,25 +43,25 @@ func (c *Custom) Load(definition interface{}) (bool, error) {
 	return false, nil
 }
 
-func (c *Custom) Perform(ui *termui.UI) error {
-	ui.TaskHeader("Custom", c.command)
+func (c *Custom) Perform(ctx *Context) error {
+	ctx.ui.TaskHeader("Custom", c.command)
 
-	ran, err := c.runCommand(ui)
+	ran, err := c.runCommand()
 	if err != nil {
-		ui.TaskError(err)
+		ctx.ui.TaskError(err)
 		return err
 	}
 
 	if ran {
-		ui.TaskActed()
+		ctx.ui.TaskActed()
 	} else {
-		ui.TaskAlreadyOk()
+		ctx.ui.TaskAlreadyOk()
 	}
 
 	return nil
 }
 
-func (c *Custom) runCommand(ui *termui.UI) (bool, error) {
+func (c *Custom) runCommand() (bool, error) {
 	code, err := executor.RunShellSilent(c.condition)
 	if err != nil {
 		return false, fmt.Errorf("failed to run the condition command: %s", err)

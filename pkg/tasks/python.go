@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/termui"
 )
 
 func init() {
@@ -36,29 +35,29 @@ func (p *Python) Load(definition interface{}) (bool, error) {
 	return false, nil
 }
 
-func (p *Python) Perform(ui *termui.UI) (err error) {
-	ui.TaskHeader("Python", p.version)
+func (p *Python) Perform(ctx *Context) (err error) {
+	ctx.ui.TaskHeader("Python", p.version)
 
-	installed, err := p.InstallPython(ui)
+	installed, err := p.InstallPython(ctx)
 	if err != nil {
-		ui.TaskError(err)
+		ctx.ui.TaskError(err)
 		return err
 	}
-	created, err := p.CreateVirtualEnv(ui)
+	created, err := p.CreateVirtualEnv(ctx)
 	if err != nil {
-		ui.TaskError(err)
+		ctx.ui.TaskError(err)
 		return err
 	}
 	if installed || created {
-		ui.TaskActed()
+		ctx.ui.TaskActed()
 	} else {
-		ui.TaskAlreadyOk()
+		ctx.ui.TaskAlreadyOk()
 	}
 
 	return nil
 }
 
-func (p *Python) InstallPython(ui *termui.UI) (acted bool, err error) {
+func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
 	output, code, err := executor.Capture("pyenv", "versions", "--bare", "--skip-aliases")
 	if err != nil {
 		return
@@ -84,7 +83,7 @@ func (p *Python) InstallPython(ui *termui.UI) (acted bool, err error) {
 	return true, nil
 }
 
-func (p *Python) CreateVirtualEnv(ui *termui.UI) (acted bool, err error) {
+func (p *Python) CreateVirtualEnv(ctx *Context) (acted bool, err error) {
 	return false, nil
 }
 

@@ -1,12 +1,10 @@
 package tasks
 
-import (
-	"github.com/pior/dad/pkg/termui"
-)
+import ()
 
 type Task interface {
 	Load(interface{}) (bool, error)
-	Perform(*termui.UI) error
+	Perform(*Context) error
 }
 
 type TaskWithFeature interface {
