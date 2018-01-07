@@ -103,7 +103,7 @@ func (e *Env) GetActiveFeatures() map[string]string {
 	return features
 }
 
-func (e *Env) SetActiveFeatures(features map[string]string) {
+func (e *Env) setActiveFeatures(features map[string]string) {
 	var parts []string
 
 	for feat, param := range features {
@@ -117,4 +117,16 @@ func (e *Env) SetActiveFeatures(features map[string]string) {
 	} else {
 		e.env[AutoEnvVariableName] = val
 	}
+}
+
+func (e *Env) SetFeature(name, param string) {
+	features := e.GetActiveFeatures()
+	features[name] = param
+	e.setActiveFeatures(features)
+}
+
+func (e *Env) UnsetFeature(name string) {
+	features := e.GetActiveFeatures()
+	delete(features, name)
+	e.setActiveFeatures(features)
 }

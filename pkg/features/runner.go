@@ -25,7 +25,6 @@ func (r *Runner) Run() {
 	}
 	r.ui.Debug("DEV_AUTO_ENV_FEATURES=\"%s\"", r.env.Get("DEV_AUTO_ENV_FEATURES"))
 	r.handleFeatures(wantedFeatures)
-	r.env.SetActiveFeatures(wantedFeatures)
 }
 
 func (r *Runner) handleFeatures(features map[string]string) {
@@ -80,6 +79,7 @@ func (r *Runner) activateFeature(name string, version string) {
 		}
 	} else {
 		r.ui.HookFeatureActivated(name, version)
+		r.env.SetFeature(name, version)
 	}
 }
 
@@ -87,5 +87,6 @@ func (r *Runner) deactivateFeature(name string, version string) {
 	feature := allFeatures[name](version)
 
 	feature.Disable(r.cfg, r.env, r.ui)
+	r.env.UnsetFeature(name)
 	r.ui.Debug("%s deactivated", name)
 }
