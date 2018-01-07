@@ -44,9 +44,9 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI
 		ui.Debug("Env change: %+v", change)
 
 		if change.Deleted {
-			fmt.Printf("unset %s", change.Name)
+			fmt.Printf("unset %s\n", change.Name)
 		} else {
-			fmt.Printf("export %s=\"%s\"", change.Name, change.Value)
+			fmt.Printf("export %s=\"%s\"\n", change.Name, change.Value)
 		}
 	}
 }
