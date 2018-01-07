@@ -3,8 +3,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/pior/dad)](https://goreportcard.com/report/github.com/pior/dad)
 [![Build Status](https://travis-ci.org/pior/dad.svg?branch=master)](https://travis-ci.org/pior/dad)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8c49eed0016c68958606/maintainability)](https://codeclimate.com/github/pior/dad/maintainability)
-[![GitHub Release](https://img.shields.io/github/release/pior/dad.svg)](https://github.com/pior/dad/releases)
-[![GitHub Release Date](https://img.shields.io/github/release-date/pior/dad.svg)](https://github.com/pior/dad/releases)
+[![GitHub Release](https://img.shields.io/github/release/pior/dad.svg)](https://github.com/pior/dad/releases/latest)
+[![GitHub Release Date](https://img.shields.io/github/release-date/pior/dad.svg)](https://github.com/pior/dad/releases/latest)
 
 ## What is this?
 
@@ -136,9 +136,15 @@ $ script/release v1.0.0
 ```
 
 The big idea:
-1. Push the release code to the `master` branch
-2. Tag the commit: `git tag v1.2.3 && git push --tags`
-3. Admire the release on [Github](https://github.com/pior/dad/releases)
+1. Create a release commit to ensure the release is visible in the git log
+2. Create an annotated tag
+3. Push the commit and tag upstream
+
+Expected:
+1. The CI process will test the release
+2. The CI process will publish macOS/Linux binaries to the Github Releases page
+
+Updating the [install.sh](https://github.com/pior/dad/blob/master/install.sh) script is probably a good idea.
 
 ## License
 
