@@ -69,7 +69,9 @@ func (e *Env) GetActiveFeatures() map[string]string {
 		for _, feat := range strings.Split(val, ":") {
 			if feat != "" {
 				parts := strings.SplitN(feat, "=", 2)
-				features[parts[0]] = parts[1]
+				if len(parts) == 2 {
+					features[parts[0]] = parts[1]
+				}
 			}
 		}
 	}
@@ -86,5 +88,9 @@ func (e *Env) SetActiveFeatures(features map[string]string) {
 
 	val := strings.Join(parts, ":")
 
-	e.env[AutoEnvVariableName] = val
+	if len(val) == 0 {
+		delete(e.env, AutoEnvVariableName)
+	} else {
+		e.env[AutoEnvVariableName] = val
+	}
 }
