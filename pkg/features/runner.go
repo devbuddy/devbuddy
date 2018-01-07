@@ -20,6 +20,7 @@ func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.HookUI, env
 
 func (r *Runner) Run() {
 	wantedFeatures := r.getWantedFeatures()
+	r.ui.Debug("DEV_AUTO_ENV_FEATURES=\"%s\"", r.env.Get("DEV_AUTO_ENV_FEATURES"))
 	r.handleFeatures(wantedFeatures)
 	r.env.SetActiveFeatures(wantedFeatures)
 }

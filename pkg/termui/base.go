@@ -24,6 +24,6 @@ func newBaseUI(cfg *config.Config) baseUI {
 func (u *baseUI) Debug(format string, params ...interface{}) {
 	if u.debugEnabled {
 		msg := fmt.Sprintf(format, params...)
-		fmt.Fprintf(u.out, "DEBUG: %s\n", color.Gray(msg))
+		fmt.Fprintf(u.out, "DAD_DEBUG: %s\n", color.Gray(msg))
 	}
 }
