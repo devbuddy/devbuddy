@@ -2,10 +2,6 @@ package tasks
 
 import (
 	"fmt"
-
-	color "github.com/logrusorgru/aurora"
-
-	"github.com/pior/dad/pkg/termui"
 )
 
 type Unknown struct {
@@ -21,7 +17,9 @@ func (u *Unknown) Load(definition interface{}) (bool, error) {
 	return true, nil
 }
 
-func (u *Unknown) Perform(ui *termui.UI) (err error) {
-	fmt.Printf("%s %s: %+v\n", color.Brown("★"), color.Red("Unknown"), color.Brown(u.definition))
+func (u *Unknown) Perform(ctx *Context) (err error) {
+	ctx.ui.TaskHeader("Unknown task", "")
+
+	ctx.ui.TaskError(fmt.Errorf("invalid task definition: %+v", u.definition))
 	return nil
 }

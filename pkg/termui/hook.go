@@ -4,15 +4,17 @@ import (
 	"fmt"
 
 	color "github.com/logrusorgru/aurora"
+
+	"github.com/pior/dad/pkg/config"
 )
 
 type HookUI struct {
 	baseUI
 }
 
-func NewHookUI() *HookUI {
+func NewHookUI(cfg *config.Config) *HookUI {
 	return &HookUI{
-		newBaseUI(),
+		newBaseUI(cfg),
 	}
 }
 

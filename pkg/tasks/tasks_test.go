@@ -23,8 +23,8 @@ custom:
   meet: custom-command
 `)
 
-	task, err := BuildFromDefinition(data)
-	require.NoError(t, err, "BuildFromDefinition() failed")
+	task, err := buildFromDefinition(data)
+	require.NoError(t, err, "buildFromDefinition() failed")
 
 	require.Equal(t, task.(*Custom).command, "custom-command")
 	require.Equal(t, task.(*Custom).condition, "test-command")
@@ -37,8 +37,8 @@ pip:
   - file2
 `)
 
-	task, err := BuildFromDefinition(data)
-	require.NoError(t, err, "BuildFromDefinition() failed")
+	task, err := buildFromDefinition(data)
+	require.NoError(t, err, "buildFromDefinition() failed")
 
 	require.Equal(t, task.(*Pip).files, []string{"file1", "file2"})
 }
@@ -46,8 +46,8 @@ pip:
 func TestPython(t *testing.T) {
 	data := loadTestData(t, `python: 3.6.3`)
 
-	task, err := BuildFromDefinition(data)
-	require.NoError(t, err, "BuildFromDefinition() failed")
+	task, err := buildFromDefinition(data)
+	require.NoError(t, err, "buildFromDefinition() failed")
 
 	require.Equal(t, task.(*Python).version, "3.6.3")
 }

@@ -1,9 +1,8 @@
 package features
 
 import (
-	"fmt"
-
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/termui"
 )
@@ -13,30 +12,28 @@ func init() {
 }
 
 type Python struct {
-	Version string
+	name string
 }
 
 func NewPython(param string) Feature {
-	return Python{Version: param}
+	return Python{name: param}
 }
 
-func (p Python) Enable(proj *project.Project, env *Env, ui *termui.HookUI) error {
-	path := fmt.Sprintf("~/.pyenv/virtualenvs/%s-%s", proj.Slug(), p.Version)
-	path = config.ExpandDir(path)
+func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) error {
+	venv := helpers.NewVirtualenv(cfg, p.name)
 
-	if !config.PathExists(path) {
+	if !venv.Exists() {
 		return DevUpNeeded
 	}
 
-	// - Add venv bin path to PATH
+	env.PrependToPath(venv.BinPath())
 
-	env.Set("VIRTUAL_ENV", path)
+	env.Set("VIRTUAL_ENV", venv.Path())
 
 	return nil
 }
 
-func (p Python) Disable(proj *project.Project, env *Env, ui *termui.HookUI) {
+func (p Python) Disable(cfg *config.Config, env *Env, ui *termui.HookUI) {
 	env.Unset("VIRTUAL_ENV")
-
-	// - Remove virtualenv bin path from PATH
+	env.RemoveFromPath(p.name)
 }

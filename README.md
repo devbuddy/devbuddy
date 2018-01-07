@@ -55,17 +55,29 @@ type dad > /dev/null 2> /dev/null && eval "$(dad --shell-init --with-completion)
 ★ Add a `dev.yml` file in your project:
 ```yaml
 up:
+  - go: 1.9.2
+  - python: 3.6.4rc1
+  - pip:
+    - requirements.txt
   - custom:
       met?: brew info upx 2> /dev/null > /dev/null
       meet: brew install upx
+  - custom:
+      met?: dep status 2> /dev/null > /dev/null
+      meet: dep ensure
 
 commands:
   test:
-    run:
-      make test
+    desc: Run the tests
+    run: script/test
 
   lint:
-    run: make lint
+    desc: Lint the project
+    run: script/lint
+
+  docserve:
+    desc: Starting GoDoc server on http://0.0.0.0:6060
+    run: godoc -http=:6060
 ```
 See Dad own [dev.yml](dev.yml)
 

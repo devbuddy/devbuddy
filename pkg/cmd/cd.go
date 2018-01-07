@@ -19,9 +19,10 @@ var cdCmd = &cobra.Command{
 }
 
 func cdRun(cmd *cobra.Command, args []string) {
-	conf := config.Load()
+	cfg, err := config.Load()
+	checkError(err)
 
-	proj, err := project.FindBestMatch(args[0], conf)
+	proj, err := project.FindBestMatch(args[0], cfg)
 	checkError(err)
 
 	fmt.Println(color.Brown("💡  Jumping to"), color.Green(proj.FullName()))

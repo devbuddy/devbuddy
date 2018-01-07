@@ -3,7 +3,9 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/tasks"
 	"github.com/pior/dad/pkg/termui"
 )
 
@@ -15,16 +17,14 @@ var upCmd = &cobra.Command{
 }
 
 func upRun(cmd *cobra.Command, args []string) {
-	ui := termui.NewUI()
+	cfg, err := config.Load()
+	checkError(err)
+
+	ui := termui.NewUI(cfg)
 
 	proj, err := project.FindCurrent()
 	checkError(err)
 
-	taskList, err := proj.GetTasks()
+	err = tasks.RunAll(cfg, proj, ui)
 	checkError(err)
-
-	for _, task := range taskList {
-		err = task.Perform(ui)
-		checkError(err)
-	}
 }

@@ -2,12 +2,13 @@ package tasks
 
 import (
 	"fmt"
-	"strings"
+	"os"
+	"path/filepath"
 
-	color "github.com/logrusorgru/aurora"
-
+	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/pior/dad/pkg/helpers"
+	"github.com/pior/dad/pkg/project"
 )
 
 func init() {
@@ -38,35 +39,102 @@ func (p *Python) Load(definition interface{}) (bool, error) {
 	return false, nil
 }
 
-func (p *Python) Perform(ui *termui.UI) (err error) {
-	ui.TaskHeader("Python", p.version)
+func (p *Python) Perform(ctx *Context) (err error) {
+	ctx.ui.TaskHeader("Python", p.version)
 
-	output, code, err := executor.Capture("pyenv", "versions", "--bare", "--skip-aliases")
+	installed, err := p.InstallPython(ctx)
 	if err != nil {
-		return
-	}
-	if code != 0 {
-		return fmt.Errorf("failed to run pyenv versions. exit code: %d", code)
+		ctx.ui.TaskError(err)
+		return err
 	}
 
-	installedVersions := strings.Split(strings.TrimSpace(output), "\n")
-
-	if stringInSlice(p.version, installedVersions) {
-		fmt.Println(color.Green("  Already good!"))
-		return nil
-	}
-
-	code, err = executor.Run("pyenv", "install", p.version)
+	venvInstalled, err := p.InstallVirtualEnv(ctx)
 	if err != nil {
-		return
+		ctx.ui.TaskError(err)
+		return err
 	}
-	if code != 0 {
-		return fmt.Errorf("failed to install the required python version. exit code: %d", code)
+
+	venvCreated, err := p.CreateVirtualEnv(ctx)
+	if err != nil {
+		ctx.ui.TaskError(err)
+		return err
+	}
+
+	if installed || venvInstalled || venvCreated {
+		ctx.ui.TaskActed()
+	} else {
+		ctx.ui.TaskAlreadyOk()
 	}
 
 	return nil
 }
 
-func (p *Python) Features() map[string]string {
-	return map[string]string{"python": p.version}
+func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
+	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
+
+	installed, err := pyEnv.VersionInstalled(p.version)
+	if err != nil {
+		return
+	}
+	if installed {
+		return
+	}
+
+	code, err := executor.Run("pyenv", "install", p.version)
+	if err != nil {
+		return
+	}
+	if code != 0 {
+		return false, fmt.Errorf("failed to install the required python version. exit code: %d", code)
+	}
+
+	return true, nil
+}
+
+func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
+	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
+
+	if config.PathExists(pyEnv.Which(p.version, "virtualenv")) {
+		return false, nil
+	}
+
+	code, err := executor.Run(pyEnv.Which(p.version, "pip"), "install", "virtualenv")
+	if err != nil {
+		return
+	}
+	if code != 0 {
+		return false, fmt.Errorf("failed to install virtualenv for the required python version. exit code: %d", code)
+	}
+
+	return true, nil
+}
+
+func (p *Python) CreateVirtualEnv(ctx *Context) (acted bool, err error) {
+	name := helpers.VirtualenvName(ctx.proj, p.version)
+	venv := helpers.NewVirtualenv(ctx.cfg, name)
+	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
+
+	if venv.Exists() {
+		return false, nil
+	}
+
+	err = os.MkdirAll(filepath.Dir(venv.Path()), 0750)
+	if err != nil {
+		return
+	}
+
+	code, err := executor.Run(pyEnv.Which(p.version, "virtualenv"), venv.Path())
+	if err != nil {
+		return
+	}
+	if code != 0 {
+		return false, fmt.Errorf("failed to create the virtualenv. exit code: %d", code)
+	}
+
+	return true, nil
+}
+
+func (p *Python) Feature(proj *project.Project) (string, string) {
+	name := helpers.VirtualenvName(proj, p.version)
+	return "python", name
 }

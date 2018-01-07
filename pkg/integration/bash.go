@@ -36,7 +36,10 @@ dad() {
 __dad_prompt_command() {
     # In shell hook mode, the command will use stderr to print in the console
     # and stdout to mutate the shell (like activating a Python virtualenv)
-    eval "$(dad --shell-hook)"
+    local hook_eval
+    hook_eval="$(dad --shell-hook)"
+    [ -n "${DAD_DEBUG}" ] && echo -e "DAD_DEBUG: Hook eval:\n${hook_eval}\n---"
+    eval "${hook_eval}"
 }
 
 if [[ ! "${PROMPT_COMMAND}" == *__dad_prompt_command* ]]; then

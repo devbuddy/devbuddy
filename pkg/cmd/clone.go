@@ -19,9 +19,10 @@ var cloneCmd = &cobra.Command{
 }
 
 func cloneRun(cmd *cobra.Command, args []string) {
-	conf := config.Load()
+	cfg, err := config.Load()
+	checkError(err)
 
-	proj, err := project.NewFromID(args[0], conf)
+	proj, err := project.NewFromID(args[0], cfg)
 	checkError(err)
 
 	if !proj.Exists() {

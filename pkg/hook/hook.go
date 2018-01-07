@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/features"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/termui"
@@ -12,23 +13,30 @@ import (
 func Hook() {
 	// In the shell hook, the stdout is evaluated by the shell
 	// stderr is used to display messages to the user
-	ui := termui.NewHookUI()
+
+	// Also, we can't annoy the user here, so we always just quit silently
+
+	cfg, configErr := config.Load()
+	ui := termui.NewHookUI(cfg)
+
+	if configErr != nil {
+		ui.Debug("error while loading the config: %s", configErr)
+		return
+	}
 
 	proj, err := project.FindCurrent()
-
 	if err != nil && err != project.ErrProjectNotFound {
-		// We can't annoy the user here, just quit silently
 		ui.Debug("error while searching for current project: %s", err)
 		return
 	}
 
-	handleFeatures(proj, ui)
+	handleFeatures(cfg, proj, ui)
 }
 
-func handleFeatures(proj *project.Project, ui *termui.HookUI) {
+func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI) {
 	env := features.NewEnv(os.Environ())
 
-	runner := features.NewRunner(proj, ui, env)
+	runner := features.NewRunner(cfg, proj, ui, env)
 	runner.Run()
 
 	envChanges := env.Changed()
@@ -36,9 +44,9 @@ func handleFeatures(proj *project.Project, ui *termui.HookUI) {
 		ui.Debug("Env change: %+v", change)
 
 		if change.Deleted {
-			fmt.Printf("unset %s", change.Name)
+			fmt.Printf("unset %s\n", change.Name)
 		} else {
-			fmt.Printf("export %s=\"%s\"", change.Name, change.Value)
+			fmt.Printf("export %s=\"%s\"\n", change.Name, change.Value)
 		}
 	}
 }

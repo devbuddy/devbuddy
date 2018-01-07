@@ -3,10 +3,7 @@ package tasks
 import (
 	"fmt"
 
-	color "github.com/logrusorgru/aurora"
-
 	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/termui"
 )
 
 func init() {
@@ -46,32 +43,43 @@ func (c *Custom) Load(definition interface{}) (bool, error) {
 	return false, nil
 }
 
-func (c *Custom) Perform(ui *termui.UI) error {
-	ui.TaskHeader("Custom", c.command)
+func (c *Custom) Perform(ctx *Context) error {
+	ctx.ui.TaskHeader("Custom", c.command)
 
+	ran, err := c.runCommand()
+	if err != nil {
+		ctx.ui.TaskError(err)
+		return err
+	}
+
+	if ran {
+		ctx.ui.TaskActed()
+	} else {
+		ctx.ui.TaskAlreadyOk()
+	}
+
+	return nil
+}
+
+func (c *Custom) runCommand() (bool, error) {
 	code, err := executor.RunShellSilent(c.condition)
 	if err != nil {
-		fmt.Printf("Failed to run the condition command: %s", err)
-		return taskFailed
+		return false, fmt.Errorf("failed to run the condition command: %s", err)
 	}
 	if code == 0 {
-		fmt.Println(color.Green("  Already good!"))
-		return nil
+		return false, nil
 	}
 
 	// The condition command was run and returned a non-zero exit code.
 	// It means we should run this custom task
 
-	// fmt.Println(color.Brown("  Running"))
 	code, err = executor.RunShellSilent(c.command)
 	if err != nil {
-		fmt.Printf("Command failed: %s", err)
-		return taskFailed
+		return false, fmt.Errorf("command failed: %s", err)
 	}
 	if code != 0 {
-		fmt.Println(color.Sprintf(color.Red("  Command exited with code %d"), code))
-		return nil
+		return false, fmt.Errorf("command exited with code %d", code)
 	}
-	fmt.Println(color.Green("  Done!"))
-	return nil
+
+	return true, nil
 }

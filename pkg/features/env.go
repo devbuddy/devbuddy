@@ -43,6 +43,30 @@ func (e *Env) Get(name string) string {
 	return e.env[name]
 }
 
+func (e *Env) getAndSplitPath() []string {
+	return strings.Split(e.env["PATH"], ":")
+}
+
+func (e *Env) joinAndSetPath(elems ...string) {
+	e.env["PATH"] = strings.Join(elems, ":")
+}
+
+func (e *Env) PrependToPath(path string) {
+	elems := e.getAndSplitPath()
+	elems = append([]string{path}, elems...)
+	e.joinAndSetPath(elems...)
+}
+
+func (e *Env) RemoveFromPath(substring string) {
+	newElems := []string{}
+	for _, elem := range e.getAndSplitPath() {
+		if !strings.Contains(elem, substring) {
+			newElems = append(newElems, elem)
+		}
+	}
+	e.joinAndSetPath(newElems...)
+}
+
 func (e *Env) Changed() []EnvVarChange {
 	c := []EnvVarChange{}
 
@@ -69,7 +93,9 @@ func (e *Env) GetActiveFeatures() map[string]string {
 		for _, feat := range strings.Split(val, ":") {
 			if feat != "" {
 				parts := strings.SplitN(feat, "=", 2)
-				features[parts[0]] = parts[1]
+				if len(parts) == 2 {
+					features[parts[0]] = parts[1]
+				}
 			}
 		}
 	}
@@ -86,5 +112,9 @@ func (e *Env) SetActiveFeatures(features map[string]string) {
 
 	val := strings.Join(parts, ":")
 
-	e.env[AutoEnvVariableName] = val
+	if len(val) == 0 {
+		delete(e.env, AutoEnvVariableName)
+	} else {
+		e.env[AutoEnvVariableName] = val
+	}
 }

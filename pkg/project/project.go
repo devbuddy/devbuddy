@@ -10,7 +10,6 @@ import (
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/manifest"
-	"github.com/pior/dad/pkg/tasks"
 )
 
 type Project struct {
@@ -79,34 +78,4 @@ func (p *Project) Clone() (err error) {
 	}
 	_, err = executor.Run("git", "clone", url, p.Path)
 	return
-}
-
-func (p *Project) GetTasks() (taskList []tasks.Task, err error) {
-	var task tasks.Task
-
-	for _, taskdef := range p.Manifest.Up {
-		task, err = tasks.BuildFromDefinition(taskdef)
-		if err != nil {
-			return nil, err
-		}
-		taskList = append(taskList, task)
-	}
-
-	return taskList, nil
-}
-
-func (p *Project) GetFeatures() (map[string]string, error) {
-	featureList := map[string]string{}
-	taskList, err := p.GetTasks()
-	if err != nil {
-		return nil, err
-	}
-	for _, task := range taskList {
-		if t, ok := task.(tasks.TaskWithFeature); ok {
-			for f, p := range t.Features() {
-				featureList[f] = p
-			}
-		}
-	}
-	return featureList, nil
 }

@@ -1,21 +1,14 @@
 up:
-  # - go: 1.9.2
+  - go: 1.9.2
   - python: 3.6.4rc1
-  # - pip:
-  #   - requirements.txt
-  #   - requirements-dev.txt
-  - custom:
-      met?: 'false'
-      meet: go get github.com/golang/dep/cmd/dep
-  - custom:
-      met?: 'false'
-      meet: go get gopkg.in/alecthomas/gometalinter.v1
+  - pip:
+    - requirements.txt
   - custom:
       met?: brew info upx 2> /dev/null > /dev/null
       meet: brew install upx
   - custom:
-      met?: 'false'
-      meet: 'false'
+      met?: dep status 2> /dev/null > /dev/null
+      meet: dep ensure
 
 commands:
   testup:
