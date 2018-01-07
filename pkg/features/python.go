@@ -2,7 +2,6 @@ package features
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
@@ -23,7 +22,7 @@ func NewPython(param string) Feature {
 
 func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) error {
 	name := fmt.Sprintf("%s-%s", proj.Slug(), p.Version)
-	path := filepath.Join(cfg.DataDir, "virtualenvs", name)
+	path := cfg.DataDir("virtualenvs", name)
 
 	if !config.PathExists(path) {
 		return DevUpNeeded

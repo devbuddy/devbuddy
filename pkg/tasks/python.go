@@ -2,8 +2,11 @@ package tasks
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 )
 
@@ -43,12 +46,20 @@ func (p *Python) Perform(ctx *Context) (err error) {
 		ctx.ui.TaskError(err)
 		return err
 	}
-	created, err := p.CreateVirtualEnv(ctx)
+
+	venvInstalled, err := p.InstallVirtualEnv(ctx)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
 	}
-	if installed || created {
+
+	venvCreated, err := p.CreateVirtualEnv(ctx)
+	if err != nil {
+		ctx.ui.TaskError(err)
+		return err
+	}
+
+	if installed || venvInstalled || venvCreated {
 		ctx.ui.TaskActed()
 	} else {
 		ctx.ui.TaskAlreadyOk()
@@ -83,8 +94,50 @@ func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
 	return true, nil
 }
 
+func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
+	virtualenvExecutablePath := ctx.cfg.HomeDir(".pyenv", "versions", p.version, "bin", "virtualenv")
+	pipExecutablePath := ctx.cfg.HomeDir(".pyenv", "versions", p.version, "bin", "pip")
+
+	if config.PathExists(virtualenvExecutablePath) {
+		return false, nil
+	}
+
+	code, err := executor.Run(pipExecutablePath, "install", "virtualenv")
+	if err != nil {
+		return
+	}
+	if code != 0 {
+		return false, fmt.Errorf("failed to install virtualenv for the required python version. exit code: %d", code)
+	}
+
+	return true, nil
+}
+
 func (p *Python) CreateVirtualEnv(ctx *Context) (acted bool, err error) {
-	return false, nil
+	virtualenvExecutablePath := ctx.cfg.HomeDir(".pyenv", "versions", p.version, "bin", "virtualenv")
+	pythonExecutablePath := ctx.cfg.HomeDir(".pyenv", "versions", p.version, "bin", "python")
+
+	name := fmt.Sprintf("%s-%s", ctx.proj.Slug(), p.version)
+	virtualenvPath := ctx.cfg.DataDir("virtualenvs", name)
+
+	if config.PathExists(virtualenvPath) {
+		return false, nil
+	}
+
+	err = os.MkdirAll(filepath.Dir(virtualenvPath), 0750)
+	if err != nil {
+		return
+	}
+
+	code, err := executor.Run(virtualenvExecutablePath, "-p", pythonExecutablePath, virtualenvPath)
+	if err != nil {
+		return
+	}
+	if code != 0 {
+		return false, fmt.Errorf("failed to create the virtualenv. exit code: %d", code)
+	}
+
+	return true, nil
 }
 
 func (p *Python) Features() map[string]string {

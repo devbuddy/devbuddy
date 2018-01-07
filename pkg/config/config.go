@@ -10,7 +10,7 @@ type Config struct {
 	homeDir      string
 	DebugEnabled bool
 	SourceDir    string
-	DataDir      string
+	dataDir      string
 }
 
 func Load() (*Config, error) {
@@ -25,7 +25,7 @@ func Load() (*Config, error) {
 		homeDir:      homedir,
 		DebugEnabled: debugEnabled(),
 		SourceDir:    filepath.Join(homedir, "src"),
-		DataDir:      filepath.Join(userDataDir, "dad"),
+		dataDir:      filepath.Join(userDataDir, "dad"),
 	}
 	return &c, nil
 }
@@ -60,4 +60,14 @@ func PathExists(path string) (exists bool) {
 		return false
 	}
 	return true
+}
+
+func (c *Config) HomeDir(elem ...string) string {
+	elem = append([]string{c.homeDir}, elem...)
+	return filepath.Join(elem...)
+}
+
+func (c *Config) DataDir(elem ...string) string {
+	elem = append([]string{c.dataDir}, elem...)
+	return filepath.Join(elem...)
 }
