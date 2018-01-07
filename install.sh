@@ -68,7 +68,8 @@ main() {
     read -p "Correct? [enter]"
 
     header "Installing to ${DEST}"
-    sudo mv "${TMPFILE}" "${DEST}/dad"
+    sudo install "${TMPFILE}" "${DEST}/dad"
+
     [[ -e "${TMPFILE}" ]] && unlink "${TMPFILE}"
 
     instructions
