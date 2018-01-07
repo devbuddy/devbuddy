@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 
-VERSION="v0.0.2"
+VERSION="v0.0.5"
 DEST="/usr/local/bin"
 SHELL_LINE='eval "$(dad --shell-init --with-completion)"'
 
