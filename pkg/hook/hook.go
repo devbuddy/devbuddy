@@ -3,6 +3,7 @@ package hook
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/features"
@@ -15,6 +16,8 @@ func Hook() {
 	// stderr is used to display messages to the user
 
 	// Also, we can't annoy the user here, so we always just quit silently
+
+	timerStart := time.Now()
 
 	cfg, configErr := config.Load()
 	ui := termui.NewHookUI(cfg)
@@ -31,6 +34,8 @@ func Hook() {
 	}
 
 	handleFeatures(cfg, proj, ui)
+
+	ui.Debug("total time: %s", time.Now().Sub(timerStart))
 }
 
 func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI) {
