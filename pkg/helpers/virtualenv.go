@@ -9,24 +9,17 @@ import (
 )
 
 type Virtualenv struct {
-	name string
 	path string
 }
 
-func NewVirtualenv(cfg *config.Config, proj *project.Project, pythonVersion string) *Virtualenv {
-	name := fmt.Sprintf("%s-%s", proj.Slug(), pythonVersion)
+func NewVirtualenv(cfg *config.Config, name string) *Virtualenv {
 	path := cfg.DataDir("virtualenvs", name)
-
-	v := Virtualenv{name: name, path: path}
+	v := Virtualenv{path: path}
 	return &v
 }
 
 func (v *Virtualenv) Exists() bool {
 	return config.PathExists(v.path)
-}
-
-func (v *Virtualenv) Name() string {
-	return v.name
 }
 
 func (v *Virtualenv) Path() string {
@@ -35,4 +28,8 @@ func (v *Virtualenv) Path() string {
 
 func (v *Virtualenv) BinPath() string {
 	return path.Join(v.path, "bin")
+}
+
+func VirtualenvName(proj *project.Project, version string) string {
+	return fmt.Sprintf("%s-%s", proj.Slug(), version)
 }

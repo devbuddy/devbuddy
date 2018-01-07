@@ -1,6 +1,8 @@
 package tasks
 
-import ()
+import (
+	"github.com/pior/dad/pkg/project"
+)
 
 type Task interface {
 	Load(interface{}) (bool, error)
@@ -9,5 +11,5 @@ type Task interface {
 
 type TaskWithFeature interface {
 	Task
-	Features() map[string]string
+	Feature(*project.Project) (string, string)
 }

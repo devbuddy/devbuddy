@@ -16,7 +16,7 @@ func init() {
 
 type Feature interface {
 	Enable(*config.Config, *project.Project, *Env, *termui.HookUI) error
-	Disable(*config.Config, *project.Project, *Env, *termui.HookUI)
+	Disable(*config.Config, *Env, *termui.HookUI)
 }
 
 type FeatureBuilder func(param string) Feature

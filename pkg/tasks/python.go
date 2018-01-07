@@ -8,6 +8,7 @@ import (
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/helpers"
+	"github.com/pior/dad/pkg/project"
 )
 
 func init() {
@@ -109,7 +110,8 @@ func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
 }
 
 func (p *Python) CreateVirtualEnv(ctx *Context) (acted bool, err error) {
-	venv := helpers.NewVirtualenv(ctx.cfg, ctx.proj, p.version)
+	name := helpers.VirtualenvName(ctx.proj, p.version)
+	venv := helpers.NewVirtualenv(ctx.cfg, name)
 	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
 
 	if venv.Exists() {
@@ -132,6 +134,7 @@ func (p *Python) CreateVirtualEnv(ctx *Context) (acted bool, err error) {
 	return true, nil
 }
 
-func (p *Python) Features() map[string]string {
-	return map[string]string{"python": p.version}
+func (p *Python) Feature(proj *project.Project) (string, string) {
+	name := helpers.VirtualenvName(proj, p.version)
+	return "python", name
 }

@@ -19,7 +19,10 @@ func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.HookUI, env
 }
 
 func (r *Runner) Run() {
-	wantedFeatures := r.getWantedFeatures()
+	wantedFeatures, err := r.getWantedFeatures()
+	if err != nil {
+		r.ui.Debug("failed to get project tasks: %s", err)
+	}
 	r.ui.Debug("DEV_AUTO_ENV_FEATURES=\"%s\"", r.env.Get("DEV_AUTO_ENV_FEATURES"))
 	r.handleFeatures(wantedFeatures)
 	r.env.SetActiveFeatures(wantedFeatures)
@@ -45,33 +48,24 @@ func (r *Runner) handleFeatures(features map[string]string) {
 
 }
 
-func (r *Runner) getWantedFeatures() map[string]string {
-	var err error
+func (r *Runner) getWantedFeatures() (map[string]string, error) {
 	wantedFeatures := map[string]string{}
 
 	if r.proj != nil {
-		wantedFeatures, err = getFeaturesFromProject(r.proj)
+		taskList, err := tasks.GetTasksFromProject(r.proj)
 		if err != nil {
-			r.ui.Debug("failed to get project tasks: %s", err)
+			return nil, err
 		}
-	}
-	return wantedFeatures
-}
 
-func getFeaturesFromProject(proj *project.Project) (map[string]string, error) {
-	featureList := map[string]string{}
-	taskList, err := tasks.GetTasksFromProject(proj)
-	if err != nil {
-		return nil, err
-	}
-	for _, task := range taskList {
-		if t, ok := task.(tasks.TaskWithFeature); ok {
-			for f, p := range t.Features() {
-				featureList[f] = p
+		for _, task := range taskList {
+			if t, ok := task.(tasks.TaskWithFeature); ok {
+				feature, param := t.Feature(r.proj)
+				wantedFeatures[feature] = param
 			}
 		}
 	}
-	return featureList, nil
+
+	return wantedFeatures, nil
 }
 
 func (r *Runner) activateFeature(name string, version string) {
@@ -92,6 +86,6 @@ func (r *Runner) activateFeature(name string, version string) {
 func (r *Runner) deactivateFeature(name string, version string) {
 	feature := allFeatures[name](version)
 
-	feature.Disable(r.cfg, r.proj, r.env, r.ui)
+	feature.Disable(r.cfg, r.env, r.ui)
 	r.ui.Debug("%s deactivated", name)
 }

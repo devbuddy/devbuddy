@@ -12,29 +12,28 @@ func init() {
 }
 
 type Python struct {
-	Version string
+	name string
 }
 
 func NewPython(param string) Feature {
-	return Python{Version: param}
+	return Python{name: param}
 }
 
 func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) error {
-	venv := helpers.NewVirtualenv(cfg, proj, p.Version)
+	venv := helpers.NewVirtualenv(cfg, p.name)
 
 	if !venv.Exists() {
 		return DevUpNeeded
 	}
 
-	// - Add venv bin path to PATH
+	env.PrependToPath(venv.BinPath())
 
 	env.Set("VIRTUAL_ENV", venv.Path())
 
 	return nil
 }
 
-func (p Python) Disable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) {
+func (p Python) Disable(cfg *config.Config, env *Env, ui *termui.HookUI) {
 	env.Unset("VIRTUAL_ENV")
-
-	// - Remove virtualenv bin path from PATH
+	env.RemoveFromPath(p.name)
 }
