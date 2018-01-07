@@ -38,6 +38,12 @@ Current limitations:
 $ bash -c "$(curl -L https://raw.githubusercontent.com/pior/dad/master/install.sh)"
 ```
 
+## Uninstall
+
+```bash
+$ sudo rm /usr/local/bin/dad
+```
+
 ## Setup
 
 ★ Install the shell integration (in `~/.bash_profile`):
