@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
+	"github.com/pior/dad/pkg/helpers"
 )
 
 func init() {
@@ -69,21 +69,17 @@ func (p *Python) Perform(ctx *Context) (err error) {
 }
 
 func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
-	output, code, err := executor.Capture("pyenv", "versions", "--bare", "--skip-aliases")
+	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
+
+	installed, err := pyEnv.VersionInstalled(p.version)
 	if err != nil {
 		return
 	}
-	if code != 0 {
-		return false, fmt.Errorf("failed to run pyenv versions. exit code: %d", code)
-	}
-
-	installedVersions := strings.Split(strings.TrimSpace(output), "\n")
-
-	if stringInSlice(p.version, installedVersions) {
+	if installed {
 		return
 	}
 
-	code, err = executor.Run("pyenv", "install", p.version)
+	code, err := executor.Run("pyenv", "install", p.version)
 	if err != nil {
 		return
 	}
@@ -95,14 +91,13 @@ func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
 }
 
 func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
-	virtualenvExecutablePath := ctx.cfg.HomeDir(".pyenv", "versions", p.version, "bin", "virtualenv")
-	pipExecutablePath := ctx.cfg.HomeDir(".pyenv", "versions", p.version, "bin", "pip")
+	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
 
-	if config.PathExists(virtualenvExecutablePath) {
+	if config.PathExists(pyEnv.Which(p.version, "virtualenv")) {
 		return false, nil
 	}
 
-	code, err := executor.Run(pipExecutablePath, "install", "virtualenv")
+	code, err := executor.Run(pyEnv.Which(p.version, "pip"), "install", "virtualenv")
 	if err != nil {
 		return
 	}
@@ -114,22 +109,19 @@ func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
 }
 
 func (p *Python) CreateVirtualEnv(ctx *Context) (acted bool, err error) {
-	virtualenvExecutablePath := ctx.cfg.HomeDir(".pyenv", "versions", p.version, "bin", "virtualenv")
-	pythonExecutablePath := ctx.cfg.HomeDir(".pyenv", "versions", p.version, "bin", "python")
+	venv := helpers.NewVirtualenv(ctx.cfg, ctx.proj, p.version)
+	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
 
-	name := fmt.Sprintf("%s-%s", ctx.proj.Slug(), p.version)
-	virtualenvPath := ctx.cfg.DataDir("virtualenvs", name)
-
-	if config.PathExists(virtualenvPath) {
+	if venv.Exists() {
 		return false, nil
 	}
 
-	err = os.MkdirAll(filepath.Dir(virtualenvPath), 0750)
+	err = os.MkdirAll(filepath.Dir(venv.Path()), 0750)
 	if err != nil {
 		return
 	}
 
-	code, err := executor.Run(virtualenvExecutablePath, "-p", pythonExecutablePath, virtualenvPath)
+	code, err := executor.Run(pyEnv.Which(p.version, "virtualenv"), venv.Path())
 	if err != nil {
 		return
 	}

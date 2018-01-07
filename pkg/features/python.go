@@ -1,9 +1,8 @@
 package features
 
 import (
-	"fmt"
-
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/termui"
 )
@@ -21,16 +20,15 @@ func NewPython(param string) Feature {
 }
 
 func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) error {
-	name := fmt.Sprintf("%s-%s", proj.Slug(), p.Version)
-	path := cfg.DataDir("virtualenvs", name)
+	venv := helpers.NewVirtualenv(cfg, proj, p.Version)
 
-	if !config.PathExists(path) {
+	if !venv.Exists() {
 		return DevUpNeeded
 	}
 
 	// - Add venv bin path to PATH
 
-	env.Set("VIRTUAL_ENV", path)
+	env.Set("VIRTUAL_ENV", venv.Path())
 
 	return nil
 }
