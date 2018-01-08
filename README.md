@@ -30,7 +30,33 @@ With **Dad**, pushing a change on a project you never touched look like this:
 Current limitations:
 
 - Github is the only _hosting platform_ implemented
-- Bash is the only shell supported
+- Bash is the only shell supported (but Zsh and Fish should be easily to support)
+
+Progress:
+
+**Tasks:**
+
+- Custom (conditional sub-command): **working**
+
+- Python (version + virtualenv): **working**
+- Pip (requirements file): **minimal**
+- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile))
+- Go (version): **planned**
+- Dep (support for [Go Dep](https://github.com/golang/dep)): **planned**
+
+- Docker Compose (manage a docker-compose setup): **planned**
+
+**Automatic environment:**
+
+- Virtualenv: **working**
+- Go: **planned**
+
+**Hosting platform:**
+
+- Github: **working**
+- Any git remote-url: **planned**
+- Gitlab: **planned**
+- Bitbucket (with Git): **planned**
 
 ## Install
 
