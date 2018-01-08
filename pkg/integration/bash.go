@@ -46,5 +46,15 @@ if [[ ! "${PROMPT_COMMAND}" == *__dad_prompt_command* ]]; then
   PROMPT_COMMAND="__dad_prompt_command; ${PROMPT_COMMAND}"
 fi
 
+dad-enable-debug() {
+    export DAD_DEBUG=1
+    echo "DAD_DEBUG: enabled"
+}
+
+dad-disable-debug() {
+    unset DAD_DEBUG
+    echo "DAD_DEBUG: disable"
+}
+
 [ -n "${DAD_DEBUG}" ] && echo "DAD_DEBUG: Dad is now enabled..."
 `
