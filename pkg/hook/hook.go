@@ -35,7 +35,7 @@ func Hook() {
 
 	handleFeatures(cfg, proj, ui)
 
-	ui.Debug("total time: %s", time.Now().Sub(timerStart))
+	ui.Debug("total time: %s", time.Since(timerStart))
 }
 
 func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI) {
