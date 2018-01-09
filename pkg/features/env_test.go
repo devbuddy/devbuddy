@@ -36,7 +36,7 @@ func TestSetFeatures(t *testing.T) {
 
 	for idx := range features {
 		env := NewEnv([]string{})
-		env.SetActiveFeatures(features[idx])
+		env.setActiveFeatures(features[idx])
 		require.Equal(t, features[idx], env.GetActiveFeatures())
 	}
 }
