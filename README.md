@@ -21,18 +21,11 @@ With **Dad**, pushing a change on a project you never touched look like this:
 - `dad test`
 - `git push`
 
-## Scope and Status
+## Status and progress
 
 **Dad** will start as a highly compatible implementation of **Dev** (when possible).
 
-**Dad** is currently a _working prototype_. Core features are being implemented.
-
-Current limitations:
-
-- Github is the only _hosting platform_ implemented
-- Bash is the only shell supported (but Zsh and Fish should be easily to support)
-
-Progress:
+Overall, **Dad** is a _working prototype_, core features are being implemented.
 
 **Tasks:**
 
@@ -40,7 +33,7 @@ Progress:
 
 - Python (version + virtualenv): **working**
 - Pip (requirements file): **minimal**
-- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile))
+- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile)): **planned**
 - Go (version): **planned**
 - Dep (support for [Go Dep](https://github.com/golang/dep)): **planned**
 
@@ -57,6 +50,12 @@ Progress:
 - Any git remote-url: **planned**
 - Gitlab: **planned**
 - Bitbucket (with Git): **planned**
+
+**Shell integration**
+
+- Bash: **working**
+- Zsh: **planned**
+- Fish: **planned**
 
 ## Install
 
