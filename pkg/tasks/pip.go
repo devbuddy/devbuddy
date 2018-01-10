@@ -2,9 +2,11 @@ package tasks
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/pior/dad/pkg/executor"
+	"github.com/pior/dad/pkg/helpers"
 )
 
 func init() {
@@ -46,10 +48,21 @@ func (p *Pip) Load(definition interface{}) (bool, error) {
 func (p *Pip) Perform(ctx *Context) (err error) {
 	ctx.ui.TaskHeader("Pip", strings.Join(p.files, ", "))
 
+	pipCmd := "pip"
+
+	pythonParam, hasPythonFeature := ctx.features["python"]
+	if hasPythonFeature {
+		venv := helpers.NewVirtualenv(ctx.cfg, pythonParam)
+		pipCmd = path.Join(venv.BinPath(), "pip")
+	}
+
 	for _, file := range p.files {
-		_, err = executor.RunSilent("pip", "install", "-r", file)
+		code, err := executor.Run(pipCmd, "install", "--require-virtualenv", "-r", file)
 		if err != nil {
-			return
+			return err
+		}
+		if code != 0 {
+			return fmt.Errorf("Pip failed with code %s", code)
 		}
 	}
 	return nil
