@@ -8,6 +8,7 @@ import (
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/features"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/tasks"
 	"github.com/pior/dad/pkg/termui"
 )
 
@@ -39,10 +40,16 @@ func Hook() {
 }
 
 func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI) {
+	allFeatures, err := getFeaturesFromProject(proj)
+	if err != nil {
+		ui.Debug("error while building the project tasks: %s", err)
+		return
+	}
+
 	env := features.NewEnv(os.Environ())
 
 	runner := features.NewRunner(cfg, proj, ui, env)
-	runner.Run()
+	runner.Run(allFeatures)
 
 	envChanges := env.Changed()
 	for _, change := range envChanges {
@@ -54,4 +61,15 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI
 			fmt.Printf("export %s=\"%s\"\n", change.Name, change.Value)
 		}
 	}
+}
+
+func getFeaturesFromProject(proj *project.Project) (map[string]string, error) {
+	if proj == nil {
+		return map[string]string{}, nil
+	}
+	allTasks, err := tasks.GetTasksFromProject(proj)
+	if err != nil {
+		return nil, err
+	}
+	return tasks.GetFeaturesFromTasks(proj, allTasks), nil
 }
