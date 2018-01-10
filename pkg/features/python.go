@@ -26,6 +26,7 @@ func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *
 		return DevUpNeeded
 	}
 
+	p.cleanPath(cfg, env)
 	env.PrependToPath(venv.BinPath())
 
 	env.Set("VIRTUAL_ENV", venv.Path())
@@ -35,5 +36,12 @@ func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *
 
 func (p Python) Disable(cfg *config.Config, env *Env, ui *termui.HookUI) {
 	env.Unset("VIRTUAL_ENV")
-	env.RemoveFromPath(p.name)
+
+	p.cleanPath(cfg, env)
+}
+
+// cleanPath removes all virtualenv path, even if multiple of them exists
+func (p Python) cleanPath(cfg *config.Config, env *Env) {
+	virtualenvBasePath := helpers.NewVirtualenv(cfg, "").Path()
+	env.RemoveFromPath(virtualenvBasePath)
 }
