@@ -3,7 +3,6 @@ package features
 import (
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
-	"github.com/pior/dad/pkg/tasks"
 	"github.com/pior/dad/pkg/termui"
 )
 
@@ -18,16 +17,7 @@ func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.HookUI, env
 	return &Runner{cfg: cfg, proj: proj, ui: ui, env: env}
 }
 
-func (r *Runner) Run() {
-	wantedFeatures, err := r.getWantedFeatures()
-	if err != nil {
-		r.ui.Debug("failed to get project tasks: %s", err)
-	}
-	r.ui.Debug("DEV_AUTO_ENV_FEATURES=\"%s\"", r.env.Get("DEV_AUTO_ENV_FEATURES"))
-	r.handleFeatures(wantedFeatures)
-}
-
-func (r *Runner) handleFeatures(features map[string]string) {
+func (r *Runner) Run(features map[string]string) {
 	activeFeatures := r.env.GetActiveFeatures()
 
 	for name := range allFeatures {
@@ -44,27 +34,6 @@ func (r *Runner) handleFeatures(features map[string]string) {
 			}
 		}
 	}
-
-}
-
-func (r *Runner) getWantedFeatures() (map[string]string, error) {
-	wantedFeatures := map[string]string{}
-
-	if r.proj != nil {
-		taskList, err := tasks.GetTasksFromProject(r.proj)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, task := range taskList {
-			if t, ok := task.(tasks.TaskWithFeature); ok {
-				feature, param := t.Feature(r.proj)
-				wantedFeatures[feature] = param
-			}
-		}
-	}
-
-	return wantedFeatures, nil
 }
 
 func (r *Runner) activateFeature(name string, version string) {

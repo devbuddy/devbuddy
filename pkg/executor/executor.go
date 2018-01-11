@@ -22,12 +22,12 @@ func GetExitCode(err error, cmd *exec.Cmd) (int, error) {
 }
 
 func Run(program string, args ...string) (int, error) {
-	fmt.Println("Running:", color.Bold(color.Cyan(program)), color.Cyan(strings.Join(args, " ")))
+	fmt.Println("  Running:", color.Bold(color.Cyan(program)), color.Cyan(strings.Join(args, " ")))
 	return RunSilent(program, args...)
 }
 
 func RunShell(cmdline string) (int, error) {
-	fmt.Println("Running:", color.Cyan(cmdline))
+	fmt.Println("  Running:", color.Cyan(cmdline))
 	return RunShellSilent(cmdline)
 }
 

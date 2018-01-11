@@ -25,6 +25,19 @@ func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
 	return taskList, nil
 }
 
+func GetFeaturesFromTasks(proj *project.Project, tasks []Task) map[string]string {
+	features := map[string]string{}
+
+	for _, task := range tasks {
+		if t, ok := task.(TaskWithFeature); ok {
+			feature, param := t.Feature(proj)
+			features[feature] = param
+		}
+	}
+
+	return features
+}
+
 func buildFromDefinition(definition interface{}) (task Task, err error) {
 	taskBuilder, err := findTaskBuilder(definition)
 	if err != nil {
