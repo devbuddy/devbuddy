@@ -30,6 +30,10 @@ func (v *Virtualenv) BinPath() string {
 	return path.Join(v.path, "bin")
 }
 
+func (v *Virtualenv) Which(cmd string) string {
+	return path.Join(v.path, "bin", cmd)
+}
+
 func VirtualenvName(proj *project.Project, version string) string {
 	return fmt.Sprintf("%s-%s", proj.Slug(), version)
 }

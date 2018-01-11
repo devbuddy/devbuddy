@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"fmt"
-	"path"
 	"strings"
 
 	"github.com/pior/dad/pkg/executor"
@@ -48,13 +47,12 @@ func (p *Pip) Load(definition interface{}) (bool, error) {
 func (p *Pip) Perform(ctx *Context) (err error) {
 	ctx.ui.TaskHeader("Pip", strings.Join(p.files, ", "))
 
-	pipCmd := "pip"
-
+	// We should also check that the python task is executed before this one
 	pythonParam, hasPythonFeature := ctx.features["python"]
-	if hasPythonFeature {
-		venv := helpers.NewVirtualenv(ctx.cfg, pythonParam)
-		pipCmd = path.Join(venv.BinPath(), "pip")
+	if !hasPythonFeature {
+		return fmt.Errorf("You must specify a Python environment to use this task")
 	}
+	pipCmd := helpers.NewVirtualenv(ctx.cfg, pythonParam).Which("pip")
 
 	for _, file := range p.files {
 		code, err := executor.Run(pipCmd, "install", "--require-virtualenv", "-r", file)
