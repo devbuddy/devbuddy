@@ -29,14 +29,17 @@ Overall, **Dad** is a _working prototype_, core features are being implemented.
 
 **Tasks:**
 
-- Custom (conditional sub-command): **working**
-
+Python:
 - Python (version + virtualenv): **working**
 - Pip (requirements file): **minimal**
-- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile)): **planned**
+- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile)): **minimal**
+
+Go:
 - Go (version): **planned**
 - Dep (support for [Go Dep](https://github.com/golang/dep)): **planned**
 
+Others
+- Custom (conditional sub-command): **working**
 - Docker Compose (manage a docker-compose setup): **planned**
 
 **Automatic environment:**
