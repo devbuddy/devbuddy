@@ -18,6 +18,10 @@ func NewUI(cfg *config.Config) *UI {
 	}
 }
 
+func (u *UI) CommandHeader(cmdline string) {
+	fmt.Fprintf(u.out, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
+}
+
 func (u *UI) TaskHeader(name string, param string) {
 	if param != "" {
 		param = fmt.Sprintf(" (%s)", color.Blue(param))
