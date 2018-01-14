@@ -26,3 +26,13 @@ commands:
   docserve:
     desc: Starting GoDoc server on http://0.0.0.0:6060
     run: godoc -http=:6060
+
+  install:
+    desc: Install dad as Go would
+    run: go install
+
+  uninstall:
+    desc: uninstall dad from /usr/local/bin/ and Go installation
+    run: |
+      [ -e "/usr/local/bin/dad" ] && sudo rm -v /usr/local/bin/dad
+      [ -e "$GOPATH/bin/dad" ] && sudo rm -v $GOPATH/bin/dad
