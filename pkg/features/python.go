@@ -4,7 +4,6 @@ import (
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/project"
-	"github.com/pior/dad/pkg/termui"
 )
 
 func init() {
@@ -19,7 +18,7 @@ func NewPython(param string) Feature {
 	return &Python{name: param}
 }
 
-func (p *Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) error {
+func (p *Python) Enable(cfg *config.Config, proj *project.Project, env *Env) error {
 	venv := helpers.NewVirtualenv(cfg, p.name)
 
 	if !venv.Exists() {
@@ -34,7 +33,7 @@ func (p *Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui 
 	return nil
 }
 
-func (p *Python) Disable(cfg *config.Config, env *Env, ui *termui.HookUI) {
+func (p *Python) Disable(cfg *config.Config, env *Env) {
 	env.Unset("VIRTUAL_ENV")
 
 	p.cleanPath(cfg, env)
