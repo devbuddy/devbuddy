@@ -36,3 +36,15 @@ commands:
     run: |
       [ -e "/usr/local/bin/dad" ] && sudo rm -v /usr/local/bin/dad
       [ -e "$GOPATH/bin/dad" ] && sudo rm -v $GOPATH/bin/dad
+
+  # Test commands
+  fail:
+    desc: test command that fail
+    run: false
+
+  multilines:
+    desc: test command with more than one line
+    run: |
+      # line one
+      # line two
+      # line three

@@ -5,24 +5,40 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/termui"
 )
 
-func customCommandRun(cmd *cobra.Command, args []string) {
+func customCommandRun(cmd *cobra.Command, args []string) error {
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+
+	ui := termui.NewUI(cfg)
+
 	proj, err := project.FindCurrent()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	name := cmd.Annotations["name"]
 	spec, ok := proj.Manifest.Commands[name]
 	if !ok {
-		exitWithMessage(fmt.Sprintf("custom command is not found: %s", name))
+		return fmt.Errorf("custom command is not found: %s", name)
 	}
 
-	_, err = executor.RunShell(spec.Run)
+	code, err := executor.RunShell(spec.Run)
 	if err != nil {
-		fmt.Printf("Command failed: %s", err)
+		return fmt.Errorf("Command failed: %s", err)
 	}
+	if code != 0 {
+		return fmt.Errorf("Command failed with code %d", code)
+	}
+
+	return nil
 }
 
 func buildCustomCommands() {
@@ -44,9 +60,10 @@ func buildCustomCommands() {
 		cmd = &cobra.Command{
 			Use:                useLine,
 			Short:              desc,
-			Run:                customCommandRun,
+			RunE:               customCommandRun,
 			Annotations:        map[string]string{"name": name},
 			DisableFlagParsing: true,
+			SilenceUsage:       true,
 		}
 		rootCmd.AddCommand(cmd)
 	}
