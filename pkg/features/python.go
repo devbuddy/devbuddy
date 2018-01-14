@@ -16,10 +16,10 @@ type Python struct {
 }
 
 func NewPython(param string) Feature {
-	return Python{name: param}
+	return &Python{name: param}
 }
 
-func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) error {
+func (p *Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *termui.HookUI) error {
 	venv := helpers.NewVirtualenv(cfg, p.name)
 
 	if !venv.Exists() {
@@ -34,14 +34,14 @@ func (p Python) Enable(cfg *config.Config, proj *project.Project, env *Env, ui *
 	return nil
 }
 
-func (p Python) Disable(cfg *config.Config, env *Env, ui *termui.HookUI) {
+func (p *Python) Disable(cfg *config.Config, env *Env, ui *termui.HookUI) {
 	env.Unset("VIRTUAL_ENV")
 
 	p.cleanPath(cfg, env)
 }
 
 // cleanPath removes all virtualenv path, even if multiple of them exists
-func (p Python) cleanPath(cfg *config.Config, env *Env) {
+func (p *Python) cleanPath(cfg *config.Config, env *Env) {
 	virtualenvBasePath := helpers.NewVirtualenv(cfg, "").Path()
 	env.RemoveFromPath(virtualenvBasePath)
 }
