@@ -23,9 +23,9 @@ commands:
     desc: Lint the project
     run: script/lint
 
-  docserve:
+  godoc:
     desc: Starting GoDoc server on http://0.0.0.0:6060
-    run: godoc -http=:6060
+    run: (sleep 1; open http://0.0.0.0:6060)& godoc -http=:6060
 
   install:
     desc: Install dad as Go would
