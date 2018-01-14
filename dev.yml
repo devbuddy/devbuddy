@@ -28,8 +28,8 @@ commands:
     run: (sleep 1; open http://0.0.0.0:6060)& godoc -http=:6060
 
   install:
-    desc: Install dad as Go would
-    run: go install
+    desc: Install dad in the GOROOT
+    run: go install -ldflags "-X main.Version=$(git describe --tags --dirty --always)"
 
   uninstall:
     desc: uninstall dad from /usr/local/bin/ and Go installation
