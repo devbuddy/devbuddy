@@ -58,7 +58,7 @@ func buildFromDefinition(definition interface{}) (task Task, err error) {
 func findTaskBuilder(definition interface{}) (TaskBuilder, error) {
 	name, err := extractTaskName(definition)
 	if err != nil {
-		return nil, fmt.Errorf("%s (%+v)", err, definition)
+		return NewInvalid, nil
 	}
 	taskBuilder, found := allTasks[name]
 	if found {

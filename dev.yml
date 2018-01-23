@@ -1,8 +1,10 @@
 up:
   - go: 1.9.2
+  - [a, list]
   - python: 3.6.4rc1
   - pip:
     - requirements.txt
+  - pipfile
   - custom:
       met?: brew info upx 2> /dev/null > /dev/null
       meet: brew install upx
