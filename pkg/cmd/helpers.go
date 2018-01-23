@@ -32,5 +32,5 @@ func checkError(err error) {
 
 func exitWithMessage(msg string) {
 	fmt.Println(color.Red("Error:"), msg)
-	os.Exit(-1)
+	os.Exit(1)
 }
