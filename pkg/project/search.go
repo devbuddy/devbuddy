@@ -27,9 +27,16 @@ func FindBestMatch(id string, conf *config.Config) (proj *Project, err error) {
 		}
 	}
 
-	// First prefix match on RepositoryName
+	// Prefix match on RepositoryName
 	for _, p := range projects {
 		if strings.HasPrefix(p.RepositoryName, id) {
+			return p, nil
+		}
+	}
+
+	// Other substring match on RepositoryName
+	for _, p := range projects {
+		if strings.Contains(p.RepositoryName, id) {
 			return p, nil
 		}
 	}
