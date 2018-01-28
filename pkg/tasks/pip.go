@@ -60,7 +60,7 @@ func (p *Pip) Perform(ctx *Context) (err error) {
 			return err
 		}
 		if code != 0 {
-			return fmt.Errorf("Pip failed with code %s", code)
+			return fmt.Errorf("Pip failed with code %d", code)
 		}
 	}
 	return nil
