@@ -55,7 +55,7 @@ func (p *Pip) Perform(ctx *Context) (err error) {
 	pipCmd := helpers.NewVirtualenv(ctx.cfg, pythonParam).Which("pip")
 
 	for _, file := range p.files {
-		code, err := executor.Run(pipCmd, "install", "--require-virtualenv", "-r", file)
+		code, err := executor.Run(pipCmd, "install", "-r", file)
 		if err != nil {
 			return err
 		}
