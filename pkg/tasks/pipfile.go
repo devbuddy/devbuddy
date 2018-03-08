@@ -3,9 +3,9 @@ package tasks
 import (
 	"fmt"
 
-	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/helpers"
+	"github.com/pior/dad/pkg/utils"
 )
 
 func init() {
@@ -58,7 +58,7 @@ func (p *Pipfile) InstallPipenv(ctx *Context, venv *helpers.Virtualenv) (acted b
 	pipCmd := venv.Which("pip")
 	pipenvCmd := venv.Which("pipenv")
 
-	if config.PathExists(pipenvCmd) {
+	if utils.PathExists(pipenvCmd) {
 		return false, nil
 	}
 

@@ -2,7 +2,6 @@ package project
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -44,20 +43,4 @@ func findByPath(path string) (*Project, error) {
 	}
 
 	return nil, ErrProjectNotFound
-}
-
-// exists checks if a file or directory exists.
-func exists(path string) bool {
-	if path == "" {
-		return false
-	}
-	_, err := os.Stat(path)
-	if err == nil {
-		return true
-	}
-	if !os.IsNotExist(err) {
-		fmt.Println("Error:", err)
-		os.Exit(1)
-	}
-	return false
 }

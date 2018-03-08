@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/utils"
 )
 
 func init() {
@@ -94,7 +94,7 @@ func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
 func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
 	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
 
-	if config.PathExists(pyEnv.Which(p.version, "virtualenv")) {
+	if utils.PathExists(pyEnv.Which(p.version, "virtualenv")) {
 		return false, nil
 	}
 

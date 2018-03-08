@@ -6,6 +6,7 @@ import (
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/utils"
 )
 
 type Virtualenv struct {
@@ -19,7 +20,7 @@ func NewVirtualenv(cfg *config.Config, name string) *Virtualenv {
 }
 
 func (v *Virtualenv) Exists() bool {
-	return config.PathExists(v.path)
+	return utils.PathExists(v.path)
 }
 
 func (v *Virtualenv) Path() string {

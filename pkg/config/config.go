@@ -55,13 +55,6 @@ func getXdgUserDataDir(homedir string) string {
 
 }
 
-func PathExists(path string) (exists bool) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
-
 func (c *Config) HomeDir(elem ...string) string {
 	elem = append([]string{c.homeDir}, elem...)
 	return filepath.Join(elem...)
