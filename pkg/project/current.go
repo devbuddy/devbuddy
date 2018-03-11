@@ -8,8 +8,6 @@ import (
 	"github.com/pior/dad/pkg/manifest"
 )
 
-var ManifestFilename = "dev.yml"
-
 var ErrProjectNotFound = errors.New("project not found")
 
 func FindCurrent() (*Project, error) {
@@ -22,12 +20,11 @@ func FindCurrent() (*Project, error) {
 
 func findByPath(path string) (*Project, error) {
 	for {
-		manifestPath := filepath.Join(path, ManifestFilename)
-		if exists(manifestPath) {
-			man, err := manifest.Load(manifestPath)
-			if err != nil {
-				return nil, err
-			}
+		man, err := manifest.Load(path)
+		if err != nil {
+			return nil, err
+		}
+		if man != nil {
 			p := &Project{
 				RepositoryName: filepath.Base(path),
 				Path:           path,
@@ -36,6 +33,7 @@ func findByPath(path string) (*Project, error) {
 			return p, nil
 		}
 
+		// Continue searching in top directory
 		path = filepath.Dir(path)
 		if path == "/" {
 			break

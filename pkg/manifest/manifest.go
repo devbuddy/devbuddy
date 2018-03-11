@@ -2,9 +2,14 @@ package manifest
 
 import (
 	"io/ioutil"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
+
+	"github.com/pior/dad/pkg/utils"
 )
+
+var ManifestFilename = "dev.yml"
 
 type Manifest struct {
 	Path string
@@ -22,9 +27,14 @@ type Command struct {
 }
 
 func Load(path string) (m *Manifest, err error) {
-	m = &Manifest{Path: path}
+	manifestPath := filepath.Join(path, ManifestFilename)
+	if !utils.PathExists(manifestPath) {
+		return nil, nil
+	}
 
-	file, err := ioutil.ReadFile(path)
+	m = &Manifest{Path: manifestPath}
+
+	file, err := ioutil.ReadFile(manifestPath)
 	if err != nil {
 		return
 	}

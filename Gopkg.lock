@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/Flaque/filet"
+  packages = ["."]
+  revision = "70fb4a62b734b80db316664a8d0932432bebaa41"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -26,6 +32,15 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/spf13/afero"
+  packages = [
+    ".",
+    "mem"
+  ]
+  revision = "bb8f1927f2a9d3ab41c9340aa034f6b803f4359c"
+  version = "v1.0.2"
+
+[[projects]]
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
@@ -39,9 +54,25 @@
 
 [[projects]]
   name = "github.com/stretchr/testify"
-  packages = ["assert","require"]
+  packages = [
+    "assert",
+    "require"
+  ]
   revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
   version = "v1.1.4"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "internal/gen",
+    "internal/triegen",
+    "internal/ucd",
+    "transform",
+    "unicode/cldr",
+    "unicode/norm"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "v2"
@@ -52,6 +83,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3156971261dc35f61c774179859e5b93217c83af842cc2bb38e0b721166d680c"
+  inputs-digest = "4f94d4bde65431cae211f9ab2c81a051324a8cdbc92d1334ead183940852a917"
   solver-name = "gps-cdcl"
   solver-version = 1
