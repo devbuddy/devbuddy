@@ -19,7 +19,7 @@ func GetFlagBool(cmd *cobra.Command, flag string) bool {
 
 func OnlyOneArg(cmd *cobra.Command, args []string) error {
 	if len(args) != 1 {
-		return fmt.Errorf("expecting 1 argument")
+		return fmt.Errorf("expecting one argument")
 	}
 	return nil
 }

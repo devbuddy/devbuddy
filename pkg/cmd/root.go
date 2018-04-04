@@ -25,8 +25,9 @@ func build(version string) {
 	err := rootCmd.Flags().MarkHidden("shell-hook")
 	checkError(err)
 
-	rootCmd.AddCommand(cloneCmd)
 	rootCmd.AddCommand(cdCmd)
+	rootCmd.AddCommand(cloneCmd)
+	rootCmd.AddCommand(createCmd)
 	rootCmd.AddCommand(upCmd)
 }
 

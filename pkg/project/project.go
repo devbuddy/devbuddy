@@ -79,3 +79,8 @@ func (p *Project) Clone() (err error) {
 	_, err = executor.Run("git", "clone", url, p.Path)
 	return
 }
+
+func (p *Project) Create() (err error) {
+	err = os.MkdirAll(p.Path, 0755)
+	return
+}

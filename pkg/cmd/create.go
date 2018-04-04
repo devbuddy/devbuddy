@@ -9,14 +9,14 @@ import (
 	"github.com/pior/dad/pkg/termui"
 )
 
-var cloneCmd = &cobra.Command{
-	Use:   "clone [REMOTE]",
-	Short: "Clone a project from github.com",
-	Run:   cloneRun,
+var createCmd = &cobra.Command{
+	Use:   "create [PROJECT]",
+	Short: "Create a new project",
+	Run:   createRun,
 	Args:  OnlyOneArg,
 }
 
-func cloneRun(cmd *cobra.Command, args []string) {
+func createRun(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
@@ -28,7 +28,7 @@ func cloneRun(cmd *cobra.Command, args []string) {
 	if proj.Exists() {
 		ui.ProjectExists()
 	} else {
-		err = proj.Clone()
+		err = proj.Create()
 		checkError(err)
 	}
 
