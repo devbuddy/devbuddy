@@ -25,13 +25,19 @@ commands:
     desc: Lint the project
     run: script/lint
 
+  ci:
+    desc: Run all tests as CI would do
+    run: script/test && script/lint
+
   godoc:
     desc: Starting GoDoc server on http://0.0.0.0:6060
     run: (sleep 1; open http://0.0.0.0:6060)& godoc -http=:6060
 
-  install:
+  install-dev:
     desc: Install dad in the GOROOT
-    run: go install -ldflags "-X main.Version=$(git describe --tags --dirty --always)"
+    run: |
+      go install -ldflags "-X main.Version=$(git describe --tags --dirty --always)"
+      [ -e "/usr/local/bin/dad" ] && sudo rm /usr/local/bin/dad || true
 
   uninstall:
     desc: uninstall dad from /usr/local/bin/ and Go installation
