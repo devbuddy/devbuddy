@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Flaque/filet"
   packages = ["."]
-  revision = "70fb4a62b734b80db316664a8d0932432bebaa41"
+  revision = "dbf95344df50497dba92c62da869a873be2968e9"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -23,7 +23,7 @@
   branch = "master"
   name = "github.com/logrusorgru/aurora"
   packages = ["."]
-  revision = "b9c3722b64a1976e0624448ee7f5a0744b8cf629"
+  revision = "ca24023cc0175fdf372518cb1c5062cc86db2634"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -37,14 +37,14 @@
     ".",
     "mem"
   ]
-  revision = "bb8f1927f2a9d3ab41c9340aa034f6b803f4359c"
-  version = "v1.0.2"
+  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
+  version = "v1.1.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "ccaecb155a2177302cb56cae929251a256d0f646"
+  revision = "a1f051bc3eba734da4772d60e2d677f47cf93ef4"
+  version = "v0.0.2"
 
 [[projects]]
   name = "github.com/spf13/pflag"
@@ -58,8 +58,8 @@
     "assert",
     "require"
   ]
-  revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
-  version = "v1.1.4"
+  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
+  version = "v1.2.1"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -75,14 +75,14 @@
   version = "v0.3.0"
 
 [[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4f94d4bde65431cae211f9ab2c81a051324a8cdbc92d1334ead183940852a917"
+  inputs-digest = "ef6c570ba2cf3ba2da22f0d645c607c29a66a5acc1b271bb3627fd92d38161b7"
   solver-name = "gps-cdcl"
   solver-version = 1
