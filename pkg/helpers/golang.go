@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
@@ -21,6 +22,14 @@ func NewGolang(cfg *config.Config, version string) *Golang {
 
 func (g *Golang) Exists() bool {
 	return utils.PathExists(g.path)
+}
+
+func (g *Golang) Path() string {
+	return g.path
+}
+
+func (g *Golang) BinPath() string {
+	return path.Join(g.path, "bin")
 }
 
 func (g *Golang) Install() (err error) {

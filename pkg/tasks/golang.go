@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"github.com/pior/dad/pkg/helpers"
+	"github.com/pior/dad/pkg/project"
 )
 
 func init() {
@@ -50,4 +51,8 @@ func (g *Golang) Perform(ctx *Context) (err error) {
 
 	ctx.ui.TaskActed()
 	return nil
+}
+
+func (g *Golang) Feature(proj *project.Project) (string, string) {
+	return "golang", g.version
 }
