@@ -109,9 +109,9 @@ commands:
     desc: Lint the project
     run: script/lint
 
-  docserve:
+  godoc:
     desc: Starting GoDoc server on http://0.0.0.0:6060
-    run: godoc -http=:6060
+    run: (sleep 1; open http://0.0.0.0:6060)& godoc -http=:6060
 ```
 See Dad own [dev.yml](dev.yml)
 
@@ -124,14 +124,17 @@ Usage:
 Available Commands:
   cd          Jump to a local project
   clone       Clone a project from github.com
+  create      Create a new project
+  godoc       Custom: Starting GoDoc server on http://0.0.0.0:6060
   help        Help about any command
-  lint        Custom
+  lint        Custom: Lint the project
   test        Custom: Run tests
   up          Ensure the project is up and running
 
 Flags:
   -h, --help              help for dad
       --shell-init        Shell initialization
+      --version           version for dad
       --with-completion   Enable completion during initialization
 
 Use "dad [command] --help" for more information about a command.

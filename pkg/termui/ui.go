@@ -40,3 +40,11 @@ func (u *UI) TaskAlreadyOk() {
 func (u *UI) TaskError(err error) {
 	fmt.Fprintf(u.out, "  %s\n", color.Red(err.Error()))
 }
+
+func (u *UI) ProjectExists() {
+	fmt.Fprintf(u.out, "🐼  %s\n", color.Brown("project already exists locally"))
+}
+
+func (u *UI) JumpProject(name string) {
+	fmt.Fprintf(u.out, "🐼  %s %s\n", color.Brown("jumping to"), color.Green(name))
+}
