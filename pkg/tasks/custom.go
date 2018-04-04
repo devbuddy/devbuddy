@@ -36,8 +36,17 @@ func (c *Custom) Load(definition interface{}) (bool, error) {
 		if !ok {
 			return false, nil
 		}
-		c.command = command.(string)
-		c.condition = condition.(string)
+
+		var err error
+		c.command, err = asString(command)
+		if err != nil {
+			return false, fmt.Errorf("invalid meet value: %s", err)
+		}
+		c.condition, err = asString(condition)
+		if err != nil {
+			return false, fmt.Errorf("invalid met? value: %s", err)
+		}
+
 		return true, nil
 	}
 	return false, nil
