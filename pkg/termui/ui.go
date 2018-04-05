@@ -41,6 +41,10 @@ func (u *UI) TaskError(err error) {
 	fmt.Fprintf(u.out, "  %s\n", color.Red(err.Error()))
 }
 
+func (u *UI) TaskWarning(message string) {
+	fmt.Fprintf(u.out, "  Warning: %s\n", color.Brown(message))
+}
+
 func (u *UI) ProjectExists() {
 	fmt.Fprintf(u.out, "🐼  %s\n", color.Brown("project already exists locally"))
 }
