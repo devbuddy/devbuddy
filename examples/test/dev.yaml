@@ -1,5 +1,13 @@
 up:
-  - go: 1.9.5
+  - go: 1.9.2
+  - [a, list]
+  - python: 3.6.4rc1
+  - pip:
+    - requirements.txt
+  - pipfile
+  - custom:
+      met?: brew info upx 2> /dev/null > /dev/null
+      meet: brew install upx
   - custom:
       met?: dep status 2> /dev/null > /dev/null
       meet: dep ensure
@@ -36,3 +44,15 @@ commands:
     run: |
       [ -e "/usr/local/bin/dad" ] && sudo rm -v /usr/local/bin/dad
       [ -e "$GOPATH/bin/dad" ] && sudo rm -v $GOPATH/bin/dad
+
+  # Test commands
+  fail:
+    desc: test command that fail
+    run: false
+
+  multilines:
+    desc: test command with more than one line
+    run: |
+      # line one
+      # line two
+      # line three
