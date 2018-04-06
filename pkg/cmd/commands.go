@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -30,10 +31,11 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("custom command is not found: %s", name)
 	}
 
-	ui.CommandHeader(spec.Run)
+	cmdline := strings.Join(append([]string{spec.Run}, args...), " ")
 
-	code, err := executor.NewShell(spec.Run).SetCwd(proj.Path).Run()
+	ui.CommandHeader(cmdline)
 
+	code, err := executor.NewShell(cmdline).SetCwd(proj.Path).Run()
 	if err != nil {
 		return fmt.Errorf("command failed: %s", err)
 	}
