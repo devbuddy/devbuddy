@@ -1,8 +1,21 @@
 #!/bin/bash
 
-TESTS_DIR=$(dirname $(realpath $0))/../tests
-TESTS=${TESTS_DIR}/*_test.sh
+ROOT=$(realpath $(dirname $(realpath $0))/..)
+export PATH=$ROOT:$PATH
 
+cd $ROOT
+go build
+
+if [[ "$(which dad)" != "$(realpath dad)" ]]; then
+    echo "In order to run the integration test on the current code,"
+    echo "the locally built dad binary must be found in the PATH."
+    echo "But 'which dad' returned: $(which dad)"
+    exit 1
+fi
+
+cd $ROOT/tests
+TESTS=*_test.sh
 for testfile in $TESTS; do
-    $testfile
+    ./$testfile
 done
+

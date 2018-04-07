@@ -64,6 +64,5 @@ testCdBySubstringOrg() {
 	assertEquals "cd to project directory" ~/src/github.com/dadorgtest/repotest "$PWD"
 }
 
-cd $(dirname $(realpath $0))  # ShUnit2 needs that
 SHUNIT_COLOR='none'  # Not macos compatible?
 . shunit2/shunit2
