@@ -9,7 +9,7 @@ import (
 	"github.com/pior/dad/pkg/config"
 )
 
-func FindBestMatch(id string, conf *config.Config) (proj *Project, err error) {
+func FindBestMatch(expr string, conf *config.Config) (proj *Project, err error) {
 	projects, err := GetAllProjects(conf.SourceDir)
 	if err != nil {
 		return
@@ -20,28 +20,49 @@ func FindBestMatch(id string, conf *config.Config) (proj *Project, err error) {
 		return
 	}
 
+	// Exact match on ID
+	for _, p := range projects {
+		if p.ID == expr {
+			return p, nil
+		}
+	}
+
 	// Exact match on RepositoryName
 	for _, p := range projects {
-		if p.RepositoryName == id {
+		if p.RepositoryName == expr {
+			return p, nil
+		}
+	}
+
+	// Prefix match on ID
+	for _, p := range projects {
+		if strings.HasPrefix(p.ID, expr) {
 			return p, nil
 		}
 	}
 
 	// Prefix match on RepositoryName
 	for _, p := range projects {
-		if strings.HasPrefix(p.RepositoryName, id) {
+		if strings.HasPrefix(p.RepositoryName, expr) {
+			return p, nil
+		}
+	}
+
+	// Other substring match on ID
+	for _, p := range projects {
+		if strings.Contains(p.ID, expr) {
 			return p, nil
 		}
 	}
 
 	// Other substring match on RepositoryName
 	for _, p := range projects {
-		if strings.Contains(p.RepositoryName, id) {
+		if strings.Contains(p.RepositoryName, expr) {
 			return p, nil
 		}
 	}
 
-	err = fmt.Errorf("no project found for %s", id)
+	err = fmt.Errorf("no project found for %s", expr)
 	return
 }
 
@@ -74,6 +95,7 @@ func GetAllProjects(sourceDir string) ([]*Project, error) {
 				HostingPlatform:  host,
 				OrganisationName: org,
 				RepositoryName:   repo,
+				ID:               filepath.Join(org, repo),
 				Path:             projPath,
 			})
 		}

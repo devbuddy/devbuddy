@@ -16,6 +16,7 @@ type Project struct {
 	HostingPlatform  string
 	OrganisationName string
 	RepositoryName   string
+	ID               string
 	Path             string
 	Manifest         *manifest.Manifest
 }
@@ -28,6 +29,7 @@ func NewFromID(id string, conf *config.Config) (p *Project, err error) {
 			HostingPlatform:  "github.com",
 			OrganisationName: match[1],
 			RepositoryName:   match[2],
+			ID:               id,
 		}
 	} else {
 		err = fmt.Errorf("Unrecognized remote project: %s", id)
