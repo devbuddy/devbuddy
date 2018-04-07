@@ -12,8 +12,9 @@ install:
   - script/setup-ci test
 
 script:
-  - script/lint
   - script/test
+  - script/integration_test
+  - script/lint
 
 before_deploy:
   - script/buildall

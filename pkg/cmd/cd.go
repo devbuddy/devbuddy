@@ -1,14 +1,12 @@
 package cmd
 
 import (
-	"fmt"
-
-	color "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/integration"
 	"github.com/pior/dad/pkg/project"
+	"github.com/pior/dad/pkg/termui"
 )
 
 var cdCmd = &cobra.Command{
@@ -22,10 +20,12 @@ func cdRun(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
+	ui := termui.NewUI(cfg)
+
 	proj, err := project.FindBestMatch(args[0], cfg)
 	checkError(err)
 
-	fmt.Println(color.Brown("💡  Jumping to"), color.Green(proj.FullName()))
+	ui.JumpProject(proj.FullName())
 
 	err = integration.AddFinalizerCd(proj.Path)
 	checkError(err)

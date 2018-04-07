@@ -1,0 +1,20 @@
+#!/bin/bash
+
+ROOT=$PWD
+export PATH=$ROOT:$PATH
+
+go build
+
+if [[ "$(which dad)" != "$ROOT/dad" ]]; then
+    echo "In order to run the integration test on the current code,"
+    echo "the locally built dad binary must be found in the PATH."
+    echo "But 'which dad' returned: $(which dad)"
+    exit 1
+fi
+
+cd $ROOT/tests
+TESTS=*_test.sh
+for testfile in $TESTS; do
+    ./$testfile
+done
+

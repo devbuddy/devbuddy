@@ -1,6 +1,8 @@
 package integration
 
 var bashSource = `
+# Be careful! This runs in the user shell.
+
 # Mask the command dad with this shell function
 # This let us mutate the current shell
 dad() {
@@ -16,7 +18,7 @@ dad() {
     # Perform finalizers
     local fin
     while read -r fin; do
-        [ -n "${DAD_DEBUG}" ] && echo "DAD_DEBUG: finalizer: ${fin}"
+        [ -n "${DAD_DEBUG:-}" ] && echo "DAD_DEBUG: finalizer: ${fin}"
 
         case "${fin}" in
             cd:*)
@@ -42,12 +44,12 @@ __dad_prompt_command() {
 
     local hook_eval
     hook_eval="$(dad --shell-hook)"
-    [ -n "${DAD_DEBUG}" ] && echo -e "DAD_DEBUG: Hook eval:\n${hook_eval}\n---"
+    [ -n "${DAD_DEBUG:-}" ] && echo -e "DAD_DEBUG: Hook eval:\n${hook_eval}\n---"
     eval "${hook_eval}"
 }
 
-if [[ ! "${PROMPT_COMMAND}" == *__dad_prompt_command* ]]; then
-  PROMPT_COMMAND="__dad_prompt_command; ${PROMPT_COMMAND}"
+if [[ ! "${PROMPT_COMMAND:-}" == *__dad_prompt_command* ]]; then
+  PROMPT_COMMAND="__dad_prompt_command; ${PROMPT_COMMAND:-}"
 fi
 
 dad-enable-debug() {
@@ -60,5 +62,7 @@ dad-disable-debug() {
     echo "DAD_DEBUG: disable"
 }
 
-[ -n "${DAD_DEBUG}" ] && echo "DAD_DEBUG: Dad is now enabled..."
+if [[ -n "${DAD_DEBUG:-}" ]]; then
+    echo "DAD_DEBUG: Dad is now enabled..."
+fi
 `
