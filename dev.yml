@@ -10,8 +10,12 @@ commands:
     run: go install && dad up
 
   test:
-    desc: Run the tests
+    desc: Run the unittests
     run: script/test
+
+  integration:
+    desc: Run the integration tests
+    run: script/integration_test
 
   lint:
     desc: Lint the project
@@ -19,7 +23,7 @@ commands:
 
   ci:
     desc: Run all tests as CI would do
-    run: script/test && script/lint
+    run: script/test && script/integration_test && script/lint
 
   godoc:
     desc: Starting GoDoc server on http://0.0.0.0:6060

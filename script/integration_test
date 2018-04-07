@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TESTS_DIR=$(dirname $(realpath $0))/../tests
+TESTS=${TESTS_DIR}/*_test.sh
+
+for testfile in $TESTS; do
+    $testfile
+done
