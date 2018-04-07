@@ -1,12 +1,11 @@
 #!/bin/bash
 
-ROOT=$(realpath $(dirname $(realpath $0))/..)
+ROOT=$PWD
 export PATH=$ROOT:$PATH
 
-cd $ROOT
 go build
 
-if [[ "$(which dad)" != "$(realpath dad)" ]]; then
+if [[ "$(which dad)" != "$ROOT/dad" ]]; then
     echo "In order to run the integration test on the current code,"
     echo "the locally built dad binary must be found in the PATH."
     echo "But 'which dad' returned: $(which dad)"
