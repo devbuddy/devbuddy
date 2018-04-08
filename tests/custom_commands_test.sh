@@ -13,6 +13,8 @@ commands:
     run: echo TESTTEST > somefile
   echo:
     run: echo PREFIX
+  isprojectroot:
+    run: test -e dev.yml
   success:
     run: true
   failure:
@@ -42,6 +44,16 @@ testFailure() {
 	dad failure
 
 	assertEquals "dad return with the right exit code" 1 $?
+}
+
+testRunInProjectRoot() {
+	dad isprojectroot
+	assertEquals "dad isprojectroot command succeed in project root" 0 $?
+
+	mkdir -p subdir
+	cd subdir
+	dad isprojectroot
+	assertEquals "dad custom commands run in project root" 0 $?
 }
 
 SHUNIT_COLOR='none'  # Not macos compatible?
