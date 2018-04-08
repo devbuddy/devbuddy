@@ -11,12 +11,12 @@ setUp() {
 
 	cat > dev.yml <<YAML
 commands:
-	mycmd:
-		run: echo TESTTEST > somefile
-	success:
-		run: true
-	failure:
-		run: false
+  mycmd:
+    run: echo TESTTEST > somefile
+  success:
+    run: true
+  failure:
+    run: false
 YAML
 }
 
