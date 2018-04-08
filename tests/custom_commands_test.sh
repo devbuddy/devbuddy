@@ -5,9 +5,7 @@ oneTimeSetUp() {
 }
 
 setUp() {
-	rm -rf ~/src/github.com/dadorg/repo
-	mkdir -p ~/src/github.com/dadorg/repo
-	cd ~/src/github.com/dadorg/repo
+	cd $SHUNIT_TMPDIR
 
 	cat > dev.yml <<YAML
 commands:
