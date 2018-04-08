@@ -11,6 +11,8 @@ setUp() {
 commands:
   mycmd:
     run: echo TESTTEST > somefile
+  echo:
+    run: echo PREFIX
   success:
     run: true
   failure:
@@ -22,6 +24,12 @@ testSimple() {
 	dad mycmd
 
 	assertEquals "somefile was created" "TESTTEST" "$(cat somefile)"
+}
+
+testArguments() {
+	local output=$(dad echo ARG1 ARG2)
+
+	assertEquals "command called with arguments" "PREFIX ARG1 ARG2" "$output"
 }
 
 testSuccess() {
