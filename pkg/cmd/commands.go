@@ -35,10 +35,10 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 	code, err := executor.NewShell(spec.Run).SetCwd(proj.Path).Run()
 
 	if err != nil {
-		return fmt.Errorf("Command failed: %s", err)
+		return fmt.Errorf("command failed: %s", err)
 	}
 	if code != 0 {
-		return fmt.Errorf("Command failed with code %d", code)
+		return fmt.Errorf("command failed with code %d", code)
 	}
 
 	return nil
