@@ -24,5 +24,11 @@ testCreate() {
     assertEquals "cd to project directory" ~/src/github.com/dadorg/repo "$PWD"
 }
 
+testCreateExisting() {
+    dad create dadorg/repo2
+
+    assertEquals "cd to project directory" ~/src/github.com/dadorg/repo2 "$PWD"
+}
+
 SHUNIT_COLOR='none'  # Not macos compatible?
 . shunit2/shunit2
