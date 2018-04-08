@@ -43,7 +43,7 @@ __dad_prompt_command() {
     which dad > /dev/null || return
 
     local hook_eval
-    hook_eval="$(dad --shell-hook)"
+    hook_eval="$(command dad --shell-hook)"
     [ -n "${DAD_DEBUG:-}" ] && echo -e "DAD_DEBUG: Hook eval:\n${hook_eval}\n---"
     eval "${hook_eval}"
 }
