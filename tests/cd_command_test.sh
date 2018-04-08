@@ -15,15 +15,6 @@ setUp() {
 	cd  # reset the cwd since this is changed in the tests
 }
 
-testCreate() {
-	rm -rf ~/src/github.com/dadorgtest/repotest
-
-	dad create dadorgtest/repotest
-
-	assertTrue "directory was created" "[ -d ~/src/github.com/dadorgtest/repotest ]"
-	assertEquals "cd to project directory" ~/src/github.com/dadorgtest/repotest "$PWD"
-}
-
 testCdExactMatch() {
 	dad cd dadorgtest/repotest
 	assertEquals "cd to project directory" ~/src/github.com/dadorgtest/repotest "$PWD"
