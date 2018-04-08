@@ -15,6 +15,7 @@ fi
 cd $ROOT/tests
 TESTS=*_test.sh
 for testfile in $TESTS; do
+    echo -e "\nTest file: $testfile"
     ./$testfile
 done
 
