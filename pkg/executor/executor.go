@@ -1,57 +1,56 @@
 package executor
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 	"syscall"
-
-	color "github.com/logrusorgru/aurora"
 )
 
-func GetExitCode(err error, cmd *exec.Cmd) (int, error) {
+type Executor struct {
+	cmd *exec.Cmd
+}
+
+// New returns an *Executor that will run the program with arguments
+func New(program string, args ...string) *Executor {
+	return &Executor{cmd: exec.Command(program, args...)}
+}
+
+// NewShell returns an *Executor that will run the command line in a shell
+func NewShell(cmdline string) *Executor {
+	return &Executor{cmd: exec.Command("sh", "-c", cmdline)}
+}
+
+// SetCwd change the current working directory the command will be run in
+func (e *Executor) SetCwd(cwd string) *Executor {
+	e.cmd.Dir = cwd
+	return e
+}
+
+func (e *Executor) getExitCode(err error) (int, error) {
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
 			return code, nil
 		}
 	}
-	code := cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
+	code := e.cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
 	return code, err
 }
 
-func Run(program string, args ...string) (int, error) {
-	fmt.Println("  Running:", color.Bold(color.Cyan(program)), color.Cyan(strings.Join(args, " ")))
-	return RunSilent(program, args...)
-}
+// Run executes the command and returns the exit code
+func (e *Executor) Run() (int, error) {
+	e.cmd.Stdin = os.Stdin
+	e.cmd.Stdout = os.Stdout
+	e.cmd.Stderr = os.Stderr
 
-func RunShell(cmdline string) (int, error) {
-	fmt.Println("  Running:", color.Cyan(cmdline))
-	return RunShellSilent(cmdline)
-}
-
-func RunSilent(program string, args ...string) (int, error) {
-	cmd := exec.Command(program, args...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	code, err := GetExitCode(err, cmd)
-
+	err := e.cmd.Run()
+	code, err := e.getExitCode(err)
 	return code, err
 }
 
-func RunShellSilent(cmdline string) (int, error) {
-	return RunSilent("sh", "-c", cmdline)
-}
-
-func Capture(program string, args ...string) (string, int, error) {
-	cmd := exec.Command(program, args...)
-
-	output, err := cmd.Output()
-	code, err := GetExitCode(err, cmd)
-
+// Capture executes the command and return the output and the exit code
+func (e *Executor) Capture() (string, int, error) {
+	output, err := e.cmd.Output()
+	code, err := getExitCode(err, e.cmd)
 	return string(output), code, err
 }
