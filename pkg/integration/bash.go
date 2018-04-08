@@ -9,7 +9,6 @@ dad() {
     # Prepare a file to pass the finalize actions
     local finalizer_file
     finalizer_file="$(mktemp /tmp/dad-finalize-XXXXXX)"
-    trap "rm -f '${finalizer_file}'" EXIT
 
     # Run the actual command
     env DAD_FINALIZER_FILE=$finalizer_file dad $@
@@ -31,6 +30,7 @@ dad() {
                 ;;
         esac
     done < "${finalizer_file}"
+    rm -f "${finalizer_file}"
 
     return ${return_code}
 }
@@ -43,7 +43,7 @@ __dad_prompt_command() {
     which dad > /dev/null || return
 
     local hook_eval
-    hook_eval="$(dad --shell-hook)"
+    hook_eval="$(command dad --shell-hook)"
     [ -n "${DAD_DEBUG:-}" ] && echo -e "DAD_DEBUG: Hook eval:\n${hook_eval}\n---"
     eval "${hook_eval}"
 }
