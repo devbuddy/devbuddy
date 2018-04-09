@@ -6,6 +6,11 @@ if [[ -z "${VERSION}" ]]; then
 	exit 1
 fi
 
+if [[ "${VERSION}" == "v"* ]]; then
+	echo "The VERSION should not start with the v prefix"
+	exit 1
+fi
+
 BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [[ "${BRANCH}" != "master" ]]; then
 	echo "Error: not on the master branch."
@@ -21,10 +26,10 @@ fi
 set -e
 
 echo " ✭ create release commit"
-git commit --allow-empty -m "Release ${VERSION}"
+git commit --allow-empty -m "Release v${VERSION}"
 
 echo " ✭ create tag"
-git tag  -a "${VERSION}" -m "Release ${VERSION}"
+git tag  -a "v${VERSION}" -m "Release v${VERSION}"
 
 echo " ✭ push to origin"
 git push --follow-tags
