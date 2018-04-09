@@ -1,18 +1,20 @@
 #!/bin/bash
 
 oneTimeSetUp() {
-	eval "$(dad --shell-init)"
+    eval "$(dad --shell-init)"
 }
 
 setUp() {
-	rm -rf ~/src/github.com/dadorg/repo
-	mkdir -p ~/src/github.com/dadorg/repo
-	cd ~/src/github.com/dadorg/repo
+    cd $SHUNIT_TMPDIR
 
-	cat > dev.yml <<YAML
+    cat > dev.yml <<YAML
 commands:
   mycmd:
     run: echo TESTTEST > somefile
+  echo:
+    run: echo PREFIX
+  isprojectroot:
+    run: test -e dev.yml
   success:
     run: true
   failure:
@@ -21,21 +23,37 @@ YAML
 }
 
 testSimple() {
-	dad mycmd
+    dad mycmd
 
-	assertEquals "somefile was created" "TESTTEST" "$(cat somefile)"
+    assertEquals "somefile was created" "TESTTEST" "$(cat somefile)"
+}
+
+testArguments() {
+    local output=$(dad echo ARG1 ARG2)
+
+    assertEquals "command called with arguments" "PREFIX ARG1 ARG2" "$output"
 }
 
 testSuccess() {
-	dad success
+    dad success
 
-	assertEquals "dad return with the right exit code" 0 $?
+    assertEquals "dad return with the right exit code" 0 $?
 }
 
 testFailure() {
-	dad failure
+    dad failure
 
-	assertEquals "dad return with the right exit code" 1 $?
+    assertEquals "dad return with the right exit code" 1 $?
+}
+
+testRunInProjectRoot() {
+    dad isprojectroot
+    assertEquals "dad isprojectroot command succeed in project root" 0 $?
+
+    mkdir -p subdir
+    cd subdir
+    dad isprojectroot
+    assertEquals "dad custom commands run in project root" 0 $?
 }
 
 SHUNIT_COLOR='none'  # Not macos compatible?
