@@ -39,8 +39,9 @@ commands:
       go install -ldflags "-X main.Version=$(git describe --tags --dirty --always)"
       [ -e "/usr/local/bin/dad" ] && sudo rm /usr/local/bin/dad || true
 
-  uninstall:
-    desc: uninstall dad from /usr/local/bin/ and Go installation
+  install-release:
+    desc: Remove all dad binaries and install a released version
     run: |
       [ -e "/usr/local/bin/dad" ] && sudo rm -v /usr/local/bin/dad
       [ -e "$GOPATH/bin/dad" ] && sudo rm -v $GOPATH/bin/dad
+      bash -c "$(curl -sL https://raw.githubusercontent.com/pior/dad/master/install.sh)"
