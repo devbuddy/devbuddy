@@ -25,6 +25,10 @@ commands:
     desc: Run all tests as CI would do
     run: script/test && script/integration_test && script/lint
 
+  release:
+    desc: Create a new release
+    run: script/release
+
   godoc:
     desc: Starting GoDoc server on http://0.0.0.0:6060
     run: (sleep 1; open http://0.0.0.0:6060)& godoc -http=:6060
