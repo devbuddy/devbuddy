@@ -23,38 +23,46 @@ With **Dad**, pushing a change on a project you never touched look like this:
 
 ## Status and progress
 
-**Dad** will start as a highly compatible implementation of **Dev** (when possible).
+**Dad** is mostly useful for Python and Go projects. More languages will be natively
+supported. Additional automatic tasks will also be implemented, making **Dad** also
+useful for languages without native support.
 
-Overall, **Dad** is a _working prototype_, core features are being implemented.
-
-**Tasks:**
+### Tasks:
 
 Python:
 - Python (version + virtualenv): **working**
-- Pip (requirements file): **minimal**
-- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile)): **minimal**
+- Pip (requirements file): **simple**
+- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile)): **simple**
 
 Go:
-- Go (version): **planned**
-- Dep (support for [Go Dep](https://github.com/golang/dep)): **planned**
+- Go (version): **working**
+- Dep (support for [Go Dep](https://github.com/golang/dep)): **simple**
 
 Others
-- Custom (conditional sub-command): **working**
+- Custom (conditional shell command): **working**
+- Packages (Homebrew, Apt...): **planned**
 - Docker Compose (manage a docker-compose setup): **planned**
 
-**Automatic environment:**
+### Automatic environment:
 
 - Virtualenv: **working**
-- Go: **planned**
+- Go: **working**
 
-**Hosting platform:**
+### Features:
+
+- Notification when important files (eg: `requirements.txt`) are updated locally
+  (eg: by `git pull`)
+- A `help` command to guide a new developer based on `dev.yml`
+- A `upgrade` command to auto-upgrade **Dad**
+
+### Hosting platform:
 
 - Github: **working**
 - Any git remote-url: **planned**
 - Gitlab: **planned**
 - Bitbucket (with Git): **planned**
 
-**Shell integration**
+### Shell integration
 
 - Bash: **working**
 - Zsh: **planned**
