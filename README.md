@@ -63,7 +63,7 @@ Others
 ## Install
 
 ```bash
-$ bash -c "$(curl -L https://raw.githubusercontent.com/pior/dad/master/install.sh)"
+$ bash -c "$(curl -sL https://raw.githubusercontent.com/pior/dad/master/install.sh)"
 ```
 
 ## Uninstall
