@@ -36,7 +36,7 @@ Python:
 
 Go:
 - Go (version): **working**
-- Dep (support for [Go Dep](https://github.com/golang/dep)): **simple**
+- Dep (support for [Go Dep](https://github.com/golang/dep)): **planned**
 
 Others
 - Custom (conditional shell command): **working**
