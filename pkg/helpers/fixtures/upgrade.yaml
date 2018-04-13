@@ -1,0 +1,158 @@
+---
+version: 1
+rwmutex: {}
+interactions:
+- request:
+    body: ""
+    form: {}
+    headers: {}
+    url: https://api.github.com/repos/pior/dad/releases/latest
+    method: GET
+  response:
+    body: '{"url":"https://api.github.com/repos/pior/dad/releases/10448348","assets_url":"https://api.github.com/repos/pior/dad/releases/10448348/assets","upload_url":"https://uploads.github.com/repos/pior/dad/releases/10448348/assets{?name,label}","html_url":"https://github.com/pior/dad/releases/tag/v0.1.0","id":10448348,"tag_name":"v0.1.0","target_commitish":"master","name":"","draft":false,"author":{"login":"pior","id":60219,"avatar_url":"https://avatars1.githubusercontent.com/u/60219?v=4","gravatar_id":"","url":"https://api.github.com/users/pior","html_url":"https://github.com/pior","followers_url":"https://api.github.com/users/pior/followers","following_url":"https://api.github.com/users/pior/following{/other_user}","gists_url":"https://api.github.com/users/pior/gists{/gist_id}","starred_url":"https://api.github.com/users/pior/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/pior/subscriptions","organizations_url":"https://api.github.com/users/pior/orgs","repos_url":"https://api.github.com/users/pior/repos","events_url":"https://api.github.com/users/pior/events{/privacy}","received_events_url":"https://api.github.com/users/pior/received_events","type":"User","site_admin":false},"prerelease":false,"created_at":"2018-04-09T01:22:32Z","published_at":"2018-04-09T01:24:55Z","assets":[{"url":"https://api.github.com/repos/pior/dad/releases/assets/6777275","id":6777275,"name":"dad-darwin-amd64","label":"","uploader":{"login":"pior","id":60219,"avatar_url":"https://avatars1.githubusercontent.com/u/60219?v=4","gravatar_id":"","url":"https://api.github.com/users/pior","html_url":"https://github.com/pior","followers_url":"https://api.github.com/users/pior/followers","following_url":"https://api.github.com/users/pior/following{/other_user}","gists_url":"https://api.github.com/users/pior/gists{/gist_id}","starred_url":"https://api.github.com/users/pior/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/pior/subscriptions","organizations_url":"https://api.github.com/users/pior/orgs","repos_url":"https://api.github.com/users/pior/repos","events_url":"https://api.github.com/users/pior/events{/privacy}","received_events_url":"https://api.github.com/users/pior/received_events","type":"User","site_admin":false},"content_type":"application/octet-stream","state":"uploaded","size":3680432,"download_count":13,"created_at":"2018-04-09T01:24:54Z","updated_at":"2018-04-09T01:24:55Z","browser_download_url":"https://github.com/pior/dad/releases/download/v0.1.0/dad-darwin-amd64"},{"url":"https://api.github.com/repos/pior/dad/releases/assets/6777276","id":6777276,"name":"dad-darwin-amd64.sha256","label":"","uploader":{"login":"pior","id":60219,"avatar_url":"https://avatars1.githubusercontent.com/u/60219?v=4","gravatar_id":"","url":"https://api.github.com/users/pior","html_url":"https://github.com/pior","followers_url":"https://api.github.com/users/pior/followers","following_url":"https://api.github.com/users/pior/following{/other_user}","gists_url":"https://api.github.com/users/pior/gists{/gist_id}","starred_url":"https://api.github.com/users/pior/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/pior/subscriptions","organizations_url":"https://api.github.com/users/pior/orgs","repos_url":"https://api.github.com/users/pior/repos","events_url":"https://api.github.com/users/pior/events{/privacy}","received_events_url":"https://api.github.com/users/pior/received_events","type":"User","site_admin":false},"content_type":"application/octet-stream","state":"uploaded","size":88,"download_count":1,"created_at":"2018-04-09T01:24:55Z","updated_at":"2018-04-09T01:24:55Z","browser_download_url":"https://github.com/pior/dad/releases/download/v0.1.0/dad-darwin-amd64.sha256"},{"url":"https://api.github.com/repos/pior/dad/releases/assets/6777273","id":6777273,"name":"dad-linux-amd64","label":"","uploader":{"login":"pior","id":60219,"avatar_url":"https://avatars1.githubusercontent.com/u/60219?v=4","gravatar_id":"","url":"https://api.github.com/users/pior","html_url":"https://github.com/pior","followers_url":"https://api.github.com/users/pior/followers","following_url":"https://api.github.com/users/pior/following{/other_user}","gists_url":"https://api.github.com/users/pior/gists{/gist_id}","starred_url":"https://api.github.com/users/pior/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/pior/subscriptions","organizations_url":"https://api.github.com/users/pior/orgs","repos_url":"https://api.github.com/users/pior/repos","events_url":"https://api.github.com/users/pior/events{/privacy}","received_events_url":"https://api.github.com/users/pior/received_events","type":"User","site_admin":false},"content_type":"application/octet-stream","state":"uploaded","size":3343840,"download_count":0,"created_at":"2018-04-09T01:24:54Z","updated_at":"2018-04-09T01:24:54Z","browser_download_url":"https://github.com/pior/dad/releases/download/v0.1.0/dad-linux-amd64"},{"url":"https://api.github.com/repos/pior/dad/releases/assets/6777274","id":6777274,"name":"dad-linux-amd64.sha256","label":"","uploader":{"login":"pior","id":60219,"avatar_url":"https://avatars1.githubusercontent.com/u/60219?v=4","gravatar_id":"","url":"https://api.github.com/users/pior","html_url":"https://github.com/pior","followers_url":"https://api.github.com/users/pior/followers","following_url":"https://api.github.com/users/pior/following{/other_user}","gists_url":"https://api.github.com/users/pior/gists{/gist_id}","starred_url":"https://api.github.com/users/pior/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/pior/subscriptions","organizations_url":"https://api.github.com/users/pior/orgs","repos_url":"https://api.github.com/users/pior/repos","events_url":"https://api.github.com/users/pior/events{/privacy}","received_events_url":"https://api.github.com/users/pior/received_events","type":"User","site_admin":false},"content_type":"application/octet-stream","state":"uploaded","size":87,"download_count":0,"created_at":"2018-04-09T01:24:54Z","updated_at":"2018-04-09T01:24:54Z","browser_download_url":"https://github.com/pior/dad/releases/download/v0.1.0/dad-linux-amd64.sha256"}],"tarball_url":"https://api.github.com/repos/pior/dad/tarball/v0.1.0","zipball_url":"https://api.github.com/repos/pior/dad/zipball/v0.1.0","body":"Features:\r\n-
+      Handle the golang environment\r\n- Run the custom commands in the project root
+      dir\r\n- Pass arguments to custom commands\r\n- Make Cd command accept the “org/repo”
+      form (+ variants)\r\n- Add integration tests \r\n\r\nFixes:\r\n- Make the bash
+      integration script more robust to non-standard environment\r\n- Fix the finalizer
+      file cleanup in the shell integration"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+        X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+      Cache-Control:
+      - public, max-age=60, s-maxage=60
+      Content-Security-Policy:
+      - default-src 'none'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 28 Apr 2018 18:24:43 GMT
+      Etag:
+      - W/"562ba981cfa34982d3cc98e18ab053a8"
+      Last-Modified:
+      - Mon, 09 Apr 2018 02:30:37 GMT
+      Referrer-Policy:
+      - origin-when-cross-origin, strict-origin-when-cross-origin
+      Server:
+      - GitHub.com
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - deny
+      X-Github-Media-Type:
+      - github.v3; format=json
+      X-Github-Request-Id:
+      - 48ED:794D:3A5577D:78E9C94:5AE4BC6A
+      X-Ratelimit-Limit:
+      - "60"
+      X-Ratelimit-Remaining:
+      - "59"
+      X-Ratelimit-Reset:
+      - "1524943483"
+      X-Runtime-Rack:
+      - "0.039915"
+      X-Xss-Protection:
+      - 1; mode=block
+    status: 200 OK
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers: {}
+    url: https://github.com/pior/dad/releases/download/v0.1.0/dad-darwin-amd64
+    method: GET
+  response:
+    body: <html><body>You are being <a href="https://github-production-release-asset-2e65be.s3.amazonaws.com/110183537/47fc50a0-3b73-11e8-9d47-0ec873ee6e3e?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180428%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20180428T182443Z&amp;X-Amz-Expires=300&amp;X-Amz-Signature=4d4f8d0a96063e37091eb46c3474a6d22c67db7c48368fdd2c9558aea23e13f1&amp;X-Amz-SignedHeaders=host&amp;actor_id=0&amp;response-content-disposition=attachment%3B%20filename%3Ddad-darwin-amd64&amp;response-content-type=application%2Foctet-stream">redirected</a>.</body></html>
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Security-Policy:
+      - 'default-src ''none''; base-uri ''self''; block-all-mixed-content; connect-src
+        ''self'' uploads.github.com status.github.com collector.githubapp.com api.github.com
+        www.google-analytics.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com
+        github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com
+        wss://live.github.com; font-src assets-cdn.github.com; form-action ''self''
+        github.com gist.github.com; frame-ancestors ''none''; frame-src render.githubusercontent.com;
+        img-src ''self'' data: assets-cdn.github.com identicons.github.com collector.githubapp.com
+        github-cloud.s3.amazonaws.com *.githubusercontent.com; manifest-src ''self'';
+        media-src ''none''; script-src assets-cdn.github.com; style-src ''unsafe-inline''
+        assets-cdn.github.com'
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Sat, 28 Apr 2018 18:24:43 GMT
+      Expect-Ct:
+      - max-age=2592000, report-uri="https://api.github.com/_private/browser/errors"
+      Location:
+      - https://github-production-release-asset-2e65be.s3.amazonaws.com/110183537/47fc50a0-3b73-11e8-9d47-0ec873ee6e3e?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180428%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20180428T182443Z&X-Amz-Expires=300&X-Amz-Signature=4d4f8d0a96063e37091eb46c3474a6d22c67db7c48368fdd2c9558aea23e13f1&X-Amz-SignedHeaders=host&actor_id=0&response-content-disposition=attachment%3B%20filename%3Ddad-darwin-amd64&response-content-type=application%2Foctet-stream
+      Server:
+      - GitHub.com
+      Set-Cookie:
+      - logged_in=no; domain=.github.com; path=/; expires=Wed, 28 Apr 2038 18:24:43
+        -0000; secure; HttpOnly
+      Status:
+      - 302 Found
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      Vary:
+      - X-PJAX
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - deny
+      X-Github-Request-Id:
+      - 48EE:3823:2E493F2:563B69C:5AE4BC6B
+      X-Request-Id:
+      - ab5376d6-4430-4954-b7d6-2430bd94b18e
+      X-Runtime:
+      - "0.061716"
+      X-Runtime-Rack:
+      - "0.070262"
+      X-Xss-Protection:
+      - 1; mode=block
+    status: 302 Found
+    code: 302
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Referer:
+      - https://github.com/pior/dad/releases/download/v0.1.0/dad-darwin-amd64
+    url: https://github-production-release-asset-2e65be.s3.amazonaws.com/110183537/47fc50a0-3b73-11e8-9d47-0ec873ee6e3e?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180428%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20180428T182443Z&X-Amz-Expires=300&X-Amz-Signature=4d4f8d0a96063e37091eb46c3474a6d22c67db7c48368fdd2c9558aea23e13f1&X-Amz-SignedHeaders=host&actor_id=0&response-content-disposition=attachment%3B%20filename%3Ddad-darwin-amd64&response-content-type=application%2Foctet-stream
+    method: GET
+  response:
+    body: "Original data was too big"
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment; filename=dad-darwin-amd64
+      Content-Length:
+      - "3680432"
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sat, 28 Apr 2018 18:24:45 GMT
+      Etag:
+      - '"e5976e10d76dcd922f704f77de65f74d"'
+      Last-Modified:
+      - Mon, 09 Apr 2018 01:24:56 GMT
+      Server:
+      - AmazonS3
+      X-Amz-Id-2:
+      - fPvIurV+Qvpo4Bv+KkScREAcKEjy8JNFkW/5iBm8iykF38V4NLcaQoxrWNl/vyAuhX0QRVeoecg=
+      X-Amz-Request-Id:
+      - DAAAEED1AFBEAC28
+    status: 200 OK
+    code: 200
+    duration: ""

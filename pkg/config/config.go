@@ -1,9 +1,11 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
+	"runtime"
 )
 
 type Config struct {
@@ -12,6 +14,8 @@ type Config struct {
 	SourceDir    string
 	dataDir      string
 }
+
+const defaultReleaseURL string = "https://api.github.com/repos/pior/dad/releases/latest"
 
 func Load() (*Config, error) {
 	homedir, err := getHomeDir()
@@ -53,6 +57,18 @@ func getXdgUserDataDir(homedir string) string {
 	}
 	return filepath.Join(homedir, ".local/share")
 
+}
+
+func (c *Config) ReleaseURL() string {
+	url := os.Getenv("DAD_RELEASE_URL")
+	if url != "" {
+		return url
+	}
+	return defaultReleaseURL
+}
+
+func (c *Config) Platform() string {
+	return fmt.Sprintf("dad-%s-%s", runtime.GOOS, runtime.GOARCH)
 }
 
 func (c *Config) HomeDir(elem ...string) string {
