@@ -49,3 +49,10 @@ func TestShellCapturePWD(t *testing.T) {
 	require.Zero(t, code)
 	require.Equal(t, "/bin\n", output)
 }
+
+func TestCommandNotFound(t *testing.T) {
+	code, err := New("never-ever-cmd").Run()
+
+	require.Error(t, err)
+	require.Equal(t, -1, code)
+}

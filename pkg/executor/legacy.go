@@ -11,14 +11,18 @@ import (
 )
 
 func getExitCode(err error, cmd *exec.Cmd) (int, error) {
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
-			return code, nil
-		}
+	if err == nil {
+		code := cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
+		return code, nil
 	}
-	code := cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
-	return code, err
+
+	if exitError, ok := err.(*exec.ExitError); ok {
+		code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
+		return code, nil
+	}
+
+	// There was an error but not a ExitError, just return it with an invalid exit code
+	return -1, err
 }
 
 func Run(program string, args ...string) (int, error) {
