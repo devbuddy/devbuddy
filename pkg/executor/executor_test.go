@@ -9,7 +9,7 @@ import (
 func TestCommandFalse(t *testing.T) {
 	code, err := New("false").Run()
 
-	require.NoError(t, err)
+	require.Error(t, err)
 	require.Equal(t, 1, code)
 }
 
@@ -30,7 +30,7 @@ func TestShellTrue(t *testing.T) {
 func TestShellFalse(t *testing.T) {
 	code, err := NewShell("false").Run()
 
-	require.NoError(t, err)
+	require.Error(t, err)
 	require.Equal(t, 1, code)
 }
 
@@ -40,6 +40,14 @@ func TestShellCapture(t *testing.T) {
 	require.NoError(t, err)
 	require.Zero(t, code)
 	require.Equal(t, "poipoi\n", output)
+}
+
+func TestShellCaptureAndTrim(t *testing.T) {
+	output, code, err := NewShell("echo poipoi").CaptureAndTrim()
+
+	require.NoError(t, err)
+	require.Zero(t, code)
+	require.Equal(t, "poipoi", output)
 }
 
 func TestShellCapturePWD(t *testing.T) {

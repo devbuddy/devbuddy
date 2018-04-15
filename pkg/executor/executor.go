@@ -3,6 +3,7 @@ package executor
 import (
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 )
 
@@ -34,7 +35,7 @@ func (e *Executor) getExitCode(err error) (int, error) {
 
 	if exitError, ok := err.(*exec.ExitError); ok {
 		code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
-		return code, nil
+		return code, err
 	}
 
 	// There was an error but not a ExitError, just return it with an invalid exit code
@@ -55,6 +56,12 @@ func (e *Executor) Run() (int, error) {
 // Capture executes the command and return the output and the exit code
 func (e *Executor) Capture() (string, int, error) {
 	output, err := e.cmd.Output()
-	code, err := getExitCode(err, e.cmd)
+	code, err := e.getExitCode(err)
 	return string(output), code, err
+}
+
+// CaptureAndTrim calls Capture() and trim the blank lines
+func (e *Executor) CaptureAndTrim() (string, int, error) {
+	output, code, err := e.Capture()
+	return strings.Trim(output, "\n"), code, err
 }

@@ -7,17 +7,19 @@ import (
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/project"
 )
 
 type PyEnv struct {
 	root string
 }
 
-func NewPyEnv(cfg *config.Config, proj *project.Project) *PyEnv {
-	root := cfg.HomeDir(".pyenv")
+func NewPyEnv(cfg *config.Config) (*PyEnv, error) {
+	root, _, err := executor.New("pyenv", "root").CaptureAndTrim()
+	if err != nil {
+		return nil, err
+	}
 	v := PyEnv{root: root}
-	return &v
+	return &v, nil
 }
 
 func (p *PyEnv) VersionInstalled(version string) (installed bool, err error) {
