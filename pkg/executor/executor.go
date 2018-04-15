@@ -3,6 +3,7 @@ package executor
 import (
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 )
 
@@ -57,4 +58,10 @@ func (e *Executor) Capture() (string, int, error) {
 	output, err := e.cmd.Output()
 	code, err := getExitCode(err, e.cmd)
 	return string(output), code, err
+}
+
+// CaptureAndTrim calls Capture() and trim the blank lines
+func (e *Executor) CaptureAndTrim() (string, int, error) {
+	output, code, err := e.Capture()
+	return strings.Trim(string(output), "\n"), code, err
 }

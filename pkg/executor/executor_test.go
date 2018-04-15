@@ -42,6 +42,14 @@ func TestShellCapture(t *testing.T) {
 	require.Equal(t, "poipoi\n", output)
 }
 
+func TestShellCaptureAndTrim(t *testing.T) {
+	output, code, err := NewShell("echo poipoi").CaptureAndTrim()
+
+	require.NoError(t, err)
+	require.Zero(t, code)
+	require.Equal(t, "poipoi", output)
+}
+
 func TestShellCapturePWD(t *testing.T) {
 	output, code, err := NewShell("echo $PWD").SetCwd("/bin").Capture()
 
