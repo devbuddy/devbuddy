@@ -63,5 +63,5 @@ func (e *Executor) Capture() (string, int, error) {
 // CaptureAndTrim calls Capture() and trim the blank lines
 func (e *Executor) CaptureAndTrim() (string, int, error) {
 	output, code, err := e.Capture()
-	return strings.Trim(string(output), "\n"), code, err
+	return strings.Trim(output, "\n"), code, err
 }
