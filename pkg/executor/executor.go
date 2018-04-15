@@ -56,7 +56,7 @@ func (e *Executor) Run() (int, error) {
 // Capture executes the command and return the output and the exit code
 func (e *Executor) Capture() (string, int, error) {
 	output, err := e.cmd.Output()
-	code, err := getExitCode(err, e.cmd)
+	code, err := e.getExitCode(err)
 	return string(output), code, err
 }
 
