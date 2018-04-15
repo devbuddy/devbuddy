@@ -42,7 +42,10 @@ func (p *Python) Load(definition interface{}) (bool, error) {
 func (p *Python) Perform(ctx *Context) (err error) {
 	ctx.ui.TaskHeader("Python", p.version)
 
-	pyEnv := helpers.NewPyEnv(ctx.cfg)
+	pyEnv, err := helpers.NewPyEnv(ctx.cfg)
+	if err != nil {
+		return
+	}
 
 	installed, err := p.InstallPython(ctx, pyEnv)
 	if err != nil {
