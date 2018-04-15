@@ -42,19 +42,21 @@ func (p *Python) Load(definition interface{}) (bool, error) {
 func (p *Python) Perform(ctx *Context) (err error) {
 	ctx.ui.TaskHeader("Python", p.version)
 
-	installed, err := p.InstallPython(ctx)
+	pyEnv := helpers.NewPyEnv(ctx.cfg)
+
+	installed, err := p.InstallPython(ctx, pyEnv)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
 	}
 
-	venvInstalled, err := p.InstallVirtualEnv(ctx)
+	venvInstalled, err := p.InstallVirtualEnv(ctx, pyEnv)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
 	}
 
-	venvCreated, err := p.CreateVirtualEnv(ctx)
+	venvCreated, err := p.CreateVirtualEnv(ctx, pyEnv)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
@@ -69,9 +71,7 @@ func (p *Python) Perform(ctx *Context) (err error) {
 	return nil
 }
 
-func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
-	pyEnv := helpers.NewPyEnv(ctx.cfg)
-
+func (p *Python) InstallPython(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
 	installed, err := pyEnv.VersionInstalled(p.version)
 	if err != nil {
 		return
@@ -91,9 +91,7 @@ func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
 	return true, nil
 }
 
-func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
-	pyEnv := helpers.NewPyEnv(ctx.cfg)
-
+func (p *Python) InstallVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
 	if utils.PathExists(pyEnv.Which(p.version, "virtualenv")) {
 		return false, nil
 	}
@@ -109,10 +107,9 @@ func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
 	return true, nil
 }
 
-func (p *Python) CreateVirtualEnv(ctx *Context) (acted bool, err error) {
+func (p *Python) CreateVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
 	name := helpers.VirtualenvName(ctx.proj, p.version)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
-	pyEnv := helpers.NewPyEnv(ctx.cfg)
 
 	if venv.Exists() {
 		return false, nil
