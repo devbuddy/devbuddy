@@ -70,7 +70,7 @@ func (p *Python) Perform(ctx *Context) (err error) {
 }
 
 func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
-	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
+	pyEnv := helpers.NewPyEnv(ctx.cfg)
 
 	installed, err := pyEnv.VersionInstalled(p.version)
 	if err != nil {
@@ -92,7 +92,7 @@ func (p *Python) InstallPython(ctx *Context) (acted bool, err error) {
 }
 
 func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
-	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
+	pyEnv := helpers.NewPyEnv(ctx.cfg)
 
 	if utils.PathExists(pyEnv.Which(p.version, "virtualenv")) {
 		return false, nil
@@ -112,7 +112,7 @@ func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
 func (p *Python) CreateVirtualEnv(ctx *Context) (acted bool, err error) {
 	name := helpers.VirtualenvName(ctx.proj, p.version)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
-	pyEnv := helpers.NewPyEnv(ctx.cfg, ctx.proj)
+	pyEnv := helpers.NewPyEnv(ctx.cfg)
 
 	if venv.Exists() {
 		return false, nil
