@@ -52,10 +52,11 @@ func (p *Pip) Perform(ctx *Context) (err error) {
 	if !hasPythonFeature {
 		return fmt.Errorf("You must specify a Python environment to use this task")
 	}
-	pipCmd := helpers.NewVirtualenv(ctx.cfg, pythonParam).Which("pip")
+
+	pythonCmd := helpers.NewVirtualenv(ctx.cfg, pythonParam).Which("python")
 
 	for _, file := range p.files {
-		code, err := executor.Run(pipCmd, "install", "-r", file)
+		code, err := executor.Run(pythonCmd, "-m", "pip", "install", "-r", file)
 		if err != nil {
 			return err
 		}

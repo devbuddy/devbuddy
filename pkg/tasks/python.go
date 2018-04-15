@@ -98,7 +98,7 @@ func (p *Python) InstallVirtualEnv(ctx *Context) (acted bool, err error) {
 		return false, nil
 	}
 
-	code, err := executor.Run(pyEnv.Which(p.version, "pip"), "install", "virtualenv")
+	code, err := executor.Run(pyEnv.Which(p.version, "python"), "-m", "pip", "install", "virtualenv")
 	if err != nil {
 		return
 	}
