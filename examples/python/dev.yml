@@ -1,0 +1,5 @@
+up:
+  - python: 3.6.1
+  - pip:
+    - requirements.txt
+  - pipfile
