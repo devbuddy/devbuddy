@@ -24,9 +24,9 @@ func NewPython() Task {
 }
 
 func (p *Python) Load(config *taskConfig) (bool, error) {
-	version, ok := config.payload.(string)
-	if !ok {
-		return false, nil
+	version, err := config.getPayloadAsString()
+	if err != nil {
+		return false, err
 	}
 
 	p.version = version

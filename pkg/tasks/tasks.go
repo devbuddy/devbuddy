@@ -22,6 +22,14 @@ type taskConfig struct {
 	payload interface{}
 }
 
+func (c *taskConfig) getPayloadAsString() (string, error) {
+	value, ok := c.payload.(string)
+	if !ok {
+		return "", fmt.Errorf("need a string, found: %T (%v)", c.payload, c.payload)
+	}
+	return value, nil
+}
+
 func parseTaskConfig(definition interface{}) (*taskConfig, error) {
 	val := reflect.ValueOf(definition)
 

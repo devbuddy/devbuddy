@@ -20,10 +20,11 @@ func NewGolang() Task {
 }
 
 func (g *Golang) Load(config *taskConfig) (bool, error) {
-	version, ok := config.payload.(string)
-	if !ok {
-		return false, nil
+	version, err := config.getPayloadAsString()
+	if err != nil {
+		return false, err
 	}
+
 	g.version = version
 	return true, nil
 }
