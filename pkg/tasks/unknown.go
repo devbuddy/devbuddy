@@ -12,7 +12,7 @@ func NewUnknown() Task {
 	return &Unknown{}
 }
 
-func (u *Unknown) Load(config *taskConfig) (bool, error) {
+func (u *Unknown) load(config *taskConfig) (bool, error) {
 	u.providedName = config.name
 	return true, nil
 }
@@ -25,7 +25,7 @@ func (u *Unknown) header() string {
 	return ""
 }
 
-func (u *Unknown) Perform(ctx *Context) (err error) {
+func (u *Unknown) perform(ctx *Context) (err error) {
 	ctx.ui.TaskError(fmt.Errorf("Unknown task"))
 	return nil
 }

@@ -23,7 +23,7 @@ func NewPython() Task {
 	return &Python{}
 }
 
-func (p *Python) Load(config *taskConfig) (bool, error) {
+func (p *Python) load(config *taskConfig) (bool, error) {
 	version, err := config.getPayloadAsString()
 	if err != nil {
 		return false, err
@@ -41,7 +41,7 @@ func (p *Python) header() string {
 	return p.version
 }
 
-func (p *Python) Perform(ctx *Context) (err error) {
+func (p *Python) perform(ctx *Context) (err error) {
 	pyEnv, err := helpers.NewPyEnv(ctx.cfg)
 	if err != nil {
 		return

@@ -19,7 +19,7 @@ func NewCustom() Task {
 	return &Custom{}
 }
 
-func (c *Custom) Load(config *taskConfig) (bool, error) {
+func (c *Custom) load(config *taskConfig) (bool, error) {
 	properties := config.payload.(map[interface{}]interface{})
 
 	command, ok := properties["meet"]
@@ -52,7 +52,7 @@ func (c *Custom) header() string {
 	return c.command
 }
 
-func (c *Custom) Perform(ctx *Context) error {
+func (c *Custom) perform(ctx *Context) error {
 	ran, err := c.runCommand()
 	if err != nil {
 		ctx.ui.TaskError(err)

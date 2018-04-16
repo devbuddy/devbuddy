@@ -8,10 +8,10 @@ import (
 )
 
 type Task interface {
-	Load(*taskConfig) (bool, error)
+	load(*taskConfig) (bool, error)
 	name() string
 	header() string
-	Perform(*Context) error
+	perform(*Context) error
 }
 
 type TaskWithFeature interface {

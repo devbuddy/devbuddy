@@ -19,7 +19,7 @@ func NewGolang() Task {
 	return &Golang{}
 }
 
-func (g *Golang) Load(config *taskConfig) (bool, error) {
+func (g *Golang) load(config *taskConfig) (bool, error) {
 	version, err := config.getPayloadAsString()
 	if err != nil {
 		return false, err
@@ -37,7 +37,7 @@ func (g *Golang) header() string {
 	return g.version
 }
 
-func (g *Golang) Perform(ctx *Context) (err error) {
+func (g *Golang) perform(ctx *Context) (err error) {
 	goSrc := helpers.NewGolang(ctx.cfg, g.version)
 
 	if os.Getenv("GOPATH") == "" {

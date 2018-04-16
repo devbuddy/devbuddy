@@ -49,7 +49,7 @@ func buildFromDefinition(definition interface{}) (task Task, err error) {
 		task = NewInvalid(definition, err)
 	}
 
-	ok, err := task.Load(taskConfig)
+	ok, err := task.load(taskConfig)
 	if err != nil {
 		return nil, err
 	}
