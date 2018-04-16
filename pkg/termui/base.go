@@ -5,20 +5,11 @@ import (
 	"os"
 
 	color "github.com/logrusorgru/aurora"
-
-	"github.com/pior/dad/pkg/config"
 )
 
 type baseUI struct {
 	out          *os.File
 	debugEnabled bool
-}
-
-func newBaseUI(cfg *config.Config) baseUI {
-	return baseUI{
-		out:          os.Stderr,
-		debugEnabled: cfg.DebugEnabled,
-	}
 }
 
 func (u *baseUI) Debug(format string, params ...interface{}) {
