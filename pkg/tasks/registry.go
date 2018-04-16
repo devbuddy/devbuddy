@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/pior/dad/pkg/project"
 )
@@ -39,10 +38,18 @@ func GetFeaturesFromTasks(proj *project.Project, tasks []Task) map[string]string
 }
 
 func buildFromDefinition(definition interface{}) (task Task, err error) {
-	taskBuilder, err := findTaskBuilder(definition)
+	var taskBuilder TaskBuilder
+
+	taskConfig, err := parseTaskConfig(definition)
 	if err != nil {
-		return nil, err
+		taskBuilder = NewInvalid
+	} else {
+		taskBuilder = allTasks[taskConfig.name]
 	}
+	if taskBuilder == nil {
+		taskBuilder = NewUnknown
+	}
+
 	task = taskBuilder()
 	ok, err := task.Load(definition)
 	if err != nil {
@@ -53,33 +60,4 @@ func buildFromDefinition(definition interface{}) (task Task, err error) {
 	}
 
 	return nil, fmt.Errorf("error parsing tasks: %+v", definition)
-}
-
-func findTaskBuilder(definition interface{}) (TaskBuilder, error) {
-	name, err := extractTaskName(definition)
-	if err != nil {
-		return NewInvalid, nil
-	}
-	taskBuilder, found := allTasks[name]
-	if found {
-		return taskBuilder, nil
-	}
-	return NewUnknown, nil
-}
-
-func extractTaskName(definition interface{}) (string, error) {
-	val := reflect.ValueOf(definition)
-	if val.Kind() == reflect.Map {
-		keys := val.MapKeys()
-		if len(keys) != 1 {
-			return "", fmt.Errorf("invalid map length")
-		}
-		definition = keys[0].Interface()
-	}
-
-	if name, ok := definition.(string); ok {
-		return name, nil
-	}
-
-	return "", fmt.Errorf("invalid structure")
 }
