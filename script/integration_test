@@ -12,10 +12,23 @@ if [[ "$(which dad)" != "$ROOT/dad" ]]; then
     exit 1
 fi
 
+RC=0
+
 cd $ROOT/tests
 TESTS=*_test.sh
 for testfile in $TESTS; do
     echo -e "\nTest file: $testfile"
     ./$testfile
+
+    if [[ $? != 0 ]]; then
+        RC=1
+    fi
 done
 
+if [[ $RC == 0 ]]; then
+    echo -e "\nAll tests passed successfully"
+else
+    echo -e "\nError: At least one test failed!"
+fi
+
+exit $RC
