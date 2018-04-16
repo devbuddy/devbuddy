@@ -8,14 +8,14 @@ import (
 )
 
 func init() {
-	allTasks["go"] = NewGolang
+	allTasks["go"] = newGolang
 }
 
 type Golang struct {
 	version string
 }
 
-func NewGolang() Task {
+func newGolang() Task {
 	return &Golang{}
 }
 

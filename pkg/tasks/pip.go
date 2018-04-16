@@ -9,14 +9,14 @@ import (
 )
 
 func init() {
-	allTasks["pip"] = NewPip
+	allTasks["pip"] = newPip
 }
 
 type Pip struct {
 	files []string
 }
 
-func NewPip() Task {
+func newPip() Task {
 	return &Pip{}
 }
 

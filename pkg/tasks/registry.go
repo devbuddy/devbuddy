@@ -6,9 +6,9 @@ import (
 	"github.com/pior/dad/pkg/project"
 )
 
-var allTasks = make(map[string]TaskBuilder)
+var allTasks = make(map[string]taskBuilder)
 
-type TaskBuilder func() Task
+type taskBuilder func() Task
 
 func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
 	var task Task
@@ -42,11 +42,11 @@ func buildFromDefinition(definition interface{}) (task Task, err error) {
 	if err == nil {
 		taskBuilder := allTasks[taskConfig.name]
 		if taskBuilder == nil {
-			taskBuilder = NewUnknown
+			taskBuilder = newUnknown
 		}
 		task = taskBuilder()
 	} else {
-		task = NewInvalid(definition, err)
+		task = newInvalid(definition, err)
 	}
 
 	ok, err := task.load(taskConfig)

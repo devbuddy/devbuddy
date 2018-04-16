@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	allTasks["custom"] = NewCustom
+	allTasks["custom"] = newCustom
 }
 
 type Custom struct {
@@ -15,7 +15,7 @@ type Custom struct {
 	command   string
 }
 
-func NewCustom() Task {
+func newCustom() Task {
 	return &Custom{}
 }
 

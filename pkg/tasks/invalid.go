@@ -9,7 +9,7 @@ type Invalid struct {
 	err        error
 }
 
-func NewInvalid(definition interface{}, err error) Task {
+func newInvalid(definition interface{}, err error) Task {
 	return &Invalid{definition: definition, err: err}
 }
 

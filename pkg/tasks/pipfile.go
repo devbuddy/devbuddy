@@ -9,13 +9,13 @@ import (
 )
 
 func init() {
-	allTasks["pipfile"] = NewPipfile
+	allTasks["pipfile"] = newPipfile
 }
 
 type Pipfile struct {
 }
 
-func NewPipfile() Task {
+func newPipfile() Task {
 	return &Pipfile{}
 }
 

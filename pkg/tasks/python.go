@@ -12,14 +12,14 @@ import (
 )
 
 func init() {
-	allTasks["python"] = NewPython
+	allTasks["python"] = newPython
 }
 
 type Python struct {
 	version string
 }
 
-func NewPython() Task {
+func newPython() Task {
 	return &Python{}
 }
 

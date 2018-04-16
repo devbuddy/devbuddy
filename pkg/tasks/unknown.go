@@ -8,7 +8,7 @@ type Unknown struct {
 	providedName string
 }
 
-func NewUnknown() Task {
+func newUnknown() Task {
 	return &Unknown{}
 }
 
