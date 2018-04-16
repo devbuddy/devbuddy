@@ -19,20 +19,14 @@ func NewGolang() Task {
 	return &Golang{}
 }
 
-func (g *Golang) Load(definition interface{}) (bool, error) {
-	def, ok := definition.(map[interface{}]interface{})
-	if !ok {
-		return false, nil
-	}
-	if version, ok := def["go"]; ok {
-		g.version, ok = version.(string)
-		if !ok {
-			return false, nil
-		}
-		return true, nil
+func (g *Golang) Load(config *taskConfig) (bool, error) {
+	version, err := config.getPayloadAsString()
+	if err != nil {
+		return false, err
 	}
 
-	return false, nil
+	g.version = version
+	return true, nil
 }
 
 func (g *Golang) Perform(ctx *Context) (err error) {

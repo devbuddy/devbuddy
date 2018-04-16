@@ -19,7 +19,7 @@ func NewPipfile() Task {
 	return &Pipfile{}
 }
 
-func (p *Pipfile) Load(definition interface{}) (bool, error) {
+func (p *Pipfile) Load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 

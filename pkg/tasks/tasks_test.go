@@ -6,18 +6,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPip(t *testing.T) {
-	task := ensureLoadTestTask(t, `
-pip:
-  - file1
-  - file2
-`)
+func TestTaskConfigStringOk(t *testing.T) {
+	config := &taskConfig{name: "test", payload: "value"}
 
-	require.Equal(t, task.(*Pip).files, []string{"file1", "file2"})
+	val, err := config.getPayloadAsString()
+	require.NoError(t, err)
+	require.Equal(t, val, "value")
 }
 
-func TestPython(t *testing.T) {
-	task := ensureLoadTestTask(t, `python: 3.6.3`)
+func TestTaskConfigStringWithNumber(t *testing.T) {
+	config := &taskConfig{name: "test", payload: 42}
 
-	require.Equal(t, task.(*Python).version, "3.6.3")
+	_, err := config.getPayloadAsString()
+	require.EqualError(t, err, "need a string, found: int (42)")
+}
+
+func TestTaskConfigStringWithBoolean(t *testing.T) {
+	config := &taskConfig{name: "test", payload: false}
+
+	_, err := config.getPayloadAsString()
+	require.EqualError(t, err, "need a string, found: bool (false)")
 }
