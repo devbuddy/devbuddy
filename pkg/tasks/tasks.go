@@ -9,6 +9,8 @@ import (
 
 type Task interface {
 	Load(*taskConfig) (bool, error)
+	name() string
+	header() string
 	Perform(*Context) error
 }
 

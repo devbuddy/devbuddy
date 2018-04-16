@@ -29,9 +29,15 @@ func (g *Golang) Load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 
-func (g *Golang) Perform(ctx *Context) (err error) {
-	ctx.ui.TaskHeader("Golang", g.version)
+func (g *Golang) name() string {
+	return "Golang"
+}
 
+func (g *Golang) header() string {
+	return g.version
+}
+
+func (g *Golang) Perform(ctx *Context) (err error) {
 	goSrc := helpers.NewGolang(ctx.cfg, g.version)
 
 	if os.Getenv("GOPATH") == "" {

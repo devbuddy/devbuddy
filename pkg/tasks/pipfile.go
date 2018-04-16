@@ -23,9 +23,15 @@ func (p *Pipfile) Load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 
-func (p *Pipfile) Perform(ctx *Context) (err error) {
-	ctx.ui.TaskHeader("Pipfile", "")
+func (p *Pipfile) name() string {
+	return "Pipfile"
+}
 
+func (p *Pipfile) header() string {
+	return ""
+}
+
+func (p *Pipfile) Perform(ctx *Context) (err error) {
 	// We should also check that the python task is executed before this one
 	pythonParam, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {

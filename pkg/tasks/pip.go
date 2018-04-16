@@ -36,9 +36,15 @@ func (p *Pip) Load(config *taskConfig) (bool, error) {
 	return false, fmt.Errorf("no pip files specified")
 }
 
-func (p *Pip) Perform(ctx *Context) (err error) {
-	ctx.ui.TaskHeader("Pip", strings.Join(p.files, ", "))
+func (p *Pip) name() string {
+	return "Pip"
+}
 
+func (p *Pip) header() string {
+	return strings.Join(p.files, ", ")
+}
+
+func (p *Pip) Perform(ctx *Context) (err error) {
 	// We should also check that the python task is executed before this one
 	pythonParam, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {

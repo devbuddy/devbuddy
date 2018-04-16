@@ -44,9 +44,15 @@ func (c *Custom) Load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 
-func (c *Custom) Perform(ctx *Context) error {
-	ctx.ui.TaskHeader("Custom", c.command)
+func (c *Custom) name() string {
+	return "Custom"
+}
 
+func (c *Custom) header() string {
+	return c.command
+}
+
+func (c *Custom) Perform(ctx *Context) error {
 	ran, err := c.runCommand()
 	if err != nil {
 		ctx.ui.TaskError(err)

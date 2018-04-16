@@ -38,19 +38,17 @@ func GetFeaturesFromTasks(proj *project.Project, tasks []Task) map[string]string
 }
 
 func buildFromDefinition(definition interface{}) (task Task, err error) {
-	var taskBuilder TaskBuilder
-
 	taskConfig, err := parseTaskConfig(definition)
-	if err != nil {
-		taskBuilder = NewInvalid
+	if err == nil {
+		taskBuilder := allTasks[taskConfig.name]
+		if taskBuilder == nil {
+			taskBuilder = NewUnknown
+		}
+		task = taskBuilder()
 	} else {
-		taskBuilder = allTasks[taskConfig.name]
-	}
-	if taskBuilder == nil {
-		taskBuilder = NewUnknown
+		task = NewInvalid(definition, err)
 	}
 
-	task = taskBuilder()
 	ok, err := task.Load(taskConfig)
 	if err != nil {
 		return nil, err

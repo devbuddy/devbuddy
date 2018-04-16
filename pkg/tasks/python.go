@@ -33,9 +33,15 @@ func (p *Python) Load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 
-func (p *Python) Perform(ctx *Context) (err error) {
-	ctx.ui.TaskHeader("Python", p.version)
+func (p *Python) name() string {
+	return "Python"
+}
 
+func (p *Python) header() string {
+	return p.version
+}
+
+func (p *Python) Perform(ctx *Context) (err error) {
 	pyEnv, err := helpers.NewPyEnv(ctx.cfg)
 	if err != nil {
 		return
