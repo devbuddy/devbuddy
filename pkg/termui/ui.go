@@ -2,6 +2,7 @@ package termui
 
 import (
 	"fmt"
+	"os"
 
 	color "github.com/logrusorgru/aurora"
 
@@ -14,12 +15,15 @@ type UI struct {
 
 func NewUI(cfg *config.Config) *UI {
 	return &UI{
-		newBaseUI(cfg),
+		baseUI{
+			out:          os.Stdout,
+			debugEnabled: cfg.DebugEnabled,
+		},
 	}
 }
 
 func (u *UI) CommandHeader(cmdline string) {
-	fmt.Fprintf(u.out, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
+	fmt.Fprintf(os.Stderr, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
 }
 
 func (u *UI) TaskHeader(name string, param string) {

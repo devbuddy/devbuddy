@@ -2,6 +2,7 @@ package termui
 
 import (
 	"fmt"
+	"os"
 
 	color "github.com/logrusorgru/aurora"
 
@@ -14,7 +15,10 @@ type HookUI struct {
 
 func NewHookUI(cfg *config.Config) *HookUI {
 	return &HookUI{
-		newBaseUI(cfg),
+		baseUI{
+			out:          os.Stderr,
+			debugEnabled: cfg.DebugEnabled,
+		},
 	}
 }
 
