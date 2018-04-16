@@ -8,7 +8,7 @@ import (
 )
 
 type Task interface {
-	Load(interface{}) (bool, error)
+	Load(*taskConfig) (bool, error)
 	Perform(*Context) error
 }
 

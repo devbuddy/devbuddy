@@ -23,20 +23,14 @@ func NewPython() Task {
 	return &Python{}
 }
 
-func (p *Python) Load(definition interface{}) (bool, error) {
-	def, ok := definition.(map[interface{}]interface{})
+func (p *Python) Load(config *taskConfig) (bool, error) {
+	version, ok := config.payload.(string)
 	if !ok {
 		return false, nil
 	}
-	if version, ok := def["python"]; ok {
-		p.version, ok = version.(string)
-		if !ok {
-			return false, nil
-		}
-		return true, nil
-	}
 
-	return false, nil
+	p.version = version
+	return true, nil
 }
 
 func (p *Python) Perform(ctx *Context) (err error) {

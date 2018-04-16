@@ -19,37 +19,29 @@ func NewCustom() Task {
 	return &Custom{}
 }
 
-func (c *Custom) Load(definition interface{}) (bool, error) {
-	def, ok := definition.(map[interface{}]interface{})
+func (c *Custom) Load(config *taskConfig) (bool, error) {
+	properties := config.payload.(map[interface{}]interface{})
+
+	command, ok := properties["meet"]
+	if !ok {
+		return false, nil
+	}
+	condition, ok := properties["met?"]
 	if !ok {
 		return false, nil
 	}
 
-	if payload, ok := def["custom"]; ok {
-		properties := payload.(map[interface{}]interface{})
-
-		command, ok := properties["meet"]
-		if !ok {
-			return false, nil
-		}
-		condition, ok := properties["met?"]
-		if !ok {
-			return false, nil
-		}
-
-		var err error
-		c.command, err = asString(command)
-		if err != nil {
-			return false, fmt.Errorf("invalid meet value: %s", err)
-		}
-		c.condition, err = asString(condition)
-		if err != nil {
-			return false, fmt.Errorf("invalid met? value: %s", err)
-		}
-
-		return true, nil
+	var err error
+	c.command, err = asString(command)
+	if err != nil {
+		return false, fmt.Errorf("invalid meet value: %s", err)
 	}
-	return false, nil
+	c.condition, err = asString(condition)
+	if err != nil {
+		return false, fmt.Errorf("invalid met? value: %s", err)
+	}
+
+	return true, nil
 }
 
 func (c *Custom) Perform(ctx *Context) error {

@@ -20,28 +20,20 @@ func NewPip() Task {
 	return &Pip{}
 }
 
-func (p *Pip) Load(definition interface{}) (bool, error) {
-	def, ok := definition.(map[interface{}]interface{})
-	if !ok {
-		return false, nil
+func (p *Pip) Load(config *taskConfig) (bool, error) {
+	for _, value := range config.payload.([]interface{}) {
+		if v, ok := value.(string); ok {
+			p.files = append(p.files, v)
+
+		} else {
+			return false, fmt.Errorf("invalid pip files")
+		}
+	}
+	if len(p.files) > 0 {
+		return true, nil
 	}
 
-	if payload, ok := def["pip"]; ok {
-		for _, value := range payload.([]interface{}) {
-			if v, ok := value.(string); ok {
-				p.files = append(p.files, v)
-
-			} else {
-				return false, fmt.Errorf("invalid pip files")
-			}
-		}
-		if len(p.files) > 0 {
-			return true, nil
-		}
-
-		return false, fmt.Errorf("no pip files specified")
-	}
-	return false, nil
+	return false, fmt.Errorf("no pip files specified")
 }
 
 func (p *Pip) Perform(ctx *Context) (err error) {

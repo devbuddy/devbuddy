@@ -51,7 +51,7 @@ func buildFromDefinition(definition interface{}) (task Task, err error) {
 	}
 
 	task = taskBuilder()
-	ok, err := task.Load(definition)
+	ok, err := task.Load(taskConfig)
 	if err != nil {
 		return nil, err
 	}
