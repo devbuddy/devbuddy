@@ -19,18 +19,16 @@ type Python struct {
 	version string
 }
 
-func newPython() Task {
-	return &Python{}
-}
+func newPython(config *taskConfig) (Task, error) {
+	task := &Python{}
 
-func (p *Python) load(config *taskConfig) error {
-	version, err := config.getPayloadAsString()
+	var err error
+	task.version, err = config.getPayloadAsString()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	p.version = version
-	return nil
+	return task, nil
 }
 
 func (p *Python) name() string {

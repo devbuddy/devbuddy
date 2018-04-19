@@ -8,13 +8,8 @@ type Unknown struct {
 	providedName string
 }
 
-func newUnknown() Task {
-	return &Unknown{}
-}
-
-func (u *Unknown) load(config *taskConfig) error {
-	u.providedName = config.name
-	return nil
+func newUnknown(config *taskConfig) (Task, error) {
+	return &Unknown{providedName: config.name}, nil
 }
 
 func (u *Unknown) name() string {

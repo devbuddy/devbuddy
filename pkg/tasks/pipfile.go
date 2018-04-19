@@ -15,12 +15,8 @@ func init() {
 type Pipfile struct {
 }
 
-func newPipfile() Task {
-	return &Pipfile{}
-}
-
-func (p *Pipfile) load(config *taskConfig) error {
-	return nil
+func newPipfile(config *taskConfig) (Task, error) {
+	return &Pipfile{}, nil
 }
 
 func (p *Pipfile) name() string {

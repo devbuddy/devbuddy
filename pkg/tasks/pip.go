@@ -16,24 +16,21 @@ type Pip struct {
 	files []string
 }
 
-func newPip() Task {
-	return &Pip{}
-}
+func newPip(config *taskConfig) (Task, error) {
+	task := &Pip{}
 
-func (p *Pip) load(config *taskConfig) error {
 	for _, value := range config.payload.([]interface{}) {
 		if v, ok := value.(string); ok {
-			p.files = append(p.files, v)
-
+			task.files = append(task.files, v)
 		} else {
-			return fmt.Errorf("invalid pip files")
+			return nil, fmt.Errorf("invalid pip files")
 		}
 	}
-	if len(p.files) > 0 {
-		return nil
+	if len(task.files) == 0 {
+		return nil, fmt.Errorf("no pip files specified")
 	}
 
-	return fmt.Errorf("no pip files specified")
+	return task, nil
 }
 
 func (p *Pip) name() string {

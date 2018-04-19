@@ -15,18 +15,16 @@ type Golang struct {
 	version string
 }
 
-func newGolang() Task {
-	return &Golang{}
-}
+func newGolang(config *taskConfig) (Task, error) {
+	task := &Golang{}
 
-func (g *Golang) load(config *taskConfig) error {
-	version, err := config.getPayloadAsString()
+	var err error
+	task.version, err = config.getPayloadAsString()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	g.version = version
-	return nil
+	return task, nil
 }
 
 func (g *Golang) name() string {

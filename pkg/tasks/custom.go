@@ -15,33 +15,31 @@ type Custom struct {
 	command   string
 }
 
-func newCustom() Task {
-	return &Custom{}
-}
+func newCustom(config *taskConfig) (Task, error) {
+	task := &Custom{}
 
-func (c *Custom) load(config *taskConfig) error {
 	properties := config.payload.(map[interface{}]interface{})
 
 	command, ok := properties["meet"]
 	if !ok {
-		return nil
+		return nil, fmt.Errorf("missing key 'meet'")
 	}
 	condition, ok := properties["met?"]
 	if !ok {
-		return nil
+		return nil, fmt.Errorf("missing key 'met?'")
 	}
 
 	var err error
-	c.command, err = asString(command)
+	task.command, err = asString(command)
 	if err != nil {
-		return fmt.Errorf("invalid meet value: %s", err)
+		return nil, fmt.Errorf("invalid meet value: %s", err)
 	}
-	c.condition, err = asString(condition)
+	task.condition, err = asString(condition)
 	if err != nil {
-		return fmt.Errorf("invalid met? value: %s", err)
+		return nil, fmt.Errorf("invalid met? value: %s", err)
 	}
 
-	return nil
+	return task, nil
 }
 
 func (c *Custom) name() string {
