@@ -12,18 +12,18 @@ import (
 )
 
 func init() {
-	allTasks["python"] = NewPython
+	allTasks["python"] = newPython
 }
 
 type Python struct {
 	version string
 }
 
-func NewPython() Task {
+func newPython() Task {
 	return &Python{}
 }
 
-func (p *Python) Load(config *taskConfig) (bool, error) {
+func (p *Python) load(config *taskConfig) (bool, error) {
 	version, err := config.getPayloadAsString()
 	if err != nil {
 		return false, err
@@ -33,9 +33,15 @@ func (p *Python) Load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 
-func (p *Python) Perform(ctx *Context) (err error) {
-	ctx.ui.TaskHeader("Python", p.version)
+func (p *Python) name() string {
+	return "Python"
+}
 
+func (p *Python) header() string {
+	return p.version
+}
+
+func (p *Python) perform(ctx *Context) (err error) {
 	pyEnv, err := helpers.NewPyEnv(ctx.cfg)
 	if err != nil {
 		return

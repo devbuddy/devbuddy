@@ -9,18 +9,18 @@ import (
 )
 
 func init() {
-	allTasks["pip"] = NewPip
+	allTasks["pip"] = newPip
 }
 
 type Pip struct {
 	files []string
 }
 
-func NewPip() Task {
+func newPip() Task {
 	return &Pip{}
 }
 
-func (p *Pip) Load(config *taskConfig) (bool, error) {
+func (p *Pip) load(config *taskConfig) (bool, error) {
 	for _, value := range config.payload.([]interface{}) {
 		if v, ok := value.(string); ok {
 			p.files = append(p.files, v)
@@ -36,9 +36,15 @@ func (p *Pip) Load(config *taskConfig) (bool, error) {
 	return false, fmt.Errorf("no pip files specified")
 }
 
-func (p *Pip) Perform(ctx *Context) (err error) {
-	ctx.ui.TaskHeader("Pip", strings.Join(p.files, ", "))
+func (p *Pip) name() string {
+	return "Pip"
+}
 
+func (p *Pip) header() string {
+	return strings.Join(p.files, ", ")
+}
+
+func (p *Pip) perform(ctx *Context) (err error) {
 	// We should also check that the python task is executed before this one
 	pythonParam, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {

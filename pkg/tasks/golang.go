@@ -8,18 +8,18 @@ import (
 )
 
 func init() {
-	allTasks["go"] = NewGolang
+	allTasks["go"] = newGolang
 }
 
 type Golang struct {
 	version string
 }
 
-func NewGolang() Task {
+func newGolang() Task {
 	return &Golang{}
 }
 
-func (g *Golang) Load(config *taskConfig) (bool, error) {
+func (g *Golang) load(config *taskConfig) (bool, error) {
 	version, err := config.getPayloadAsString()
 	if err != nil {
 		return false, err
@@ -29,9 +29,15 @@ func (g *Golang) Load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 
-func (g *Golang) Perform(ctx *Context) (err error) {
-	ctx.ui.TaskHeader("Golang", g.version)
+func (g *Golang) name() string {
+	return "Golang"
+}
 
+func (g *Golang) header() string {
+	return g.version
+}
+
+func (g *Golang) perform(ctx *Context) (err error) {
 	goSrc := helpers.NewGolang(ctx.cfg, g.version)
 
 	if os.Getenv("GOPATH") == "" {

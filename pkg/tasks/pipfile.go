@@ -9,23 +9,29 @@ import (
 )
 
 func init() {
-	allTasks["pipfile"] = NewPipfile
+	allTasks["pipfile"] = newPipfile
 }
 
 type Pipfile struct {
 }
 
-func NewPipfile() Task {
+func newPipfile() Task {
 	return &Pipfile{}
 }
 
-func (p *Pipfile) Load(config *taskConfig) (bool, error) {
+func (p *Pipfile) load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 
-func (p *Pipfile) Perform(ctx *Context) (err error) {
-	ctx.ui.TaskHeader("Pipfile", "")
+func (p *Pipfile) name() string {
+	return "Pipfile"
+}
 
+func (p *Pipfile) header() string {
+	return ""
+}
+
+func (p *Pipfile) perform(ctx *Context) (err error) {
 	// We should also check that the python task is executed before this one
 	pythonParam, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {

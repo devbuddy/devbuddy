@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	allTasks["custom"] = NewCustom
+	allTasks["custom"] = newCustom
 }
 
 type Custom struct {
@@ -15,11 +15,11 @@ type Custom struct {
 	command   string
 }
 
-func NewCustom() Task {
+func newCustom() Task {
 	return &Custom{}
 }
 
-func (c *Custom) Load(config *taskConfig) (bool, error) {
+func (c *Custom) load(config *taskConfig) (bool, error) {
 	properties := config.payload.(map[interface{}]interface{})
 
 	command, ok := properties["meet"]
@@ -44,9 +44,15 @@ func (c *Custom) Load(config *taskConfig) (bool, error) {
 	return true, nil
 }
 
-func (c *Custom) Perform(ctx *Context) error {
-	ctx.ui.TaskHeader("Custom", c.command)
+func (c *Custom) name() string {
+	return "Custom"
+}
 
+func (c *Custom) header() string {
+	return c.command
+}
+
+func (c *Custom) perform(ctx *Context) error {
 	ran, err := c.runCommand()
 	if err != nil {
 		ctx.ui.TaskError(err)
