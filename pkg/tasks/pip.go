@@ -20,20 +20,20 @@ func newPip() Task {
 	return &Pip{}
 }
 
-func (p *Pip) load(config *taskConfig) (bool, error) {
+func (p *Pip) load(config *taskConfig) error {
 	for _, value := range config.payload.([]interface{}) {
 		if v, ok := value.(string); ok {
 			p.files = append(p.files, v)
 
 		} else {
-			return false, fmt.Errorf("invalid pip files")
+			return fmt.Errorf("invalid pip files")
 		}
 	}
 	if len(p.files) > 0 {
-		return true, nil
+		return nil
 	}
 
-	return false, fmt.Errorf("no pip files specified")
+	return fmt.Errorf("no pip files specified")
 }
 
 func (p *Pip) name() string {

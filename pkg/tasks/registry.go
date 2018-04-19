@@ -1,8 +1,6 @@
 package tasks
 
 import (
-	"fmt"
-
 	"github.com/pior/dad/pkg/project"
 )
 
@@ -49,13 +47,9 @@ func buildFromDefinition(definition interface{}) (task Task, err error) {
 		task = newInvalid(definition, err)
 	}
 
-	ok, err := task.load(taskConfig)
+	err = task.load(taskConfig)
 	if err != nil {
 		return nil, err
 	}
-	if ok {
-		return task, nil
-	}
-
-	return nil, fmt.Errorf("error parsing tasks: %+v", definition)
+	return task, nil
 }

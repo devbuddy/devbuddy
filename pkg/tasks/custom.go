@@ -19,29 +19,29 @@ func newCustom() Task {
 	return &Custom{}
 }
 
-func (c *Custom) load(config *taskConfig) (bool, error) {
+func (c *Custom) load(config *taskConfig) error {
 	properties := config.payload.(map[interface{}]interface{})
 
 	command, ok := properties["meet"]
 	if !ok {
-		return false, nil
+		return nil
 	}
 	condition, ok := properties["met?"]
 	if !ok {
-		return false, nil
+		return nil
 	}
 
 	var err error
 	c.command, err = asString(command)
 	if err != nil {
-		return false, fmt.Errorf("invalid meet value: %s", err)
+		return fmt.Errorf("invalid meet value: %s", err)
 	}
 	c.condition, err = asString(condition)
 	if err != nil {
-		return false, fmt.Errorf("invalid met? value: %s", err)
+		return fmt.Errorf("invalid met? value: %s", err)
 	}
 
-	return true, nil
+	return nil
 }
 
 func (c *Custom) name() string {

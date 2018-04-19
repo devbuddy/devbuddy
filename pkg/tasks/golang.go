@@ -19,14 +19,14 @@ func newGolang() Task {
 	return &Golang{}
 }
 
-func (g *Golang) load(config *taskConfig) (bool, error) {
+func (g *Golang) load(config *taskConfig) error {
 	version, err := config.getPayloadAsString()
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	g.version = version
-	return true, nil
+	return nil
 }
 
 func (g *Golang) name() string {

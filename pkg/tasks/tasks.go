@@ -8,7 +8,7 @@ import (
 )
 
 type Task interface {
-	load(*taskConfig) (bool, error)
+	load(*taskConfig) error
 	name() string
 	header() string
 	perform(*Context) error

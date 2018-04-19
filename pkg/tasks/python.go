@@ -23,14 +23,14 @@ func newPython() Task {
 	return &Python{}
 }
 
-func (p *Python) load(config *taskConfig) (bool, error) {
+func (p *Python) load(config *taskConfig) error {
 	version, err := config.getPayloadAsString()
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	p.version = version
-	return true, nil
+	return nil
 }
 
 func (p *Python) name() string {

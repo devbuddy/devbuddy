@@ -19,8 +19,8 @@ func newPipfile() Task {
 	return &Pipfile{}
 }
 
-func (p *Pipfile) load(config *taskConfig) (bool, error) {
-	return true, nil
+func (p *Pipfile) load(config *taskConfig) error {
+	return nil
 }
 
 func (p *Pipfile) name() string {

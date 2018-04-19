@@ -12,9 +12,9 @@ func newUnknown() Task {
 	return &Unknown{}
 }
 
-func (u *Unknown) load(config *taskConfig) (bool, error) {
+func (u *Unknown) load(config *taskConfig) error {
 	u.providedName = config.name
-	return true, nil
+	return nil
 }
 
 func (u *Unknown) name() string {
