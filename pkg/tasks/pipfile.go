@@ -35,13 +35,13 @@ func (p *Pipfile) perform(ctx *Context) (err error) {
 	}
 	venv := helpers.NewVirtualenv(ctx.cfg, pythonParam)
 
-	pipenvInstalled, err := p.InstallPipenv(ctx, venv)
+	pipenvInstalled, err := p.installPipenv(ctx, venv)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
 	}
 
-	InstallRan, err := p.RunInstall(ctx, venv)
+	InstallRan, err := p.runInstall(ctx, venv)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
@@ -56,7 +56,7 @@ func (p *Pipfile) perform(ctx *Context) (err error) {
 	return nil
 }
 
-func (p *Pipfile) InstallPipenv(ctx *Context, venv *helpers.Virtualenv) (acted bool, err error) {
+func (p *Pipfile) installPipenv(ctx *Context, venv *helpers.Virtualenv) (acted bool, err error) {
 	pipCmd := venv.Which("pip")
 	pipenvCmd := venv.Which("pipenv")
 
@@ -75,7 +75,7 @@ func (p *Pipfile) InstallPipenv(ctx *Context, venv *helpers.Virtualenv) (acted b
 	return true, nil
 }
 
-func (p *Pipfile) RunInstall(ctx *Context, venv *helpers.Virtualenv) (acted bool, err error) {
+func (p *Pipfile) runInstall(ctx *Context, venv *helpers.Virtualenv) (acted bool, err error) {
 	pipenvCmd := venv.Which("pipenv")
 
 	code, err := executor.Run(pipenvCmd, "install", "--system", "--dev")

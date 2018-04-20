@@ -16,7 +16,7 @@ type Task interface {
 
 type TaskWithFeature interface {
 	Task
-	Feature(*project.Project) (string, string)
+	feature(*project.Project) (string, string)
 }
 
 func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
@@ -38,7 +38,7 @@ func GetFeaturesFromTasks(proj *project.Project, tasks []Task) map[string]string
 
 	for _, task := range tasks {
 		if t, ok := task.(TaskWithFeature); ok {
-			feature, param := t.Feature(proj)
+			feature, param := t.feature(proj)
 			features[feature] = param
 		}
 	}

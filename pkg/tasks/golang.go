@@ -57,6 +57,6 @@ func (g *Golang) perform(ctx *Context) (err error) {
 	return nil
 }
 
-func (g *Golang) Feature(proj *project.Project) (string, string) {
+func (g *Golang) feature(proj *project.Project) (string, string) {
 	return "golang", g.version
 }
