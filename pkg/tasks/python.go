@@ -45,19 +45,19 @@ func (p *Python) perform(ctx *Context) (err error) {
 		return
 	}
 
-	installed, err := p.InstallPython(ctx, pyEnv)
+	installed, err := p.installPython(ctx, pyEnv)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
 	}
 
-	venvInstalled, err := p.InstallVirtualEnv(ctx, pyEnv)
+	venvInstalled, err := p.installVirtualEnv(ctx, pyEnv)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
 	}
 
-	venvCreated, err := p.CreateVirtualEnv(ctx, pyEnv)
+	venvCreated, err := p.createVirtualEnv(ctx, pyEnv)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
@@ -72,7 +72,7 @@ func (p *Python) perform(ctx *Context) (err error) {
 	return nil
 }
 
-func (p *Python) InstallPython(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
+func (p *Python) installPython(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
 	installed, err := pyEnv.VersionInstalled(p.version)
 	if err != nil {
 		return
@@ -92,7 +92,7 @@ func (p *Python) InstallPython(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, 
 	return true, nil
 }
 
-func (p *Python) InstallVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
+func (p *Python) installVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
 	if utils.PathExists(pyEnv.Which(p.version, "virtualenv")) {
 		return false, nil
 	}
@@ -108,7 +108,7 @@ func (p *Python) InstallVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bo
 	return true, nil
 }
 
-func (p *Python) CreateVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
+func (p *Python) createVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
 	name := helpers.VirtualenvName(ctx.proj, p.version)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
 
@@ -132,7 +132,7 @@ func (p *Python) CreateVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted boo
 	return true, nil
 }
 
-func (p *Python) Feature(proj *project.Project) (string, string) {
+func (p *Python) feature(proj *project.Project) (string, string) {
 	name := helpers.VirtualenvName(proj, p.version)
 	return "python", name
 }
