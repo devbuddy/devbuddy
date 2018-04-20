@@ -13,10 +13,6 @@ func newInvalid(definition interface{}, err error) Task {
 	return &Invalid{definition: definition, err: err}
 }
 
-func (u *Invalid) load(config *taskConfig) (bool, error) {
-	return true, nil
-}
-
 func (u *Invalid) name() string {
 	return "Invalid task"
 }
