@@ -18,6 +18,6 @@ type Feature interface {
 	deactivate(*config.Config, *Env)
 }
 
-type FeatureBuilder func(param string) Feature
+type featureBuilder func(param string) Feature
 
-var allFeatures = make(map[string]FeatureBuilder)
+var allFeatures = make(map[string]featureBuilder)

@@ -7,14 +7,14 @@ import (
 )
 
 func init() {
-	allFeatures["golang"] = NewGolang
+	allFeatures["golang"] = newGolang
 }
 
 type Golang struct {
 	version string
 }
 
-func NewGolang(param string) Feature {
+func newGolang(param string) Feature {
 	return &Golang{version: param}
 }
 

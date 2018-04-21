@@ -7,14 +7,14 @@ import (
 )
 
 func init() {
-	allFeatures["python"] = NewPython
+	allFeatures["python"] = newPython
 }
 
 type Python struct {
 	name string
 }
 
-func NewPython(param string) Feature {
+func newPython(param string) Feature {
 	return &Python{name: param}
 }
 
