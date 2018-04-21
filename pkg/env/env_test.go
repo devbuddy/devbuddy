@@ -43,15 +43,15 @@ func TestSetFeatures(t *testing.T) {
 
 func TestChanged(t *testing.T) {
 	env := New([]string{})
-	require.Equal(t, []EnvVarChange{}, env.Changed())
+	require.Equal(t, []VariableChange{}, env.Changed())
 
 	env.Set("K2", "1")
-	require.Equal(t, []EnvVarChange{EnvVarChange{"K2", "1", false}}, env.Changed())
+	require.Equal(t, []VariableChange{VariableChange{"K2", "1", false}}, env.Changed())
 
 	env.Set("K2", "2")
-	require.Equal(t, []EnvVarChange{EnvVarChange{"K2", "2", false}}, env.Changed())
+	require.Equal(t, []VariableChange{VariableChange{"K2", "2", false}}, env.Changed())
 
 	env = New([]string{"K1=1"})
 	env.Unset("K1")
-	require.Equal(t, []EnvVarChange{EnvVarChange{"K1", "", true}}, env.Changed())
+	require.Equal(t, []VariableChange{VariableChange{"K1", "", true}}, env.Changed())
 }
