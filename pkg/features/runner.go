@@ -2,6 +2,7 @@ package features
 
 import (
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/env"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/termui"
 )
@@ -10,10 +11,10 @@ type Runner struct {
 	cfg  *config.Config
 	proj *project.Project
 	ui   *termui.HookUI
-	env  *Env
+	env  *env.Env
 }
 
-func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.HookUI, env *Env) *Runner {
+func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.HookUI, env *env.Env) *Runner {
 	return &Runner{cfg: cfg, proj: proj, ui: ui, env: env}
 }
 

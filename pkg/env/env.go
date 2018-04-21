@@ -1,4 +1,4 @@
-package features
+package env
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ type Env struct {
 	verbatimEnv map[string]string
 }
 
-func NewEnv(env []string) (e *Env) {
+func New(env []string) (e *Env) {
 	e = &Env{
 		env:         make(map[string]string),
 		verbatimEnv: make(map[string]string),
