@@ -18,7 +18,7 @@ func NewPython(param string) Feature {
 	return &Python{name: param}
 }
 
-func (p *Python) Enable(cfg *config.Config, proj *project.Project, env *Env) error {
+func (p *Python) activate(cfg *config.Config, proj *project.Project, env *Env) error {
 	venv := helpers.NewVirtualenv(cfg, p.name)
 
 	if !venv.Exists() {
@@ -33,7 +33,7 @@ func (p *Python) Enable(cfg *config.Config, proj *project.Project, env *Env) err
 	return nil
 }
 
-func (p *Python) Disable(cfg *config.Config, env *Env) {
+func (p *Python) deactivate(cfg *config.Config, env *Env) {
 	env.Unset("VIRTUAL_ENV")
 
 	p.cleanPath(cfg, env)

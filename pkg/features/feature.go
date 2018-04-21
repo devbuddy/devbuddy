@@ -14,8 +14,8 @@ func init() {
 }
 
 type Feature interface {
-	Enable(*config.Config, *project.Project, *Env) error
-	Disable(*config.Config, *Env)
+	activate(*config.Config, *project.Project, *Env) error
+	deactivate(*config.Config, *Env)
 }
 
 type FeatureBuilder func(param string) Feature
