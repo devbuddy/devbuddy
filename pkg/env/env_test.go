@@ -9,9 +9,9 @@ import (
 func TestGetActiveFeatures(t *testing.T) {
 	envs := [][]string{
 		[]string{},
-		[]string{"DEV_AUTO_ENV_FEATURES="},
-		[]string{"DEV_AUTO_ENV_FEATURES=f1=v1"},
-		[]string{"DEV_AUTO_ENV_FEATURES=f1=v1:f2=v2"},
+		[]string{"DAD_AUTO_ENV_FEATURES="},
+		[]string{"DAD_AUTO_ENV_FEATURES=f1=v1"},
+		[]string{"DAD_AUTO_ENV_FEATURES=f1=v1:f2=v2"},
 	}
 	features := []map[string]string{
 		map[string]string{},
