@@ -41,7 +41,7 @@ func (e *Executor) getExitCode(err error) (int, error) {
 
 	if exitError, ok := err.(*exec.ExitError); ok {
 		code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
-		return code, err
+		return code, nil
 	}
 
 	// There was an error but not a ExitError, just return it with an invalid exit code

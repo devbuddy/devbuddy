@@ -3,7 +3,6 @@ package tasks
 import (
 	"fmt"
 
-	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/utils"
 )
@@ -41,7 +40,7 @@ func (p *Pipfile) perform(ctx *Context) (err error) {
 		return err
 	}
 
-	InstallRan, err := p.runInstall(ctx, venv)
+	InstallRan, err := p.runInstall(ctx)
 	if err != nil {
 		ctx.ui.TaskError(err)
 		return err
@@ -57,14 +56,13 @@ func (p *Pipfile) perform(ctx *Context) (err error) {
 }
 
 func (p *Pipfile) installPipenv(ctx *Context, venv *helpers.Virtualenv) (acted bool, err error) {
-	pipCmd := venv.Which("pip")
 	pipenvCmd := venv.Which("pipenv")
 
 	if utils.PathExists(pipenvCmd) {
 		return false, nil
 	}
 
-	code, err := executor.Run(pipCmd, "install", "--require-virtualenv", "pipenv")
+	code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "pipenv")
 	if err != nil {
 		return false, err
 	}
@@ -75,10 +73,8 @@ func (p *Pipfile) installPipenv(ctx *Context, venv *helpers.Virtualenv) (acted b
 	return true, nil
 }
 
-func (p *Pipfile) runInstall(ctx *Context, venv *helpers.Virtualenv) (acted bool, err error) {
-	pipenvCmd := venv.Which("pipenv")
-
-	code, err := executor.Run(pipenvCmd, "install", "--system", "--dev")
+func (p *Pipfile) runInstall(ctx *Context) (acted bool, err error) {
+	code, err := runCommand(ctx, "pipenv", "install", "--system", "--dev")
 	if err != nil {
 		return false, err
 	}

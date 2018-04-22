@@ -1,6 +1,10 @@
 package tasks
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/pior/dad/pkg/executor"
+)
 
 func asString(value interface{}) (string, error) {
 	result, ok := value.(string)
@@ -14,4 +18,13 @@ func asString(value interface{}) (string, error) {
 	}
 
 	return "", errors.New("not a string")
+}
+
+func runCommand(ctx *Context, program string, args ...string) (int, error) {
+	ctx.ui.TaskCommand(program, args...)
+	return executor.New(program, args...).SetEnv(ctx.env.Environ()).Run()
+}
+
+func runShellSilent(ctx *Context, cmdline string) (int, error) {
+	return executor.NewShell(cmdline).SetEnv(ctx.env.Environ()).Run()
 }
