@@ -3,9 +3,6 @@ package tasks
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/helpers"
 )
 
 func init() {
@@ -43,15 +40,13 @@ func (p *Pip) header() string {
 
 func (p *Pip) perform(ctx *Context) (err error) {
 	// We should also check that the python task is executed before this one
-	pythonParam, hasPythonFeature := ctx.features["python"]
+	_, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {
 		return fmt.Errorf("You must specify a Python environment to use this task")
 	}
 
-	pythonCmd := helpers.NewVirtualenv(ctx.cfg, pythonParam).Which("python")
-
 	for _, file := range p.files {
-		code, err := executor.Run(pythonCmd, "-m", "pip", "install", "-r", file)
+		code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "-r", file)
 		if err != nil {
 			return err
 		}

@@ -5,7 +5,6 @@ import (
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/env"
-	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/features"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/termui"

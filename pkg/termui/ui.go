@@ -3,6 +3,7 @@ package termui
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	color "github.com/logrusorgru/aurora"
 
@@ -31,6 +32,10 @@ func (u *UI) TaskHeader(name string, param string) {
 		param = fmt.Sprintf(" (%s)", color.Blue(param))
 	}
 	fmt.Fprintf(u.out, "%s %s%s\n", color.Brown("◼︎"), color.Magenta(name), param)
+}
+
+func (u *UI) TaskCommand(cmdline string, args ...string) {
+	fmt.Fprint(u.out, "  Running:", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
 }
 
 func (u *UI) TaskActed() {
