@@ -23,3 +23,8 @@ func asString(value interface{}) (string, error) {
 func runCommand(ctx *Context, program string, args ...string) (int, error) {
 	ctx.ui.TaskCommand(program, args...)
 	return executor.New(program, args...).SetEnv(ctx.env.Environ()).Run()
+}
+
+func runShellSilent(ctx *Context, cmdline string) (int, error) {
+	return executor.NewShell(cmdline).SetEnv(ctx.env.Environ()).Run()
+}
