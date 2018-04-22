@@ -1,4 +1,4 @@
-package features
+package env
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ type Env struct {
 	verbatimEnv map[string]string
 }
 
-func NewEnv(env []string) (e *Env) {
+func New(env []string) (e *Env) {
 	e = &Env{
 		env:         make(map[string]string),
 		verbatimEnv: make(map[string]string),
@@ -25,7 +25,7 @@ func NewEnv(env []string) (e *Env) {
 	return
 }
 
-type EnvVarChange struct {
+type VariableChange struct {
 	Name    string
 	Value   string
 	Deleted bool
@@ -67,17 +67,17 @@ func (e *Env) RemoveFromPath(substring string) {
 	e.joinAndSetPath(newElems...)
 }
 
-func (e *Env) Changed() []EnvVarChange {
-	c := []EnvVarChange{}
+func (e *Env) Changed() []VariableChange {
+	c := []VariableChange{}
 
 	for k, v := range e.env {
 		if v != e.verbatimEnv[k] {
-			c = append(c, EnvVarChange{Name: k, Value: v})
+			c = append(c, VariableChange{Name: k, Value: v})
 		}
 	}
 	for k := range e.verbatimEnv {
 		if _, ok := e.env[k]; !ok {
-			c = append(c, EnvVarChange{Name: k, Deleted: true})
+			c = append(c, VariableChange{Name: k, Deleted: true})
 		}
 	}
 	return c

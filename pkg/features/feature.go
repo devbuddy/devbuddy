@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/env"
 	"github.com/pior/dad/pkg/project"
 )
 
@@ -14,10 +15,10 @@ func init() {
 }
 
 type Feature interface {
-	Enable(*config.Config, *project.Project, *Env) error
-	Disable(*config.Config, *Env)
+	activate(*config.Config, *project.Project, *env.Env) error
+	deactivate(*config.Config, *env.Env)
 }
 
-type FeatureBuilder func(param string) Feature
+type featureBuilder func(param string) Feature
 
-var allFeatures = make(map[string]FeatureBuilder)
+var allFeatures = make(map[string]featureBuilder)

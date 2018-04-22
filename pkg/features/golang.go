@@ -2,23 +2,24 @@ package features
 
 import (
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/env"
 	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/project"
 )
 
 func init() {
-	allFeatures["golang"] = NewGolang
+	allFeatures["golang"] = newGolang
 }
 
 type Golang struct {
 	version string
 }
 
-func NewGolang(param string) Feature {
+func newGolang(param string) Feature {
 	return &Golang{version: param}
 }
 
-func (g *Golang) Enable(cfg *config.Config, proj *project.Project, env *Env) error {
+func (g *Golang) activate(cfg *config.Config, proj *project.Project, env *env.Env) error {
 	golang := helpers.NewGolang(cfg, g.version)
 
 	if !golang.Exists() {
@@ -35,7 +36,7 @@ func (g *Golang) Enable(cfg *config.Config, proj *project.Project, env *Env) err
 	return nil
 }
 
-func (g *Golang) Disable(cfg *config.Config, env *Env) {
+func (g *Golang) deactivate(cfg *config.Config, env *env.Env) {
 	// Golang install without version to get the base path
 	golang := helpers.NewGolang(cfg, "")
 	env.RemoveFromPath(golang.Path())

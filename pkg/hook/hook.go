@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/env"
 	"github.com/pior/dad/pkg/features"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/tasks"
@@ -46,7 +47,7 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI
 		return
 	}
 
-	env := features.NewEnv(os.Environ())
+	env := env.New(os.Environ())
 
 	runner := features.NewRunner(cfg, proj, ui, env)
 	runner.Run(allFeatures)
