@@ -55,3 +55,10 @@ func TestChanged(t *testing.T) {
 	env.Unset("K1")
 	require.Equal(t, []VariableChange{VariableChange{"K1", "", true}}, env.Changed())
 }
+
+func TestEnviron(t *testing.T) {
+	env := New([]string{"K1=V1", "K2=V2", "K3=V3"})
+	env.Set("K1", "V1B")
+	env.Unset("K2")
+	require.ElementsMatch(t, []string{"K1=V1B", "K3=V3"}, env.Environ())
+}

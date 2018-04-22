@@ -54,6 +54,14 @@ func (e *Env) Get(name string) string {
 	return e.env[name]
 }
 
+// Environ returns all variable as os.Environ() would
+func (e *Env) Environ() (vars []string) {
+	for name, value := range e.env {
+		vars = append(vars, name+"="+value)
+	}
+	return vars
+}
+
 func (e *Env) getAndSplitPath() []string {
 	return strings.Split(e.env["PATH"], ":")
 }
