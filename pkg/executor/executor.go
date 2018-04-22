@@ -21,9 +21,15 @@ func NewShell(cmdline string) *Executor {
 	return &Executor{cmd: exec.Command("sh", "-c", cmdline)}
 }
 
-// SetCwd change the current working directory the command will be run in
+// SetCwd changes the current working directory the command will be run in
 func (e *Executor) SetCwd(cwd string) *Executor {
 	e.cmd.Dir = cwd
+	return e
+}
+
+// SetEnv changes the environment variables that will be used to run the command
+func (e *Executor) SetEnv(env []string) *Executor {
+	e.cmd.Env = env
 	return e
 }
 
