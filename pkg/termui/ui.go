@@ -35,7 +35,7 @@ func (u *UI) TaskHeader(name string, param string) {
 }
 
 func (u *UI) TaskCommand(cmdline string, args ...string) {
-	fmt.Fprint(u.out, "  Running:", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
+	fmt.Fprint(u.out, "  Running: ", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
 }
 
 func (u *UI) TaskActed() {
