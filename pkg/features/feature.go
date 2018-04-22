@@ -15,10 +15,14 @@ func init() {
 }
 
 type Feature interface {
-	activate(*config.Config, *project.Project, *env.Env) error
-	deactivate(*config.Config, *env.Env)
+	Activate(*config.Config, *project.Project, *env.Env) error
+	Deactivate(*config.Config, *env.Env)
 }
 
 type featureBuilder func(param string) Feature
 
 var allFeatures = make(map[string]featureBuilder)
+
+func New(name string, param string) Feature {
+	return allFeatures[name](param)
+}

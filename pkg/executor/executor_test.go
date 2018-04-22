@@ -64,3 +64,11 @@ func TestCommandNotFound(t *testing.T) {
 	require.Error(t, err)
 	require.Equal(t, -1, code)
 }
+
+func TestSetEnv(t *testing.T) {
+	output, code, err := NewShell("echo $POIPOI").SetEnv([]string{"POIPOI=something"}).Capture()
+
+	require.NoError(t, err)
+	require.Zero(t, code)
+	require.Equal(t, "something\n", output)
+}

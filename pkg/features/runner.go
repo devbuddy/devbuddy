@@ -38,9 +38,7 @@ func (r *Runner) Run(features map[string]string) {
 }
 
 func (r *Runner) activateFeature(name string, version string) {
-	feature := allFeatures[name](version)
-
-	err := feature.activate(r.cfg, r.proj, r.env)
+	err := New(name, version).Activate(r.cfg, r.proj, r.env)
 	if err != nil {
 		if err == DevUpNeeded {
 			r.ui.HookFeatureFailure(name, version)
@@ -54,9 +52,7 @@ func (r *Runner) activateFeature(name string, version string) {
 }
 
 func (r *Runner) deactivateFeature(name string, version string) {
-	feature := allFeatures[name](version)
-
-	feature.deactivate(r.cfg, r.env)
+	New(name, version).Deactivate(r.cfg, r.env)
 	r.env.UnsetFeature(name)
 	r.ui.Debug("%s deactivated", name)
 }
