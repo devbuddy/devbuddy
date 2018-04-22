@@ -9,7 +9,7 @@ import (
 func TestCommandFalse(t *testing.T) {
 	code, err := New("false").Run()
 
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.Equal(t, 1, code)
 }
 
@@ -30,7 +30,7 @@ func TestShellTrue(t *testing.T) {
 func TestShellFalse(t *testing.T) {
 	code, err := NewShell("false").Run()
 
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.Equal(t, 1, code)
 }
 

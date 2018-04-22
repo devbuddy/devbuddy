@@ -14,9 +14,12 @@ type PyEnv struct {
 }
 
 func NewPyEnv(cfg *config.Config) (*PyEnv, error) {
-	root, _, err := executor.New("pyenv", "root").CaptureAndTrim()
+	root, code, err := executor.New("pyenv", "root").CaptureAndTrim()
 	if err != nil {
 		return nil, err
+	}
+	if code != 0 {
+		return nil, fmt.Errorf("Command 'pyenv root' failed with code %d", code)
 	}
 	v := PyEnv{root: root}
 	return &v, nil
