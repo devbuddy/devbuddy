@@ -1,6 +1,7 @@
 package env
 
 import (
+	"os"
 	"strings"
 )
 
@@ -10,7 +11,7 @@ type Env struct {
 	verbatimEnv map[string]string
 }
 
-// New returns a new Env from os.Environ()
+// New returns a new Env from an arbitrary list of variables
 func New(env []string) (e *Env) {
 	e = &Env{
 		env:         make(map[string]string),
@@ -24,6 +25,11 @@ func New(env []string) (e *Env) {
 	}
 
 	return
+}
+
+// NewFromOS returns a new Env with variables from os.Environ()
+func NewFromOS() (e *Env) {
+	return New(os.Environ())
 }
 
 // A VariableChange represents the change made on a variable

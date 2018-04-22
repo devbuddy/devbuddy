@@ -2,7 +2,6 @@ package hook
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/pior/dad/pkg/config"
@@ -47,7 +46,7 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI
 		return
 	}
 
-	env := env.New(os.Environ())
+	env := env.NewFromOS()
 
 	runner := features.NewRunner(cfg, proj, ui, env)
 	runner.Run(allFeatures)
