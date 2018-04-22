@@ -19,7 +19,7 @@ func newGolang(param string) Feature {
 	return &Golang{version: param}
 }
 
-func (g *Golang) activate(cfg *config.Config, proj *project.Project, env *env.Env) error {
+func (g *Golang) Activate(cfg *config.Config, proj *project.Project, env *env.Env) error {
 	golang := helpers.NewGolang(cfg, g.version)
 
 	if !golang.Exists() {
@@ -36,7 +36,7 @@ func (g *Golang) activate(cfg *config.Config, proj *project.Project, env *env.En
 	return nil
 }
 
-func (g *Golang) deactivate(cfg *config.Config, env *env.Env) {
+func (g *Golang) Deactivate(cfg *config.Config, env *env.Env) {
 	// Golang install without version to get the base path
 	golang := helpers.NewGolang(cfg, "")
 	env.RemoveFromPath(golang.Path())
