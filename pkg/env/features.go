@@ -7,6 +7,7 @@ import (
 
 const autoEnvVariableName = "DAD_AUTO_ENV_FEATURES"
 
+// GetActiveFeatures returns a Hash of feature name -> param
 func (e *Env) GetActiveFeatures() map[string]string {
 	features := map[string]string{}
 
@@ -41,12 +42,14 @@ func (e *Env) setActiveFeatures(features map[string]string) {
 	}
 }
 
+// SetFeature marks a feature as active
 func (e *Env) SetFeature(name, param string) {
 	features := e.GetActiveFeatures()
 	features[name] = param
 	e.setActiveFeatures(features)
 }
 
+// UnsetFeature marks a feature as inactive
 func (e *Env) UnsetFeature(name string) {
 	features := e.GetActiveFeatures()
 	delete(features, name)

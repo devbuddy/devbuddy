@@ -4,11 +4,13 @@ import (
 	"strings"
 )
 
+// An Env provides a simple interface to manipulate environment variables
 type Env struct {
 	env         map[string]string
 	verbatimEnv map[string]string
 }
 
+// New returns a new Env from os.Environ()
 func New(env []string) (e *Env) {
 	e = &Env{
 		env:         make(map[string]string),
@@ -24,20 +26,24 @@ func New(env []string) (e *Env) {
 	return
 }
 
+// A VariableChange represents the change made on a variable
 type VariableChange struct {
 	Name    string
 	Value   string
 	Deleted bool
 }
 
+// Set adds or changes a variable
 func (e *Env) Set(name string, value string) {
 	e.env[name] = value
 }
 
+// Unset removes a variable if it exists
 func (e *Env) Unset(name string) {
 	delete(e.env, name)
 }
 
+// Get returns the value of a variable (defaults to empty string)
 func (e *Env) Get(name string) string {
 	return e.env[name]
 }
@@ -50,12 +56,14 @@ func (e *Env) joinAndSetPath(elems ...string) {
 	e.env["PATH"] = strings.Join(elems, ":")
 }
 
+// PrependToPath inserts a new path at the begining of the PATH variable
 func (e *Env) PrependToPath(path string) {
 	elems := e.getAndSplitPath()
 	elems = append([]string{path}, elems...)
 	e.joinAndSetPath(elems...)
 }
 
+// RemoveFromPath removes all path entries matching a substring
 func (e *Env) RemoveFromPath(substring string) {
 	newElems := []string{}
 	for _, elem := range e.getAndSplitPath() {
@@ -66,6 +74,7 @@ func (e *Env) RemoveFromPath(substring string) {
 	e.joinAndSetPath(newElems...)
 }
 
+// Changed returns all changes made on the variables
 func (e *Env) Changed() []VariableChange {
 	c := []VariableChange{}
 
