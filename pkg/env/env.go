@@ -83,7 +83,7 @@ func (e *Env) Changed() []VariableChange {
 	return c
 }
 
-const AutoEnvVariableName = "DEV_AUTO_ENV_FEATURES"
+const AutoEnvVariableName = "DAD_AUTO_ENV_FEATURES"
 
 func (e *Env) GetActiveFeatures() map[string]string {
 	features := map[string]string{}
