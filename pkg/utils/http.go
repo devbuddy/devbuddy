@@ -18,18 +18,24 @@ func DownloadFile(filepath string, url string) error {
 		return fmt.Errorf("failed to download (code %d)", resp.StatusCode)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		cerr := resp.Body.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
 
 	out, err := os.Create(filepath)
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer func() {
+		cerr := out.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
 
 	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
