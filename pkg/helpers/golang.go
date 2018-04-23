@@ -46,6 +46,11 @@ func (g *Golang) Install() (err error) {
 	tarPath := path.Join(g.tarDir, archiveName)
 
 	if !utils.PathExists(tarPath) {
+		err = os.MkdirAll(g.tarDir, 0750)
+		if err != nil {
+			return
+		}
+
 		url := "https://dl.google.com/go/" + archiveName
 		err = utils.DownloadFile(tarPath, url)
 		if err != nil {
