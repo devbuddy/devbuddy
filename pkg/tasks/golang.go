@@ -1,8 +1,6 @@
 package tasks
 
 import (
-	"os"
-
 	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/project"
 )
@@ -38,7 +36,7 @@ func (g *Golang) header() string {
 func (g *Golang) perform(ctx *Context) (err error) {
 	goSrc := helpers.NewGolang(ctx.cfg, g.version)
 
-	if os.Getenv("GOPATH") == "" {
+	if ctx.env.Get("GOPATH") == "" {
 		ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
 	}
 
