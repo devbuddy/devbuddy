@@ -13,7 +13,7 @@ var upCmd = &cobra.Command{
 	Use:   "up",
 	Short: "Ensure the project is up and running",
 	Run:   upRun,
-	// Args:  OnlyOneArg,
+	Args:  NoArgs,
 }
 
 func upRun(cmd *cobra.Command, args []string) {

@@ -24,6 +24,13 @@ func OnlyOneArg(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func NoArgs(cmd *cobra.Command, args []string) error {
+	if len(args) > 0 {
+		return fmt.Errorf("expecting no arguments at all for command '%s'", cmd.Name())
+	}
+	return nil
+}
+
 func checkError(err error) {
 	if err != nil {
 		exitWithMessage(err.Error())
