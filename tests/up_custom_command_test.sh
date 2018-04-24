@@ -52,5 +52,25 @@ YAML
     assertEquals "command did not failed" 1 $rc
 }
 
+
+testProjectDir() {
+    cat > dev.yml <<YAML
+up:
+  - custom:
+      met?: 'false'
+      meet: touch sentinel
+YAML
+
+    mkdir subdir
+    cd subdir
+    output=$(dad up)
+    rc=$?
+    cd ..
+
+    assertEquals "command failed" 0 $rc
+    assertTrue "the custom task should have run in project dir" '[ -e sentinel ]'
+}
+
+
 SHUNIT_COLOR='none'  # Not macos compatible?
 . shunit2/shunit2
