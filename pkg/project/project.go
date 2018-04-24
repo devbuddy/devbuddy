@@ -78,7 +78,8 @@ func (p *Project) Clone() (err error) {
 	if err != nil {
 		return
 	}
-	_, err = executor.Run("git", "clone", url, p.Path)
+
+	_, err = executor.New("git", "clone", url, p.Path).Run()
 	return
 }
 

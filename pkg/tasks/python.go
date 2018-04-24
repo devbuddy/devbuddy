@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/project"
 	"github.com/pior/dad/pkg/utils"
@@ -81,7 +80,7 @@ func (p *Python) installPython(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, 
 		return
 	}
 
-	code, err := executor.Run("pyenv", "install", p.version)
+	code, err := runCommand(ctx, "pyenv", "install", p.version)
 	if err != nil {
 		return
 	}
@@ -97,7 +96,7 @@ func (p *Python) installVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bo
 		return false, nil
 	}
 
-	code, err := executor.Run(pyEnv.Which(p.version, "python"), "-m", "pip", "install", "virtualenv")
+	code, err := runCommand(ctx, pyEnv.Which(p.version, "python"), "-m", "pip", "install", "virtualenv")
 	if err != nil {
 		return
 	}
@@ -121,7 +120,7 @@ func (p *Python) createVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted boo
 		return
 	}
 
-	code, err := executor.Run(pyEnv.Which(p.version, "virtualenv"), venv.Path())
+	code, err := runCommand(ctx, pyEnv.Which(p.version, "virtualenv"), venv.Path())
 	if err != nil {
 		return
 	}

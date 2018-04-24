@@ -40,7 +40,7 @@ func (p *PyEnv) VersionInstalled(version string) (installed bool, err error) {
 }
 
 func (p *PyEnv) listVersions() ([]string, error) {
-	output, code, err := executor.Capture("pyenv", "versions", "--bare", "--skip-aliases")
+	output, code, err := executor.New("pyenv", "versions", "--bare", "--skip-aliases").Capture()
 	if err != nil {
 		return nil, err
 	}
