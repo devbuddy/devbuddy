@@ -46,19 +46,16 @@ func (p *Python) perform(ctx *Context) (err error) {
 
 	installed, err := p.installPython(ctx, pyEnv)
 	if err != nil {
-		ctx.ui.TaskError(err)
 		return err
 	}
 
 	venvInstalled, err := p.installVirtualEnv(ctx, pyEnv)
 	if err != nil {
-		ctx.ui.TaskError(err)
 		return err
 	}
 
 	venvCreated, err := p.createVirtualEnv(ctx, pyEnv)
 	if err != nil {
-		ctx.ui.TaskError(err)
 		return err
 	}
 
