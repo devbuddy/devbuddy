@@ -13,7 +13,7 @@ var cloneCmd = &cobra.Command{
 	Use:   "clone [REMOTE]",
 	Short: "Clone a project from github.com",
 	Run:   cloneRun,
-	Args:  OnlyOneArg,
+	Args:  onlyOneArg,
 }
 
 func cloneRun(cmd *cobra.Command, args []string) {

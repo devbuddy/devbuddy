@@ -13,7 +13,7 @@ var createCmd = &cobra.Command{
 	Use:   "create [PROJECT]",
 	Short: "Create a new project",
 	Run:   createRun,
-	Args:  OnlyOneArg,
+	Args:  onlyOneArg,
 }
 
 func createRun(cmd *cobra.Command, args []string) {

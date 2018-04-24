@@ -13,7 +13,7 @@ var cdCmd = &cobra.Command{
 	Use:   "cd [PROJECT]",
 	Short: "Jump to a local project",
 	Run:   cdRun,
-	Args:  OnlyOneArg,
+	Args:  onlyOneArg,
 }
 
 func cdRun(cmd *cobra.Command, args []string) {

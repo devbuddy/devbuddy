@@ -17,14 +17,14 @@ func GetFlagBool(cmd *cobra.Command, flag string) bool {
 	return b
 }
 
-func OnlyOneArg(cmd *cobra.Command, args []string) error {
+func onlyOneArg(cmd *cobra.Command, args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("expecting one argument")
 	}
 	return nil
 }
 
-func NoArgs(cmd *cobra.Command, args []string) error {
+func noArgs(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		return fmt.Errorf("expecting no arguments at all for command '%s'", cmd.Name())
 	}
