@@ -51,7 +51,6 @@ func (c *Custom) header() string {
 func (c *Custom) perform(ctx *Context) error {
 	ran, err := c.runCommand(ctx)
 	if err != nil {
-		ctx.ui.TaskError(err)
 		return err
 	}
 

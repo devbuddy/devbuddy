@@ -21,6 +21,6 @@ func (u *Unknown) header() string {
 }
 
 func (u *Unknown) perform(ctx *Context) (err error) {
-	ctx.ui.TaskError(fmt.Errorf("Unknown task"))
+	ctx.ui.TaskWarning(fmt.Sprintf("Unknown task"))
 	return nil
 }

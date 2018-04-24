@@ -47,7 +47,6 @@ func (g *Golang) perform(ctx *Context) (err error) {
 
 	err = goSrc.Install()
 	if err != nil {
-		ctx.ui.TaskError(err)
 		return err
 	}
 

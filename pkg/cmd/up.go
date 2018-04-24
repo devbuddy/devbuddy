@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 
 	"github.com/pior/dad/pkg/config"
@@ -25,6 +27,9 @@ func upRun(cmd *cobra.Command, args []string) {
 	proj, err := project.FindCurrent()
 	checkError(err)
 
-	err = tasks.RunAll(cfg, proj, ui)
+	success, err := tasks.RunAll(cfg, proj, ui)
 	checkError(err)
+	if !success {
+		os.Exit(1)
+	}
 }

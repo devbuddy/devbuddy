@@ -18,10 +18,10 @@ type Context struct {
 	features map[string]string
 }
 
-func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) error {
+func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success bool, err error) {
 	taskList, err := GetTasksFromProject(proj)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	ctx := &Context{
@@ -37,17 +37,18 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) error {
 
 		err = task.perform(ctx)
 		if err != nil {
-			return err
+			ctx.ui.TaskError(err)
+			return false, nil
 		}
 
 		err = activateFeature(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
-			return err
+			return false, nil
 		}
 	}
 
-	return nil
+	return true, nil
 }
 
 func activateFeature(ctx *Context, task Task) (err error) {

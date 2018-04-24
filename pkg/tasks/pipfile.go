@@ -36,13 +36,11 @@ func (p *Pipfile) perform(ctx *Context) (err error) {
 
 	pipenvInstalled, err := p.installPipenv(ctx, venv)
 	if err != nil {
-		ctx.ui.TaskError(err)
 		return err
 	}
 
 	InstallRan, err := p.runInstall(ctx)
 	if err != nil {
-		ctx.ui.TaskError(err)
 		return err
 	}
 

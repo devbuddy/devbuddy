@@ -22,6 +22,6 @@ func (u *Invalid) header() string {
 }
 
 func (u *Invalid) perform(ctx *Context) (err error) {
-	ctx.ui.TaskError(fmt.Errorf("%s: %+v", u.err, u.definition))
+	ctx.ui.TaskWarning(fmt.Sprintf("%s: %+v", u.err, u.definition))
 	return nil
 }
