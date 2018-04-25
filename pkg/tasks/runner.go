@@ -18,6 +18,7 @@ type Context struct {
 	features map[string]string
 }
 
+// RunAll builds and execute all tasks found in the project
 func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success bool, err error) {
 	taskList, err := GetTasksFromProject(proj)
 	if err != nil {
@@ -33,12 +34,32 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	}
 
 	for _, task := range taskList {
+		if t, ok := task.(taskWithPreRunValidation); ok {
+			err = t.preRunValidation(ctx)
+			if err != nil {
+				ctx.ui.TaskError(err)
+				return false, nil
+			}
+		}
+	}
+
+	for _, task := range taskList {
 		ctx.ui.TaskHeader(task.name(), task.header())
 
-		err = task.perform(ctx)
-		if err != nil {
-			ctx.ui.TaskError(err)
-			return false, nil
+		if t, ok := task.(taskWithPerform); ok {
+			err = t.perform(ctx)
+			if err != nil {
+				ctx.ui.TaskError(err)
+				return false, nil
+			}
+		}
+
+		for _, action := range task.actions(ctx) {
+			err = runAction(ctx, action)
+			if err != nil {
+				ctx.ui.TaskError(err)
+				return false, nil
+			}
 		}
 
 		err = activateFeature(ctx, task)
@@ -46,9 +67,41 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 			ctx.ui.TaskError(err)
 			return false, nil
 		}
+
 	}
 
 	return true, nil
+}
+
+func runAction(ctx *Context, action taskAction) error {
+	desc := action.description()
+
+	needed, err := action.needed(ctx)
+	if err != nil {
+		return fmt.Errorf("The task action (%s) failed to detect whether it need to run: %s", desc, err)
+	}
+
+	if desc != "" {
+		ctx.ui.TaskActionHeader(desc)
+	}
+
+	if needed {
+		err = action.run(ctx)
+		if err != nil {
+			return fmt.Errorf("The task action failed to run: %s", err)
+		}
+	}
+
+	stillNeeded, err := action.needed(ctx)
+	if err != nil {
+		return fmt.Errorf("The task action failed to detect if it is resolved: %s", err)
+	}
+
+	if stillNeeded {
+		return fmt.Errorf("The task action is not resolved after running it")
+	}
+
+	return nil
 }
 
 func activateFeature(ctx *Context, task Task) (err error) {

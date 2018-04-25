@@ -24,3 +24,7 @@ func (u *Unknown) perform(ctx *Context) (err error) {
 	ctx.ui.TaskWarning(fmt.Sprintf("Unknown task"))
 	return nil
 }
+
+func (u *Unknown) actions(ctx *Context) (actions []taskAction) {
+	return
+}

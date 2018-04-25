@@ -11,6 +11,14 @@ var allTasks = make(map[string]taskBuilder)
 type Task interface {
 	name() string
 	header() string
+	actions(*Context) []taskAction
+}
+
+type taskWithPreRunValidation interface {
+	preRunValidation(*Context) error
+}
+
+type taskWithPerform interface {
 	perform(*Context) error
 }
 

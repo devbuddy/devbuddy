@@ -25,3 +25,7 @@ func (u *Invalid) perform(ctx *Context) (err error) {
 	ctx.ui.TaskWarning(fmt.Sprintf("%s: %+v", u.err, u.definition))
 	return nil
 }
+
+func (u *Invalid) actions(ctx *Context) (actions []taskAction) {
+	return
+}

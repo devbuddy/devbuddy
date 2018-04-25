@@ -26,59 +26,66 @@ func (p *Pipfile) header() string {
 	return ""
 }
 
-func (p *Pipfile) perform(ctx *Context) (err error) {
-	// We should also check that the python task is executed before this one
-	pythonParam, hasPythonFeature := ctx.features["python"]
+func (p *Pipfile) preRunValidation(ctx *Context) (err error) {
+	_, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {
 		return fmt.Errorf("You must specify a Python environment to use this task")
 	}
-	venv := helpers.NewVirtualenv(ctx.cfg, pythonParam)
-
-	pipenvInstalled, err := p.installPipenv(ctx, venv)
-	if err != nil {
-		return err
-	}
-
-	InstallRan, err := p.runInstall(ctx)
-	if err != nil {
-		return err
-	}
-
-	if pipenvInstalled || InstallRan {
-		ctx.ui.TaskActed()
-	} else {
-		ctx.ui.TaskAlreadyOk()
-	}
-
 	return nil
 }
 
-func (p *Pipfile) installPipenv(ctx *Context, venv *helpers.Virtualenv) (acted bool, err error) {
-	pipenvCmd := venv.Which("pipenv")
-
-	if utils.PathExists(pipenvCmd) {
-		return false, nil
+func (p *Pipfile) actions(ctx *Context) []taskAction {
+	return []taskAction{
+		&pipfileInstall{},
+		&pipfileRun{},
 	}
-
-	code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "pipenv")
-	if err != nil {
-		return false, err
-	}
-	if code != 0 {
-		return false, fmt.Errorf("failed to install pipenv for the required python version. exit code: %d", code)
-	}
-
-	return true, nil
 }
 
-func (p *Pipfile) runInstall(ctx *Context) (acted bool, err error) {
-	code, err := runCommand(ctx, "pipenv", "install", "--system", "--dev")
+type pipfileInstall struct {
+}
+
+func (p *pipfileInstall) description() string {
+	return "install pipfile command"
+}
+
+func (p *pipfileInstall) needed(ctx *Context) (bool, error) {
+	pythonParam := ctx.features["python"]
+	venv := helpers.NewVirtualenv(ctx.cfg, pythonParam)
+	pipenvCmd := venv.Which("pipenv")
+	return !utils.PathExists(pipenvCmd), nil
+}
+
+func (p *pipfileInstall) run(ctx *Context) error {
+	code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "pipenv")
 	if err != nil {
-		return false, err
+		return err
 	}
 	if code != 0 {
-		return false, fmt.Errorf("failed to run `pipenv install`. exit code: %d", code)
+		return fmt.Errorf("failed to install pipenv. exit code: %d", code)
 	}
+	return nil
+}
 
-	return true, nil
+type pipfileRun struct {
+	success bool
+}
+
+func (p *pipfileRun) description() string {
+	return "install dependencies from the Pipfile"
+}
+
+func (p *pipfileRun) needed(ctx *Context) (bool, error) {
+	return !p.success, nil
+}
+
+func (p *pipfileRun) run(ctx *Context) error {
+	code, err := runCommand(ctx, "pipenv", "install", "--system", "--dev")
+	if err != nil {
+		return err
+	}
+	if code != 0 {
+		return fmt.Errorf("pipenv failed with exit code: %d", code)
+	}
+	p.success = true
+	return nil
 }
