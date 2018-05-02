@@ -2,6 +2,7 @@ package env
 
 import (
 	"os"
+	"runtime"
 	"strings"
 )
 
@@ -60,6 +61,11 @@ func (e *Env) Environ() (vars []string) {
 		vars = append(vars, name+"="+value)
 	}
 	return vars
+}
+
+// Os returns the current running operating system
+func (e *Env) Os() string {
+	return runtime.GOOS
 }
 
 func (e *Env) getAndSplitPath() []string {

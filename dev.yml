@@ -1,6 +1,8 @@
 up:
   - go: 1.10.1
   - golang_dep
+  - homebrew:
+    - curl
   - custom:
       name: Install shellcheck
       met?: test -e /usr/local/Cellar/shellcheck
