@@ -16,8 +16,6 @@ type Upgrade struct {
 	skipSudo  bool
 }
 
-const dadPrefix string = "dad-"
-
 func NewUpgrade(cfg *config.Config) (u *Upgrade) {
 	return NewUpgradeWithHTTPClient(cfg, http.DefaultClient)
 }

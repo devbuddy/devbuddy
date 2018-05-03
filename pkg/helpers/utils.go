@@ -6,7 +6,7 @@ import (
 )
 
 func makeTemporaryFile() (f *os.File, err error) {
-	tmpFile, err := ioutil.TempFile("", dadPrefix)
+	tmpFile, err := ioutil.TempFile("", "dad-")
 
 	if err != nil {
 		return nil, err
