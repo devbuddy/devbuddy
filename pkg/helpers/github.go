@@ -72,25 +72,23 @@ func releaseURL() string {
 }
 
 // LatestRelease get latest release url for a specific `platform`
-func (g *Github) LatestRelease(plateform string) (release *GithubReleaseItem, err error) {
+func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 	releaseList, err := g.listReleases()
-	release = &GithubReleaseItem{}
 
 	if err != nil {
-		return
+		return nil, nil
 	}
 
-	for _, *release = range releaseList.Items {
-		if release.Plateform == plateform {
-			release.TagName = releaseList.TagName
-			return
+	for _, item := range releaseList.Items {
+		if item.Plateform == plateform {
+			item.TagName = releaseList.TagName
+			return &item, nil
 		}
 	}
 
 	err = fmt.Errorf("Cannot find release for %s", plateform)
-	release = nil
 
-	return
+	return nil, nil
 }
 
 func (item *GithubReleaseItem) Get(client *http.Client) (data []byte, err error) {
