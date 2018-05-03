@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/pior/dad/pkg/config"
 )
+
+const defaultReleaseURL string = "https://api.github.com/repos/pior/dad/releases/latest"
 
 type Github struct {
 	config *config.Config
@@ -38,7 +41,7 @@ func NewGithubWithClient(cfg *config.Config, client *http.Client) (g *Github) {
 
 func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 
-	response, err := g.client.Get(g.config.ReleaseURL())
+	response, err := g.client.Get(releaseURL())
 
 	if err != nil {
 		return nil, err
@@ -58,6 +61,14 @@ func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 	err = json.Unmarshal(body, releases)
 
 	return
+}
+
+func releaseURL() string {
+	url := os.Getenv("DAD_RELEASE_URL")
+	if url != "" {
+		return url
+	}
+	return defaultReleaseURL
 }
 
 // LatestRelease get latest release url for a specific `platform`
