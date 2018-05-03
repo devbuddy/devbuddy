@@ -44,12 +44,14 @@ func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 		return nil, err
 	}
 
-	defer close(response.Body)
-
 	releases = &GithubReleaseList{}
 	body, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
+		return
+	}
+
+	if err = response.Body.Close(); err != nil {
 		return
 	}
 
@@ -81,15 +83,19 @@ func (g *Github) LatestRelease(plateform string) (release *GithubReleaseItem, er
 }
 
 func (item *GithubReleaseItem) Get(client *http.Client) (data []byte, err error) {
-	resp, err := client.Get(item.DownloadURL)
+	response, err := client.Get(item.DownloadURL)
 
 	if err != nil {
 		return
 	}
 
-	defer close(resp.Body)
+	data, err = ioutil.ReadAll(response.Body)
 
-	data, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	err = response.Body.Close()
 
 	return
 }

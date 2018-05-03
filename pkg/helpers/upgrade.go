@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -42,27 +41,23 @@ func (u *Upgrade) Perform(target string, release *GithubReleaseItem) (err error)
 	}
 
 	tmpFile, err := makeTemporaryFile()
-
 	if err != nil {
 		return
 	}
-
-	defer func() {
-		err = os.Remove(tmpFile.Name())
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
 
 	if _, err = tmpFile.Write(data); err != nil {
 		return
 	}
 
-	defer close(tmpFile)
-
 	cmdline := u.buildCmdline(tmpFile.Name(), target)
 
 	_, err = executor.NewShell(cmdline).Run()
+
+	if err = tmpFile.Close(); err != nil {
+		return
+	}
+
+	err = os.Remove(tmpFile.Name())
 
 	return
 }
