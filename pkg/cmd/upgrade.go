@@ -15,7 +15,7 @@ var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
 	Short: "Upgrade dad to the latest available release.",
 	Run:   upgradeRun,
-	// Args:  OnlyOneArg,
+	Args:  noArgs,
 }
 
 func upgradeRun(cmd *cobra.Command, args []string) {
