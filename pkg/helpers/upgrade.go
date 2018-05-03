@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/pior/dad/pkg/env"
+
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 )
@@ -22,11 +24,11 @@ func NewUpgrade(cfg *config.Config) (u *Upgrade) {
 
 func NewUpgradeWithHTTPClient(cfg *config.Config, client *http.Client) (u *Upgrade) {
 	g := NewGithubWithClient(cfg, client)
-	plateform := cfg.Platform()
+	env := env.NewFromOS()
 
 	return &Upgrade{
 		github:    g,
-		plateform: plateform,
+		plateform: env.Platform(),
 		client:    client,
 	}
 }

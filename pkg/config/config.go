@@ -1,11 +1,9 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
-	"runtime"
 )
 
 type Config struct {
@@ -65,10 +63,6 @@ func (c *Config) ReleaseURL() string {
 		return url
 	}
 	return defaultReleaseURL
-}
-
-func (c *Config) Platform() string {
-	return fmt.Sprintf("dad-%s-%s", runtime.GOOS, runtime.GOARCH)
 }
 
 func (c *Config) HomeDir(elem ...string) string {

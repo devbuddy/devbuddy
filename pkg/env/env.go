@@ -1,7 +1,9 @@
 package env
 
 import (
+	"fmt"
 	"os"
+	"runtime"
 	"strings"
 )
 
@@ -60,6 +62,11 @@ func (e *Env) Environ() (vars []string) {
 		vars = append(vars, name+"="+value)
 	}
 	return vars
+}
+
+// Platform returns the platform of the dad executable
+func (e *Env) Platform() string {
+	return fmt.Sprintf("dad-%s-%s", runtime.GOOS, runtime.GOARCH)
 }
 
 func (e *Env) getAndSplitPath() []string {
