@@ -20,7 +20,6 @@ type Github struct {
 type GithubReleaseItem struct {
 	Plateform   string `json:"name"`
 	DownloadURL string `json:"browser_download_url"`
-	TagName     string `json:"tag_name"`
 }
 type GithubReleaseList struct {
 	TagName string              `json:"tag_name"`
@@ -81,7 +80,6 @@ func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 
 	for _, item := range releaseList.Items {
 		if item.Plateform == plateform {
-			item.TagName = releaseList.TagName
 			return &item, nil
 		}
 	}

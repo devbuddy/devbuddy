@@ -35,7 +35,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 	destinationPath, err := os.Executable()
 	checkError(err)
 
-	ui.CommandRun("Upgrading", destinationPath, release.TagName)
+	ui.CommandRun("Upgrading", destinationPath)
 
 	err = u.Perform(destinationPath, release.DownloadURL)
 	checkError(err)
