@@ -103,7 +103,5 @@ func (g *Github) Get(url string) (data []byte, err error) {
 		return
 	}
 
-	err = response.Body.Close()
-
-	return
+	return data, response.Body.Close()
 }
