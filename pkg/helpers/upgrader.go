@@ -56,15 +56,15 @@ func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error)
 
 	cmdline := u.buildCmdline(tmpFile.Name(), destinationPath)
 
-	_, err = executor.NewShell(cmdline).Run()
+	if _, err = executor.NewShell(cmdline).Run(); err != nil {
+		return
+	}
 
 	if err = tmpFile.Close(); err != nil {
 		return
 	}
 
-	err = os.Remove(tmpFile.Name())
-
-	return
+	return os.Remove(tmpFile.Name())
 }
 
 func (u *Upgrader) buildCmdline(filename string, target string) string {
