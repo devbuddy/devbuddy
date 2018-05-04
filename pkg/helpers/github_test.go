@@ -52,3 +52,11 @@ func TestLatestReleaseOnLinux(t *testing.T) {
 	err = r.Stop()
 	require.NoError(t, err, "Recorder.Stop() failed")
 }
+
+func TestLatestReleaseOnUnknown(t *testing.T) {
+	g, _ := buildGithubClient(t)
+
+	_, err := g.LatestRelease("dad-linux-amd128")
+
+	require.Error(t, err)
+}

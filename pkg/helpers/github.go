@@ -86,7 +86,7 @@ func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 
 	err = fmt.Errorf("Cannot find release for %s", plateform)
 
-	return nil, nil
+	return nil, err
 }
 
 // Get download the content at `url`
