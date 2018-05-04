@@ -25,7 +25,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
-	u := helpers.NewUpgrade(cfg, true)
+	u := helpers.NewUpgrader(cfg, true)
 	ui := termui.NewUI(cfg)
 
 	ui.CommandHeader(fmt.Sprintf("upgrade %s", env.Platform()))

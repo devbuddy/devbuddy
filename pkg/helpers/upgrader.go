@@ -11,24 +11,24 @@ import (
 	"github.com/pior/dad/pkg/executor"
 )
 
-type Upgrade struct {
+type Upgrader struct {
 	github    *Github
 	plateform string
 	client    *http.Client
 	useSudo   bool
 }
 
-// NewUpgrade returns a new upgrade helper using the default http client
-func NewUpgrade(cfg *config.Config, useSudo bool) (u *Upgrade) {
-	return NewUpgradeWithHTTPClient(cfg, http.DefaultClient, useSudo)
+// NewUpgrader returns a new upgrade helper using the default http client
+func NewUpgrader(cfg *config.Config, useSudo bool) (u *Upgrader) {
+	return NewUpgraderWithHTTPClient(cfg, http.DefaultClient, useSudo)
 }
 
-// NewUpgradeWithHTTPClient returns a new upgrade helper using the provided http client
-func NewUpgradeWithHTTPClient(cfg *config.Config, client *http.Client, useSudo bool) (u *Upgrade) {
+// NewUpgraderWithHTTPClient returns a new upgrade helper using the provided http client
+func NewUpgraderWithHTTPClient(cfg *config.Config, client *http.Client, useSudo bool) (u *Upgrader) {
 	g := NewGithubWithClient(cfg, client)
 	env := env.NewFromOS()
 
-	return &Upgrade{
+	return &Upgrader{
 		github:    g,
 		plateform: env.Platform(),
 		client:    client,
@@ -37,7 +37,7 @@ func NewUpgradeWithHTTPClient(cfg *config.Config, client *http.Client, useSudo b
 }
 
 // Perform is fetching a new executable from `release` and upgrading the executable at `target` with it
-func (u *Upgrade) Perform(target string, release *GithubReleaseItem) (err error) {
+func (u *Upgrader) Perform(target string, release *GithubReleaseItem) (err error) {
 	data, err := release.Get(u.client)
 
 	if err != nil {
@@ -66,7 +66,7 @@ func (u *Upgrade) Perform(target string, release *GithubReleaseItem) (err error)
 	return
 }
 
-func (u *Upgrade) buildCmdline(filename string, target string) string {
+func (u *Upgrader) buildCmdline(filename string, target string) string {
 	if u.useSudo {
 		return fmt.Sprintf("sudo cp %s %s", filename, target)
 	}
@@ -74,14 +74,14 @@ func (u *Upgrade) buildCmdline(filename string, target string) string {
 }
 
 // LatestRelease get latest release item for current platform
-func (u *Upgrade) LatestRelease() (release *GithubReleaseItem, err error) {
+func (u *Upgrader) LatestRelease() (release *GithubReleaseItem, err error) {
 	release, err = u.LatestReleaseFor(u.plateform)
 
 	return
 }
 
 // LatestReleaseFor get latest release item for `platform`
-func (u *Upgrade) LatestReleaseFor(platform string) (release *GithubReleaseItem, err error) {
+func (u *Upgrader) LatestReleaseFor(platform string) (release *GithubReleaseItem, err error) {
 	release, err = u.github.LatestRelease(platform)
 
 	return

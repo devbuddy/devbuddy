@@ -12,11 +12,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestUpgradeToLatestRelease(t *testing.T) {
+func TestUpgraderLatestRelease(t *testing.T) {
 	cfg, err := config.Load()
 	require.NoError(t, err, "config.Load() failed")
 
-	r, err := recorder.New("fixtures/upgrade")
+	r, err := recorder.New("fixtures/upgrader")
 	require.NoError(t, err, "recorder.New() failed")
 
 	defer func() {
@@ -38,13 +38,13 @@ func TestUpgradeToLatestRelease(t *testing.T) {
 
 	client := &http.Client{Transport: r}
 
-	u := NewUpgradeWithHTTPClient(cfg, client, false)
+	u := NewUpgraderWithHTTPClient(cfg, client, false)
 
 	release, err := u.LatestReleaseFor("dad-darwin-amd64")
-	require.NoError(t, err, "upgrade.LatestRelease() failed")
+	require.NoError(t, err, "upgrader.LatestRelease() failed")
 
 	err = u.Perform(target.Name(), release)
-	require.NoError(t, err, "upgrade.Perform() failed")
+	require.NoError(t, err, "upgrader.Perform() failed")
 
 	result, err := ioutil.ReadFile(target.Name())
 	require.NoError(t, err, "ioutil.ReadFile() failed")
