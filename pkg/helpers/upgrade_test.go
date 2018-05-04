@@ -38,9 +38,7 @@ func TestUpgradeToLatestRelease(t *testing.T) {
 
 	client := &http.Client{Transport: r}
 
-	u := NewUpgradeWithHTTPClient(cfg, client)
-
-	u.skipSudo = true
+	u := NewUpgradeWithHTTPClient(cfg, client, false)
 
 	release, err := u.LatestReleaseFor("dad-darwin-amd64")
 	require.NoError(t, err, "upgrade.LatestRelease() failed")
