@@ -40,10 +40,7 @@ func TestUpgraderLatestRelease(t *testing.T) {
 
 	u := NewUpgraderWithHTTPClient(cfg, client, false)
 
-	release, err := u.LatestReleaseFor("dad-darwin-amd64")
-	require.NoError(t, err, "upgrader.LatestRelease() failed")
-
-	err = u.Perform(target.Name(), release)
+	err = u.Perform(target.Name(), "https://github.com/pior/dad/releases/download/v0.1.0/dad-darwin-amd64")
 	require.NoError(t, err, "upgrader.Perform() failed")
 
 	result, err := ioutil.ReadFile(target.Name())

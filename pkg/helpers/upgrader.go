@@ -36,9 +36,10 @@ func NewUpgraderWithHTTPClient(cfg *config.Config, client *http.Client, useSudo 
 	}
 }
 
-// Perform is fetching a new executable from `release` and upgrading the executable at `target` with it
-func (u *Upgrader) Perform(target string, release *GithubReleaseItem) (err error) {
-	data, err := release.Get(u.client)
+// Perform is fetching a new executable from `release`
+//   and upgrading the executable at `destinationPath` with it
+func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error) {
+	data, err := u.github.Get(sourceURL)
 
 	if err != nil {
 		return
@@ -53,7 +54,7 @@ func (u *Upgrader) Perform(target string, release *GithubReleaseItem) (err error
 		return
 	}
 
-	cmdline := u.buildCmdline(tmpFile.Name(), target)
+	cmdline := u.buildCmdline(tmpFile.Name(), destinationPath)
 
 	_, err = executor.NewShell(cmdline).Run()
 

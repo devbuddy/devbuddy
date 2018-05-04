@@ -91,8 +91,9 @@ func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 	return nil, nil
 }
 
-func (item *GithubReleaseItem) Get(client *http.Client) (data []byte, err error) {
-	response, err := client.Get(item.DownloadURL)
+// Get download the content at `url`
+func (g *Github) Get(url string) (data []byte, err error) {
+	response, err := g.client.Get(url)
 
 	if err != nil {
 		return

@@ -31,14 +31,13 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 	ui.CommandHeader(fmt.Sprintf("upgrade %s", env.Platform()))
 
 	release, err := u.LatestRelease()
+
+	destinationPath, err := os.Executable()
 	checkError(err)
 
-	target, err := os.Executable()
-	checkError(err)
+	ui.CommandRun("Upgrading", destinationPath, release.TagName)
 
-	ui.CommandRun("Upgrading", target, release.TagName)
-
-	err = u.Perform(target, release)
+	err = u.Perform(destinationPath, release.DownloadURL)
 	checkError(err)
 
 	ui.CommandActed()
