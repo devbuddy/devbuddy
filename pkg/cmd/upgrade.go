@@ -31,6 +31,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 	ui.CommandHeader(fmt.Sprintf("upgrade %s", env.Platform()))
 
 	release, err := u.LatestRelease()
+	checkError(err)
 
 	destinationPath, err := os.Executable()
 	checkError(err)
