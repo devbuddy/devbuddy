@@ -14,7 +14,7 @@ import (
 
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
-	Short: "Upgrade dad to the latest available release.",
+	Short: "[experimental] Upgrade dad to the latest available release.",
 	Run:   upgradeRun,
 	Args:  noArgs,
 }
