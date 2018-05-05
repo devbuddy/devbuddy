@@ -7,11 +7,13 @@ import (
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
+	"github.com/pior/dad/pkg/termui"
 )
 
 type Upgrader struct {
 	github  *Github
 	client  *http.Client
+	ui      *termui.UI
 	useSudo bool
 }
 
@@ -23,11 +25,13 @@ func NewUpgrader(cfg *config.Config, useSudo bool) (u *Upgrader) {
 // NewUpgraderWithHTTPClient returns a new upgrade helper using the provided http client
 func NewUpgraderWithHTTPClient(cfg *config.Config, client *http.Client, useSudo bool) (u *Upgrader) {
 	g := NewGithubWithClient(cfg, client)
+	ui := termui.NewUI(cfg)
 
 	return &Upgrader{
 		github:  g,
 		client:  client,
 		useSudo: useSudo,
+		ui:      ui,
 	}
 }
 
@@ -50,6 +54,8 @@ func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error)
 	}
 
 	cmdline := u.buildCmdline(tmpFile.Name(), destinationPath)
+
+	u.ui.CommandHeader(cmdline)
 
 	if _, err = executor.NewShell(cmdline).Run(); err != nil {
 		return

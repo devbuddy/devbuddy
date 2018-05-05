@@ -28,7 +28,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 
 	plateform := fmt.Sprintf("dad-%s-%s", runtime.GOOS, runtime.GOARCH)
 
-	ui.CommandHeader(fmt.Sprintf("upgrade %s", plateform))
+	ui.CommandRun("Getting latest release for", plateform)
 
 	release, err := u.LatestRelease(plateform)
 	checkError(err)
@@ -36,7 +36,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 	destinationPath, err := os.Executable()
 	checkError(err)
 
-	ui.CommandRun("Upgrading", destinationPath)
+	ui.CommandRun("Downloading", release.DownloadURL)
 
 	err = u.Perform(destinationPath, release.DownloadURL)
 	checkError(err)
