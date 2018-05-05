@@ -71,7 +71,7 @@ func (u *Upgrader) buildCmdline(filename string, target string) string {
 
 // LatestRelease get latest release item for current platform
 func (u *Upgrader) LatestRelease(plateform string) (release *GithubReleaseItem, err error) {
-	release, err = u.LatestRelease(plateform)
+	release, err = u.github.LatestRelease(plateform)
 
 	return
 }
