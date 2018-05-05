@@ -5,17 +5,14 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pior/dad/pkg/env"
-
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 )
 
 type Upgrader struct {
-	github    *Github
-	plateform string
-	client    *http.Client
-	useSudo   bool
+	github  *Github
+	client  *http.Client
+	useSudo bool
 }
 
 // NewUpgrader returns a new upgrade helper using the default http client
@@ -26,13 +23,11 @@ func NewUpgrader(cfg *config.Config, useSudo bool) (u *Upgrader) {
 // NewUpgraderWithHTTPClient returns a new upgrade helper using the provided http client
 func NewUpgraderWithHTTPClient(cfg *config.Config, client *http.Client, useSudo bool) (u *Upgrader) {
 	g := NewGithubWithClient(cfg, client)
-	env := env.NewFromOS()
 
 	return &Upgrader{
-		github:    g,
-		plateform: env.Platform(),
-		client:    client,
-		useSudo:   useSudo,
+		github:  g,
+		client:  client,
+		useSudo: useSudo,
 	}
 }
 
@@ -75,15 +70,8 @@ func (u *Upgrader) buildCmdline(filename string, target string) string {
 }
 
 // LatestRelease get latest release item for current platform
-func (u *Upgrader) LatestRelease() (release *GithubReleaseItem, err error) {
-	release, err = u.LatestReleaseFor(u.plateform)
-
-	return
-}
-
-// LatestReleaseFor get latest release item for `platform`
-func (u *Upgrader) LatestReleaseFor(platform string) (release *GithubReleaseItem, err error) {
-	release, err = u.github.LatestRelease(platform)
+func (u *Upgrader) LatestRelease(plateform string) (release *GithubReleaseItem, err error) {
+	release, err = u.LatestRelease(plateform)
 
 	return
 }

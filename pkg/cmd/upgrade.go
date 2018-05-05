@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"os"
+	"runtime"
 
 	"fmt"
 
 	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/env"
 	"github.com/pior/dad/pkg/helpers"
 	"github.com/pior/dad/pkg/termui"
 	"github.com/spf13/cobra"
@@ -20,17 +20,17 @@ var upgradeCmd = &cobra.Command{
 }
 
 func upgradeRun(cmd *cobra.Command, args []string) {
-	env := env.NewFromOS()
-
 	cfg, err := config.Load()
 	checkError(err)
 
 	u := helpers.NewUpgrader(cfg, true)
 	ui := termui.NewUI(cfg)
 
-	ui.CommandHeader(fmt.Sprintf("upgrade %s", env.Platform()))
+	plateform := fmt.Sprintf("dad-%s-%s", runtime.GOOS, runtime.GOARCH)
 
-	release, err := u.LatestRelease()
+	ui.CommandHeader(fmt.Sprintf("upgrade %s", plateform))
+
+	release, err := u.LatestRelease(plateform)
 	checkError(err)
 
 	destinationPath, err := os.Executable()
