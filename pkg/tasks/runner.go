@@ -45,32 +45,37 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 
 	for _, task := range taskList {
 		ctx.ui.TaskHeader(task.name(), task.header())
-
-		if t, ok := task.(taskWithPerform); ok {
-			err = t.perform(ctx)
-			if err != nil {
-				ctx.ui.TaskError(err)
-				return false, nil
-			}
-		}
-
-		for _, action := range task.actions(ctx) {
-			err = runAction(ctx, action)
-			if err != nil {
-				ctx.ui.TaskError(err)
-				return false, nil
-			}
-		}
-
-		err = activateFeature(ctx, task)
+		err = runTask(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
-			return false, nil
+			return false, err
 		}
-
 	}
 
 	return true, nil
+}
+
+func runTask(ctx *context, task Task) error {
+	if t, ok := task.(taskWithPerform); ok {
+		err := t.perform(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, action := range task.actions(ctx) {
+		err := runAction(ctx, action)
+		if err != nil {
+			return err
+		}
+	}
+
+	err := activateFeature(ctx, task)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func runAction(ctx *context, action taskAction) error {
