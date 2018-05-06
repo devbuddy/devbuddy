@@ -7,21 +7,22 @@ oneTimeSetUp() {
 
 setUp() {
     cd $SHUNIT_TMPDIR
+    rm -f sentinel
 }
 
 testNotMetThenMet() {
     cat > dev.yml <<YAML
 up:
   - custom:
-      met?: 'test -e testfile'
-      meet: 'touch testfile'
+      met?: test -e sentinel
+      meet: touch sentinel
 YAML
 
     output=$(dad up)
     rc=$?
     assertEquals "command failed" 0 $rc
 
-    assertTrue "the test file was not created" '[ -e testfile ]'
+    assertTrue "the test file was not created" '[ -e sentinel ]'
 }
 
 testAlreadyMet() {
@@ -29,7 +30,7 @@ testAlreadyMet() {
 up:
   - custom:
       met?: 'true'
-      meet: 'touch sentinel'
+      meet: touch sentinel
 YAML
 
     output=$(dad up)
@@ -57,7 +58,7 @@ testProjectDir() {
     cat > dev.yml <<YAML
 up:
   - custom:
-      met?: 'false'
+      met?: test -e sentinel
       meet: touch sentinel
 YAML
 
