@@ -26,7 +26,7 @@ commands:
     run: script/test && script/integration_test && script/lint
 
   release:
-    desc: Create a new release
+    desc: Create a new release (dad release [VERSION])
     run: script/release
 
   godoc:

@@ -177,7 +177,7 @@ export DAD_DEBUG=1
 ### Release
 
 ```bash
-$ script/release v1.0.0
+$ dad release 1.0.0
 ```
 
 The big idea:
