@@ -48,7 +48,7 @@ func (c *Custom) header() string {
 	return c.command
 }
 
-func (c *Custom) actions(ctx *Context) []taskAction {
+func (c *Custom) actions(ctx *context) []taskAction {
 	return []taskAction{
 		&customAction{condition: c.condition, command: c.command},
 	}
@@ -63,7 +63,7 @@ func (c *customAction) description() string {
 	return ""
 }
 
-func (c *customAction) needed(ctx *Context) (bool, error) {
+func (c *customAction) needed(ctx *context) (bool, error) {
 	code, err := runShellSilent(ctx, c.condition)
 	if err != nil {
 		return false, fmt.Errorf("failed to run the condition command: %s", err)
@@ -71,7 +71,7 @@ func (c *customAction) needed(ctx *Context) (bool, error) {
 	return code != 0, nil
 }
 
-func (c *customAction) run(ctx *Context) error {
+func (c *customAction) run(ctx *context) error {
 	code, err := runShellSilent(ctx, c.command)
 	if err != nil {
 		return fmt.Errorf("command failed: %s", err)

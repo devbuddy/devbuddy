@@ -35,7 +35,7 @@ func (g *Golang) header() string {
 	return g.version
 }
 
-func (g *Golang) actions(ctx *Context) []taskAction {
+func (g *Golang) actions(ctx *context) []taskAction {
 	return []taskAction{
 		&golangGoPath{},
 		&golangInstall{version: g.version},
@@ -52,11 +52,11 @@ func (g *golangGoPath) description() string {
 	return ""
 }
 
-func (g *golangGoPath) needed(ctx *Context) (bool, error) {
+func (g *golangGoPath) needed(ctx *context) (bool, error) {
 	return ctx.env.Get("GOPATH") == "", nil
 }
 
-func (g *golangGoPath) run(ctx *Context) error {
+func (g *golangGoPath) run(ctx *context) error {
 	ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
 	return nil
 }
@@ -69,10 +69,10 @@ func (g *golangInstall) description() string {
 	return fmt.Sprintf("Install Go version %s", g.version)
 }
 
-func (g *golangInstall) needed(ctx *Context) (bool, error) {
+func (g *golangInstall) needed(ctx *context) (bool, error) {
 	return !helpers.NewGolang(ctx.cfg, g.version).Exists(), nil
 }
 
-func (g *golangInstall) run(ctx *Context) error {
+func (g *golangInstall) run(ctx *context) error {
 	return helpers.NewGolang(ctx.cfg, g.version).Install()
 }

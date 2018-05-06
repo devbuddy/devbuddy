@@ -26,7 +26,7 @@ func (p *Pipfile) header() string {
 	return ""
 }
 
-func (p *Pipfile) preRunValidation(ctx *Context) (err error) {
+func (p *Pipfile) preRunValidation(ctx *context) (err error) {
 	_, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {
 		return fmt.Errorf("You must specify a Python environment to use this task")
@@ -34,7 +34,7 @@ func (p *Pipfile) preRunValidation(ctx *Context) (err error) {
 	return nil
 }
 
-func (p *Pipfile) actions(ctx *Context) []taskAction {
+func (p *Pipfile) actions(ctx *context) []taskAction {
 	return []taskAction{
 		&pipfileInstall{},
 		&pipfileRun{},
@@ -48,14 +48,14 @@ func (p *pipfileInstall) description() string {
 	return "install pipfile command"
 }
 
-func (p *pipfileInstall) needed(ctx *Context) (bool, error) {
+func (p *pipfileInstall) needed(ctx *context) (bool, error) {
 	pythonParam := ctx.features["python"]
 	venv := helpers.NewVirtualenv(ctx.cfg, pythonParam)
 	pipenvCmd := venv.Which("pipenv")
 	return !utils.PathExists(pipenvCmd), nil
 }
 
-func (p *pipfileInstall) run(ctx *Context) error {
+func (p *pipfileInstall) run(ctx *context) error {
 	code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "pipenv")
 	if err != nil {
 		return err
@@ -74,11 +74,11 @@ func (p *pipfileRun) description() string {
 	return "install dependencies from the Pipfile"
 }
 
-func (p *pipfileRun) needed(ctx *Context) (bool, error) {
+func (p *pipfileRun) needed(ctx *context) (bool, error) {
 	return !p.success, nil
 }
 
-func (p *pipfileRun) run(ctx *Context) error {
+func (p *pipfileRun) run(ctx *context) error {
 	code, err := runCommand(ctx, "pipenv", "install", "--system", "--dev")
 	if err != nil {
 		return err

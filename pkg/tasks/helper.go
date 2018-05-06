@@ -20,11 +20,11 @@ func asString(value interface{}) (string, error) {
 	return "", errors.New("not a string")
 }
 
-func runCommand(ctx *Context, program string, args ...string) (int, error) {
+func runCommand(ctx *context, program string, args ...string) (int, error) {
 	ctx.ui.TaskCommand(program, args...)
 	return executor.New(program, args...).SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ()).Run()
 }
 
-func runShellSilent(ctx *Context, cmdline string) (int, error) {
+func runShellSilent(ctx *context, cmdline string) (int, error) {
 	return executor.NewShell(cmdline).SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ()).Run()
 }

@@ -39,7 +39,7 @@ func (p *Python) header() string {
 	return p.version
 }
 
-func (p *Python) actions(ctx *Context) []taskAction {
+func (p *Python) actions(ctx *context) []taskAction {
 	pyEnv, err := helpers.NewPyEnv(ctx.cfg)
 	if err != nil {
 	}
@@ -63,12 +63,12 @@ func (p *pythonPyenv) description() string {
 	return "install Python version with PyEnv"
 }
 
-func (p *pythonPyenv) needed(ctx *Context) (bool, error) {
+func (p *pythonPyenv) needed(ctx *context) (bool, error) {
 	installed, err := p.pyEnv.VersionInstalled(p.version)
 	return !installed, err
 }
 
-func (p *pythonPyenv) run(ctx *Context) error {
+func (p *pythonPyenv) run(ctx *context) error {
 	code, err := runCommand(ctx, "pyenv", "install", p.version)
 	if err != nil {
 		return err
@@ -88,12 +88,12 @@ func (p *pythonInstallVenv) description() string {
 	return "install virtualenv"
 }
 
-func (p *pythonInstallVenv) needed(ctx *Context) (bool, error) {
+func (p *pythonInstallVenv) needed(ctx *context) (bool, error) {
 	installed := utils.PathExists(p.pyEnv.Which(p.version, "virtualenv"))
 	return !installed, nil
 }
 
-func (p *pythonInstallVenv) run(ctx *Context) error {
+func (p *pythonInstallVenv) run(ctx *context) error {
 	code, err := runCommand(ctx, p.pyEnv.Which(p.version, "python"), "-m", "pip", "install", "virtualenv")
 	if err != nil {
 		return err
@@ -115,11 +115,11 @@ func (p *pythonCreateVenv) description() string {
 	return "create virtualenv"
 }
 
-func (p *pythonCreateVenv) needed(ctx *Context) (bool, error) {
+func (p *pythonCreateVenv) needed(ctx *context) (bool, error) {
 	return !p.venv.Exists(), nil
 }
 
-func (p *pythonCreateVenv) run(ctx *Context) error {
+func (p *pythonCreateVenv) run(ctx *context) error {
 	err := os.MkdirAll(filepath.Dir(p.venv.Path()), 0750)
 	if err != nil {
 		return err

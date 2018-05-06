@@ -37,7 +37,7 @@ func (p *Pip) header() string {
 	return "" //strings.Join(p.files, ", ")
 }
 
-func (p *Pip) preRunValidation(ctx *Context) (err error) {
+func (p *Pip) preRunValidation(ctx *context) (err error) {
 	_, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {
 		return fmt.Errorf("You must specify a Python environment to use this task")
@@ -45,7 +45,7 @@ func (p *Pip) preRunValidation(ctx *Context) (err error) {
 	return nil
 }
 
-func (p *Pip) actions(ctx *Context) (actions []taskAction) {
+func (p *Pip) actions(ctx *context) (actions []taskAction) {
 	for _, file := range p.files {
 		actions = append(actions, &pipInstall{file: file})
 	}
@@ -61,11 +61,11 @@ func (p *pipInstall) description() string {
 	return fmt.Sprintf("install %s", p.file)
 }
 
-func (p *pipInstall) needed(ctx *Context) (bool, error) {
+func (p *pipInstall) needed(ctx *context) (bool, error) {
 	return !p.success, nil
 }
 
-func (p *pipInstall) run(ctx *Context) error {
+func (p *pipInstall) run(ctx *context) error {
 	code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "-r", p.file)
 	if err != nil {
 		return err

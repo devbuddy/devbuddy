@@ -10,7 +10,7 @@ import (
 	"github.com/pior/dad/pkg/termui"
 )
 
-type Context struct {
+type context struct {
 	proj     *project.Project
 	ui       *termui.UI
 	cfg      *config.Config
@@ -25,7 +25,7 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 		return false, err
 	}
 
-	ctx := &Context{
+	ctx := &context{
 		cfg:      cfg,
 		proj:     proj,
 		ui:       ui,
@@ -73,7 +73,7 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	return true, nil
 }
 
-func runAction(ctx *Context, action taskAction) error {
+func runAction(ctx *context, action taskAction) error {
 	desc := action.description()
 
 	needed, err := action.needed(ctx)
@@ -104,7 +104,7 @@ func runAction(ctx *Context, action taskAction) error {
 	return nil
 }
 
-func activateFeature(ctx *Context, task Task) (err error) {
+func activateFeature(ctx *context, task Task) (err error) {
 	t, ok := task.(TaskWithFeature)
 	if !ok {
 		return nil
