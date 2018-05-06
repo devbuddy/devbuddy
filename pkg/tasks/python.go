@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -42,6 +43,7 @@ func (p *Python) header() string {
 func (p *Python) actions(ctx *context) []taskAction {
 	pyEnv, err := helpers.NewPyEnv(ctx.cfg)
 	if err != nil {
+		log.Fatalf("PyEnv helper failed: %s", err)
 	}
 
 	name := helpers.VirtualenvName(ctx.proj, p.version)
