@@ -173,6 +173,10 @@ To show the debug messages, add this before in your environment:
 ```bash
 export DAD_DEBUG=1
 ```
+Or:
+```bash
+$ dad-enable-debug  # dad-disable-debug
+```
 
 ### Release
 
