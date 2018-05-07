@@ -1,4 +1,4 @@
-#!/bin/bash
+set -uo pipefail
 
 oneTimeSetUp() {
     # This runs in a subshell (subprocess).
@@ -30,5 +30,5 @@ testCreateExisting() {
     assertEquals "cd to project directory" ~/src/github.com/dadorg/repo2 "$PWD"
 }
 
-SHUNIT_COLOR='none'  # Not macos compatible?
-. shunit2/shunit2
+SHUNIT_PARENT=$0
+. ./shunit2.sh
