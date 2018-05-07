@@ -1,4 +1,4 @@
-set -uo pipefail
+set -u
 
 oneTimeSetUp() {
     # This runs in a subshell (subprocess).

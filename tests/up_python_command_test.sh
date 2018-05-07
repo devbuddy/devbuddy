@@ -1,4 +1,4 @@
-set -uo pipefail
+set -u
 
 oneTimeSetUp() {
     eval "$(dad --shell-init)"
