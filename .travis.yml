@@ -8,6 +8,10 @@ go:
 
 go_import_path: github.com/pior/dad
 
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq zsh
+
 install:
   - script/setup-ci test
 
