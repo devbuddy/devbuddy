@@ -20,7 +20,7 @@ YAML
 testMissingGOPATH() {
     unset GOPATH
 
-    output=$(dad up | grep -q 'Warning.*GOPATH')  # Expect a warning about GOPATH
+    output=$(dad up | grep 'Warning.*GOPATH')  # Expect a warning about GOPATH
     rc=$?
     assertEquals "dad up should warn about GOPATH not set" 0 $rc
 }
