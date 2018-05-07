@@ -1,5 +1,4 @@
-#!/bin/bash
-set -u
+set -uo pipefail
 
 oneTimeSetUp() {
     eval "$(dad --shell-init)"
@@ -71,6 +70,5 @@ YAML
     assertTrue "the custom task should have run in project dir" '[ -e sentinel ]'
 }
 
-
-SHUNIT_COLOR='none'  # Not macos compatible?
-. shunit2/shunit2
+SHUNIT_PARENT=$0
+. ./shunit2.sh

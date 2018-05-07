@@ -1,5 +1,4 @@
-#!/bin/bash
-set -u
+set -uo pipefail
 
 oneTimeSetUp() {
     eval "$(dad --shell-init)"
@@ -41,5 +40,5 @@ YAML
     assertEquals "command should have succeed" 0 $rc
 }
 
-SHUNIT_COLOR='none'  # Not macos compatible?
-. shunit2/shunit2
+SHUNIT_PARENT=$0
+. ./shunit2.sh

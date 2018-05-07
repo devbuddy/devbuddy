@@ -1,5 +1,4 @@
-#!/bin/bash
-set -u
+set -uo pipefail
 
 oneTimeSetUp() {
     eval "$(dad --shell-init)"
@@ -36,5 +35,5 @@ testEnv() {
     assertEquals "go version" "go1.5" "$version"
 }
 
-SHUNIT_COLOR='none'  # Not macos compatible?
-. shunit2/shunit2
+SHUNIT_PARENT=$0
+. ./shunit2.sh

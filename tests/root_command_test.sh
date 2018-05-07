@@ -1,5 +1,4 @@
-#!/bin/bash
-set -u
+set -uo pipefail
 
 oneTimeSetUp() {
     eval "$(dad --shell-init)"
@@ -32,5 +31,5 @@ testDadVersion() {
     assertEquals "dad command output the usage message" "dad version devel" "${output}"
 }
 
-SHUNIT_COLOR='none'  # Not macos compatible?
-. shunit2/shunit2
+SHUNIT_PARENT=$0
+. ./shunit2.sh

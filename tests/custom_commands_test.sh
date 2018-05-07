@@ -1,4 +1,4 @@
-#!/bin/bash
+set -uo pipefail
 
 oneTimeSetUp() {
     eval "$(dad --shell-init)"
@@ -56,5 +56,5 @@ testRunInProjectRoot() {
     assertEquals "dad custom commands run in project root" 0 $?
 }
 
-SHUNIT_COLOR='none'  # Not macos compatible?
-. shunit2/shunit2
+SHUNIT_PARENT=$0
+. ./shunit2.sh
