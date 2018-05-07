@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+title() {
+    echo -e "\n\n#--------------------------------------------"
+    echo -e "# $@"
+    echo -e "#"
+}
+
 setup_environment() {
     echo " -> Build the project."
     go build
@@ -19,11 +25,9 @@ setup_environment() {
 
 run_tests() {
     local failures=()
-    local readonly shell=$1
+    local -r shell=$1
 
-    echo -e "\n\n#--------------------------------------------"
-    echo -e "# Running tests with $shell"
-    echo -e "#"
+    title "Running tests with $shell"
 
     for testfile in *_test.sh; do
         echo -e "\nRunning: ${testfile}"
@@ -31,10 +35,10 @@ run_tests() {
     done
 
     if [[ ${#failures[@]} -ne 0 ]]; then
-        echo -e "\n\n#--------------------------------------------"
-        echo -e "\n\REPORT: the following tests failed! ❌"
+        title "REPORT: the following tests failed! ❌"
+
         for failure in "${failures[@]}"; do
-            echo "Failed: $failure -> ❌"
+            echo "Failed: $failure ❌"
         done
         return 1
     fi
@@ -45,7 +49,7 @@ run_tests() {
 main() {
     setup_environment
 
-    cd $ROOT/tests
+    cd "$ROOT/tests"
 
     local exitcode=0
 
