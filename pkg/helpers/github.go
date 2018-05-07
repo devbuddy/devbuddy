@@ -10,8 +10,6 @@ import (
 	"github.com/pior/dad/pkg/config"
 )
 
-const defaultReleaseURL string = "https://api.github.com/repos/pior/dad/releases/latest"
-
 type Github struct {
 	config *config.Config
 	client *http.Client
@@ -67,7 +65,7 @@ func releaseURL() string {
 	if url != "" {
 		return url
 	}
-	return defaultReleaseURL
+	return "https://api.github.com/repos/pior/dad/releases/latest"
 }
 
 // LatestRelease get latest release url for a specific `platform`
