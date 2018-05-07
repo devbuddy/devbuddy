@@ -1,34 +1,58 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-ROOT=$PWD
-export PATH=$ROOT:$PATH
+setup_environment() {
+    echo " -> Build the project."
+    go build
 
-go build
+    echo " -> Adding the current dir to PATH."
+    ROOT=$PWD
+    export PATH="$ROOT:$PATH"
 
-if [[ "$(which dad)" != "$ROOT/dad" ]]; then
-    echo "In order to run the integration test on the current code,"
-    echo "the locally built dad binary must be found in the PATH."
-    echo "But 'which dad' returned: $(which dad)"
-    exit 1
-fi
-
-RC=0
-
-cd $ROOT/tests
-TESTS=*_test.sh
-for testfile in $TESTS; do
-    echo -e "\nTest file: $testfile"
-    ./$testfile
-
-    if [[ $? != 0 ]]; then
-        RC=1
+    if [[ "$(which dad)" != "$ROOT/dad" ]]; then
+        echo "In order to run the integration test on the current code,"
+        echo "the locally built dad binary must be found in the PATH."
+        echo "But 'which dad' returned: $(which dad)"
+        exit 1
     fi
-done
+}
 
-if [[ $RC == 0 ]]; then
-    echo -e "\nAll tests passed successfully"
-else
-    echo -e "\nError: At least one test failed!"
-fi
+run_tests() {
+    local failures=()
+    local readonly shell=$1
 
-exit $RC
+    echo -e "\n\n#--------------------------------------------"
+    echo -e "# Running tests with $shell"
+    echo -e "#"
+
+    for testfile in *_test.sh; do
+        echo -e "\nRunning: ${testfile}"
+        $shell ${testfile} || failures+=(${testfile})
+    done
+
+    if [[ ${#failures[@]} -ne 0 ]]; then
+        echo -e "\n\n#--------------------------------------------"
+        echo -e "\n\REPORT: the following tests failed! ❌"
+        for failure in "${failures[@]}"; do
+            echo "Failed: $failure -> ❌"
+        done
+        return 1
+    fi
+
+    echo -e "\nAll tests passed successfully: ✅"
+}
+
+main() {
+    setup_environment
+
+    cd $ROOT/tests
+
+    local exitcode=0
+
+    run_tests "bash" || exitcode=1
+    run_tests "zsh -o shwordsplit" || exitcode=1
+
+    exit $exitcode
+}
+
+main
