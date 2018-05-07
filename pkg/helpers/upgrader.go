@@ -53,7 +53,10 @@ func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error)
 		return
 	}
 
-	cmdline := u.buildCmdline(tmpFile.Name(), destinationPath)
+	cmdline := fmt.Sprintf("cp %s %s", tmpFile.Name(), destinationPath)
+	if u.useSudo {
+		cmdline = fmt.Sprintf("sudo %s", cmdline)
+	}
 
 	u.ui.CommandHeader(cmdline)
 
@@ -66,13 +69,6 @@ func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error)
 	}
 
 	return os.Remove(tmpFile.Name())
-}
-
-func (u *Upgrader) buildCmdline(filename string, target string) string {
-	if u.useSudo {
-		return fmt.Sprintf("sudo cp %s %s", filename, target)
-	}
-	return fmt.Sprintf("cp %s %s", filename, target)
 }
 
 // LatestRelease get latest release item for current platform
