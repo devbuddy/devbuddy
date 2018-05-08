@@ -3,6 +3,9 @@ up:
   - custom:
       met?: dep status 2> /dev/null > /dev/null
       meet: dep ensure
+  - custom:
+      met?: test -e /usr/local/Cellar/shellcheck
+      meet: brew install shellcheck
 
 commands:
   testup:
@@ -20,6 +23,10 @@ commands:
   lint:
     desc: Lint the project
     run: script/lint
+
+  lint-shell:
+    desc: Lint the shell scripts
+    run: shellcheck script/* tests/*.sh
 
   ci:
     desc: Run all tests as CI would do
