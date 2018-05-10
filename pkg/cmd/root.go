@@ -29,6 +29,7 @@ func build(version string) {
 	rootCmd.AddCommand(cloneCmd)
 	rootCmd.AddCommand(createCmd)
 	rootCmd.AddCommand(upCmd)
+	rootCmd.AddCommand(upgradeCmd)
 }
 
 func rootRun(cmd *cobra.Command, args []string) {

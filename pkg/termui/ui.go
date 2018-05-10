@@ -27,6 +27,14 @@ func (u *UI) CommandHeader(cmdline string) {
 	fmt.Fprintf(os.Stderr, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
 }
 
+func (u *UI) CommandRun(cmdline string, args ...string) {
+	fmt.Fprint(u.out, color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")), "\n")
+}
+
+func (u *UI) CommandActed() {
+	fmt.Fprintf(u.out, "  %s\n", color.Green("Done!"))
+}
+
 func (u *UI) TaskHeader(name string, param string) {
 	if param != "" {
 		param = fmt.Sprintf(" (%s)", color.Blue(param))
