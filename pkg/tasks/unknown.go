@@ -20,7 +20,11 @@ func (u *Unknown) header() string {
 	return ""
 }
 
-func (u *Unknown) perform(ctx *Context) (err error) {
+func (u *Unknown) perform(ctx *context) (err error) {
 	ctx.ui.TaskWarning(fmt.Sprintf("Unknown task"))
 	return nil
+}
+
+func (u *Unknown) actions(ctx *context) (actions []taskAction) {
+	return
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/pior/dad/pkg/termui"
 )
 
-type Context struct {
+type context struct {
 	proj     *project.Project
 	ui       *termui.UI
 	cfg      *config.Config
@@ -18,13 +18,14 @@ type Context struct {
 	features map[string]string
 }
 
+// RunAll builds and execute all tasks found in the project
 func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success bool, err error) {
 	taskList, err := GetTasksFromProject(proj)
 	if err != nil {
 		return false, err
 	}
 
-	ctx := &Context{
+	ctx := &context{
 		cfg:      cfg,
 		proj:     proj,
 		ui:       ui,
@@ -33,25 +34,78 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	}
 
 	for _, task := range taskList {
-		ctx.ui.TaskHeader(task.name(), task.header())
-
-		err = task.perform(ctx)
-		if err != nil {
-			ctx.ui.TaskError(err)
-			return false, nil
+		if t, ok := task.(taskWithPreRunValidation); ok {
+			err = t.preRunValidation(ctx)
+			if err != nil {
+				ctx.ui.TaskError(err)
+				return false, nil
+			}
 		}
+	}
 
-		err = activateFeature(ctx, task)
+	for _, task := range taskList {
+		ctx.ui.TaskHeader(task.name(), task.header())
+		err = runTask(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
-			return false, nil
+			return false, err
 		}
 	}
 
 	return true, nil
 }
 
-func activateFeature(ctx *Context, task Task) (err error) {
+func runTask(ctx *context, task Task) (err error) {
+	if t, ok := task.(taskWithPerform); ok {
+		err = t.perform(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, action := range task.actions(ctx) {
+		err = runAction(ctx, action)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = activateFeature(ctx, task)
+	return err
+}
+
+func runAction(ctx *context, action taskAction) error {
+	desc := action.description()
+
+	needed, err := action.needed(ctx)
+	if err != nil {
+		return fmt.Errorf("The task action (%s) failed to detect whether it need to run: %s", desc, err)
+	}
+
+	if desc != "" {
+		ctx.ui.TaskActionHeader(desc)
+	}
+
+	if needed {
+		err = action.run(ctx)
+		if err != nil {
+			return fmt.Errorf("The task action failed to run: %s", err)
+		}
+	}
+
+	stillNeeded, err := action.needed(ctx)
+	if err != nil {
+		return fmt.Errorf("The task action failed to detect if it is resolved: %s", err)
+	}
+
+	if stillNeeded {
+		return fmt.Errorf("The task action is not resolved after running it")
+	}
+
+	return nil
+}
+
+func activateFeature(ctx *context, task Task) (err error) {
 	t, ok := task.(TaskWithFeature)
 	if !ok {
 		return nil

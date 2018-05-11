@@ -43,7 +43,7 @@ func (u *UI) TaskHeader(name string, param string) {
 }
 
 func (u *UI) TaskCommand(cmdline string, args ...string) {
-	fmt.Fprint(u.out, "  Running: ", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
+	fmt.Fprintf(u.out, "  Running: %s %s\n", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
 }
 
 func (u *UI) TaskActed() {
@@ -60,6 +60,10 @@ func (u *UI) TaskError(err error) {
 
 func (u *UI) TaskWarning(message string) {
 	fmt.Fprintf(u.out, "  Warning: %s\n", color.Brown(message))
+}
+
+func (u *UI) TaskActionHeader(desc string) {
+	fmt.Fprintf(u.out, "  %s%s\n", color.Brown("▪︎"), color.Magenta(desc))
 }
 
 func (u *UI) ProjectExists() {

@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"fmt"
-	"strings"
 )
 
 func init() {
@@ -35,24 +34,45 @@ func (p *Pip) name() string {
 }
 
 func (p *Pip) header() string {
-	return strings.Join(p.files, ", ")
+	return "" //strings.Join(p.files, ", ")
 }
 
-func (p *Pip) perform(ctx *Context) (err error) {
-	// We should also check that the python task is executed before this one
+func (p *Pip) preRunValidation(ctx *context) (err error) {
 	_, hasPythonFeature := ctx.features["python"]
 	if !hasPythonFeature {
 		return fmt.Errorf("You must specify a Python environment to use this task")
 	}
+	return nil
+}
 
+func (p *Pip) actions(ctx *context) (actions []taskAction) {
 	for _, file := range p.files {
-		code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "-r", file)
-		if err != nil {
-			return err
-		}
-		if code != 0 {
-			return fmt.Errorf("Pip failed with code %d", code)
-		}
+		actions = append(actions, &pipInstall{file: file})
 	}
+	return
+}
+
+type pipInstall struct {
+	file    string
+	success bool
+}
+
+func (p *pipInstall) description() string {
+	return fmt.Sprintf("install %s", p.file)
+}
+
+func (p *pipInstall) needed(ctx *context) (bool, error) {
+	return !p.success, nil
+}
+
+func (p *pipInstall) run(ctx *context) error {
+	code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "-r", p.file)
+	if err != nil {
+		return err
+	}
+	if code != 0 {
+		return fmt.Errorf("Pip failed with code %d", code)
+	}
+	p.success = true
 	return nil
 }

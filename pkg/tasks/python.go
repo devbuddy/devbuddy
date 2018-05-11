@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -14,6 +15,7 @@ func init() {
 	allTasks["python"] = newPython
 }
 
+// Python task: setup a virtualenv with a specified Python version
 type Python struct {
 	version string
 }
@@ -38,94 +40,102 @@ func (p *Python) header() string {
 	return p.version
 }
 
-func (p *Python) perform(ctx *Context) (err error) {
+func (p *Python) actions(ctx *context) []taskAction {
 	pyEnv, err := helpers.NewPyEnv(ctx.cfg)
 	if err != nil {
-		return
+		log.Fatalf("PyEnv helper failed: %s", err)
 	}
 
-	installed, err := p.installPython(ctx, pyEnv)
+	name := helpers.VirtualenvName(ctx.proj, p.version)
+	venv := helpers.NewVirtualenv(ctx.cfg, name)
+
+	return []taskAction{
+		&pythonPyenv{version: p.version, pyEnv: pyEnv},
+		&pythonInstallVenv{version: p.version, pyEnv: pyEnv},
+		&pythonCreateVenv{version: p.version, pyEnv: pyEnv, venv: venv},
+	}
+}
+
+type pythonPyenv struct {
+	version string
+	pyEnv   *helpers.PyEnv
+}
+
+func (p *pythonPyenv) description() string {
+	return "install Python version with PyEnv"
+}
+
+func (p *pythonPyenv) needed(ctx *context) (bool, error) {
+	installed, err := p.pyEnv.VersionInstalled(p.version)
+	return !installed, err
+}
+
+func (p *pythonPyenv) run(ctx *context) error {
+	code, err := runCommand(ctx, "pyenv", "install", p.version)
 	if err != nil {
 		return err
 	}
+	if code != 0 {
+		return fmt.Errorf("failed to install the required python version. exit code: %d", code)
+	}
+	return nil
+}
 
-	venvInstalled, err := p.installVirtualEnv(ctx, pyEnv)
+type pythonInstallVenv struct {
+	version string
+	pyEnv   *helpers.PyEnv
+}
+
+func (p *pythonInstallVenv) description() string {
+	return "install virtualenv"
+}
+
+func (p *pythonInstallVenv) needed(ctx *context) (bool, error) {
+	installed := utils.PathExists(p.pyEnv.Which(p.version, "virtualenv"))
+	return !installed, nil
+}
+
+func (p *pythonInstallVenv) run(ctx *context) error {
+	code, err := runCommand(ctx, p.pyEnv.Which(p.version, "python"), "-m", "pip", "install", "virtualenv")
 	if err != nil {
 		return err
 	}
-
-	venvCreated, err := p.createVirtualEnv(ctx, pyEnv)
-	if err != nil {
-		return err
-	}
-
-	if installed || venvInstalled || venvCreated {
-		ctx.ui.TaskActed()
-	} else {
-		ctx.ui.TaskAlreadyOk()
+	if code != 0 {
+		return fmt.Errorf("failed to install virtualenv. exit code: %d", code)
 	}
 
 	return nil
 }
 
-func (p *Python) installPython(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
-	installed, err := pyEnv.VersionInstalled(p.version)
-	if err != nil {
-		return
-	}
-	if installed {
-		return
-	}
-
-	code, err := runCommand(ctx, "pyenv", "install", p.version)
-	if err != nil {
-		return
-	}
-	if code != 0 {
-		return false, fmt.Errorf("failed to install the required python version. exit code: %d", code)
-	}
-
-	return true, nil
+type pythonCreateVenv struct {
+	version string
+	pyEnv   *helpers.PyEnv
+	venv    *helpers.Virtualenv
 }
 
-func (p *Python) installVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
-	if utils.PathExists(pyEnv.Which(p.version, "virtualenv")) {
-		return false, nil
-	}
-
-	code, err := runCommand(ctx, pyEnv.Which(p.version, "python"), "-m", "pip", "install", "virtualenv")
-	if err != nil {
-		return
-	}
-	if code != 0 {
-		return false, fmt.Errorf("failed to install virtualenv for the required python version. exit code: %d", code)
-	}
-
-	return true, nil
+func (p *pythonCreateVenv) description() string {
+	return "create virtualenv"
 }
 
-func (p *Python) createVirtualEnv(ctx *Context, pyEnv *helpers.PyEnv) (acted bool, err error) {
-	name := helpers.VirtualenvName(ctx.proj, p.version)
-	venv := helpers.NewVirtualenv(ctx.cfg, name)
+func (p *pythonCreateVenv) needed(ctx *context) (bool, error) {
+	return !p.venv.Exists(), nil
+}
 
-	if venv.Exists() {
-		return false, nil
+func (p *pythonCreateVenv) run(ctx *context) error {
+	err := os.MkdirAll(filepath.Dir(p.venv.Path()), 0750)
+	if err != nil {
+		return err
 	}
 
-	err = os.MkdirAll(filepath.Dir(venv.Path()), 0750)
+	code, err := runCommand(ctx, p.pyEnv.Which(p.version, "virtualenv"), p.venv.Path())
 	if err != nil {
-		return
-	}
-
-	code, err := runCommand(ctx, pyEnv.Which(p.version, "virtualenv"), venv.Path())
-	if err != nil {
-		return
+		return err
 	}
 	if code != 0 {
-		return false, fmt.Errorf("failed to create the virtualenv. exit code: %d", code)
+		return fmt.Errorf("failed to create the virtualenv. exit code: %d", code)
 	}
 
-	return true, nil
+	return nil
 }
 
 func (p *Python) feature(proj *project.Project) (string, string) {

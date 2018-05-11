@@ -21,7 +21,11 @@ func (u *Invalid) header() string {
 	return ""
 }
 
-func (u *Invalid) perform(ctx *Context) (err error) {
+func (u *Invalid) perform(ctx *context) (err error) {
 	ctx.ui.TaskWarning(fmt.Sprintf("%s: %+v", u.err, u.definition))
 	return nil
+}
+
+func (u *Invalid) actions(ctx *context) (actions []taskAction) {
+	return
 }

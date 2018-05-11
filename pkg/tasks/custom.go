@@ -48,40 +48,36 @@ func (c *Custom) header() string {
 	return c.command
 }
 
-func (c *Custom) perform(ctx *Context) error {
-	ran, err := c.runCommand(ctx)
-	if err != nil {
-		return err
+func (c *Custom) actions(ctx *context) []taskAction {
+	return []taskAction{
+		&customAction{condition: c.condition, command: c.command},
 	}
-
-	if ran {
-		ctx.ui.TaskActed()
-	} else {
-		ctx.ui.TaskAlreadyOk()
-	}
-
-	return nil
 }
 
-func (c *Custom) runCommand(ctx *Context) (bool, error) {
+type customAction struct {
+	condition string
+	command   string
+}
+
+func (c *customAction) description() string {
+	return ""
+}
+
+func (c *customAction) needed(ctx *context) (bool, error) {
 	code, err := runShellSilent(ctx, c.condition)
 	if err != nil {
 		return false, fmt.Errorf("failed to run the condition command: %s", err)
 	}
-	if code == 0 {
-		return false, nil
-	}
+	return code != 0, nil
+}
 
-	// The condition command was run and returned a non-zero exit code.
-	// It means we should run this custom task
-
-	code, err = runShellSilent(ctx, c.command)
+func (c *customAction) run(ctx *context) error {
+	code, err := runShellSilent(ctx, c.command)
 	if err != nil {
-		return false, fmt.Errorf("command failed: %s", err)
+		return fmt.Errorf("command failed: %s", err)
 	}
 	if code != 0 {
-		return false, fmt.Errorf("command exited with code %d", code)
+		return fmt.Errorf("command exited with code %d", code)
 	}
-
-	return true, nil
+	return nil
 }
