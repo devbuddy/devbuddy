@@ -1,4 +1,4 @@
-set -uo pipefail
+set -u
 
 oneTimeSetUp() {
     eval "$(dad --shell-init)"
@@ -29,7 +29,7 @@ testSimple() {
 }
 
 testArguments() {
-    local output=$(dad echo ARG1 ARG2)
+    output=$(dad echo ARG1 ARG2)
 
     assertEquals "command called with arguments" "PREFIX ARG1 ARG2" "$output"
 }

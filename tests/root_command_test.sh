@@ -1,4 +1,4 @@
-set -uo pipefail
+set -u
 
 oneTimeSetUp() {
     eval "$(dad --shell-init)"
@@ -14,13 +14,11 @@ YAML
 }
 
 testDadUsage() {
-    output=$(dad)
+    output=$(dad | head -n1)
     rc=$?
-
-    lines=(${output[@]})
-
     assertEquals "dad command returns zero" 0 $rc
-    assertEquals "dad command output the usage message" "Usage:" "${lines[0]}"
+
+    assertEquals "dad command output the usage message" "Usage:" "${output}"
 }
 
 testDadVersion() {
