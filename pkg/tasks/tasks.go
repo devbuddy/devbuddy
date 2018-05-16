@@ -1,6 +1,8 @@
 package tasks
 
 import (
+	"fmt"
+
 	"github.com/pior/dad/pkg/project"
 )
 
@@ -52,6 +54,18 @@ func GetFeaturesFromTasks(proj *project.Project, tasks []Task) map[string]string
 	}
 
 	return features
+}
+
+func InspectTasks(taskList []Task, proj *project.Project) (s string) {
+	for _, task := range taskList {
+		s += fmt.Sprintf("Task %s\n", task.name())
+		s += fmt.Sprintf("  Internal: %+v\n", task)
+		if t, ok := task.(TaskWithFeature); ok {
+			featureName, featureVersion := t.feature(proj)
+			s += fmt.Sprintf("  Feature: %s=%s\n", featureName, featureVersion)
+		}
+	}
+	return s
 }
 
 func buildFromDefinition(definition interface{}) (task Task, err error) {
