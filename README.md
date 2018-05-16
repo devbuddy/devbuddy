@@ -36,7 +36,7 @@ Python:
 
 Go:
 - Go (version): **working**
-- Dep (support for [Go Dep](https://github.com/golang/dep)): **planned**
+- Dep (support for [Go Dep](https://github.com/golang/dep)): **simple**
 
 Others
 - Custom (conditional shell command): **working**
@@ -98,6 +98,7 @@ type dad > /dev/null 2> /dev/null && eval "$(dad --shell-init --with-completion)
 ```yaml
 up:
   - go: 1.9.2
+  - golang_dep
   - python: 3.6.4rc1
   - pip:
     - requirements.txt

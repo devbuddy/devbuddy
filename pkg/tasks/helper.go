@@ -2,6 +2,8 @@ package tasks
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 
 	"github.com/pior/dad/pkg/executor"
 )
@@ -27,4 +29,19 @@ func runCommand(ctx *context, program string, args ...string) (int, error) {
 
 func runShellSilent(ctx *context, cmdline string) (int, error) {
 	return executor.NewShell(cmdline).SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ()).Run()
+}
+
+func fileExists(ctx *context, path string) bool {
+	if _, err := os.Stat(filepath.Join(ctx.proj.Path, path)); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+func fileModTime(ctx *context, path string) (int64, error) {
+	s, err := os.Stat(filepath.Join(ctx.proj.Path, path))
+	if err != nil {
+		return 0, err
+	}
+	return s.ModTime().UnixNano(), nil
 }
