@@ -7,6 +7,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Flaque/filet"
+
 	"github.com/dnaeon/go-vcr/recorder"
 	"github.com/pior/dad/pkg/config"
 	"github.com/stretchr/testify/require"
@@ -26,8 +28,7 @@ func TestUpgraderLatestRelease(t *testing.T) {
 		}
 	}()
 
-	target, err := makeTemporaryFile()
-	require.NoError(t, err, "makeTemporaryFile() failed")
+	target := filet.TmpFile(t, "", "")
 
 	defer func() {
 		err = os.Remove(target.Name())

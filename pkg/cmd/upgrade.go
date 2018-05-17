@@ -23,14 +23,14 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
-	u := helpers.NewUpgrader(cfg, true)
 	ui := termui.NewUI(cfg)
 
 	plateform := fmt.Sprintf("dad-%s-%s", runtime.GOOS, runtime.GOARCH)
 
 	ui.CommandRun("Getting latest release for", plateform)
 
-	release, err := u.LatestRelease(plateform)
+	upgrader := helpers.NewUpgrader(cfg, true)
+	release, err := upgrader.LatestRelease(plateform)
 	checkError(err)
 
 	destinationPath, err := os.Executable()
@@ -38,7 +38,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 
 	ui.CommandRun("Downloading", release.DownloadURL)
 
-	err = u.Perform(destinationPath, release.DownloadURL)
+	err = upgrader.Perform(destinationPath, release.DownloadURL)
 	checkError(err)
 
 	ui.CommandActed()
