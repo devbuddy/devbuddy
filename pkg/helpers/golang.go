@@ -63,9 +63,9 @@ func (g *Golang) Install() (err error) {
 		return
 	}
 
-	code, err := executor.New("tar", "--strip", "1", "-xzC", g.path, "-f", tarPath).Run()
-	if err != nil || code != 0 {
-		return fmt.Errorf("failed to extract %s to %s (code: %d err: %s)", tarPath, g.path, code, err)
+	err = executor.New("tar", "--strip", "1", "-xzC", g.path, "-f", tarPath).Run()
+	if err != nil {
+		return fmt.Errorf("failed to extract %s to %s: %s", tarPath, g.path, err)
 	}
 
 	return nil

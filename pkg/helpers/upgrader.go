@@ -71,8 +71,7 @@ func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error)
 
 	u.ui.CommandHeader(cmdline)
 
-	_, err = executor.NewShell(cmdline).Run()
-	return
+	return executor.NewShell(cmdline).Run()
 }
 
 // LatestRelease get latest release item for current platform

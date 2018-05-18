@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -48,15 +49,30 @@ func (e *Executor) getExitCode(err error) (int, error) {
 	return -1, err
 }
 
-// Run executes the command and returns the exit code
-func (e *Executor) Run() (int, error) {
+// RunWithCode executes the command. Return the exit code and an error.
+func (e *Executor) RunWithCode() (int, error) {
 	e.cmd.Stdin = os.Stdin
 	e.cmd.Stdout = os.Stdout
 	e.cmd.Stderr = os.Stderr
 
 	err := e.cmd.Run()
 	code, err := e.getExitCode(err)
+	if err != nil {
+		return code, fmt.Errorf("command failed with: %s", err)
+	}
 	return code, err
+}
+
+// Run executes the command. Return an error for non-zero exitcode.
+func (e *Executor) Run() error {
+	code, err := e.RunWithCode()
+	if err != nil {
+		return err
+	}
+	if code != 0 {
+		return fmt.Errorf("command failed with exit code %d", code)
+	}
+	return nil
 }
 
 // Capture executes the command and return the output and the exit code

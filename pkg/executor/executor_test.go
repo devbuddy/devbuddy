@@ -6,29 +6,35 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestCommandFalseWithoutCode(t *testing.T) {
+	err := New("false").Run()
+
+	require.Error(t, err)
+}
+
 func TestCommandFalse(t *testing.T) {
-	code, err := New("false").Run()
+	code, err := New("false").RunWithCode()
 
 	require.NoError(t, err)
 	require.Equal(t, 1, code)
 }
 
 func TestCommandTrue(t *testing.T) {
-	code, err := New("true").Run()
+	code, err := New("true").RunWithCode()
 
 	require.NoError(t, err)
 	require.Equal(t, 0, code)
 }
 
 func TestShellTrue(t *testing.T) {
-	code, err := NewShell("true").Run()
+	code, err := NewShell("true").RunWithCode()
 
 	require.NoError(t, err)
 	require.Equal(t, 0, code)
 }
 
 func TestShellFalse(t *testing.T) {
-	code, err := NewShell("false").Run()
+	code, err := NewShell("false").RunWithCode()
 
 	require.NoError(t, err)
 	require.Equal(t, 1, code)
@@ -59,7 +65,7 @@ func TestShellCapturePWD(t *testing.T) {
 }
 
 func TestCommandNotFound(t *testing.T) {
-	code, err := New("never-ever-cmd").Run()
+	code, err := New("never-ever-cmd").RunWithCode()
 
 	require.Error(t, err)
 	require.Equal(t, -1, code)

@@ -35,15 +35,7 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 
 	ui.CommandHeader(cmdline)
 
-	code, err := executor.NewShell(cmdline).SetCwd(proj.Path).Run()
-	if err != nil {
-		return fmt.Errorf("command failed: %s", err)
-	}
-	if code != 0 {
-		return fmt.Errorf("command failed with code %d", code)
-	}
-
-	return nil
+	return executor.NewShell(cmdline).SetCwd(proj.Path).Run()
 }
 
 func buildCustomCommands() {
