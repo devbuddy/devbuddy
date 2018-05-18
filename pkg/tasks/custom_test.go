@@ -14,8 +14,18 @@ custom:
   meet: custom-command
 `)
 
-	require.Equal(t, task.(*Custom).command, "custom-command")
-	require.Equal(t, task.(*Custom).condition, "test-command")
+	require.Equal(t, "custom-command", task.(*Custom).command)
+	require.Equal(t, "test-command", task.(*Custom).condition)
+}
+func TestCustomName(t *testing.T) {
+	task := ensureLoadTestTask(t, `
+custom:
+  name: NAMENAME
+  met?: test-command
+  meet: custom-command
+`)
+
+	require.Equal(t, "NAMENAME", task.header())
 }
 
 func TestCustomWithBoolean(t *testing.T) {
