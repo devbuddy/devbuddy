@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"strings"
+
+	"github.com/sahilm/fuzzy"
 
 	"github.com/pior/dad/pkg/config"
 )
@@ -28,25 +29,24 @@ func FindBestMatch(expr string, conf *config.Config) (found *Project, err error)
 }
 
 func projectMatch(expr string, projects []*Project) *Project {
-	// Exact match
+	// First, try to match on project name only
+	names := []string{}
 	for _, p := range projects {
-		if p.RepositoryName == expr || p.id == expr {
-			return p
-		}
+		names = append(names, p.RepositoryName)
+	}
+	matches := fuzzy.Find(expr, names)
+	if matches.Len() >= 1 {
+		return projects[matches[0].Index]
 	}
 
-	// Prefix match
+	// Then, extend match to the organisation name as well
+	names = []string{}
 	for _, p := range projects {
-		if strings.HasPrefix(p.id, expr) || strings.HasPrefix(p.RepositoryName, expr) {
-			return p
-		}
+		names = append(names, p.id)
 	}
-
-	// Substring match
-	for _, p := range projects {
-		if strings.Contains(p.id, expr) {
-			return p
-		}
+	matches = fuzzy.Find(expr, names)
+	if matches.Len() >= 1 {
+		return projects[matches[0].Index]
 	}
 
 	return nil

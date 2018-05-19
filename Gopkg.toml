@@ -6,3 +6,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/dnaeon/go-vcr"
+
+[[constraint]]
+  name = "github.com/sahilm/fuzzy"
+  version = "0.0.5"
