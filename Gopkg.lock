@@ -41,6 +41,12 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/sahilm/fuzzy"
+  packages = ["."]
+  revision = "df93d96a0fd86b97655b90f63c70802b4e793afb"
+  version = "v0.0.5"
+
+[[projects]]
   name = "github.com/spf13/afero"
   packages = [
     ".",
@@ -92,6 +98,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e1012298090d12a80ee11b1a9679f0925f6e9f865b42cbd349eecdd5822f1ef6"
+  inputs-digest = "cb51793c5e019e70be6ebb2ce63cc0a2fd8753f5618606e997b5e96ecf2c682d"
   solver-name = "gps-cdcl"
   solver-version = 1

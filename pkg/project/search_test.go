@@ -29,22 +29,46 @@ func runFind(t *testing.T, dir string, input string) string {
 func TestMatches(t *testing.T) {
 	defer filet.CleanUp(t)
 	dir := filet.TmpDir(t, "")
+	populateProjects(t, dir, "pior", []string{"dad", "george", "caravan", "pyramid_bugsnag"})
 	populateProjects(t, dir, "george", []string{"carpe", "dorade", "gardon", "marlin"})
-	populateProjects(t, dir, "pior", []string{"dad", "ecfg", "caravan", "pyramid_bugsnag"})
 
 	tests := map[string]string{
 		"marlin": "github.com:george/marlin",
 		"mar":    "github.com:george/marlin",
 		"rli":    "github.com:george/marlin",
+		"mln":    "github.com:george/marlin",
+		"gm":     "github.com:george/marlin",
 
-		"pior/dad": "github.com:pior/dad",
-		"pior/car": "github.com:pior/caravan",
+		"car": "github.com:george/carpe", // multiple projects matches
 
-		"pyramid_bugsnag": "github.com:pior/pyramid_bugsnag",
+		"george/carpe": "github.com:george/carpe", // with org name
+		"george/car":   "github.com:george/carpe",
+		"p/c":          "github.com:pior/caravan",
+		"p/n":          "github.com:pior/caravan",
+
+		"pyramid_bugsnag": "github.com:pior/pyramid_bugsnag", // with separator
 		"pyramid":         "github.com:pior/pyramid_bugsnag",
+		"_bug":            "github.com:pior/pyramid_bugsnag",
+		"pb":              "github.com:pior/pyramid_bugsnag",
+		"ppb":             "github.com:pior/pyramid_bugsnag",
+
+		"george": "github.com:pior/george", // collision org<->project, project should win
+		"gg":     "github.com:pior/george",
 	}
 
 	for input, expected := range tests {
 		assert.Equal(t, expected, runFind(t, dir, input), "for input: %s", input)
 	}
+}
+
+func TestNoMatch(t *testing.T) {
+	defer filet.CleanUp(t)
+	dir := filet.TmpDir(t, "")
+
+	populateProjects(t, dir, "pior", []string{"dad"})
+
+	cfg := &config.Config{SourceDir: dir}
+	_, err := FindBestMatch("nope", cfg)
+	require.Error(t, err, "FindBestMatch() should return an error when no project found")
+	require.Equal(t, "no project found for nope", err.Error())
 }
