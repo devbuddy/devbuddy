@@ -8,6 +8,7 @@ import (
 	"github.com/sahilm/fuzzy"
 
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/utils"
 )
 
 func FindBestMatch(expr string, conf *config.Config) (found *Project, err error) {
@@ -55,35 +56,41 @@ func projectMatch(expr string, projects []*Project) *Project {
 func GetAllProjects(sourceDir string) ([]*Project, error) {
 	var projects []*Project
 
-	host := "github.com"
+	hostingPlatforms := []string{"github.com"}
 
-	hostPath := filepath.Join(sourceDir, host)
-	var orgPath string
-	var projPath string
+	for _, hostingPlatform := range hostingPlatforms {
+		hostingPlatformPath := filepath.Join(sourceDir, hostingPlatform)
+		if !utils.PathExists(hostingPlatformPath) {
+			continue
+		}
 
-	orgs, err := listChildDir(hostPath)
-	if err != nil {
-		return nil, err
-	}
+		var orgPath string
+		var projPath string
 
-	for _, org := range orgs {
-		orgPath = filepath.Join(hostPath, org)
-
-		repos, err := listChildDir(orgPath)
+		orgs, err := listChildDir(hostingPlatformPath)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, repo := range repos {
-			projPath = filepath.Join(orgPath, repo)
+		for _, org := range orgs {
+			orgPath = filepath.Join(hostingPlatformPath, org)
 
-			projects = append(projects, &Project{
-				HostingPlatform:  host,
-				OrganisationName: org,
-				RepositoryName:   repo,
-				id:               filepath.Join(org, repo),
-				Path:             projPath,
-			})
+			repos, err := listChildDir(orgPath)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, repo := range repos {
+				projPath = filepath.Join(orgPath, repo)
+
+				projects = append(projects, &Project{
+					HostingPlatform:  hostingPlatform,
+					OrganisationName: org,
+					RepositoryName:   repo,
+					id:               filepath.Join(org, repo),
+					Path:             projPath,
+				})
+			}
 		}
 	}
 
