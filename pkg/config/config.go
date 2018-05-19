@@ -6,13 +6,15 @@ import (
 	"path/filepath"
 )
 
+// Config represents the user system and environment configuration
 type Config struct {
-	homeDir      string
-	DebugEnabled bool
-	SourceDir    string
-	dataDir      string
+	homeDir      string // the user home directory
+	DebugEnabled bool   // whether debug logging is activated
+	SourceDir    string // projects base directory
+	dataDir      string // directory managed by Dad (languages distribs, virtualenvs...)
 }
 
+// Load returns a Config populated from the user environment
 func Load() (*Config, error) {
 	homedir, err := getHomeDir()
 	if err != nil {
