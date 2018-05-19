@@ -12,15 +12,18 @@ import (
 	"github.com/pior/dad/pkg/manifest"
 )
 
+// Project represents a project whether it exists locally or not
 type Project struct {
-	HostingPlatform  string
-	OrganisationName string
-	RepositoryName   string
-	id               string
-	Path             string
-	Manifest         *manifest.Manifest
+	HostingPlatform  string // Name and directory name of the hosting platform like "github.com"
+	OrganisationName string // Name and directory name of the organisation owning this project
+	RepositoryName   string // Name and directory name of this project
+	id               string // Short id like "org/name"
+	Path             string // Full path of this project
+
+	Manifest *manifest.Manifest // Manifest of this project
 }
 
+// NewFromID creates an instance of Project from a short id like "org/name"
 func NewFromID(id string, conf *config.Config) (p *Project, err error) {
 	reGithubFull := regexp.MustCompile(`([^/]+)/([^/]+)`)
 
@@ -40,15 +43,18 @@ func NewFromID(id string, conf *config.Config) (p *Project, err error) {
 	return
 }
 
+// FullName returns a logical id like platform:org/project
 func (p *Project) FullName() string {
 	return fmt.Sprintf("%s:%s/%s", p.HostingPlatform, p.OrganisationName, p.RepositoryName)
 }
 
+// Slug returns a short, unique but humanly recognizable id based on the path
 func (p *Project) Slug() string {
 	locationToken := adler32.Checksum([]byte(filepath.Clean(p.Path)))
 	return fmt.Sprintf("%s-%d", p.RepositoryName, locationToken)
 }
 
+// GetRemoteURL builds the Git remote url for the project
 func (p *Project) GetRemoteURL() (url string, err error) {
 	if p.HostingPlatform == "github.com" {
 		url = fmt.Sprintf("git@github.com:%s/%s.git", p.OrganisationName, p.RepositoryName)
@@ -58,6 +64,7 @@ func (p *Project) GetRemoteURL() (url string, err error) {
 	return
 }
 
+// Exists checks whether the project exists locally
 func (p *Project) Exists() bool {
 	if p.Path == "" {
 		panic("Project path can't be null")
@@ -68,6 +75,7 @@ func (p *Project) Exists() bool {
 	return false
 }
 
+// Clone runs the Git command needed to clone the project
 func (p *Project) Clone() (err error) {
 	err = os.MkdirAll(filepath.Dir(p.Path), 0755)
 	if err != nil {
@@ -82,6 +90,7 @@ func (p *Project) Clone() (err error) {
 	return executor.New("git", "clone", url, p.Path).Run()
 }
 
+// Create creates the project directory locally
 func (p *Project) Create() (err error) {
 	err = os.MkdirAll(p.Path, 0755)
 	return
