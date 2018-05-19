@@ -15,6 +15,8 @@ import (
 )
 
 func TestUpgraderLatestRelease(t *testing.T) {
+	defer filet.CleanUp(t)
+
 	cfg, err := config.Load()
 	require.NoError(t, err, "config.Load() failed")
 
