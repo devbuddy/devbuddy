@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -44,10 +45,20 @@ func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error)
 		return
 	}
 
-	tmpFile, err := makeTemporaryFile()
+	tmpFile, err := ioutil.TempFile("", "dad-")
 	if err != nil {
 		return
 	}
+	defer func() {
+		err = tmpFile.Close()
+		if err != nil {
+			return
+		}
+		err = os.Remove(tmpFile.Name())
+		if err != nil {
+			return
+		}
+	}()
 
 	if _, err = tmpFile.Write(data); err != nil {
 		return
@@ -60,20 +71,12 @@ func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error)
 
 	u.ui.CommandHeader(cmdline)
 
-	if _, err = executor.NewShell(cmdline).Run(); err != nil {
-		return
-	}
-
-	if err = tmpFile.Close(); err != nil {
-		return
-	}
-
-	return os.Remove(tmpFile.Name())
+	_, err = executor.NewShell(cmdline).Run()
+	return
 }
 
 // LatestRelease get latest release item for current platform
 func (u *Upgrader) LatestRelease(plateform string) (release *GithubReleaseItem, err error) {
 	release, err = u.github.LatestRelease(plateform)
-
 	return
 }
