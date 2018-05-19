@@ -9,6 +9,7 @@ func init() {
 }
 
 type Custom struct {
+	taskName  string
 	condition string
 	command   string
 }
@@ -18,6 +19,10 @@ func newCustom(config *taskConfig) (Task, error) {
 
 	properties := config.payload.(map[interface{}]interface{})
 
+	name, ok := properties["name"]
+	if !ok {
+		name = ""
+	}
 	command, ok := properties["meet"]
 	if !ok {
 		return nil, fmt.Errorf("missing key 'meet'")
@@ -28,6 +33,10 @@ func newCustom(config *taskConfig) (Task, error) {
 	}
 
 	var err error
+	task.taskName, err = asString(name)
+	if err != nil {
+		return nil, fmt.Errorf("invalid name value: %s", err)
+	}
 	task.command, err = asString(command)
 	if err != nil {
 		return nil, fmt.Errorf("invalid meet value: %s", err)
@@ -45,6 +54,9 @@ func (c *Custom) name() string {
 }
 
 func (c *Custom) header() string {
+	if c.taskName != "" {
+		return c.taskName
+	}
 	return c.command
 }
 
