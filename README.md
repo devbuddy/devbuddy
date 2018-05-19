@@ -1,4 +1,4 @@
-# Dad 👴
+# Dad
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/pior/dad)](https://goreportcard.com/report/github.com/pior/dad)
 [![Build Status](https://travis-ci.org/pior/dad.svg?branch=master)](https://travis-ci.org/pior/dad)
@@ -15,9 +15,9 @@ The first goal of this tools is to automate the **setup** tasks required to work
 
 With **Dad**, pushing a change on a project you never touched look like this:
 
-- `dad clone Shopify/sarama`
+- `dad clone pior/dad`
 - `dad up`
-- **Commit your changes**
+- `git commit`
 - `dad test`
 - `git push`
 
@@ -26,6 +26,8 @@ With **Dad**, pushing a change on a project you never touched look like this:
 **Dad** is mostly useful for Python and Go projects. More languages will be natively
 supported. Additional automatic tasks will also be implemented, making **Dad** also
 useful for languages without native support.
+
+See the project config [documentation](docs/Config.md).
 
 ### Tasks:
 
@@ -65,7 +67,7 @@ Others
 ### Shell integration
 
 - Bash: **working**
-- Zsh: **planned**
+- Zsh: **working**
 - Fish: **planned**
 
 ## Install
@@ -74,8 +76,7 @@ Others
 $ bash -c "$(curl -sL https://raw.githubusercontent.com/pior/dad/master/install.sh)"
 ```
 
-## Uninstall
-
+Uninstall it:
 ```bash
 $ sudo rm /usr/local/bin/dad
 ```
@@ -102,12 +103,6 @@ up:
   - python: 3.6.4rc1
   - pip:
     - requirements.txt
-  - custom:
-      met?: brew info upx 2> /dev/null > /dev/null
-      meet: brew install upx
-  - custom:
-      met?: dep status 2> /dev/null > /dev/null
-      meet: dep ensure
 
 commands:
   test:
@@ -117,10 +112,6 @@ commands:
   lint:
     desc: Lint the project
     run: script/lint
-
-  godoc:
-    desc: Starting GoDoc server on http://0.0.0.0:6060
-    run: (sleep 1; open http://0.0.0.0:6060)& godoc -http=:6060
 ```
 See Dad own [dev.yml](dev.yml)
 
