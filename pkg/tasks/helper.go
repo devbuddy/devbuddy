@@ -22,13 +22,17 @@ func asString(value interface{}) (string, error) {
 	return "", errors.New("not a string")
 }
 
-func runCommand(ctx *context, program string, args ...string) (int, error) {
+func runCommand(ctx *context, program string, args ...string) error {
 	ctx.ui.TaskCommand(program, args...)
 	return executor.New(program, args...).SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ()).Run()
 }
 
-func runShellSilent(ctx *context, cmdline string) (int, error) {
+func runShellSilent(ctx *context, cmdline string) error {
 	return executor.NewShell(cmdline).SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ()).Run()
+}
+
+func runShellSilentWithCode(ctx *context, cmdline string) (int, error) {
+	return executor.NewShell(cmdline).SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ()).RunWithCode()
 }
 
 func fileExists(ctx *context, path string) bool {

@@ -66,12 +66,9 @@ func (p *pipInstall) needed(ctx *context) (bool, error) {
 }
 
 func (p *pipInstall) run(ctx *context) error {
-	code, err := runCommand(ctx, "pip", "install", "--require-virtualenv", "-r", p.file)
+	err := runCommand(ctx, "pip", "install", "--require-virtualenv", "-r", p.file)
 	if err != nil {
-		return err
-	}
-	if code != 0 {
-		return fmt.Errorf("Pip failed with code %d", code)
+		return fmt.Errorf("Pip failed: %s", err)
 	}
 	p.success = true
 	return nil

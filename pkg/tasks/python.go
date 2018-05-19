@@ -71,12 +71,9 @@ func (p *pythonPyenv) needed(ctx *context) (bool, error) {
 }
 
 func (p *pythonPyenv) run(ctx *context) error {
-	code, err := runCommand(ctx, "pyenv", "install", p.version)
+	err := runCommand(ctx, "pyenv", "install", p.version)
 	if err != nil {
-		return err
-	}
-	if code != 0 {
-		return fmt.Errorf("failed to install the required python version. exit code: %d", code)
+		return fmt.Errorf("failed to install the required python version: %s", err)
 	}
 	return nil
 }
@@ -96,12 +93,9 @@ func (p *pythonInstallVenv) needed(ctx *context) (bool, error) {
 }
 
 func (p *pythonInstallVenv) run(ctx *context) error {
-	code, err := runCommand(ctx, p.pyEnv.Which(p.version, "python"), "-m", "pip", "install", "virtualenv")
+	err := runCommand(ctx, p.pyEnv.Which(p.version, "python"), "-m", "pip", "install", "virtualenv")
 	if err != nil {
-		return err
-	}
-	if code != 0 {
-		return fmt.Errorf("failed to install virtualenv. exit code: %d", code)
+		return fmt.Errorf("failed to install virtualenv: %s", err)
 	}
 
 	return nil
@@ -127,12 +121,9 @@ func (p *pythonCreateVenv) run(ctx *context) error {
 		return err
 	}
 
-	code, err := runCommand(ctx, p.pyEnv.Which(p.version, "virtualenv"), p.venv.Path())
+	err = runCommand(ctx, p.pyEnv.Which(p.version, "virtualenv"), p.venv.Path())
 	if err != nil {
-		return err
-	}
-	if code != 0 {
-		return fmt.Errorf("failed to create the virtualenv. exit code: %d", code)
+		return fmt.Errorf("failed to create the virtualenv: %s", err)
 	}
 
 	return nil
