@@ -28,6 +28,8 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestData(t *testing.T) {
+	defer filet.CleanUp(t)
+
 	server := httptest.NewServer(&TestHandler{})
 	defer server.Close()
 
@@ -44,6 +46,8 @@ func TestData(t *testing.T) {
 }
 
 func TestStatus(t *testing.T) {
+	defer filet.CleanUp(t)
+
 	server := httptest.NewServer(&TestHandler{})
 	defer server.Close()
 
@@ -55,6 +59,8 @@ func TestStatus(t *testing.T) {
 }
 
 func TestRedirect(t *testing.T) {
+	defer filet.CleanUp(t)
+
 	server := httptest.NewServer(&TestHandler{})
 	defer server.Close()
 
@@ -71,6 +77,8 @@ func TestRedirect(t *testing.T) {
 }
 
 func TestRedirectLimit(t *testing.T) {
+	defer filet.CleanUp(t)
+
 	server := httptest.NewServer(&TestHandler{})
 	defer server.Close()
 
