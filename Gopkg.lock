@@ -20,7 +20,7 @@
     "cassette",
     "recorder"
   ]
-  revision = "b68d3628568e385c2f706bf3f0db84f9c32fe610"
+  revision = "f8a7e8b9c630b486df74145bb887793a1b85459b"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -32,7 +32,7 @@
   branch = "master"
   name = "github.com/logrusorgru/aurora"
   packages = ["."]
-  revision = "ca24023cc0175fdf372518cb1c5062cc86db2634"
+  revision = "d694e6f975a9109e2b063829d563a7c153c4b53c"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -56,10 +56,10 @@
   version = "v1.1.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "615425954c3b0d9485a7027d4d451fdcdfdee84e"
+  revision = "ef82de70bb3f60c65fb8eebacbb2d122ef517385"
+  version = "v0.0.3"
 
 [[projects]]
   name = "github.com/spf13/pflag"
