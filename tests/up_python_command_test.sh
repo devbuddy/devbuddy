@@ -17,7 +17,7 @@ up:
 YAML
 
     cat > requirements.txt <<EOF
-pyreleaser==0.3
+six==1.10.0
 EOF
     cat > requirements-2.txt <<EOF
 dataclasses==0.4
@@ -34,8 +34,8 @@ testEnv() {
     version=$(python --version)
     assertEquals "python version" "Python 3.6.3" "$version"
 
-    version=$(pip show pyreleaser | grep Version)
-    assertEquals "package version" "Version: 0.3" "$version"
+    version=$(pip show six | grep Version)
+    assertEquals "package version" "Version: 1.10.0" "$version"
 
     version=$(pip show dataclasses | grep Version)
     assertEquals "package version" "Version: 0.4" "$version"

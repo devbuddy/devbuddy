@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/env"
@@ -121,5 +122,11 @@ func activateFeature(ctx *context, task Task) (err error) {
 		}
 	}
 
-	return nil
+	// Special case, we want the dad process to get PATH updates from features to call the right processes.
+	// Like the pip process from the newly activated virtualenv.
+	// Explanation: exec.Command calls exec.LookPath to find the executable path, which rely on the PATH of
+	// the process itself.
+	// There is no problem when executing a shell command since the shell process will do the executable lookup
+	// itself with the PATH value from the specified Env.
+	return os.Setenv("PATH", ctx.env.Get("PATH"))
 }
