@@ -29,6 +29,12 @@ type TaskWithFeature interface {
 	feature(*project.Project) (string, string)
 }
 
+type taskAction interface {
+	description() string
+	needed(*context) (bool, error)
+	run(*context) error
+}
+
 func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
 	var task Task
 
