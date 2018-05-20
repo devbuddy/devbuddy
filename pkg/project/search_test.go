@@ -72,3 +72,13 @@ func TestNoMatch(t *testing.T) {
 	require.Error(t, err, "FindBestMatch() should return an error when no project found")
 	require.Equal(t, "no project found for nope", err.Error())
 }
+
+func TestSearchingWithNoProject(t *testing.T) {
+	defer filet.CleanUp(t)
+	dir := filet.TmpDir(t, "")
+
+	cfg := &config.Config{SourceDir: dir}
+	_, err := FindBestMatch("nope", cfg)
+	require.Error(t, err, "FindBestMatch() should return an error when no project found")
+	require.Equal(t, "no projects found at all! Try cloning one first", err.Error())
+}
