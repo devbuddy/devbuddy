@@ -40,13 +40,13 @@ func (e *Executor) SetEnv(env []string) *Executor {
 	return e
 }
 
-// SetOutputPrefix sets  the current working directory the command will be run in
+// SetOutputPrefix sets a prefix for each line printed by the command
 func (e *Executor) SetOutputPrefix(prefix string) *Executor {
 	e.outputPrefix = prefix
 	return e
 }
 
-// AddOutputFilter adds an output filter based on substring match
+// AddOutputFilter adds a substring to the list used to suppress lines printed by the command
 func (e *Executor) AddOutputFilter(substring string) *Executor {
 	e.filterSubstrings = append(e.filterSubstrings, substring)
 	return e
