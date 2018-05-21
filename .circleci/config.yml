@@ -1,0 +1,68 @@
+version: 2
+jobs:
+  tests:
+    docker:
+      - image: circleci/golang:1.10.2
+    working_directory: /go/src/github.com/pior/dad
+    steps:
+      - checkout
+      - run: dep ensure
+      - run: script/test
+
+  integration-tests:
+    docker:
+      - image: circleci/golang:1.10.2
+    working_directory: /go/src/github.com/pior/dad
+    steps:
+      - checkout
+      - run: dep ensure
+      - run:
+          name: Install PyEnv
+          command: |
+            DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install git make build-essential python-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl
+            git clone git://github.com/yyuu/pyenv.git ~/.pyenv
+            echo 'export PYENV_ROOT=$HOME/.pyenv' >> $BASH_ENV
+            echo 'export PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> $BASH_ENV
+      - run:
+          name: Install Zsh
+          command: |
+            DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install zsh
+      - run:
+          command: script/integration_test
+          environment:
+            TERM: dumb
+
+  lint:
+    docker:
+      - image: circleci/golang:1.10.2
+    working_directory: /go/src/github.com/pior/dad
+    steps:
+      - checkout
+      - run: dep ensure
+      - run: go get -u gopkg.in/alecthomas/gometalinter.v2
+      - run: gometalinter.v2 --install --update
+      - run: script/lint
+
+  deploy-release:
+    docker:
+      - image: circleci/golang:1.10.2
+    working_directory: /go/src/github.com/pior/dad
+    steps:
+      - checkout
+      - run: dep ensure
+      - run: script/buildall
+      - run: go get github.com/tcnksm/ghr
+      - run: echo ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME `git describe --tags` dist
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - tests
+      - integration-tests
+      - lint
+      - deploy-release:
+          requires: [tests, integration-tests, lint]
+          filters:
+            branches: {only: master}
+            tags: {only: /^v.*/}
