@@ -46,6 +46,10 @@ func (u *UI) TaskCommand(cmdline string, args ...string) {
 	fmt.Fprintf(u.out, "  Running: %s %s\n", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
 }
 
+func (u *UI) TaskShell(cmdline string) {
+	fmt.Fprintf(u.out, "  Running: %s\n", color.Cyan(cmdline))
+}
+
 func (u *UI) TaskActed() {
 	fmt.Fprintf(u.out, "  %s\n", color.Green("Done!"))
 }

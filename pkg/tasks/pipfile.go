@@ -56,7 +56,7 @@ func (p *pipfileInstall) needed(ctx *context) (bool, error) {
 }
 
 func (p *pipfileInstall) run(ctx *context) error {
-	err := runCommand(ctx, "pip", "install", "--require-virtualenv", "pipenv")
+	err := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
 	if err != nil {
 		return fmt.Errorf("failed to install pipenv: %s", err)
 	}
@@ -76,7 +76,7 @@ func (p *pipfileRun) needed(ctx *context) (bool, error) {
 }
 
 func (p *pipfileRun) run(ctx *context) error {
-	err := runCommand(ctx, "pipenv", "install", "--system", "--dev")
+	err := command(ctx, "pipenv", "install", "--system", "--dev").Run()
 	if err != nil {
 		return fmt.Errorf("pipenv failed: %s", err)
 	}
