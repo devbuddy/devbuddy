@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -67,7 +68,12 @@ func (e *Executor) getExitCode(err error) (int, error) {
 }
 
 func (e *Executor) printPipe(pipe io.ReadCloser) {
-	defer pipe.Close()
+	defer func() {
+		err := pipe.Close()
+		if err != nil {
+			log.Fatalf("error when closing a command output pipe: %s", err)
+		}
+	}()
 	scanner := bufio.NewScanner(pipe)
 
 	for scanner.Scan() {
