@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"syscall"
 )
 
@@ -67,15 +67,10 @@ func (e *Executor) getExitCode(err error) (int, error) {
 	return -1, err
 }
 
-func (e *Executor) printPipe(pipe io.ReadCloser) {
-	defer func() {
-		err := pipe.Close()
-		if err != nil {
-			log.Fatalf("error when closing a command output pipe: %s", err)
-		}
-	}()
-	scanner := bufio.NewScanner(pipe)
+func (e *Executor) printPipe(wg *sync.WaitGroup, pipe io.Reader) {
+	defer wg.Done()
 
+	scanner := bufio.NewScanner(pipe)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if e.shouldSuppressLine(line) {
@@ -115,8 +110,11 @@ func (e *Executor) RunWithCode() (int, error) {
 		return -1, err
 	}
 
-	go e.printPipe(stdout)
-	go e.printPipe(stderr)
+	outputWait := new(sync.WaitGroup)
+	outputWait.Add(2)
+	go e.printPipe(outputWait, stdout)
+	go e.printPipe(outputWait, stderr)
+	outputWait.Wait()
 
 	err = e.cmd.Wait()
 	code, err := e.getExitCode(err)
