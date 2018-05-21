@@ -64,5 +64,7 @@ workflows:
       - deploy-release:
           requires: [tests, integration-tests, lint]
           filters:
-            branches: {only: master}
-            tags: {only: /^v.*/}
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
