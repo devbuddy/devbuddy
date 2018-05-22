@@ -76,7 +76,7 @@ func (c *customAction) description() string {
 }
 
 func (c *customAction) needed(ctx *context) (bool, error) {
-	code, err := runShellSilentWithCode(ctx, c.condition)
+	code, err := shellSilent(ctx, c.condition).RunWithCode()
 	if err != nil {
 		return false, fmt.Errorf("failed to run the condition command: %s", err)
 	}
@@ -84,7 +84,7 @@ func (c *customAction) needed(ctx *context) (bool, error) {
 }
 
 func (c *customAction) run(ctx *context) error {
-	err := runShellSilent(ctx, c.command)
+	err := shell(ctx, c.command).Run()
 	if err != nil {
 		return fmt.Errorf("command failed: %s", err)
 	}

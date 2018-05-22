@@ -66,7 +66,8 @@ func (p *pipInstall) needed(ctx *context) (bool, error) {
 }
 
 func (p *pipInstall) run(ctx *context) error {
-	err := runCommand(ctx, "pip", "install", "--require-virtualenv", "-r", p.file)
+	err := command(ctx, "pip", "install", "--require-virtualenv", "-r", p.file).AddOutputFilter("already satisfied").Run()
+
 	if err != nil {
 		return fmt.Errorf("Pip failed: %s", err)
 	}

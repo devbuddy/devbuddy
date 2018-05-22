@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -77,4 +78,29 @@ func TestSetEnv(t *testing.T) {
 	require.NoError(t, err)
 	require.Zero(t, code)
 	require.Equal(t, "something\n", output)
+}
+
+func TestPrefix(t *testing.T) {
+	buf := &bytes.Buffer{}
+
+	executor := NewShell("echo \"line1\nline2\nline3\"")
+	executor.outputWriter = buf
+	executor.SetOutputPrefix("---")
+	err := executor.Run()
+
+	require.NoError(t, err)
+	require.Equal(t, "---line1\n---line2\n---line3\n", buf.String())
+}
+
+func TestFilter(t *testing.T) {
+	buf := &bytes.Buffer{}
+
+	executor := NewShell("echo \"line1\nline2\nline3\nline4\"")
+	executor.outputWriter = buf
+	executor.AddOutputFilter("line2")
+	executor.AddOutputFilter("line4")
+	err := executor.Run()
+
+	require.NoError(t, err)
+	require.Equal(t, "line1\nline3\n", buf.String())
 }

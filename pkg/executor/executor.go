@@ -1,15 +1,21 @@
 package executor
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"syscall"
 )
 
 type Executor struct {
-	cmd *exec.Cmd
+	cmd              *exec.Cmd
+	outputPrefix     string
+	filterSubstrings []string
+	outputWriter     io.Writer
 }
 
 // New returns an *Executor that will run the program with arguments
@@ -34,6 +40,18 @@ func (e *Executor) SetEnv(env []string) *Executor {
 	return e
 }
 
+// SetOutputPrefix sets a prefix for each line printed by the command
+func (e *Executor) SetOutputPrefix(prefix string) *Executor {
+	e.outputPrefix = prefix
+	return e
+}
+
+// AddOutputFilter adds a substring to the list used to suppress lines printed by the command
+func (e *Executor) AddOutputFilter(substring string) *Executor {
+	e.filterSubstrings = append(e.filterSubstrings, substring)
+	return e
+}
+
 func (e *Executor) getExitCode(err error) (int, error) {
 	if err == nil {
 		code := e.cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
@@ -49,13 +67,56 @@ func (e *Executor) getExitCode(err error) (int, error) {
 	return -1, err
 }
 
+func (e *Executor) printPipe(wg *sync.WaitGroup, pipe io.Reader) {
+	defer wg.Done()
+
+	scanner := bufio.NewScanner(pipe)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if e.shouldSuppressLine(line) {
+			continue
+		}
+		fmt.Fprintf(e.outputWriter, "%s%s\n", e.outputPrefix, line)
+	}
+}
+
+func (e *Executor) shouldSuppressLine(line string) bool {
+	for _, substring := range e.filterSubstrings {
+		if strings.Contains(line, substring) {
+			return true
+		}
+	}
+	return false
+}
+
 // RunWithCode executes the command. Return the exit code and an error.
 func (e *Executor) RunWithCode() (int, error) {
-	e.cmd.Stdin = os.Stdin
-	e.cmd.Stdout = os.Stdout
-	e.cmd.Stderr = os.Stderr
+	if e.outputWriter == nil {
+		e.outputWriter = os.Stdout
+	}
 
-	err := e.cmd.Run()
+	e.cmd.Stdin = nil
+	stdout, err := e.cmd.StdoutPipe()
+	if err != nil {
+		return -1, err
+	}
+	stderr, err := e.cmd.StderrPipe()
+	if err != nil {
+		return -1, err
+	}
+
+	err = e.cmd.Start()
+	if err != nil {
+		return -1, err
+	}
+
+	outputWait := new(sync.WaitGroup)
+	outputWait.Add(2)
+	go e.printPipe(outputWait, stdout)
+	go e.printPipe(outputWait, stderr)
+	outputWait.Wait()
+
+	err = e.cmd.Wait()
 	code, err := e.getExitCode(err)
 	if err != nil {
 		return code, fmt.Errorf("command failed with: %s", err)
