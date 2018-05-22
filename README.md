@@ -1,7 +1,7 @@
 # Dad
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/pior/dad)](https://goreportcard.com/report/github.com/pior/dad)
-[![Build Status](https://travis-ci.org/pior/dad.svg?branch=master)](https://travis-ci.org/pior/dad)
+[![CircleCI](https://circleci.com/gh/pior/dad.svg?style=svg)](https://circleci.com/gh/pior/dad)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8c49eed0016c68958606/maintainability)](https://codeclimate.com/github/pior/dad/maintainability)
 [![GitHub Release](https://img.shields.io/github/release/pior/dad.svg)](https://github.com/pior/dad/releases/latest)
 [![GitHub Release Date](https://img.shields.io/github/release-date/pior/dad.svg)](https://github.com/pior/dad/releases/latest)
