@@ -103,7 +103,7 @@ The condition is expressed as a command.
 ```yaml
 up:
   - custom:
-      desc: Install shellcheck with Brew
+      name: Install shellcheck with Brew
       met?: test -e /usr/local/Cellar/shellcheck
       meet: brew install shellcheck
 ```
