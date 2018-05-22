@@ -52,15 +52,24 @@ jobs:
       - run: dep ensure
       - run: script/buildall
       - run: go get github.com/tcnksm/ghr
-      - run: echo ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME `git describe --tags` dist
+      - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME `git describe --tags` dist
 
 workflows:
   version: 2
   all:
     jobs:
-      - tests
-      - integration-tests
-      - lint
+      - tests:
+          filters:
+            tags:
+              only: /.*/
+      - integration-tests:
+          filters:
+            tags:
+              only: /.*/
+      - lint:
+          filters:
+            tags:
+              only: /.*/
       - deploy-release:
           requires: [tests, integration-tests, lint]
           filters:
