@@ -83,11 +83,11 @@ func runAction(ctx *context, action taskAction) error {
 		return fmt.Errorf("The task action (%s) failed to detect whether it need to run: %s", desc, err)
 	}
 
-	if desc != "" {
-		ctx.ui.TaskActionHeader(desc)
-	}
-
 	if needed {
+		if desc != "" {
+			ctx.ui.TaskActionHeader(desc)
+		}
+
 		err = action.run(ctx)
 		if err != nil {
 			return fmt.Errorf("The task action failed to run: %s", err)
