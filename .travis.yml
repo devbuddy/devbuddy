@@ -1,6 +1,6 @@
 language: go
 
-sudo: false
+sudo: required
 
 os: linux
 go:

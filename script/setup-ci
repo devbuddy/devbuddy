@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -xe
 
 go get -u github.com/golang/dep/cmd/dep
 dep ensure
@@ -8,3 +8,5 @@ if [ "$1" == "test" ]; then
     go get -u gopkg.in/alecthomas/gometalinter.v2
     gometalinter.v2 --install --update
 fi
+
+sudo apt-get install upx
