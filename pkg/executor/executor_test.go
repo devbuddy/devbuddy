@@ -42,26 +42,23 @@ func TestShellFalse(t *testing.T) {
 }
 
 func TestShellCapture(t *testing.T) {
-	output, code, err := NewShell("echo poipoi").Capture()
+	output, err := NewShell("echo poipoi").Capture()
 
 	require.NoError(t, err)
-	require.Zero(t, code)
 	require.Equal(t, "poipoi\n", output)
 }
 
 func TestShellCaptureAndTrim(t *testing.T) {
-	output, code, err := NewShell("echo poipoi").CaptureAndTrim()
+	output, err := NewShell("echo poipoi").CaptureAndTrim()
 
 	require.NoError(t, err)
-	require.Zero(t, code)
 	require.Equal(t, "poipoi", output)
 }
 
 func TestShellCapturePWD(t *testing.T) {
-	output, code, err := NewShell("echo $PWD").SetCwd("/bin").Capture()
+	output, err := NewShell("echo $PWD").SetCwd("/bin").Capture()
 
 	require.NoError(t, err)
-	require.Zero(t, code)
 	require.Equal(t, "/bin\n", output)
 }
 
@@ -73,10 +70,9 @@ func TestCommandNotFound(t *testing.T) {
 }
 
 func TestSetEnv(t *testing.T) {
-	output, code, err := NewShell("echo $POIPOI").SetEnv([]string{"POIPOI=something"}).Capture()
+	output, err := NewShell("echo $POIPOI").SetEnv([]string{"POIPOI=something"}).Capture()
 
 	require.NoError(t, err)
-	require.Zero(t, code)
 	require.Equal(t, "something\n", output)
 }
 
