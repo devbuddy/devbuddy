@@ -137,14 +137,13 @@ func (e *Executor) Run() error {
 }
 
 // Capture executes the command and return the output and the exit code
-func (e *Executor) Capture() (string, int, error) {
+func (e *Executor) Capture() (string, error) {
 	output, err := e.cmd.Output()
-	code, err := e.getExitCode(err)
-	return string(output), code, err
+	return string(output), err
 }
 
 // CaptureAndTrim calls Capture() and trim the blank lines
-func (e *Executor) CaptureAndTrim() (string, int, error) {
-	output, code, err := e.Capture()
-	return strings.Trim(output, "\n"), code, err
+func (e *Executor) CaptureAndTrim() (string, error) {
+	output, err := e.Capture()
+	return strings.Trim(output, "\n"), err
 }

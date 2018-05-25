@@ -14,12 +14,9 @@ type PyEnv struct {
 }
 
 func NewPyEnv(cfg *config.Config) (*PyEnv, error) {
-	root, code, err := executor.New("pyenv", "root").CaptureAndTrim()
+	root, err := executor.New("pyenv", "root").CaptureAndTrim()
 	if err != nil {
-		return nil, err
-	}
-	if code != 0 {
-		return nil, fmt.Errorf("Command 'pyenv root' failed with code %d", code)
+		return nil, fmt.Errorf("Command 'pyenv root' failed: %s", err)
 	}
 	v := PyEnv{root: root}
 	return &v, nil
@@ -40,12 +37,9 @@ func (p *PyEnv) VersionInstalled(version string) (installed bool, err error) {
 }
 
 func (p *PyEnv) listVersions() ([]string, error) {
-	output, code, err := executor.New("pyenv", "versions", "--bare", "--skip-aliases").Capture()
+	output, err := executor.New("pyenv", "versions", "--bare", "--skip-aliases").Capture()
 	if err != nil {
-		return nil, err
-	}
-	if code != 0 {
-		return nil, fmt.Errorf("failed to run pyenv versions. exit code: %d", code)
+		return nil, fmt.Errorf("failed to run pyenv versions: %s", err)
 	}
 
 	versions := strings.Split(strings.TrimSpace(output), "\n")
