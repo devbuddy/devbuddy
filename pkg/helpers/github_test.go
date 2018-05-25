@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pior/dad/pkg/config"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/dnaeon/go-vcr/recorder"
@@ -15,16 +13,12 @@ import (
 const baseURL = "https://github.com/pior/dad/releases/download/v0.1.0"
 
 func buildGithubClient(t *testing.T) (g *Github, r *recorder.Recorder) {
-	cfg, err := config.Load()
-	require.NoError(t, err, "config.Load() failed")
-
-	r, err = recorder.New("fixtures/github")
+	r, err := recorder.New("fixtures/github")
 	require.NoError(t, err, "recorder.New() failed")
 
 	client := &http.Client{Transport: r}
 
-	g = NewGithubWithClient(cfg, client)
-
+	g = NewGithubWithClient(client)
 	return
 }
 func TestLatestReleaseOnDarwin(t *testing.T) {
@@ -57,6 +51,5 @@ func TestLatestReleaseOnUnknown(t *testing.T) {
 	g, _ := buildGithubClient(t)
 
 	_, err := g.LatestRelease("dad-linux-amd128")
-
 	require.Error(t, err)
 }

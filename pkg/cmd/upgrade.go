@@ -29,7 +29,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 
 	ui.CommandRun("Getting latest release for", plateform)
 
-	upgrader := helpers.NewUpgrader(cfg, true)
+	upgrader := helpers.NewUpgrader(true)
 	release, err := upgrader.LatestRelease(plateform)
 	checkError(err)
 
@@ -38,7 +38,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 
 	ui.CommandRun("Downloading", release.DownloadURL)
 
-	err = upgrader.Perform(destinationPath, release.DownloadURL)
+	err = upgrader.Perform(ui, destinationPath, release.DownloadURL)
 	checkError(err)
 
 	ui.CommandActed()

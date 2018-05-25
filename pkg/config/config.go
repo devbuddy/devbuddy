@@ -14,6 +14,12 @@ type Config struct {
 	dataDir      string // directory managed by Dad (languages distribs, virtualenvs...)
 }
 
+func NewTestConfig() *Config {
+	return &Config{
+		DebugEnabled: false,
+	}
+}
+
 // Load returns a Config populated from the user environment
 func Load() (*Config, error) {
 	homedir, err := getHomeDir()

@@ -6,12 +6,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-
-	"github.com/pior/dad/pkg/config"
 )
 
 type Github struct {
-	config *config.Config
 	client *http.Client
 }
 
@@ -24,16 +21,12 @@ type GithubReleaseList struct {
 	Items   []GithubReleaseItem `json:"assets"`
 }
 
-func NewGithub(cfg *config.Config) (g *Github) {
-	g = &Github{config: cfg, client: http.DefaultClient}
-
-	return
+func NewGithub() *Github {
+	return &Github{client: http.DefaultClient}
 }
 
-func NewGithubWithClient(cfg *config.Config, client *http.Client) (g *Github) {
-	g = &Github{config: cfg, client: client}
-
-	return
+func NewGithubWithClient(client *http.Client) *Github {
+	return &Github{client: client}
 }
 
 func (g *Github) listReleases() (releases *GithubReleaseList, err error) {

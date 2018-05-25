@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pior/dad/pkg/config"
 	"github.com/pior/dad/pkg/executor"
 	"github.com/pior/dad/pkg/termui"
 )
@@ -14,31 +13,28 @@ import (
 type Upgrader struct {
 	github  *Github
 	client  *http.Client
-	ui      *termui.UI
 	useSudo bool
 }
 
 // NewUpgrader returns a new upgrade helper using the default http client
-func NewUpgrader(cfg *config.Config, useSudo bool) (u *Upgrader) {
-	return NewUpgraderWithHTTPClient(cfg, http.DefaultClient, useSudo)
+func NewUpgrader(useSudo bool) (u *Upgrader) {
+	return NewUpgraderWithHTTPClient(http.DefaultClient, useSudo)
 }
 
 // NewUpgraderWithHTTPClient returns a new upgrade helper using the provided http client
-func NewUpgraderWithHTTPClient(cfg *config.Config, client *http.Client, useSudo bool) (u *Upgrader) {
-	g := NewGithubWithClient(cfg, client)
-	ui := termui.NewUI(cfg)
+func NewUpgraderWithHTTPClient(client *http.Client, useSudo bool) (u *Upgrader) {
+	g := NewGithubWithClient(client)
 
 	return &Upgrader{
 		github:  g,
 		client:  client,
 		useSudo: useSudo,
-		ui:      ui,
 	}
 }
 
 // Perform is fetching a new executable from `release`
 //   and upgrading the executable at `destinationPath` with it
-func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error) {
+func (u *Upgrader) Perform(ui *termui.UI, destinationPath string, sourceURL string) (err error) {
 	data, err := u.github.Get(sourceURL)
 
 	if err != nil {
@@ -69,7 +65,7 @@ func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error)
 		cmdline = fmt.Sprintf("sudo %s", cmdline)
 	}
 
-	u.ui.CommandHeader(cmdline)
+	ui.CommandHeader(cmdline)
 
 	return executor.NewShell(cmdline).Run()
 }

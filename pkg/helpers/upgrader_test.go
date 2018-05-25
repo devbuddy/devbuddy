@@ -11,14 +11,12 @@ import (
 
 	"github.com/dnaeon/go-vcr/recorder"
 	"github.com/pior/dad/pkg/config"
+	"github.com/pior/dad/pkg/termui"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUpgraderLatestRelease(t *testing.T) {
 	defer filet.CleanUp(t)
-
-	cfg, err := config.Load()
-	require.NoError(t, err, "config.Load() failed")
 
 	r, err := recorder.New("fixtures/upgrader")
 	require.NoError(t, err, "recorder.New() failed")
@@ -41,9 +39,10 @@ func TestUpgraderLatestRelease(t *testing.T) {
 
 	client := &http.Client{Transport: r}
 
-	u := NewUpgraderWithHTTPClient(cfg, client, false)
+	u := NewUpgraderWithHTTPClient(client, false)
 
-	err = u.Perform(target.Name(), "https://github.com/pior/dad/releases/download/v0.1.0/dad-darwin-amd64")
+	ui := termui.NewUI(config.NewTestConfig())
+	err = u.Perform(ui, target.Name(), "https://github.com/pior/dad/releases/download/v0.1.0/dad-darwin-amd64")
 	require.NoError(t, err, "upgrader.Perform() failed")
 
 	result, err := ioutil.ReadFile(target.Name())
