@@ -20,6 +20,8 @@ func buildGitRepos(t *testing.T, path string) {
 		git init
 		echo POIPOI > file1
 		git add file1
+		git config user.email "you@example.com"
+		git config user.name "Your Name"
 		git commit -m Commit1
 
 		cd $1
