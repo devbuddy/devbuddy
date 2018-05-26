@@ -10,7 +10,7 @@ import (
 )
 
 var openCmd = &cobra.Command{
-	Use:   "open [github]",
+	Use:   "open [github|pullrequest]",
 	Short: "Open a link about your project",
 	Run:   openRun,
 	Args:  onlyOneArg,
@@ -20,28 +20,19 @@ func openRun(cmd *cobra.Command, args []string) {
 	proj, err := project.FindCurrent()
 	checkError(err)
 
+	var url string
+
 	switch args[0] {
 	case "github", "gh":
-		err = openGithub(proj)
+		url, err = helpers.NewGitRepo(proj.Path).BuildGithubProjectURL()
+	case "pullrequest", "pr":
+		url, err = helpers.NewGitRepo(proj.Path).BuildGithubPullrequestURL()
 	default:
 		err = fmt.Errorf("I don't know how to open %s", args[0])
 	}
 	checkError(err)
-}
-
-func openGithub(proj *project.Project) error {
-	gitRepo := helpers.NewGitRepo(proj.Path)
-	branch, err := gitRepo.GetCurrentBranch()
-	if err != nil {
-		return err
+	if url != "" {
+		err = helpers.Open(url)
 	}
-	remoteURL, err := gitRepo.GetRemoteURL()
-	if err != nil {
-		return err
-	}
-	webURL, err := helpers.WebURLFromGitURL(remoteURL, branch)
-	if err != nil {
-		return err
-	}
-	return helpers.Open(webURL)
+	checkError(err)
 }

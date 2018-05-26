@@ -53,12 +53,3 @@ func TestLatestReleaseOnUnknown(t *testing.T) {
 	_, err := g.LatestRelease("dad-linux-amd128")
 	require.Error(t, err)
 }
-
-func TestWebURLFromGitURL(t *testing.T) {
-	_, err := WebURLFromGitURL("", "")
-	require.Error(t, err)
-
-	url, err := WebURLFromGitURL("git@github.com:ORG/REPO.git", "somebranch")
-	require.NoError(t, err, "WebURLFromGitURL() failed")
-	require.Equal(t, "https://github.com/ORG/REPO/tree/somebranch", url)
-}
