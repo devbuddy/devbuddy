@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 type Github struct {
@@ -95,4 +96,17 @@ func (g *Github) Get(url string) (data []byte, err error) {
 	}
 
 	return data, response.Body.Close()
+}
+
+func WebURLFromGitURL(gitURL string, branch string) (string, error) {
+	re := regexp.MustCompile("git@github.com:([^/]+)/([^.]+).git")
+	matches := re.FindStringSubmatch(gitURL)
+	if matches == nil {
+		return "", fmt.Errorf("unrecognized git url: %s", gitURL)
+	}
+	if branch == "" {
+		branch = "master"
+	}
+	url := fmt.Sprintf("https://github.com/%s/%s/tree/%s", matches[1], matches[2], branch)
+	return url, nil
 }
