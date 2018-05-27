@@ -12,5 +12,8 @@ for GOOS in linux darwin; do
 
 	echo "Building $NAME"
 	GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "$LDFLAGS" -o dist/${NAME}
-	shasum -a 256 dist/${NAME} > dist/${NAME}.sha256
+
+	pushd dist
+	shasum -a 256 ${NAME} > ${NAME}.sha256
+	popd
 done
