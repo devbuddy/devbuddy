@@ -11,35 +11,32 @@ import (
 
 var ManifestFilename = "dev.yml"
 
+// Manifest is a representatiomn of the project manifest
 type Manifest struct {
-	Path string
-	Content
-}
-
-type Content struct {
 	Up       []interface{}      `yaml:"up"`
 	Commands map[string]Command `yaml:"commands"`
 }
 
+// Command is a representation of the `command` section of a manifest
 type Command struct {
 	Run         string `yaml:"run"`
 	Description string `yaml:"desc"`
 }
 
+// Load returns a Manifest struct populated from a manifest file
 func Load(path string) (m *Manifest, err error) {
 	manifestPath := filepath.Join(path, ManifestFilename)
 	if !utils.PathExists(manifestPath) {
 		return nil, nil
 	}
 
-	m = &Manifest{Path: manifestPath}
-
 	file, err := ioutil.ReadFile(manifestPath)
 	if err != nil {
 		return
 	}
 
-	err = yaml.Unmarshal(file, &m.Content)
+	m = &Manifest{}
+	err = yaml.Unmarshal(file, &m)
 	if err != nil {
 		return
 	}
