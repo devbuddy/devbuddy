@@ -51,3 +51,6 @@ commands:
       [ -e "/usr/local/bin/dad" ] && sudo rm -v /usr/local/bin/dad
       [ -e "$GOPATH/bin/dad" ] && sudo rm -v $GOPATH/bin/dad
       bash -c "$(curl -sL https://raw.githubusercontent.com/pior/dad/master/install.sh)"
+
+open:
+  milestone: https://github.com/pior/dad/milestone/1
