@@ -11,12 +11,10 @@ import (
 func Print() {
 	var currentShell = os.Getenv("SHELL")
 
-	fmt.Println(shellSource)
-
 	if strings.HasSuffix(currentShell, "bash") {
-		fmt.Println(bashSource)
+		fmt.Println(shellSource, bashSource)
 	} else if strings.HasSuffix(currentShell, "zsh") {
-		fmt.Println(zshSource)
+		fmt.Println(shellSource, zshSource)
 	} else {
 		fmt.Println(color.Brown("Your shell is not supported"))
 	}
