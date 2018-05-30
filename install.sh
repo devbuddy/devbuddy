@@ -69,8 +69,6 @@ main() {
     header "Installing to ${DEST}"
     sudo install "${BINARY}" "${DEST}/dad"
 
-    rm -rf "${TMPDIR}"
-
     instructions
 }
 
