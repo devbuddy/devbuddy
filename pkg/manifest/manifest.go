@@ -9,38 +9,34 @@ import (
 	"github.com/pior/dad/pkg/utils"
 )
 
-var ManifestFilename = "dev.yml"
+var manifestFilename = "dev.yml"
 
+// Manifest is a representation of the project manifest
 type Manifest struct {
-	Path string
-	Content
-}
-
-type Content struct {
 	Up       []interface{}       `yaml:"up"`
 	Commands map[string]*Command `yaml:"commands"`
 	Open     map[string]string   `yaml:"open"`
 }
 
+// Command is a representation of the `command` section of a manifest
 type Command struct {
 	Run         string `yaml:"run"`
 	Description string `yaml:"desc"`
 }
 
+// Load returns a Manifest struct populated from a manifest file
 func Load(path string) (m *Manifest, err error) {
-	manifestPath := filepath.Join(path, ManifestFilename)
+	manifestPath := filepath.Join(path, manifestFilename)
 	if !utils.PathExists(manifestPath) {
 		return nil, nil
 	}
-
-	m = &Manifest{Path: manifestPath}
 
 	file, err := ioutil.ReadFile(manifestPath)
 	if err != nil {
 		return
 	}
 
-	err = yaml.Unmarshal(file, &m.Content)
+	err = yaml.Unmarshal(file, &m)
 	if err != nil {
 		return
 	}

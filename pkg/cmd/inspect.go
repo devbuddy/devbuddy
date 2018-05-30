@@ -22,7 +22,6 @@ func inspectRun(cmd *cobra.Command, args []string) {
 	checkError(err)
 
 	fmt.Printf("Found project at %s\n", proj.Path)
-	fmt.Printf("Manifest: %s\n", proj.Manifest.Path)
 
 	projectTasks, err := tasks.GetTasksFromProject(proj)
 	checkError(err)
