@@ -15,9 +15,12 @@ func Print() {
 		fmt.Println(shellSource, bashSource)
 	} else if strings.HasSuffix(currentShell, "zsh") {
 		fmt.Println(shellSource, zshSource)
+	} else if {
+		fmt.Fprintln(os.Stderr, color.Red("Your shell configuration is undefined"))
 	} else {
 		fmt.Fprintln(os.Stderr, color.Brown("Your shell is not supported"))
 	}
+	return nil
 }
 
 func AddFinalizerCd(path string) error {
