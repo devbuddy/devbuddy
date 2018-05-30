@@ -3,12 +3,23 @@ package integration
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	color "github.com/logrusorgru/aurora"
 )
 
 func Print() {
-	fmt.Println(bashSource)
+	var currentShell = os.Getenv("SHELL")
+
+	fmt.Println(shellSource)
+
+	if strings.HasSuffix(currentShell, "bash") {
+		fmt.Println(bashSource)
+	} else if strings.HasSuffix(currentShell, "zsh") {
+		fmt.Println(zshSource)
+	} else {
+		fmt.Println(color.Brown("Your shell is not supported"))
+	}
 }
 
 func AddFinalizerCd(path string) error {
