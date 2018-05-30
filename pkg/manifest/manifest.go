@@ -13,8 +13,9 @@ var manifestFilename = "dev.yml"
 
 // Manifest is a representation of the project manifest
 type Manifest struct {
-	Up       []interface{}      `yaml:"up"`
-	Commands map[string]Command `yaml:"commands"`
+	Up       []interface{}       `yaml:"up"`
+	Commands map[string]*Command `yaml:"commands"`
+	Open     map[string]string   `yaml:"open"`
 }
 
 // Command is a representation of the `command` section of a manifest

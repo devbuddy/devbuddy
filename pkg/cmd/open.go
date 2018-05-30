@@ -28,7 +28,11 @@ func openRun(cmd *cobra.Command, args []string) {
 	case "pullrequest", "pr":
 		url, err = helpers.NewGitRepo(proj.Path).BuildGithubPullrequestURL()
 	default:
-		err = fmt.Errorf("I don't know how to open %s", args[0])
+		url = proj.Manifest.Open[args[0]]
+		if url != "" {
+			break
+		}
+		err = fmt.Errorf("no link for '%s'", args[0])
 	}
 	checkError(err)
 	if url != "" {
