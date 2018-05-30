@@ -11,7 +11,7 @@ import (
 
 var ManifestFilename = "dev.yml"
 
-// Manifest is a representatiomn of the project manifest
+// Manifest is a representation of the project manifest
 type Manifest struct {
 	Up       []interface{}      `yaml:"up"`
 	Commands map[string]Command `yaml:"commands"`
