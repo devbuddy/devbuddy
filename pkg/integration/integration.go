@@ -16,7 +16,7 @@ func Print() {
 	} else if strings.HasSuffix(currentShell, "zsh") {
 		fmt.Println(shellSource, zshSource)
 	} else {
-		fmt.Println(color.Brown("Your shell is not supported"))
+		fmt.Fprintln(os.Stderr, color.Brown("Your shell is not supported"))
 	}
 }
 
