@@ -36,7 +36,6 @@ func Load(path string) (m *Manifest, err error) {
 		return
 	}
 
-	m = &Manifest{}
 	err = yaml.Unmarshal(file, &m)
 	if err != nil {
 		return
