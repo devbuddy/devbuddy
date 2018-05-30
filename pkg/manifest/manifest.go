@@ -9,7 +9,7 @@ import (
 	"github.com/pior/dad/pkg/utils"
 )
 
-var ManifestFilename = "dev.yml"
+var manifestFilename = "dev.yml"
 
 // Manifest is a representation of the project manifest
 type Manifest struct {
@@ -25,7 +25,7 @@ type Command struct {
 
 // Load returns a Manifest struct populated from a manifest file
 func Load(path string) (m *Manifest, err error) {
-	manifestPath := filepath.Join(path, ManifestFilename)
+	manifestPath := filepath.Join(path, manifestFilename)
 	if !utils.PathExists(manifestPath) {
 		return nil, nil
 	}
