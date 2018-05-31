@@ -25,13 +25,13 @@ setup_environment() {
 
 run_tests() {
     local failures=()
-    local -r shell=$1
+    local -r SHELL=$1
 
-    title "Running tests with $shell"
+    title "Running tests with $SHELL"
 
     for testfile in *_test.sh; do
         echo -e "\nRunning: ${testfile}"
-        $shell ${testfile} || failures+=(${testfile})
+        $SHELL ${testfile} || failures+=(${testfile})
     done
 
     if [[ ${#failures[@]} -ne 0 ]]; then
