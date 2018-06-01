@@ -1,7 +1,7 @@
 set -u
 
 oneTimeSetUp() {
-    eval "$(dad --shell-init)"
+    eval "$(bud --shell-init)"
 }
 
 setUp() {
@@ -13,7 +13,7 @@ testInvalidUpSection() {
 up: blabla
 YAML
 
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
     assertEquals "command should have failed" 1 $rc
 }
@@ -24,7 +24,7 @@ up:
   - nopenopenope
 YAML
 
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
     assertEquals "command should have succeed" 0 $rc
 }
@@ -35,7 +35,7 @@ up:
   - true
 YAML
 
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
     assertEquals "command should have succeed" 0 $rc
 }

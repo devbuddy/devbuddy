@@ -3,7 +3,7 @@ set -eu
 
 VERSION="v0.3.0"
 DEST="/usr/local/bin"
-SHELL_LINE='eval "$(dad --shell-init --with-completion)"'
+SHELL_LINE='eval "$(bud --shell-init --with-completion)"'
 
 YELLOW="\033[1;33m"
 BLUE="\033[1;34m"
@@ -41,7 +41,7 @@ header() {
 
 banner() {
     echo ""
-    echo -e "${YELLOW}Welcome to Dad installer!${RESET}"
+    echo -e "${YELLOW}Welcome to DevBuddy installer!${RESET}"
 }
 
 instructions() {
@@ -49,14 +49,14 @@ instructions() {
     echo -e "${YELLOW}Good!${RESET}\n"
     echo -e "${WHITE}Now, all you need is to add this to your bash .profile:${RESET}\n"
     echo -e "   ${CODE}" ${SHELL_LINE} "${RESET}\n"
-    echo -e "Report any issue to ${LINK}https://github.com/pior/dad/issues${RESET}\n"
+    echo -e "Report any issue to ${LINK}https://github.com/devbuddy/devbuddy/issues${RESET}\n"
 }
 
 main() {
     banner
 
     header "Downloading binary from Github"
-    URL="https://github.com/pior/dad/releases/download/${VERSION}/dad-$(make_variant)"
+    URL="https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-$(make_variant)"
     TMPFILE=`mktemp`
     curl -L -# --fail "${URL}" -o "${TMPFILE}"
 
@@ -68,7 +68,7 @@ main() {
     read -p "Correct? [enter]"
 
     header "Installing to ${DEST}"
-    sudo install "${TMPFILE}" "${DEST}/dad"
+    sudo install "${TMPFILE}" "${DEST}/bud"
 
     [[ -e "${TMPFILE}" ]] && unlink "${TMPFILE}"
 

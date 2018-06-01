@@ -1,29 +1,29 @@
-# Dad
+# DevBuddy
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/pior/dad)](https://goreportcard.com/report/github.com/pior/dad)
-[![CircleCI](https://circleci.com/gh/pior/dad.svg?style=svg)](https://circleci.com/gh/pior/dad)
-[![GitHub Release](https://img.shields.io/github/release/pior/dad.svg)](https://github.com/pior/dad/releases/latest)
-[![GitHub Release Date](https://img.shields.io/github/release-date/pior/dad.svg)](https://github.com/pior/dad/releases/latest)
+[![Go Report Card](https://goreportcard.com/badge/github.com/devbuddy/devbuddy)](https://goreportcard.com/report/github.com/devbuddy/devbuddy)
+[![CircleCI](https://circleci.com/gh/devbuddy/devbuddy.svg?style=svg)](https://circleci.com/gh/devbuddy/devbuddy)
+[![GitHub Release](https://img.shields.io/github/release/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
+[![GitHub Release Date](https://img.shields.io/github/release-date/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 
 ## What is this?
 
-**Dad** is an open-source implementation of an amazing internal tool developed at
+**DevBuddy** is an open-source implementation of an amazing internal tool developed at
 [Shopify](https://engineering.shopify.com) called "**Dev**".
 
 The first goal of this tools is to automate the **setup** tasks required to work on a project.
 
-With **Dad**, pushing a change on a project you never touched look like this:
+With **DevBuddy**, pushing a change on a project you never touched look like this:
 
-- `dad clone pior/dad`
-- `dad up`
+- `bud clone devbuddy/devbuddy`
+- `bud up`
 - `git commit`
-- `dad test`
+- `bud test`
 - `git push`
 
 ## Status and progress
 
-**Dad** is mostly useful for Python and Go projects. More languages will be natively
-supported. Additional automatic tasks will also be implemented, making **Dad** also
+**DevBuddy** is mostly useful for Python and Go projects. More languages will be natively
+supported. Additional automatic tasks will also be implemented, making **DevBuddy** also
 useful for languages without native support.
 
 See the project config [documentation](docs/Config.md).
@@ -54,7 +54,7 @@ Others
 - Notification when important files (eg: `requirements.txt`) are updated locally
   (eg: by `git pull`)
 - A `help` command to guide a new developer based on `dev.yml`
-- A `upgrade` command to auto-upgrade **Dad**
+- A `upgrade` command to auto-upgrade **DevBuddy**
 
 ### Hosting platform:
 
@@ -72,24 +72,24 @@ Others
 ## Install
 
 ```bash
-$ bash -c "$(curl -sL https://raw.githubusercontent.com/pior/dad/master/install.sh)"
+$ bash -c "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
 ```
 
 Uninstall it:
 ```bash
-$ sudo rm /usr/local/bin/dad
+$ sudo rm /usr/local/bin/bud
 ```
 
 ## Setup
 
 ★ Install the shell integration (in `~/.bash_profile`):
 ```bash
-eval "$(dad --shell-init --with-completion)"
+eval "$(bud --shell-init --with-completion)"
 ```
 
 A safer version:
 ```bash
-type dad > /dev/null 2> /dev/null && eval "$(dad --shell-init --with-completion)"
+type bud > /dev/null 2> /dev/null && eval "$(bud --shell-init --with-completion)"
 ```
 
 ## Usage
@@ -112,13 +112,13 @@ commands:
     desc: Lint the project
     run: script/lint
 ```
-See Dad own [dev.yml](dev.yml)
+See DevBuddy own [dev.yml](dev.yml)
 
 ```bash
-$ dad
+$ bud
 Usage:
-  dad [flags]
-  dad [command]
+  bud [flags]
+  bud [command]
 
 Available Commands:
   cd          Jump to a local project
@@ -131,12 +131,12 @@ Available Commands:
   up          Ensure the project is up and running
 
 Flags:
-  -h, --help              help for dad
+  -h, --help              help for bud
       --shell-init        Shell initialization
-      --version           version for dad
+      --version           version for bud
       --with-completion   Enable completion during initialization
 
-Use "dad [command] --help" for more information about a command.
+Use "bud [command] --help" for more information about a command.
 ```
 
 ## Development
@@ -145,7 +145,7 @@ Use "dad [command] --help" for more information about a command.
 ```bash
 ~ $ mkdir -p ~/src/github.com/pior
 ~ $ cd ~/src/github.com/pior
-~/src/github.com/pior $ git clone git@github.com:pior/dad.git
+~/src/github.com/pior $ git clone git@github.com:devbuddy/devbuddy.git
 ```
 
 ★ Fetch the dependencies (in `vendor`)
@@ -162,11 +162,11 @@ Use "dad [command] --help" for more information about a command.
 
 To show the debug messages, add this before in your environment:
 ```bash
-export DAD_DEBUG=1
+export BUD_DEBUG=1
 ```
 Or:
 ```bash
-$ dad-enable-debug  # dad-disable-debug
+$ bud-enable-debug  # bud-disable-debug
 ```
 
 ### Release
@@ -184,8 +184,8 @@ Expected:
 1. The CI process will test the release
 2. The CI process will publish macOS/Linux binaries to the Github Releases page
 
-Updating the [install.sh](https://github.com/pior/dad/blob/master/install.sh) script is probably a good idea.
+Updating the [install.sh](https://github.com/devbuddy/devbuddy/blob/master/install.sh) script is probably a good idea.
 
 ## License
 
-[MIT](https://github.com/pior/dad/blob/master/LICENSE)
+[MIT](https://github.com/devbuddy/devbuddy/blob/master/LICENSE)

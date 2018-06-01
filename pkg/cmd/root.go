@@ -13,7 +13,7 @@ var rootCmd *cobra.Command
 
 func build(version string) {
 	rootCmd = &cobra.Command{
-		Use:     "dad",
+		Use:     "bud",
 		Run:     rootRun,
 		Version: version,
 	}

@@ -41,7 +41,7 @@ func (u *Upgrader) Perform(ui *termui.UI, destinationPath string, sourceURL stri
 		return
 	}
 
-	tmpFile, err := ioutil.TempFile("", "dad-")
+	tmpFile, err := ioutil.TempFile("", "bud-")
 	if err != nil {
 		return
 	}

@@ -15,10 +15,10 @@ setup_environment() {
     ROOT=$PWD
     export PATH="$ROOT:$PATH"
 
-    if [[ "$(which dad)" != "$ROOT/dad" ]]; then
+    if [[ "$(which bud)" != "$ROOT/bud" ]]; then
         echo "In order to run the integration test on the current code,"
-        echo "the locally built dad binary must be found in the PATH."
-        echo "But 'which dad' returned: $(which dad)"
+        echo "the locally built bud binary must be found in the PATH."
+        echo "But 'which bud' returned: $(which bud)"
         exit 1
     fi
 }

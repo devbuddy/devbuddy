@@ -122,7 +122,7 @@ func activateFeature(ctx *context, task Task) (err error) {
 		}
 	}
 
-	// Special case, we want the dad process to get PATH updates from features to call the right processes.
+	// Special case, we want the bud process to get PATH updates from features to call the right processes.
 	// Like the pip process from the newly activated virtualenv.
 	// Explanation: exec.Command calls exec.LookPath to find the executable path, which rely on the PATH of
 	// the process itself.

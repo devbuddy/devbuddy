@@ -14,7 +14,7 @@ import (
 
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
-	Short: "[experimental] Upgrade dad to the latest available release.",
+	Short: "[experimental] Upgrade DevBuddy to the latest available release.",
 	Run:   upgradeRun,
 	Args:  noArgs,
 }
@@ -25,7 +25,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 
 	ui := termui.NewUI(cfg)
 
-	plateform := fmt.Sprintf("dad-%s-%s", runtime.GOOS, runtime.GOARCH)
+	plateform := fmt.Sprintf("bud-%s-%s", runtime.GOOS, runtime.GOARCH)
 
 	ui.CommandRun("Getting latest release for", plateform)
 

@@ -1,7 +1,7 @@
 set -u
 
 oneTimeSetUp() {
-    eval "$(dad --shell-init)"
+    eval "$(bud --shell-init)"
 }
 
 setUp() {
@@ -17,7 +17,7 @@ up:
       meet: touch sentinel
 YAML
 
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
     assertEquals "command failed" 0 $rc
 
@@ -32,7 +32,7 @@ up:
       meet: touch sentinel
 YAML
 
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
     assertEquals "command failed" 0 $rc
 
@@ -47,7 +47,7 @@ up:
       meet: 'false'
 YAML
 
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
     assertEquals "command did not failed" 1 $rc
 }
@@ -63,7 +63,7 @@ YAML
 
     mkdir subdir
     cd subdir
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
     cd ..
 

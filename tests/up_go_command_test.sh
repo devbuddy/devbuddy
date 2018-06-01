@@ -1,7 +1,7 @@
 set -u
 
 oneTimeSetUp() {
-    eval "$(dad --shell-init)"
+    eval "$(bud --shell-init)"
 }
 
 setUp() {
@@ -19,17 +19,17 @@ YAML
 testMissingGOPATH() {
     unset GOPATH
 
-    output=$(dad up | grep 'Warning.*GOPATH')  # Expect a warning about GOPATH
+    output=$(bud up | grep 'Warning.*GOPATH')  # Expect a warning about GOPATH
     rc=$?
-    assertEquals "dad up should warn about GOPATH not set" 0 $rc
+    assertEquals "bud up should warn about GOPATH not set" 0 $rc
 }
 
 testEnv() {
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
-    assertEquals "dad command returns zero" 0 $rc
+    assertEquals "bud command returns zero" 0 $rc
 
-    eval "$(command dad --shell-hook)"  # Simulate a prompt hook
+    eval "$(command bud --shell-hook)"  # Simulate a prompt hook
 
     version=$(go version | cut -d ' ' -f 3)
     assertEquals "go version" "go1.5" "$version"

@@ -1,7 +1,7 @@
 set -u
 
 oneTimeSetUp() {
-    eval "$(dad --shell-init)"
+    eval "$(bud --shell-init)"
 }
 
 setUp() {
@@ -14,19 +14,19 @@ YAML
 }
 
 testDadUsage() {
-    output=$(dad | head -n1)
+    output=$(bud | head -n1)
     rc=$?
-    assertEquals "dad command returns zero" 0 $rc
+    assertEquals "bud command returns zero" 0 $rc
 
-    assertEquals "dad command output the usage message" "Usage:" "${output}"
+    assertEquals "bud command output the usage message" "Usage:" "${output}"
 }
 
 testDadVersion() {
-    output=$(dad --version)
+    output=$(bud --version)
     rc=$?
 
-    assertEquals "dad command returns zero" 0 $rc
-    assertEquals "dad command output the usage message" "dad version devel" "${output}"
+    assertEquals "bud command returns zero" 0 $rc
+    assertEquals "bud command output the usage message" "bud version devel" "${output}"
 }
 
 SHUNIT_PARENT=$0
