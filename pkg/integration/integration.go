@@ -13,6 +13,7 @@ func Print() {
 
 	if currentShell == "" {
 		currentShell = "bash"
+		fmt.Fprintln(os.Stderr, color.Red("SHELL environment variable is empty"))
 	}
 
 	if strings.HasSuffix(currentShell, "bash") {
