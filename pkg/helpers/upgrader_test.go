@@ -10,8 +10,8 @@ import (
 	"github.com/Flaque/filet"
 
 	"github.com/dnaeon/go-vcr/recorder"
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/stretchr/testify/require"
 )
 

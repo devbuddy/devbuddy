@@ -6,9 +6,9 @@ import (
 
 	"fmt"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/helpers"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/spf13/cobra"
 )
 

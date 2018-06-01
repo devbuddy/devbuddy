@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/project"
-	"github.com/pior/dad/pkg/utils"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 type Virtualenv struct {

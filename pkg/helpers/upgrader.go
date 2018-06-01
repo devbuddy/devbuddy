@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 type Upgrader struct {

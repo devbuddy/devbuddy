@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/pior/dad/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 )
 
 // GitRepo represents a local git repository

@@ -3,11 +3,11 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pior/dad/pkg/tasks"
+	"github.com/devbuddy/devbuddy/pkg/tasks"
 
 	"github.com/spf13/cobra"
 
-	"github.com/pior/dad/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 var inspectCmd = &cobra.Command{
