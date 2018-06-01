@@ -11,12 +11,14 @@ import (
 func Print() {
 	var currentShell = os.Getenv("SHELL")
 
+	if currentShell == "" {
+		currentShell = "bash"
+	}
+
 	if strings.HasSuffix(currentShell, "bash") {
 		fmt.Println(shellSource, bashSource)
 	} else if strings.HasSuffix(currentShell, "zsh") {
 		fmt.Println(shellSource, zshSource)
-	} else if currentShell == "" {
-		fmt.Fprintln(os.Stderr, color.Red("Your SHELL environment variable is empty"))
 	} else {
 		fmt.Fprintln(os.Stderr, color.Brown("Your shell is not supported"))
 	}
