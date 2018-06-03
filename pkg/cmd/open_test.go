@@ -13,13 +13,13 @@ func TestFindOpenURL(t *testing.T) {
 	open := map[string]string{"doc": "http://doc.com", "logs": "http://logs"}
 	proj := &project.Project{Manifest: &manifest.Manifest{Open: open}}
 
-	url, err := findOpenURL(proj, []string{})
+	_, err := findOpenURL(proj, []string{})
 	require.Error(t, err)
 
-	url, err = findOpenURL(proj, []string{"unknown"})
+	_, err = findOpenURL(proj, []string{"unknown"})
 	require.Error(t, err)
 
-	url, err = findOpenURL(proj, []string{"doc"})
+	url, err := findOpenURL(proj, []string{"doc"})
 	require.NoError(t, err)
 	require.Equal(t, "http://doc.com", url)
 }
