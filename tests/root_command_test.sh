@@ -13,7 +13,7 @@ commands: {}
 YAML
 }
 
-testDadUsage() {
+testBudUsage() {
     output=$(bud | head -n1)
     rc=$?
     assertEquals "bud command returns zero" 0 $rc
@@ -21,7 +21,7 @@ testDadUsage() {
     assertEquals "bud command output the usage message" "Usage:" "${output}"
 }
 
-testDadVersion() {
+testBudVersion() {
     output=$(bud --version)
     rc=$?
 

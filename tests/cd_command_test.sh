@@ -2,7 +2,7 @@ set -u
 
 oneTimeSetUp() {
     # This runs in a subshell (subprocess).
-    # Even if Dad was enabled in the parent shell, we need to enable it here.
+    # Even if DevBuddy was enabled in the parent shell, we need to enable it here.
     eval "$(bud --shell-init)"
 }
 

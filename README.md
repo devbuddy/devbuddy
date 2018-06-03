@@ -172,7 +172,7 @@ $ bud-enable-debug  # bud-disable-debug
 ### Release
 
 ```bash
-$ dad release 1.0.0
+$ bud release 1.0.0
 ```
 
 The big idea:
