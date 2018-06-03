@@ -30,16 +30,12 @@ func NewGithubWithClient(client *http.Client) *Github {
 }
 
 func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
-
 	response, err := g.client.Get(releaseURL())
-
 	if err != nil {
 		return nil, err
 	}
 
-	releases = &GithubReleaseList{}
 	body, err := ioutil.ReadAll(response.Body)
-
 	if err != nil {
 		return
 	}
@@ -49,7 +45,6 @@ func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 	}
 
 	err = json.Unmarshal(body, releases)
-
 	return
 }
 
@@ -64,7 +59,6 @@ func releaseURL() string {
 // LatestRelease get latest release url for a specific `platform`
 func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 	releaseList, err := g.listReleases()
-
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +69,7 @@ func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 		}
 	}
 
-	err = fmt.Errorf("Cannot find release for %s", plateform)
-
-	return nil, err
+	return nil, fmt.Errorf("Cannot find release for %s", plateform)
 }
 
 // Get download the content at `url`
