@@ -66,7 +66,7 @@ func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 	releaseList, err := g.listReleases()
 
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	for _, item := range releaseList.Items {
