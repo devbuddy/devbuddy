@@ -1,5 +1,4 @@
 up:
-  - python: 3.6.5
   - go: 1.10.1
   - golang_dep
   - custom:
