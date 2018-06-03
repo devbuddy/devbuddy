@@ -32,7 +32,7 @@ func NewGithubWithClient(client *http.Client) *Github {
 func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 	response, err := g.client.Get(releaseURL())
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
@@ -44,6 +44,7 @@ func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 		return
 	}
 
+	releases = &GithubReleaseList{}
 	err = json.Unmarshal(body, releases)
 	return
 }
