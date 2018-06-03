@@ -9,7 +9,8 @@ import (
 	"github.com/pior/dad/pkg/project"
 )
 
-// Open a file or URL with the default application, return immediately
+// Open a file or URL with the default application, return immediately.
+// Use `xdg-open` or `open` depending on the platform.
 func Open(location string) error {
 	openCommand := "xdg-open"
 	if runtime.GOOS == "darwin" {
@@ -19,7 +20,9 @@ func Open(location string) error {
 	return exec.Command(openCommand, location).Start()
 }
 
-// FindLink returns the url of a link about the project
+// FindLink returns the url of a link about the project.
+// Possible links are github/pullrequest pages and arbitrary links declared in dev.yml. In case of collision, links
+// declared in dev.yml have precedence over Github links.
 func FindLink(proj *project.Project, linkName string) (url string, err error) {
 	if linkName == "" {
 		if len(proj.Manifest.Open) == 1 {
