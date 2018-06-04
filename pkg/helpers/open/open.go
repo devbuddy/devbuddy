@@ -30,7 +30,7 @@ func FindLink(proj *project.Project, linkName string) (url string, err error) {
 				return url, nil
 			}
 		}
-		return "", fmt.Errorf("more than one link defined: which one do you want?")
+		return "", fmt.Errorf("which link should I open?")
 	}
 
 	url = proj.Manifest.Open[linkName]
