@@ -3,21 +3,21 @@ package integration
 var bashSource = `
 # Be careful! This runs in the user shell.
 
-# Mask the command dad with this shell function
+# Mask the command bud with this shell function
 # This let us mutate the current shell
-dad() {
+bud() {
     # Prepare a file to pass the finalize actions
     local finalizer_file
-    finalizer_file="$(mktemp /tmp/dad-finalize-XXXXXX)"
+    finalizer_file="$(mktemp /tmp/bud-finalize-XXXXXX)"
 
     # Run the actual command
-    env DAD_FINALIZER_FILE=$finalizer_file dad $@
+    env BUD_FINALIZER_FILE=$finalizer_file bud $@
     return_code=$?
 
     # Perform finalizers
     local fin
     while read -r fin; do
-        [ -n "${DAD_DEBUG:-}" ] && echo "DAD_DEBUG: finalizer: ${fin}"
+        [ -n "${BUD_DEBUG:-}" ] && echo "BUD_DEBUG: finalizer: ${fin}"
 
         case "${fin}" in
             cd:*)
@@ -35,34 +35,34 @@ dad() {
     return ${return_code}
 }
 
-__dad_prompt_command() {
+__bud_prompt_command() {
     # In shell hook mode, the command will use stderr to print in the console
     # and stdout to mutate the shell (like activating a Python virtualenv)
 
-    # Fail fast if no dad executable is reachable
-    which dad > /dev/null || return
+    # Fail fast if no bud executable is reachable
+    which bud > /dev/null || return
 
     local hook_eval
-    hook_eval="$(command dad --shell-hook)"
-    [ -n "${DAD_DEBUG:-}" ] && echo -e "DAD_DEBUG: Hook eval:\n${hook_eval}\n---"
+    hook_eval="$(command bud --shell-hook)"
+    [ -n "${BUD_DEBUG:-}" ] && echo -e "BUD_DEBUG: Hook eval:\n${hook_eval}\n---"
     eval "${hook_eval}"
 }
 
-if [[ ! "${PROMPT_COMMAND:-}" == *__dad_prompt_command* ]]; then
-  PROMPT_COMMAND="__dad_prompt_command; ${PROMPT_COMMAND:-}"
+if [[ ! "${PROMPT_COMMAND:-}" == *__bud_prompt_command* ]]; then
+  PROMPT_COMMAND="__bud_prompt_command; ${PROMPT_COMMAND:-}"
 fi
 
-dad-enable-debug() {
-    export DAD_DEBUG=1
-    echo "DAD_DEBUG: enabled"
+bud-enable-debug() {
+    export BUD_DEBUG=1
+    echo "BUD_DEBUG: enabled"
 }
 
-dad-disable-debug() {
-    unset DAD_DEBUG
-    echo "DAD_DEBUG: disable"
+bud-disable-debug() {
+    unset BUD_DEBUG
+    echo "BUD_DEBUG: disable"
 }
 
-if [[ -n "${DAD_DEBUG:-}" ]]; then
-    echo "DAD_DEBUG: Dad is now enabled..."
+if [[ -n "${BUD_DEBUG:-}" ]]; then
+    echo "BUD_DEBUG: DevBuddy is now enabled..."
 fi
 `
