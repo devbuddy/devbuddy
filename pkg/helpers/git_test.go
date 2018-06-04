@@ -1,33 +1,17 @@
 package helpers
 
 import (
-	"os/exec"
 	"testing"
 
 	"github.com/Flaque/filet"
+	"github.com/pior/dad/pkg/test"
 	"github.com/stretchr/testify/require"
 )
-
-func buildGitRepos(t *testing.T, path string) {
-	init := `
-		set -ex
-		git init
-		git config user.email "you@example.com"
-		git config user.name "Your Name"
-		git commit -m Commit1 --allow-empty
-		git remote add origin git@github.com:org1/repo1.git
-	`
-	initFile := filet.TmpFile(t, "", init)
-	cmd := exec.Command("sh", initFile.Name(), path)
-	cmd.Dir = path
-	err := cmd.Run()
-	require.NoError(t, err, "init failed")
-}
 
 func TestGitGithubProjectURL(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
-	buildGitRepos(t, tmpdir)
+	test.GitInit(t, tmpdir)
 
 	url, err := NewGitRepo(tmpdir).BuildGithubProjectURL()
 
@@ -38,7 +22,7 @@ func TestGitGithubProjectURL(t *testing.T) {
 func TestGitGithubPullrequestURL(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
-	buildGitRepos(t, tmpdir)
+	test.GitInit(t, tmpdir)
 
 	url, err := NewGitRepo(tmpdir).BuildGithubPullrequestURL()
 

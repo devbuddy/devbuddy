@@ -1,16 +1,14 @@
 package open
 
 import (
-	"os"
-	"os/exec"
 	"testing"
 
 	"github.com/Flaque/filet"
+	"github.com/stretchr/testify/require"
 
 	"github.com/pior/dad/pkg/manifest"
 	"github.com/pior/dad/pkg/project"
-
-	"github.com/stretchr/testify/require"
+	"github.com/pior/dad/pkg/test"
 )
 
 func TestFindLink(t *testing.T) {
@@ -37,35 +35,12 @@ func TestFindLinkDefault(t *testing.T) {
 	require.Equal(t, "http://doc.com", url)
 }
 
-func setupProject(t *testing.T, path string) *project.Project {
-	cmd := exec.Command("git", "init")
-	cmd.Dir = path
-	require.NoError(t, cmd.Run())
-
-	cmd = exec.Command("git", "commit", "-m", "Commit1", "--allow-empty")
-	cmd.Dir = path
-	cmd.Env = []string{
-		"GIT_COMMITTER_NAME=John",
-		"GIT_AUTHOR_NAME=John",
-		"GIT_COMMITTER_EMAIL=john@doo.com",
-		"GIT_AUTHOR_EMAIL=john@doo.com",
-	}
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	require.NoError(t, cmd.Run())
-
-	cmd = exec.Command("git", "remote", "add", "origin", "git@github.com:org1/repo1.git")
-	cmd.Dir = path
-	require.NoError(t, cmd.Run())
-
-	return &project.Project{Path: path, Manifest: &manifest.Manifest{}}
-}
-
 func TestFindLinkGithub(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	proj := setupProject(t, tmpdir)
+	test.GitInit(t, tmpdir)
+	proj := &project.Project{Path: tmpdir, Manifest: &manifest.Manifest{}}
 
 	nameToURL := map[string]string{
 		"pullrequest": "https://github.com/org1/repo1/pull/master?expand=1",
