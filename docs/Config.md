@@ -5,11 +5,18 @@
 The file `dev.yml` must be placed at the root directory of your project.
 It should be commited to your repository and shared with everyone working on the project.
 
-The `up` section describes the tasks that the `dev up` command will run.
+The `up` section describes the tasks that the `bud up` command will run.
+Some tasks prepare your environment to use a language like `python` or `go`.
+Other tasks ensure your environment is up to date like `pip` or `golang_dep`.
+The special `custom` task let you handle specific case needed for your project.
+More info in [Tasks](#tasks).
 
-The `commands` section describes the custom commands like `dev test`.
+The `commands` section describes the custom commands like `bud test`.
+More info in [Commands](#commands).
 
-Example:
+The `open` section describes the project links available through `bud open <name>`.
+More info in [Open](#open).
+
 ```yaml
 up:
   - go: 1.10.1
@@ -26,9 +33,13 @@ commands:
   test:
     desc: Run tests for Python and Go
     run: pytest -v python/tests && go test $(go list ./...)
+
+open:
+  staging: https://staging.myapp.com
+  doc: https://godoc.org/github.com/org/myapp
 ```
 
-## Tasks for Python
+## Tasks
 
 ### `python`
 
@@ -71,9 +82,7 @@ up:
   - pipfile
 ```
 
-## Tasks for Go
-
-## `go`
+### `go`
 
 This task will download the Go distribution from `dl.google.com/go` and activate it
 in your shell (with `GOROOT`).
@@ -83,7 +92,7 @@ up:
   - go: 1.10.1
 ```
 
-## `golang_dep`
+### `golang_dep`
 
 This task will run [Go Dep](https://github.com/golang/dep) if needed.
 
@@ -95,7 +104,7 @@ up:
   - golang_dep
 ```
 
-## Custom task
+### Custom task
 
 This task will run a command if a condition is not met.
 The condition is expressed as a command.
@@ -107,3 +116,47 @@ up:
       met?: test -e /usr/local/Cellar/shellcheck
       meet: brew install shellcheck
 ```
+
+## Commands
+
+The project can define custom command in `dev.yml` that can be called with: `bud <command>`. Additional arguments are
+also passed to the command: `bud <command> <arg> <arg>...`.
+
+```yaml
+commands:
+  test:
+    desc: Run tests for Python and Go
+    run: pytest -v python/tests && go test $(go list ./...)
+  lint:
+    desc: Run the linters
+    run: script/run_all_linters
+```
+
+`bud test` is not much shorter than calling `script/test` for example.
+The idea is to introduce an indirection that will be easy to document and remember by being consistent across projects
+regardless of the programming language used (`rails test`? `pytest -v`? `npm test`? `go test ./...`?).
+
+```bash
+$ dad lint
+🐼  running script/lint
+pkg/project/current.go:14:2:warning: unused variable or constant someVariable declared but not used (varcheck)
+```
+
+## Open
+
+The command `bud open <name>` will open a link about the project with the OS default handler (using `open`/`xdg-open`).
+
+### Custom links
+
+They are defined in `dev.yml`:
+```yaml
+open:
+  staging: https://staging.myapp.com
+  doc: https://godoc.org/github.com/org/myapp
+```
+
+Tip: `dev open` is enough if there is only one link.
+
+### Github links:
+- `github`/`gh`: open the Github source code page for your checked out branch
+- `pullrequest`/`pr`: open the Github pull-request page for your checked out branch
