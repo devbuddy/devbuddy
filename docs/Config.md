@@ -8,14 +8,11 @@ It should be commited to your repository and shared with everyone working on the
 The `up` section describes the tasks that the `bud up` command will run.
 Some tasks prepare your environment to use a language like `python` or `go`.
 Other tasks ensure your environment is up to date like `pip` or `golang_dep`.
-The special `custom` task let you handle specific case needed for your project.
-More info in [Tasks](#tasks).
+The special `custom` task let you handle specific case needed for your project. See [Tasks](#tasks).
 
-The `commands` section describes the custom commands like `bud test`.
-More info in [Commands](#commands).
+The `commands` section describes the custom commands like `bud test`. See [Commands](#commands).
 
-The `open` section describes the project links available through `bud open <name>`.
-More info in [Open](#open).
+The `open` section describes the project links available through `bud open <name>`. See [Open](#open).
 
 ```yaml
 up:
