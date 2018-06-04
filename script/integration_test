@@ -9,7 +9,7 @@ title() {
 
 setup_environment() {
     echo " -> Build the project."
-    go build
+    go build -o bud
 
     echo " -> Adding the current dir to PATH."
     ROOT=$PWD
