@@ -14,6 +14,7 @@ The `commands` section describes the custom commands like `bud test`. See [Comma
 
 The `open` section describes the project links available through `bud open <name>`. See [Open](#open).
 
+**`dev.yml`**:
 ```yaml
 up:
   - go: 1.10.1
@@ -101,7 +102,7 @@ up:
   - golang_dep
 ```
 
-### Custom task
+### `custom`
 
 This task will run a command if a condition is not met.
 The condition is expressed as a command.
