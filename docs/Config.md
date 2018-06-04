@@ -10,9 +10,9 @@ Some tasks prepare your environment to use a language like `python` or `go`.
 Other tasks ensure your environment is up to date like `pip` or `golang_dep`.
 The special `custom` task let you handle specific case needed for your project. See [Tasks](#tasks).
 
-The `commands` section describes the custom commands like `bud test`. See [Commands](#commands).
+The `commands` section describes the project commands like `bud test`. See [Project Commands](#project-commands).
 
-The `open` section describes the project links available through `bud open <name>`. See [Open](#open).
+The `open` section describes the project links available through `bud open <name>`. See [Open Command](#open-command).
 
 **`dev.yml`**:
 ```yaml
@@ -115,7 +115,7 @@ up:
       meet: brew install shellcheck
 ```
 
-## Commands
+## Project commands
 
 The project can define custom command in `dev.yml` that can be called with: `bud <command>`. Additional arguments are
 also passed to the command: `bud <command> <arg> <arg>...`.
@@ -140,7 +140,7 @@ $ dad lint
 pkg/project/current.go:14:2:warning: unused variable or constant someVariable declared but not used (varcheck)
 ```
 
-## Open
+## Open Command
 
 The command `bud open <name>` will open a link about the project with the OS default handler (using `open`/`xdg-open`).
 
