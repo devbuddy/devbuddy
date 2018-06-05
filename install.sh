@@ -3,7 +3,7 @@ set -eu
 
 VERSION="v0.4.0"
 DEST="/usr/local/bin"
-SHELL_LINE='eval "$(dad --shell-init --with-completion)"'
+SHELL_LINE='eval "$(bud --shell-init --with-completion)"'
 
 YELLOW="\033[1;33m"
 BLUE="\033[1;34m"
@@ -40,7 +40,7 @@ header() {
 
 banner() {
     echo ""
-    echo -e "${YELLOW}Welcome to Dad installer!${RESET}"
+    echo -e "${YELLOW}Welcome to DevBuddy installer!${RESET}"
 }
 
 instructions() {
@@ -48,7 +48,7 @@ instructions() {
     echo -e "${YELLOW}Good!${RESET}\n"
     echo -e "${WHITE}Now, all you need is to add this to your bash .profile:${RESET}\n"
     echo -e "   ${CODE}" ${SHELL_LINE} "${RESET}\n"
-    echo -e "Report any issue to ${LINK}https://github.com/pior/dad/issues${RESET}\n"
+    echo -e "Report any issue to ${LINK}https://github.com/devbuddy/devbuddy/issues${RESET}\n"
 }
 
 main() {
@@ -58,8 +58,8 @@ main() {
     cd "${TMPDIR}"
 
     header "Downloading binary from Github"
-    BINARY="dad-$(make_variant)"
-    URL="https://github.com/pior/dad/releases/download/${VERSION}/${BINARY}"
+    BINARY="bud-$(make_variant)"
+    URL="https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/${BINARY}"
     curl -L -# --fail "${URL}" -o "${BINARY}"
     curl -L -# --fail "${URL}.sha256" -o "${BINARY}.sha256"
 
@@ -67,7 +67,7 @@ main() {
     shasum -c "${BINARY}.sha256"
 
     header "Installing to ${DEST}"
-    sudo install "${BINARY}" "${DEST}/dad"
+    sudo install "${BINARY}" "${DEST}/bud"
 
     instructions
 }

@@ -3,8 +3,8 @@ package tasks
 import (
 	"fmt"
 
-	"github.com/pior/dad/pkg/helpers"
-	"github.com/pior/dad/pkg/utils"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 func init() {

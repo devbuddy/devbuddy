@@ -6,7 +6,7 @@ import (
 
 	color "github.com/logrusorgru/aurora"
 
-	"github.com/pior/dad/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/config"
 )
 
 type HookUI struct {
@@ -29,7 +29,7 @@ func (u *HookUI) HookFeatureActivated(name string, version string) {
 }
 
 func (u *HookUI) HookFeatureFailure(name string, version string) {
-	msg := color.Sprintf("failed to activate %s. Try running dad up first!", name)
+	msg := color.Sprintf("failed to activate %s. Try running 'bud up' first!", name)
 	ver := color.Sprintf("(version: %s)", version)
 	fmt.Fprintf(u.out, "🐼  %s %s\n", color.Red(msg), color.Brown(ver))
 }

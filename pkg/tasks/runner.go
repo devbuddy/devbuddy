@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/env"
-	"github.com/pior/dad/pkg/features"
-	"github.com/pior/dad/pkg/project"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 type context struct {
@@ -122,7 +122,7 @@ func activateFeature(ctx *context, task Task) (err error) {
 		}
 	}
 
-	// Special case, we want the dad process to get PATH updates from features to call the right processes.
+	// Special case, we want the bud process to get PATH updates from features to call the right processes.
 	// Like the pip process from the newly activated virtualenv.
 	// Explanation: exec.Command calls exec.LookPath to find the executable path, which rely on the PATH of
 	// the process itself.

@@ -3,11 +3,11 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pior/dad/pkg/tasks"
+	"github.com/devbuddy/devbuddy/pkg/tasks"
 
 	"github.com/spf13/cobra"
 
-	"github.com/pior/dad/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 var inspectCmd = &cobra.Command{
@@ -22,7 +22,6 @@ func inspectRun(cmd *cobra.Command, args []string) {
 	checkError(err)
 
 	fmt.Printf("Found project at %s\n", proj.Path)
-	fmt.Printf("Manifest: %s\n", proj.Manifest.Path)
 
 	projectTasks, err := tasks.GetTasksFromProject(proj)
 	checkError(err)

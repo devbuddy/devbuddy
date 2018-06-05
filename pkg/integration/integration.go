@@ -3,12 +3,26 @@ package integration
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	color "github.com/logrusorgru/aurora"
 )
 
 func Print() {
-	fmt.Println(bashSource)
+	var currentShell = os.Getenv("SHELL")
+
+	if currentShell == "" {
+		currentShell = "bash"
+		fmt.Fprintln(os.Stderr, color.Red("SHELL environment variable is empty"))
+	}
+
+	if strings.HasSuffix(currentShell, "bash") {
+		fmt.Println(shellSource, bashSource)
+	} else if strings.HasSuffix(currentShell, "zsh") {
+		fmt.Println(shellSource, zshSource)
+	} else {
+		fmt.Fprintln(os.Stderr, color.Brown("Your shell is not supported"))
+	}
 }
 
 func AddFinalizerCd(path string) error {
@@ -18,7 +32,7 @@ func AddFinalizerCd(path string) error {
 func addFinalizer(action, arg string) (err error) {
 	content := fmt.Sprintf("%s:%s\n", action, arg)
 
-	finalizerPath := os.Getenv("DAD_FINALIZER_FILE")
+	finalizerPath := os.Getenv("BUD_FINALIZER_FILE")
 
 	if finalizerPath == "" {
 		fmt.Println(color.Red("Shell integration error:"), "can't run a finalizer action:", color.Brown(content))

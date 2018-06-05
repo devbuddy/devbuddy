@@ -30,16 +30,12 @@ func NewGithubWithClient(client *http.Client) *Github {
 }
 
 func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
-
 	response, err := g.client.Get(releaseURL())
-
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	releases = &GithubReleaseList{}
 	body, err := ioutil.ReadAll(response.Body)
-
 	if err != nil {
 		return
 	}
@@ -48,25 +44,24 @@ func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 		return
 	}
 
+	releases = &GithubReleaseList{}
 	err = json.Unmarshal(body, releases)
-
 	return
 }
 
 func releaseURL() string {
-	url := os.Getenv("DAD_RELEASE_URL")
+	url := os.Getenv("BUD_RELEASE_URL")
 	if url != "" {
 		return url
 	}
-	return "https://api.github.com/repos/pior/dad/releases/latest"
+	return "https://api.github.com/repos/devbuddy/devbuddy/releases/latest"
 }
 
 // LatestRelease get latest release url for a specific `platform`
 func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 	releaseList, err := g.listReleases()
-
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	for _, item := range releaseList.Items {
@@ -75,9 +70,7 @@ func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
 		}
 	}
 
-	err = fmt.Errorf("Cannot find release for %s", plateform)
-
-	return nil, err
+	return nil, fmt.Errorf("Cannot find release for %s", plateform)
 }
 
 // Get download the content at `url`

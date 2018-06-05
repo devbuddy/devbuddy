@@ -1,7 +1,7 @@
 set -u
 
 oneTimeSetUp() {
-    eval "$(dad --shell-init)"
+    eval "$(bud --shell-init)"
 }
 
 setUp() {
@@ -16,13 +16,13 @@ up:
   - pip: [requirements.txt]
 YAML
 
-    output=$(dad inspect)
+    output=$(bud inspect)
     rc=$?
     assertEquals "command failed" 0 $rc
 }
 
 testWithouthManifest() {
-    output=$(dad inspect)
+    output=$(bud inspect)
     rc=$?
     assertEquals "command didn't fail" 1 $rc
 }

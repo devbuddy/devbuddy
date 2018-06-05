@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/pior/dad/pkg/helpers"
-	"github.com/pior/dad/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 var openCmd = &cobra.Command{
@@ -28,7 +28,11 @@ func openRun(cmd *cobra.Command, args []string) {
 	case "pullrequest", "pr":
 		url, err = helpers.NewGitRepo(proj.Path).BuildGithubPullrequestURL()
 	default:
-		err = fmt.Errorf("I don't know how to open %s", args[0])
+		url = proj.Manifest.Open[args[0]]
+		if url != "" {
+			break
+		}
+		err = fmt.Errorf("no link for '%s'", args[0])
 	}
 	checkError(err)
 	if url != "" {

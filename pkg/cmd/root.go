@@ -5,15 +5,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/pior/dad/pkg/hook"
-	"github.com/pior/dad/pkg/integration"
+	"github.com/devbuddy/devbuddy/pkg/hook"
+	"github.com/devbuddy/devbuddy/pkg/integration"
 )
 
 var rootCmd *cobra.Command
 
 func build(version string) {
 	rootCmd = &cobra.Command{
-		Use:     "dad",
+		Use:     "bud",
 		Run:     rootRun,
 		Version: version,
 	}
