@@ -189,3 +189,7 @@ Updating the [install.sh](https://github.com/devbuddy/devbuddy/blob/master/insta
 ## License
 
 [MIT](https://github.com/devbuddy/devbuddy/blob/master/LICENSE)
+
+Authors:
+- Pior Bastida (pior@pbastida.net)
+- Mathieu Leduc-Hamel (mathieu.leduchamel@shopify.com)
