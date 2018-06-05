@@ -8,16 +8,16 @@ import (
 
 func TestGetActiveFeatures(t *testing.T) {
 	envs := [][]string{
-		[]string{},
-		[]string{"BUD_AUTO_ENV_FEATURES="},
-		[]string{"BUD_AUTO_ENV_FEATURES=f1=v1"},
-		[]string{"BUD_AUTO_ENV_FEATURES=f1=v1:f2=v2"},
+		{},
+		{"BUD_AUTO_ENV_FEATURES="},
+		{"BUD_AUTO_ENV_FEATURES=f1=v1"},
+		{"BUD_AUTO_ENV_FEATURES=f1=v1:f2=v2"},
 	}
 	features := []map[string]string{
-		map[string]string{},
-		map[string]string{},
-		map[string]string{"f1": "v1"},
-		map[string]string{"f1": "v1", "f2": "v2"},
+		{},
+		{},
+		{"f1": "v1"},
+		{"f1": "v1", "f2": "v2"},
 	}
 
 	for idx := range envs {
@@ -28,10 +28,10 @@ func TestGetActiveFeatures(t *testing.T) {
 
 func TestSetFeatures(t *testing.T) {
 	features := []map[string]string{
-		map[string]string{},
-		map[string]string{},
-		map[string]string{"f1": "v1"},
-		map[string]string{"f1": "v1", "f2": "v2"},
+		{},
+		{},
+		{"f1": "v1"},
+		{"f1": "v1", "f2": "v2"},
 	}
 
 	for idx := range features {
@@ -46,14 +46,14 @@ func TestChanged(t *testing.T) {
 	require.Equal(t, []VariableChange{}, env.Changed())
 
 	env.Set("K2", "1")
-	require.Equal(t, []VariableChange{VariableChange{"K2", "1", false}}, env.Changed())
+	require.Equal(t, []VariableChange{{"K2", "1", false}}, env.Changed())
 
 	env.Set("K2", "2")
-	require.Equal(t, []VariableChange{VariableChange{"K2", "2", false}}, env.Changed())
+	require.Equal(t, []VariableChange{{"K2", "2", false}}, env.Changed())
 
 	env = New([]string{"K1=1"})
 	env.Unset("K1")
-	require.Equal(t, []VariableChange{VariableChange{"K1", "", true}}, env.Changed())
+	require.Equal(t, []VariableChange{{"K1", "", true}}, env.Changed())
 }
 
 func TestEnviron(t *testing.T) {
