@@ -59,6 +59,6 @@ bud-disable-debug() {
 }
 
 if [[ -n "${BUD_DEBUG:-}" ]]; then
-    echo "BUD_DEBUG: Dad is now enabled..."
+    echo "BUD_DEBUG: DevBuddy is now enabled..."
 fi
 `
