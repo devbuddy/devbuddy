@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/pior/dad/pkg/helpers"
-	"github.com/pior/dad/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 var openCmd = &cobra.Command{

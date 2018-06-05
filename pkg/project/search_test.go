@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/pior/dad/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/config"
 
 	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/assert"

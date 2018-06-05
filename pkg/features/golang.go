@@ -1,10 +1,10 @@
 package features
 
 import (
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/env"
-	"github.com/pior/dad/pkg/helpers"
-	"github.com/pior/dad/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 func init() {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/pior/dad/pkg/cmd"
+	"github.com/devbuddy/devbuddy/pkg/cmd"
 )
 
 var Version = "devel" // replaced by build flag

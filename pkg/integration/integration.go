@@ -32,7 +32,7 @@ func AddFinalizerCd(path string) error {
 func addFinalizer(action, arg string) (err error) {
 	content := fmt.Sprintf("%s:%s\n", action, arg)
 
-	finalizerPath := os.Getenv("DAD_FINALIZER_FILE")
+	finalizerPath := os.Getenv("BUD_FINALIZER_FILE")
 
 	if finalizerPath == "" {
 		fmt.Println(color.Red("Shell integration error:"), "can't run a finalizer action:", color.Brown(content))

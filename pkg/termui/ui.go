@@ -7,7 +7,7 @@ import (
 
 	color "github.com/logrusorgru/aurora"
 
-	"github.com/pior/dad/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/config"
 )
 
 type UI struct {

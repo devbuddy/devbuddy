@@ -50,11 +50,11 @@ func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 }
 
 func releaseURL() string {
-	url := os.Getenv("DAD_RELEASE_URL")
+	url := os.Getenv("BUD_RELEASE_URL")
 	if url != "" {
 		return url
 	}
-	return "https://api.github.com/repos/pior/dad/releases/latest"
+	return "https://api.github.com/repos/devbuddy/devbuddy/releases/latest"
 }
 
 // LatestRelease get latest release url for a specific `platform`

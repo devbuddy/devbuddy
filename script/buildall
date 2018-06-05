@@ -8,7 +8,7 @@ LDFLAGS="-s -w -X \"main.Version=${VERSION}\""
 
 for GOOS in linux darwin; do
 	export GOOS
-	NAME=dad-${GOOS}-amd64
+	NAME=bud-${GOOS}-amd64
 
 	echo "Building $NAME"
 	GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "$LDFLAGS" -o dist/${NAME}

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pior/dad/pkg/manifest"
+	"github.com/devbuddy/devbuddy/pkg/manifest"
 )
 
 var ErrProjectNotFound = errors.New("project not found")

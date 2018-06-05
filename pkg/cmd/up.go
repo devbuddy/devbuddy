@@ -5,10 +5,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/project"
-	"github.com/pior/dad/pkg/tasks"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/tasks"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 var upCmd = &cobra.Command{

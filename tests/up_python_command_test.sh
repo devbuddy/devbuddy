@@ -1,7 +1,7 @@
 set -u
 
 oneTimeSetUp() {
-    eval "$(dad --shell-init)"
+    eval "$(bud --shell-init)"
 
     # Check the test requirements
     pyenv versions | grep -q 3.6.3
@@ -25,11 +25,11 @@ EOF
 }
 
 testEnv() {
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
-    assertEquals "dad command returns zero" 0 $rc
+    assertEquals "bud command returns zero" 0 $rc
 
-    eval "$(command dad --shell-hook)"  # Simulate a prompt hook
+    eval "$(command bud --shell-hook)"  # Simulate a prompt hook
 
     version=$(python --version)
     assertEquals "python version" "Python 3.6.3" "$version"
@@ -44,9 +44,9 @@ testEnv() {
 testFailure() {
     rm requirements-2.txt
 
-    output=$(dad up)
+    output=$(bud up)
     rc=$?
-    assertEquals "dad command returns non-zero" 1 $rc
+    assertEquals "bud command returns non-zero" 1 $rc
 }
 
 SHUNIT_PARENT=$0

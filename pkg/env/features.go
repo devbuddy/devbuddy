@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-const autoEnvVariableName = "DAD_AUTO_ENV_FEATURES"
+const autoEnvVariableName = "BUD_AUTO_ENV_FEATURES"
 
 // GetActiveFeatures returns a Hash of feature name -> param
 func (e *Env) GetActiveFeatures() map[string]string {

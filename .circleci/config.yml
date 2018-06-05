@@ -3,7 +3,7 @@ jobs:
   tests:
     docker:
       - image: circleci/golang:1.10.2
-    working_directory: /go/src/github.com/pior/dad
+    working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
       - run: dep ensure
@@ -12,7 +12,7 @@ jobs:
   integration-tests:
     docker:
       - image: circleci/golang:1.10.2
-    working_directory: /go/src/github.com/pior/dad
+    working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
       - run: dep ensure
@@ -35,7 +35,7 @@ jobs:
   lint:
     docker:
       - image: circleci/golang:1.10.2
-    working_directory: /go/src/github.com/pior/dad
+    working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
       - run: dep ensure
@@ -46,7 +46,7 @@ jobs:
   deploy-release:
     docker:
       - image: circleci/golang:1.10.2
-    working_directory: /go/src/github.com/pior/dad
+    working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
       - run: dep ensure

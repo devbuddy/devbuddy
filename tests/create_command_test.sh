@@ -2,8 +2,8 @@ set -u
 
 oneTimeSetUp() {
     # This runs in a subshell (subprocess).
-    # Even if Dad was enabled in the parent shell, we need to enable it here.
-    eval "$(dad --shell-init)"
+    # Even if DevBuddy was enabled in the parent shell, we need to enable it here.
+    eval "$(bud --shell-init)"
 }
 
 setUp() {
@@ -18,14 +18,14 @@ tearDown() {
 }
 
 testCreate() {
-    dad create dadorg/repo
+    bud create dadorg/repo
 
     assertTrue "directory was created" "[ -d ~/src/github.com/dadorg/repo ]"
     assertEquals "cd to project directory" ~/src/github.com/dadorg/repo "$PWD"
 }
 
 testCreateExisting() {
-    dad create dadorg/repo2
+    bud create dadorg/repo2
 
     assertEquals "cd to project directory" ~/src/github.com/dadorg/repo2 "$PWD"
 }

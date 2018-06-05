@@ -6,15 +6,15 @@ import (
 
 	"fmt"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/helpers"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/spf13/cobra"
 )
 
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
-	Short: "[experimental] Upgrade dad to the latest available release.",
+	Short: "[experimental] Upgrade DevBuddy to the latest available release.",
 	Run:   upgradeRun,
 	Args:  noArgs,
 }
@@ -25,7 +25,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 
 	ui := termui.NewUI(cfg)
 
-	plateform := fmt.Sprintf("dad-%s-%s", runtime.GOOS, runtime.GOARCH)
+	plateform := fmt.Sprintf("bud-%s-%s", runtime.GOOS, runtime.GOARCH)
 
 	ui.CommandRun("Getting latest release for", plateform)
 
