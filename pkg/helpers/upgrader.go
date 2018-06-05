@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 type Upgrader struct {
@@ -41,7 +41,7 @@ func (u *Upgrader) Perform(ui *termui.UI, destinationPath string, sourceURL stri
 		return
 	}
 
-	tmpFile, err := ioutil.TempFile("", "dad-")
+	tmpFile, err := ioutil.TempFile("", "bud-")
 	if err != nil {
 		return
 	}

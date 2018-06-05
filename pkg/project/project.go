@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/manifest"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/manifest"
 )
 
 // Project represents a project whether it exists locally or not

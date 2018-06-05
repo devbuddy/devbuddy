@@ -6,9 +6,9 @@ import (
 	"path"
 	"runtime"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/executor"
-	"github.com/pior/dad/pkg/utils"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 type Golang struct {

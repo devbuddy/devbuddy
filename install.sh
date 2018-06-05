@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -eu
 
-VERSION="v0.3.0"
+VERSION="v0.4.1"
 DEST="/usr/local/bin"
-SHELL_LINE='eval "$(dad --shell-init --with-completion)"'
+SHELL_LINE='eval "$(bud --shell-init --with-completion)"'
 
 YELLOW="\033[1;33m"
 BLUE="\033[1;34m"
-CYAN="\033[1;36m"
 WHITE="\033[1;37m"
 CODE="\033[44m\033[1;37m"
 LINK="\033[4m\033[1;34m"
@@ -41,7 +40,7 @@ header() {
 
 banner() {
     echo ""
-    echo -e "${YELLOW}Welcome to Dad installer!${RESET}"
+    echo -e "${YELLOW}Welcome to DevBuddy installer!${RESET}"
 }
 
 instructions() {
@@ -49,28 +48,26 @@ instructions() {
     echo -e "${YELLOW}Good!${RESET}\n"
     echo -e "${WHITE}Now, all you need is to add this to your bash .profile:${RESET}\n"
     echo -e "   ${CODE}" ${SHELL_LINE} "${RESET}\n"
-    echo -e "Report any issue to ${LINK}https://github.com/pior/dad/issues${RESET}\n"
+    echo -e "Report any issue to ${LINK}https://github.com/devbuddy/devbuddy/issues${RESET}\n"
 }
 
 main() {
     banner
 
-    header "Downloading binary from Github"
-    URL="https://github.com/pior/dad/releases/download/${VERSION}/dad-$(make_variant)"
-    TMPFILE=`mktemp`
-    curl -L -# --fail "${URL}" -o "${TMPFILE}"
+    TMPDIR=$(mktemp -d)
+    cd "${TMPDIR}"
 
-    header "Downloading SHA from Github"
-    expected_hash=$(curl -LsS --fail "${URL}.sha256")
-    downloaded_hash=$(shasum -a 256 "${TMPFILE}")
-    echo "Expected hash   : ${expected_hash}"
-    echo "Downloaded hash : ${downloaded_hash}"
-    read -p "Correct? [enter]"
+    header "Downloading binary from Github"
+    BINARY="bud-$(make_variant)"
+    URL="https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/${BINARY}"
+    curl -L -# --fail "${URL}" -o "${BINARY}"
+    curl -L -# --fail "${URL}.sha256" -o "${BINARY}.sha256"
+
+    header "Verify SHA256 checksum"
+    shasum -c "${BINARY}.sha256"
 
     header "Installing to ${DEST}"
-    sudo install "${TMPFILE}" "${DEST}/dad"
-
-    [[ -e "${TMPFILE}" ]] && unlink "${TMPFILE}"
+    sudo install "${BINARY}" "${DEST}/bud"
 
     instructions
 }

@@ -11,7 +11,7 @@ type Config struct {
 	homeDir      string // the user home directory
 	DebugEnabled bool   // whether debug logging is activated
 	SourceDir    string // projects base directory
-	dataDir      string // directory managed by Dad (languages distribs, virtualenvs...)
+	dataDir      string // directory managed by DevBuddy (languages distribs, virtualenvs...)
 }
 
 func NewTestConfig() *Config {
@@ -33,13 +33,13 @@ func Load() (*Config, error) {
 		homeDir:      homedir,
 		DebugEnabled: debugEnabled(),
 		SourceDir:    filepath.Join(homedir, "src"),
-		dataDir:      filepath.Join(userDataDir, "dad"),
+		dataDir:      filepath.Join(userDataDir, "bud"),
 	}
 	return &c, nil
 }
 
 func debugEnabled() bool {
-	return os.Getenv("DAD_DEBUG") != ""
+	return os.Getenv("BUD_DEBUG") != ""
 }
 
 func getHomeDir() (string, error) {

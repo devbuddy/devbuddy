@@ -6,7 +6,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/pior/dad/pkg/utils"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 var manifestFilename = "dev.yml"

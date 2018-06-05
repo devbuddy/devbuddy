@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pior/dad/pkg/helpers"
-	"github.com/pior/dad/pkg/project"
-	"github.com/pior/dad/pkg/utils"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 func init() {

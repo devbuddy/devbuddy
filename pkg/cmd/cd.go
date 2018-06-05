@@ -3,10 +3,10 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/integration"
-	"github.com/pior/dad/pkg/project"
-	"github.com/pior/dad/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/integration"
+	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 var cdCmd = &cobra.Command{

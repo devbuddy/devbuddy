@@ -5,8 +5,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 )
 
 type PyEnv struct {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pior/dad/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 )
 
 func asString(value interface{}) (string, error) {

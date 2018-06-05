@@ -3,7 +3,7 @@ package tasks
 import (
 	"fmt"
 
-	"github.com/pior/dad/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 type taskBuilder func(*taskConfig) (Task, error)

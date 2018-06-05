@@ -7,8 +7,8 @@ import (
 
 	"github.com/sahilm/fuzzy"
 
-	"github.com/pior/dad/pkg/config"
-	"github.com/pior/dad/pkg/utils"
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 func FindBestMatch(expr string, conf *config.Config) (found *Project, err error) {

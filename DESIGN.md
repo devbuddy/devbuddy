@@ -62,5 +62,5 @@ Initialize the shell:
 
 ```bash
 # DAD_DEBUG=1
-eval "$(dad --init)"
+eval "$(bud --init)"
 ```

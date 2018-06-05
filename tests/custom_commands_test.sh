@@ -1,7 +1,7 @@
 set -u
 
 oneTimeSetUp() {
-    eval "$(dad --shell-init)"
+    eval "$(bud --shell-init)"
 }
 
 setUp() {
@@ -23,37 +23,37 @@ YAML
 }
 
 testSimple() {
-    dad mycmd
+    bud mycmd
 
     assertEquals "somefile was created" "TESTTEST" "$(cat somefile)"
 }
 
 testArguments() {
-    output=$(dad echo ARG1 ARG2)
+    output=$(bud echo ARG1 ARG2)
 
     assertEquals "command called with arguments" "PREFIX ARG1 ARG2" "$output"
 }
 
 testSuccess() {
-    dad success
+    bud success
 
-    assertEquals "dad return with the right exit code" 0 $?
+    assertEquals "bud return with the right exit code" 0 $?
 }
 
 testFailure() {
-    dad failure
+    bud failure
 
-    assertEquals "dad return with the right exit code" 1 $?
+    assertEquals "bud return with the right exit code" 1 $?
 }
 
 testRunInProjectRoot() {
-    dad isprojectroot
-    assertEquals "dad isprojectroot command succeed in project root" 0 $?
+    bud isprojectroot
+    assertEquals "bud isprojectroot command succeed in project root" 0 $?
 
     mkdir -p subdir
     cd subdir
-    dad isprojectroot
-    assertEquals "dad custom commands run in project root" 0 $?
+    bud isprojectroot
+    assertEquals "bud custom commands run in project root" 0 $?
 }
 
 SHUNIT_PARENT=$0

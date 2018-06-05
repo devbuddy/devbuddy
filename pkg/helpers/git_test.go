@@ -4,8 +4,9 @@ import (
 	"testing"
 
 	"github.com/Flaque/filet"
-	"github.com/pior/dad/pkg/test"
 	"github.com/stretchr/testify/require"
+
+	"github.com/devbuddy/devbuddy/pkg/test"
 )
 
 func TestGitGithubProjectURL(t *testing.T) {

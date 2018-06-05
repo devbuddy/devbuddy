@@ -6,9 +6,9 @@ import (
 	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/require"
 
-	"github.com/pior/dad/pkg/manifest"
-	"github.com/pior/dad/pkg/project"
-	"github.com/pior/dad/pkg/test"
+	"github.com/devbuddy/devbuddy/pkg/manifest"
+	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/test"
 )
 
 func TestFindLink(t *testing.T) {

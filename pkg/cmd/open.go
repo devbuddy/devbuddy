@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/pior/dad/pkg/helpers/open"
-	"github.com/pior/dad/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/helpers/open"
+	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 var openCmd = &cobra.Command{

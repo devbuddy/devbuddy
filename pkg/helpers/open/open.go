@@ -5,8 +5,8 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/pior/dad/pkg/helpers"
-	"github.com/pior/dad/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 // Open a file or URL with the default application, return immediately.

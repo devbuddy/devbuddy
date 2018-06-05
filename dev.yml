@@ -9,7 +9,7 @@ up:
 commands:
   testup:
     desc: Build, install and run the development version
-    run: go install && dad up
+    run: go install && bud up
 
   test:
     desc: Run the unittests
@@ -32,7 +32,7 @@ commands:
     run: script/test && script/integration_test && script/lint
 
   release:
-    desc: Create a new release (dad release [VERSION])
+    desc: Create a new release (bud release [VERSION])
     run: script/release
 
   godoc:
@@ -40,17 +40,17 @@ commands:
     run: (sleep 1; open http://0.0.0.0:6060)& godoc -http=:6060
 
   install-dev:
-    desc: Install dad in the GOROOT
+    desc: Install bud in the GOROOT
     run: |
       go install -ldflags "-X main.Version=$(git describe --tags --dirty --always)"
-      [ -e "/usr/local/bin/dad" ] && sudo rm /usr/local/bin/dad || true
+      [ -e "/usr/local/bin/bud" ] && sudo rm /usr/local/bin/bud || true
 
   install-release:
-    desc: Remove all dad binaries and install a released version
+    desc: Remove all bud binaries and install a released version
     run: |
-      [ -e "/usr/local/bin/dad" ] && sudo rm -v /usr/local/bin/dad
-      [ -e "$GOPATH/bin/dad" ] && sudo rm -v $GOPATH/bin/dad
-      bash -c "$(curl -sL https://raw.githubusercontent.com/pior/dad/master/install.sh)"
+      [ -e "/usr/local/bin/bud" ] && sudo rm -v /usr/local/bin/bud
+      [ -e "$GOPATH/bin/bud" ] && sudo rm -v $GOPATH/bin/bud
+      bash -c "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
 
 open:
-  milestone: https://github.com/pior/dad/milestone/1
+  milestone: https://github.com/devbuddy/devbuddy/milestone/1
