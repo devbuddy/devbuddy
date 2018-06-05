@@ -6,5 +6,6 @@ gometalinter.v2 \
     --deadline=120s \
     --disable=gotype \
     --disable=gas \
+    --enable=gofmt \
     --exclude=".*should have comment or be unexported.*" \
     ./...
