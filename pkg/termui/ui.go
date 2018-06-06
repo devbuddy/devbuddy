@@ -18,13 +18,14 @@ func NewUI(cfg *config.Config) *UI {
 	return &UI{
 		baseUI{
 			out:          os.Stdout,
+			err:          os.Stderr,
 			debugEnabled: cfg.DebugEnabled,
 		},
 	}
 }
 
 func (u *UI) CommandHeader(cmdline string) {
-	fmt.Fprintf(os.Stderr, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
+	fmt.Fprintf(u.err, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
 }
 
 func (u *UI) CommandRun(cmdline string, args ...string) {

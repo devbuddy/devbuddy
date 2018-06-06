@@ -16,7 +16,8 @@ type HookUI struct {
 func NewHookUI(cfg *config.Config) *HookUI {
 	return &HookUI{
 		baseUI{
-			out:          os.Stderr,
+			out:          os.Stdout,
+			err:          os.Stderr,
 			debugEnabled: cfg.DebugEnabled,
 		},
 	}
@@ -25,11 +26,11 @@ func NewHookUI(cfg *config.Config) *HookUI {
 func (u *HookUI) HookFeatureActivated(name string, version string) {
 	msg := color.Sprintf("%s activated.", name)
 	ver := color.Sprintf("(version: %s)", version)
-	fmt.Fprintf(u.out, "🐼  %s %s\n", color.Cyan(msg), color.Blue(ver))
+	fmt.Fprintf(u.err, "🐼  %s %s\n", color.Cyan(msg), color.Blue(ver))
 }
 
 func (u *HookUI) HookFeatureFailure(name string, version string) {
 	msg := color.Sprintf("failed to activate %s. Try running 'bud up' first!", name)
 	ver := color.Sprintf("(version: %s)", version)
-	fmt.Fprintf(u.out, "🐼  %s %s\n", color.Red(msg), color.Brown(ver))
+	fmt.Fprintf(u.err, "🐼  %s %s\n", color.Red(msg), color.Brown(ver))
 }
