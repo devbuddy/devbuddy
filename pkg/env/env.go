@@ -70,7 +70,7 @@ func (e *Env) joinAndSetPath(elems ...string) {
 	e.env["PATH"] = strings.Join(elems, ":")
 }
 
-// PrependToPath inserts a new path at the begining of the PATH variable
+// PrependToPath inserts a new path at the beginning of the PATH variable
 func (e *Env) PrependToPath(path string) {
 	elems := e.getAndSplitPath()
 	elems = append([]string{path}, elems...)
