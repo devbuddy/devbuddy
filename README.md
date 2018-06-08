@@ -131,17 +131,17 @@ Available Commands:
   godoc           Custom: Starting GoDoc server on http://0.0.0.0:6060
   help            Help about any command
   inspect         Inspect the project and its tasks
-  install-dev     Custom: Install dad in the GOROOT
-  install-release Custom: Remove all dad binaries and install a released version
+  install-dev     Custom: Install bud in the GOROOT
+  install-release Custom: Remove all bud binaries and install a released version
   integration     Custom: Run the integration tests
   lint            Custom: Lint the project
   lint-shell      Custom: Lint the shell scripts
   open            Open a link about your project
-  release         Custom: Create a new release (dad release [VERSION])
+  release         Custom: Create a new release (bud release [VERSION])
   test            Custom: Run the unittests
   testup          Custom: Build, install and run the development version
   up              Ensure the project is up and running
-  upgrade         [experimental] Upgrade dad to the latest available release.
+  upgrade         [experimental] Upgrade DevBuddy to the latest available release.
 
 Flags:
   -h, --help              help for bud
