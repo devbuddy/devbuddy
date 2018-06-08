@@ -31,6 +31,13 @@ func noArgs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func zeroOrOneArg(cmd *cobra.Command, args []string) error {
+	if len(args) > 1 {
+		return fmt.Errorf("expecting zero or one argument")
+	}
+	return nil
+}
+
 func checkError(err error) {
 	if err != nil {
 		exitWithMessage(err.Error())
