@@ -135,7 +135,7 @@ The idea is to introduce an indirection that will be easy to document and rememb
 regardless of the programming language used (`rails test`? `pytest -v`? `npm test`? `go test ./...`?).
 
 ```bash
-$ dad lint
+$ bud lint
 🐼  running script/lint
 pkg/project/current.go:14:2:warning: unused variable or constant someVariable declared but not used (varcheck)
 ```
