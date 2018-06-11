@@ -15,20 +15,11 @@ type Homebrew struct {
 
 // NewHomebrew is returning a new Cellar
 func NewHomebrew(env *env.Env) *Homebrew {
-	return NewHomebrewWithPrefix(env, "/usr/local")
+	return &Homebrew{env: env, prefix: "/usr/local"}
 }
 
 // NewHomebrewWithPrefix is returning a new Cellar at prefix
 func NewHomebrewWithPrefix(env *env.Env, prefix string) *Homebrew {
-	if !utils.PathExists(filepath.Join(prefix, "Cellar")) {
-
-		paths := env.GetPathParts()
-
-		if len(paths) > 0 && utils.PathExists(paths[0]) {
-			prefix = filepath.Dir(paths[0])
-		}
-	}
-
 	return &Homebrew{env: env, prefix: prefix}
 }
 
