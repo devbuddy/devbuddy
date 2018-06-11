@@ -64,7 +64,7 @@ func (b *brewInstall) needed(ctx *context) (bool, error) {
 func (b *brewInstall) run(ctx *context) error {
 	cellar := helpers.NewHomebrew(ctx.env)
 
-	if !cellar.PackageIsInstalled(b.formula) {
+	if !cellar.IsInstalled(b.formula) {
 		err := command(ctx, "brew", "install", b.formula)
 
 		if err != nil {

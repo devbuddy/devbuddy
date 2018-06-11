@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPackageIsInCellar(t *testing.T) {
+func TestIsInCellar(t *testing.T) {
 	prefix, err := ioutil.TempDir("/tmp", "dad-brew")
 	require.NoError(t, err, "ioutil.TempDir() failed")
 
@@ -19,6 +19,6 @@ func TestPackageIsInCellar(t *testing.T) {
 
 	h := NewHomebrewWithPrefix(prefix)
 
-	require.Truef(t, h.PackageIsInCellar("curl"), "Curl is missing from Cellar %s", cellarPath)
-	require.Falsef(t, h.PackageIsInCellar("vim"), "Curl is missing from Cellar %s", cellarPath)
+	require.Truef(t, h.IsInCellar("curl"), "Curl is missing from Cellar %s", cellarPath)
+	require.Falsef(t, h.IsInCellar("vim"), "Curl is missing from Cellar %s", cellarPath)
 }
