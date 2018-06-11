@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pior/dad/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
 )
 
 func init() {
@@ -12,7 +12,7 @@ func init() {
 }
 
 type Homebrew struct {
-	files []string
+	formulas []string
 }
 
 func newHomebrew(config *taskConfig) (Task, error) {
@@ -20,14 +20,14 @@ func newHomebrew(config *taskConfig) (Task, error) {
 
 	for _, value := range config.payload.([]interface{}) {
 		if v, ok := value.(string); ok {
-			task.files = append(task.files, v)
+			task.formulas = append(task.formulas, v)
 		} else {
-			return nil, fmt.Errorf("invalid homebrew packages")
+			return nil, fmt.Errorf("invalid homebrew formulas")
 		}
 	}
 
-	if len(task.files) == 0 {
-		return nil, fmt.Errorf("no homebrew packages specified")
+	if len(task.formulas) == 0 {
+		return nil, fmt.Errorf("no homebrew formulas specified")
 	}
 
 	return task, nil
@@ -38,29 +38,40 @@ func (h *Homebrew) name() string {
 }
 
 func (h *Homebrew) header() string {
-	return strings.Join(h.files, ", ")
+	return strings.Join(h.formulas, ", ")
 }
 
-func (h *Homebrew) perform(ctx *Context) error {
-	packageHelper := helpers.NewHomebrew()
-
-	if ctx.env.Os() != "darwin" {
-		return fmt.Errorf("homebrew is only supported on darwin operating system")
+func (h *Homebrew) actions(ctx *context) (actions []taskAction) {
+	for _, f := range h.formulas {
+		actions = append(actions, &brewInstall{formula: f})
 	}
+	return
+}
 
-	for _, file := range h.files {
-		if packageHelper.PackageIsInstalled(file) {
-			continue
-		}
+type brewInstall struct {
+	formula string
+	success bool
+}
 
-		code, err := runCommand(ctx, "brew", "install", file)
+func (b *brewInstall) description() string {
+	return fmt.Sprintf("installing %s", b.formula)
+}
+
+func (b *brewInstall) needed(ctx *context) (bool, error) {
+	return !b.success, nil
+}
+
+func (b *brewInstall) run(ctx *context) error {
+	cellar := helpers.NewHomebrew(ctx.env)
+
+	if !cellar.PackageIsInstalled(b.formula) {
+		err := command(ctx, "brew", "install", b.formula)
+
 		if err != nil {
-			return err
-		}
-
-		if code != 0 {
-			return fmt.Errorf("Homebrew failed with code %d", code)
+			return fmt.Errorf("Homebrew failed: %s", err)
 		}
 	}
+
+	b.success = true
 	return nil
 }

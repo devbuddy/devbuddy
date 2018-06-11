@@ -2,7 +2,6 @@ package env
 
 import (
 	"os"
-	"runtime"
 	"strings"
 )
 
@@ -63,35 +62,32 @@ func (e *Env) Environ() (vars []string) {
 	return vars
 }
 
-// Os returns the current running operating system
-func (e *Env) Os() string {
-	return runtime.GOOS
-}
-
-func (e *Env) getAndSplitPath() []string {
+// Gets paths in PATH environment variable
+func (e *Env) GetPathParts() []string {
 	return strings.Split(e.env["PATH"], ":")
 }
 
-func (e *Env) joinAndSetPath(elems ...string) {
+// Set PATH environment variable
+func (e *Env) SetPathParts(elems ...string) {
 	e.env["PATH"] = strings.Join(elems, ":")
 }
 
 // PrependToPath inserts a new path at the beginning of the PATH variable
 func (e *Env) PrependToPath(path string) {
-	elems := e.getAndSplitPath()
+	elems := e.GetPathParts()
 	elems = append([]string{path}, elems...)
-	e.joinAndSetPath(elems...)
+	e.SetPathParts(elems...)
 }
 
 // RemoveFromPath removes all path entries matching a substring
 func (e *Env) RemoveFromPath(substring string) {
 	newElems := []string{}
-	for _, elem := range e.getAndSplitPath() {
+	for _, elem := range e.GetPathParts() {
 		if !strings.Contains(elem, substring) {
 			newElems = append(newElems, elem)
 		}
 	}
-	e.joinAndSetPath(newElems...)
+	e.SetPathParts(newElems...)
 }
 
 // Changed returns all changes made on the variables

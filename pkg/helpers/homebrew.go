@@ -4,30 +4,32 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pior/dad/pkg/env"
-	"github.com/pior/dad/pkg/utils"
+	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 type Homebrew struct {
+	env    *env.Env
 	prefix string
 }
 
 // NewHomebrew is returning a new Cellar
-func NewHomebrew() *Homebrew {
-	return NewHomebrewWithPrefix("/usr/local")
+func NewHomebrew(env *env.Env) *Homebrew {
+	return NewHomebrewWithPrefix(env, "/usr/local")
 }
 
-func NewHomebrewWithPrefix(prefix string) *Homebrew {
+// NewHomebrewWithPrefix is returning a new Cellar at prefix
+func NewHomebrewWithPrefix(env *env.Env, prefix string) *Homebrew {
 	if !utils.PathExists(filepath.Join(prefix, "Cellar")) {
 
-		path := strings.Split(env.NewFromOS().Get("PATH"), ":")
+		paths := env.GetPathParts()
 
-		if len(path) > 0 && utils.PathExists(path[0]) {
-			prefix = filepath.Dir(path[0])
+		if len(paths) > 0 && utils.PathExists(paths[0]) {
+			prefix = filepath.Dir(paths[0])
 		}
 	}
 
-	return &Homebrew{prefix: prefix}
+	return &Homebrew{env: env, prefix: prefix}
 }
 
 func pathToPackage(filename string) string {
