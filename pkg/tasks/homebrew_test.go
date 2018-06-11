@@ -12,5 +12,5 @@ homebrew:
   - file1
   - file2
 `)
-	require.Equal(t, task.(*Homebrew).files, []string{"file1", "file2"})
+	require.Equal(t, task.(*Homebrew).formulas, []string{"file1", "file2"})
 }
