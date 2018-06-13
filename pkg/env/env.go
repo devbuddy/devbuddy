@@ -62,12 +62,12 @@ func (e *Env) Environ() (vars []string) {
 	return vars
 }
 
-// Gets paths in PATH environment variable
+// GetPathParts gets paths in PATH environment variable
 func (e *Env) GetPathParts() []string {
 	return strings.Split(e.env["PATH"], ":")
 }
 
-// Set PATH environment variable
+// SetPathParts set PATH environment variable
 func (e *Env) SetPathParts(elems ...string) {
 	e.env["PATH"] = strings.Join(elems, ":")
 }
