@@ -28,9 +28,7 @@ jobs:
           command: |
             DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install zsh
       - run:
-          command: script/integration_test
-          environment:
-            TERM: dumb
+          command: pytest -vv tests
 
   lint:
     docker:
