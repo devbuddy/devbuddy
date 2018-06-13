@@ -19,6 +19,6 @@ func TestIsInCellar(t *testing.T) {
 
 	h := NewHomebrewWithPrefix(prefix)
 
-	require.Truef(t, h.IsInCellar("curl"), "Curl is missing from Cellar %s", cellarPath)
-	require.Falsef(t, h.IsInCellar("vim"), "Curl is missing from Cellar %s", cellarPath)
+	require.Truef(t, h.IsInstalled("curl"), "Curl is missing from Cellar %s", cellarPath)
+	require.Falsef(t, h.IsInstalled("vim"), "Curl is missing from Cellar %s", cellarPath)
 }
