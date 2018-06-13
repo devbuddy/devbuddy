@@ -30,10 +30,10 @@ def pexpect_bash(cwd):
 
 def pexpect_zsh(cwd):
     child = pexpect.spawn(
-        'zsh', ['--no-globalrcs', '--no-rcs', '--no-zle'],
+        'zsh', ['--no-globalrcs', '--no-rcs', '--no-zle', '--no-promptcr'],
         echo=False,
         encoding='utf-8',
-        env={'PROMPT': 'ps1', 'TERM': 'dumb'},
+        env={'PROMPT': 'ps1'},
         cwd=cwd,
     )
 
@@ -57,21 +57,18 @@ def shell(workdir, binary_path):
     else:
         raise ValueError('unknown shell: %s' % name)
 
-    p.run_command('PATH={}:$PATH'.format(binary_path))
+    p.run_command('export PATH={}:$PATH'.format(binary_path))
 
     output = p.run_command('which bud')
-    assert '/bud' in output
+    assert str(binary_path) in output
 
     p.run_command('eval "$(bud --shell-init)"')
 
     output = p.run_command('type bud')
     assert 'bud is a shell function' in output
 
-    output = p.run_command('echo $PATH')
-    assert not output
-
     output = p.run_command('bud --version')
-    assert not output
+    assert 'bud version devel' in output
 
     return p
 
