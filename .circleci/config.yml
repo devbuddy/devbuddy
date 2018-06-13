@@ -28,6 +28,8 @@ jobs:
           command: |
             DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install zsh
       - run:
+          command: pip install -r tests/requirements.txt
+      - run:
           command: pytest -vv tests
 
   lint:
