@@ -15,9 +15,13 @@ commands:
     desc: Run the unittests
     run: script/test
 
-  integration:
-    desc: Run the integration tests
-    run: script/integration_test
+  test-bash:
+    desc: Run the integration tests with Bash
+    run: script/integration_test "bash"
+
+  test-zsh:
+    desc: Run the integration tests with Zsh
+    run: script/integration_test "zsh -o shwordsplit"
 
   lint:
     desc: Lint the project

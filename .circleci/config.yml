@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  tests:
+  tests: &base_job
     docker:
       - image: circleci/golang:1.10.2
     working_directory: /go/src/github.com/devbuddy/devbuddy
@@ -9,14 +9,12 @@ jobs:
       - run: dep ensure
       - run: script/test
 
-  integration-tests:
-    docker:
-      - image: circleci/golang:1.10.2
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+  integration-tests-bash:
+    <<: *base_job
     steps:
       - checkout
       - run: dep ensure
-      - run:
+      - run: &step_install_pyenv
           name: Install PyEnv
           command: |
             DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install git make build-essential python-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl
@@ -24,18 +22,28 @@ jobs:
             echo 'export PYENV_ROOT=$HOME/.pyenv' >> $BASH_ENV
             echo 'export PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> $BASH_ENV
       - run:
+          command: script/integration_test "bash"
+          environment:
+            TERM: dumb
+
+  integration-tests-zsh:
+    <<: *base_job
+    steps:
+      - checkout
+      - run: dep ensure
+      - run: *step_install_pyenv
+      - run:
           name: Install Zsh
           command: |
             DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install zsh
       - run:
-          command: script/integration_test
+          # shwordsplit needed because old zsh does not support the -u mode
+          command: script/integration_test "zsh -o shwordsplit"
           environment:
             TERM: dumb
 
   lint:
-    docker:
-      - image: circleci/golang:1.10.2
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+    <<: *base_job
     steps:
       - checkout
       - run: dep ensure
@@ -44,9 +52,7 @@ jobs:
       - run: script/lint
 
   deploy-release:
-    docker:
-      - image: circleci/golang:1.10.2
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+    <<: *base_job
     steps:
       - checkout
       - run: dep ensure
@@ -62,7 +68,11 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - integration-tests:
+      - integration-tests-bash:
+          filters:
+            tags:
+              only: /.*/
+      - integration-tests-zsh:
           filters:
             tags:
               only: /.*/
@@ -71,7 +81,7 @@ workflows:
             tags:
               only: /.*/
       - deploy-release:
-          requires: [tests, integration-tests, lint]
+          requires: [tests, integration-tests-bash, integration-tests-zsh, lint]
           filters:
             branches:
               ignore: /.*/

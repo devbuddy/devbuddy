@@ -48,15 +48,8 @@ run_tests() {
 
 main() {
     setup_environment
-
     cd "$ROOT/tests"
-
-    local exitcode=0
-
-    run_tests "bash" || exitcode=1
-    run_tests "zsh -o shwordsplit" || exitcode=1
-
-    exit $exitcode
+    run_tests "$1"
 }
 
-main
+main "$1"
