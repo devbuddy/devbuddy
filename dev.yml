@@ -2,7 +2,7 @@ up:
   - go: 1.10.1
   - golang_dep
   - python: 3.6.5
-  - pipfile
+  - pip: [tests/requirements.txt]
   - custom:
       name: Install shellcheck
       met?: test -e /usr/local/Cellar/shellcheck
