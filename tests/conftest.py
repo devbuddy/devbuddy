@@ -13,7 +13,19 @@ def binary_path(tmpdir_factory):
 
 @pytest.fixture(scope='session', autouse=True)
 def binary(binary_path):
-    subprocess.run('go build -o {}/bud'.format(binary_path), shell=True, check=True)
+    project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+
+    proc = subprocess.run(
+        'go build -o {}/bud'.format(binary_path),
+        shell=True,
+        cwd=project_path,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if proc.returncode:
+        raise RuntimeError(
+            "Failed to build binary to use in tests:\nstdout: %s\nstderr: %s" % (proc.stdout, proc.stderr)
+        )
 
 
 @pytest.fixture(scope='module')
@@ -79,7 +91,7 @@ def shell(workdir, binary_path, request):
 @pytest.fixture
 def make_test_repo(request):
     def func(name):
-        path = os.path.expanduser('~/src/github.com/devbuddy_integration_tests/%s' % name)
+        path = os.path.expanduser('~/src/github.com/%s' % name)
 
         if os.path.exists(path):
             shutil.rmtree(path)
