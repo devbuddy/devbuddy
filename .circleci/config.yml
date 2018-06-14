@@ -16,25 +16,12 @@ jobs:
     steps:
       - checkout
       - run: dep ensure
-      - run:
-          name: Install debian packages
-          command: |
-            DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install \
-              git make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl zsh
-      - run:
-          name: Install PyEnv
-          command: |
-            curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash && \
-            ~/.pyenv/bin/pyenv init - >> $BASH_ENV
-      - run:
-          name: Install Python
-          command: |
-            pyenv install 3.6.5
-            pyenv global 3.6.5
-            pip install -U pip setuptools
-            pip install -r tests/requirements.txt
-      - run:
-          command: pytest -v tests
+      - run: DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install git make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl zsh
+      - run: curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+      - run: ~/.pyenv/bin/pyenv init -
+      - run: pyenv install 3.6.5 && pyenv global 3.6.5
+      - run: pip install -U pip setuptools && pip install -r tests/requirements.txt
+      - run: pytest -v tests
 
   lint:
     docker:
