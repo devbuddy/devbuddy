@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers/open"
@@ -14,6 +16,10 @@ var openCmd = &cobra.Command{
 	Args:  zeroOrOneArg,
 }
 
+func init() {
+	openCmd.Flags().Bool("list", false, "List available project's URLs")
+}
+
 func openRun(cmd *cobra.Command, args []string) {
 	linkName := ""
 	if len(args) == 1 {
@@ -22,6 +28,12 @@ func openRun(cmd *cobra.Command, args []string) {
 
 	proj, err := project.FindCurrent()
 	checkError(err)
+
+	if GetFlagBool(cmd, "list") {
+		err = open.PrintLinks(proj)
+		checkError(err)
+		os.Exit(0)
+	}
 
 	url, err := open.FindLink(proj, linkName)
 	checkError(err)

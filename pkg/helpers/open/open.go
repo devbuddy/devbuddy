@@ -7,6 +7,8 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/project"
+
+	color "github.com/logrusorgru/aurora"
 )
 
 // Open a file or URL with the default application, return immediately.
@@ -50,4 +52,15 @@ func FindLink(proj *project.Project, linkName string) (url string, err error) {
 	}
 
 	return
+}
+
+func PrintLinks(proj *project.Project) (err error) {
+	if len(proj.Manifest.Open) == 0 {
+		return fmt.Errorf("no links found in the project")
+	}
+	for title, url := range proj.Manifest.Open {
+		fmt.Println(color.Green(title), "\t", url)
+	}
+
+	return nil
 }
