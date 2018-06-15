@@ -41,7 +41,9 @@ func FindLink(proj *project.Project, linkName string) (url string, err error) {
 		return "", fmt.Errorf("which link should I open?")
 	}
 
-	url = man.Open[linkName]
+	link := project.FindBestLinkMatch(linkName, BuildIndex(man.Open))
+	url = man.Open[link]
+
 	if url != "" {
 		return
 	}
@@ -74,4 +76,14 @@ func PrintLinks(proj *project.Project) (err error) {
 	}
 
 	return nil
+}
+
+func BuildIndex(links map[string]string) []string {
+	var index []string
+
+	for key := range links {
+		index = append(index, key)
+	}
+
+	return index
 }

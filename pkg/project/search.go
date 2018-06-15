@@ -29,6 +29,15 @@ func FindBestMatch(expr string, conf *config.Config) (found *Project, err error)
 	return
 }
 
+func FindBestLinkMatch(expr string, index []string) string {
+	matches := fuzzy.Find(expr, index)
+	if matches.Len() >= 1 {
+		return matches[0].Str
+	}
+
+	return ""
+}
+
 func projectMatch(expr string, projects []*Project) *Project {
 	// First, try to match on project name only
 	names := []string{}
