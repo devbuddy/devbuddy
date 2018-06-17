@@ -8,45 +8,52 @@ def project(cmd, project_factory):
     return p
 
 
-def test_should_run(cmd, project):
+def test_command(cmd, project):
     project.write_devyml("""
-        up:
-        - custom:
-            name: TestCustom
-            met?: test -e sentinel
-            meet: touch sentinel
+        commands:
+          mycmd:
+            run: touch somefile
+    """)
+    cmd.run("bud mycmd")
+    project.assert_file('somefile')
+
+
+def test_run_in_project_dir(cmd, project):
+    project.write_devyml("""
+        commands:
+          mycmd:
+            run: touch somefile
+    """)
+    cmd.run('mkdir subdir')
+    cmd.run('cd subdir')
+    cmd.run("bud mycmd")
+    project.assert_file('somefile')
+
+
+def test_exit_code(cmd, project):
+    project.write_devyml("""
+        commands:
+          success:
+            run: 'true'
+          failure:
+            run: 'false'
     """)
 
-    cmd.run('bud up')
-    project.assert_file("sentinel")
+    cmd.run("bud success")
+    cmd.assert_succeed()
 
-
-def test_should_not_run(cmd, project):
-    project.write_devyml("""
-        up:
-        - custom:
-            name: TestCustom
-            met?: 'true'
-            meet: touch sentinel
-    """)
-
-    cmd.run("bud up")
-    project.assert_file("sentinel", present=False)
-
-
-def test_should_run_and_fail(cmd, project):
-    project.write_devyml("""
-        up:
-        - custom:
-            name: TestCustom
-            met?: 'false'
-            meet: 'false'
-    """)
-
-    output = cmd.run("bud up")
+    cmd.run("bud failure")
     cmd.assert_failed()
 
-    assert 'command failed' in output
 
+def test_with_arguments(cmd, project):
+    project.write_devyml("""
+        commands:
+          mycmd:
+            run: echo PREFIX
+    """)
+    output = cmd.run("bud mycmd ARG1 ARG2")
+    lines = [l for l in output.splitlines() if not l.startswith("🐼")]
+    assert ["PREFIX ARG1 ARG2"] == lines
 
 
