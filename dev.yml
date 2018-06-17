@@ -18,8 +18,12 @@ commands:
     run: script/test
 
   integration:
-    desc: Run the integration tests
+    desc: Run the integration tests with Bash
     run: pytest -v tests
+
+  integration-zsh:
+    desc: Run the integration tests with Zsh
+    run: pytest --shell zsh -v tests
 
   lint:
     desc: Lint the project

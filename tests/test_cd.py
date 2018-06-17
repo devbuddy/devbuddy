@@ -1,37 +1,36 @@
 import pytest
 
 
-def test_find_project(shell, make_test_repo):
-    path_1 = make_test_repo('devbuddy_tests/project')
-    path_2 = make_test_repo('devbuddy_tests/project2')
+def test_find_project(cmd, project_factory):
+    project_1 = project_factory('devbuddy_tests', 'project')
+    project_2 = project_factory('devbuddy_tests', 'project2')
 
     tests = {
-        'devbuddy_tests/project': path_1,
-        'devbuddy_tests/project2': path_2,
+        'devbuddy_tests/project': project_1.path,
+        'devbuddy_tests/project2': project_2.path,
 
-        'devbuddyproject': path_1,
-        'devbuddyproject2': path_2,
+        'devbuddyproject': project_1.path,
+        'devbuddyproject2': project_2.path,
 
-        'proj': path_1,
+        'proj': project_1.path,
 
-        'pro2': path_2,
+        'pro2': project_2.path,
 
-        'dtp': path_1,
-        'dtp2': path_2,
+        'dtp': project_1.path,
+        'dtp2': project_2.path,
     }
 
     for arg, path in tests.items():
-        shell.run_command('bud cd %s' % arg)
+        cmd.run('bud cd %s' % arg)
 
-        output = shell.run_command('pwd')
+        output = cmd.run('pwd')
         found = output.strip()
         assert found == path, "'%s' should match project '%s', not '%s'" % (arg, path, found)
 
 
-def test_ui(shell, make_test_repo):
-    name = 'devbuddy_tests/repo'
-    make_test_repo(name)
+def test_ui(cmd, project_factory):
+    project_factory('devbuddy_tests', 'repo')
 
-    output = shell.run_command('bud cd %s' % name)
+    output = cmd.run('bud cd devbuddy_tests/repo')
     assert 'jumping to' in output
-    assert name in output
+    assert 'devbuddy_tests/repo' in output
