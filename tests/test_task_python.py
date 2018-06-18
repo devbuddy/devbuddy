@@ -1,0 +1,14 @@
+
+def test_task(cmd, project):
+    project.write_devyml("""
+        up:
+        - python: 3.6.3
+    """)
+
+    cmd.run("bud up")
+
+    output = cmd.run("python --version")
+    assert output == "Python 3.6.3"
+
+    output = cmd.run("python -c 'import sys; print(sys.prefix)'")
+    assert "/.local/share/bud/virtualenvs/" in output, "the virtualenv is not properly activated"

@@ -1,4 +1,5 @@
 import os
+import random
 import shutil
 import subprocess
 import textwrap
@@ -163,6 +164,6 @@ def project_factory(request):
 
 @pytest.fixture
 def project(cmd, project_factory):
-    p = project_factory('devbuddy_tests', 'poipoi')
+    p = project_factory('devbuddy_tests', 'test_%s' % random.randrange(10e6))
     cmd.run(f"cd {p.path}")
     return p
