@@ -71,7 +71,13 @@ class CommandTestHelper:
         self._pexpect_wrapper = pexpect_wrapper
 
     def run(self, command):
-        return self._pexpect_wrapper.run_command(command).strip()
+        output = self._pexpect_wrapper.run_command(command).strip()
+
+        error_lines = [l for l in output.splitlines() if 'failed to activate ' in l]
+        if error_lines:
+            pytest.fail(f"Failed to activate features:\n%s" % error_lines)
+
+        return output
 
     def get_exit_code(self):
         return int(self.run("echo $?"))
@@ -153,3 +159,10 @@ def project_factory(request):
         return project
 
     return func
+
+
+@pytest.fixture
+def project(cmd, project_factory):
+    p = project_factory('devbuddy_tests', 'poipoi')
+    cmd.run(f"cd {p.path}")
+    return p

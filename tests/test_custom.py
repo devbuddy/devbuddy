@@ -1,12 +1,3 @@
-import pytest
-
-
-@pytest.fixture
-def project(cmd, project_factory):
-    p = project_factory('devbuddy_tests', 'poipoi')
-    cmd.run(f"cd {p.path}")
-    return p
-
 
 def test_command(cmd, project):
     project.write_devyml("""
