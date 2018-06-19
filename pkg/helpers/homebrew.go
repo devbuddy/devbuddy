@@ -46,8 +46,13 @@ func (h *Homebrew) IsInstalled(formula string) (installed bool) {
 	return h.cellar.IsInstalled(path) || h.caskroom.IsInstalled(path)
 }
 
-func buildFormulaPath(filename string) string {
-	results := strings.Split(filename, "/")
+// buildFormulaPath building a formula name from a full path by doing the following operations:
+// 1. split the path by `/`
+// 2. returns the filename
+// 3. removes the file extension
+// 4. returns the resulting formula name
+func buildFormulaPath(path string) string {
+	results := strings.Split(path, "/")
 	formula := results[len(results)-1]
 	return strings.TrimSuffix(formula, filepath.Ext(formula))
 }
