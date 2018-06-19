@@ -43,7 +43,7 @@ func NewHomebrewWithPrefix(prefix string) *Homebrew {
 func (h *Homebrew) IsInstalled(formula string) (installed bool) {
 	path := buildFormulaPath(formula)
 
-	return h.cellar.IsInstalled(path) || h.caskroom.IsInstalled(path)
+	return h.cellar.isInstalled(path) || h.caskroom.isInstalled(path)
 }
 
 // buildFormulaPath building a formula name from a full path by doing the following operations:
@@ -57,8 +57,8 @@ func buildFormulaPath(path string) string {
 	return strings.TrimSuffix(formula, filepath.Ext(formula))
 }
 
-// IsInstalled returns true if formulua was installed in Caskrook
-func (c *caskroom) IsInstalled(formula string) bool {
+// isInstalled returns true if formulua was installed in Caskrook
+func (c *caskroom) isInstalled(formula string) bool {
 	path := "/opt/homebrew-cask/Caskroom"
 
 	if !utils.PathExists(path) {
@@ -68,8 +68,8 @@ func (c *caskroom) IsInstalled(formula string) bool {
 	return utils.PathExists(filepath.Join(path, formula))
 }
 
-// IsInstalled returns true if formulua was installed in cellar
-func (c *cellar) IsInstalled(formula string) bool {
+// isInstalled returns true if formulua was installed in cellar
+func (c *cellar) isInstalled(formula string) bool {
 	path := filepath.Join(c.prefix, "Cellar")
 
 	path = filepath.Join(path, formula)
