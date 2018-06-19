@@ -65,7 +65,7 @@ func (b *brewInstall) run(ctx *context) error {
 	brew := helpers.NewHomebrew()
 
 	if !brew.IsInstalled(b.formula) {
-		err := command(ctx, "brew", "install", b.formula).AddOutputFilter("already satisfied").Run()
+		err := command(ctx, "brew", "install", b.formula).Run()
 
 		if err != nil {
 			return fmt.Errorf("Homebrew failed: %s", err)
