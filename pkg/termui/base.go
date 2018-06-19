@@ -9,12 +9,13 @@ import (
 
 type baseUI struct {
 	out          *os.File
+	err          *os.File
 	debugEnabled bool
 }
 
 func (u *baseUI) Debug(format string, params ...interface{}) {
 	if u.debugEnabled {
 		msg := fmt.Sprintf(format, params...)
-		fmt.Fprintf(u.out, "BUD_DEBUG: %s\n", color.Gray(msg))
+		fmt.Fprintf(u.err, "BUD_DEBUG: %s\n", color.Gray(msg))
 	}
 }
