@@ -58,19 +58,20 @@ func (b *brewInstall) description() string {
 }
 
 func (b *brewInstall) needed(ctx *context) (bool, error) {
-	return !b.success, nil
+	brew := helpers.NewHomebrew()
+
+	installed := brew.IsInstalled(b.formula)
+
+	return !installed, nil
 }
 
 func (b *brewInstall) run(ctx *context) error {
-	brew := helpers.NewHomebrew()
+	err := command(ctx, "brew", "install", b.formula).Run()
 
-	if !brew.IsInstalled(b.formula) {
-		err := command(ctx, "brew", "install", b.formula).Run()
-
-		if err != nil {
-			return fmt.Errorf("Homebrew failed: %s", err)
-		}
+	if err != nil {
+		return fmt.Errorf("Homebrew failed: %s", err)
 	}
+
 	b.success = true
 	return nil
 }
