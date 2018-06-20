@@ -54,3 +54,17 @@ func TestFindLinkGithub(t *testing.T) {
 		require.Equal(t, expectedURL, url)
 	}
 }
+
+func TestPrintLinks(t *testing.T) {
+	open := map[string]string{}
+	proj := &project.Project{Manifest: &manifest.Manifest{Open: open}}
+
+	err := PrintLinks(proj)
+	require.Error(t, err)
+
+	open = map[string]string{"doc": "http://doc.com"}
+	proj = &project.Project{Manifest: &manifest.Manifest{Open: open}}
+
+	err = PrintLinks(proj)
+	require.NoError(t, err)
+}
