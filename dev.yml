@@ -60,5 +60,9 @@ commands:
       [ -e "$GOPATH/bin/bud" ] && sudo rm -v $GOPATH/bin/bud
       bash -c "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
 
+  build:
+    desc: Build all bud binaries
+    run: script/buildall
+
 open:
   milestone: https://github.com/devbuddy/devbuddy/milestone/1
