@@ -18,4 +18,5 @@ vendor
 __pycache__
 
 bud
+devbuddy
 dist/

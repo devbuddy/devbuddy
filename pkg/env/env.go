@@ -62,30 +62,22 @@ func (e *Env) Environ() (vars []string) {
 	return vars
 }
 
-func (e *Env) getAndSplitPath() []string {
-	return strings.Split(e.env["PATH"], ":")
-}
-
-func (e *Env) joinAndSetPath(elems ...string) {
-	e.env["PATH"] = strings.Join(elems, ":")
-}
-
 // PrependToPath inserts a new path at the beginning of the PATH variable
 func (e *Env) PrependToPath(path string) {
-	elems := e.getAndSplitPath()
+	elems := e.getPathParts()
 	elems = append([]string{path}, elems...)
-	e.joinAndSetPath(elems...)
+	e.setPathParts(elems...)
 }
 
 // RemoveFromPath removes all path entries matching a substring
 func (e *Env) RemoveFromPath(substring string) {
 	newElems := []string{}
-	for _, elem := range e.getAndSplitPath() {
+	for _, elem := range e.getPathParts() {
 		if !strings.Contains(elem, substring) {
 			newElems = append(newElems, elem)
 		}
 	}
-	e.joinAndSetPath(newElems...)
+	e.setPathParts(newElems...)
 }
 
 // Changed returns all changes made on the variables
@@ -103,4 +95,12 @@ func (e *Env) Changed() []VariableChange {
 		}
 	}
 	return c
+}
+
+func (e *Env) getPathParts() []string {
+	return strings.Split(e.env["PATH"], ":")
+}
+
+func (e *Env) setPathParts(elems ...string) {
+	e.env["PATH"] = strings.Join(elems, ":")
 }

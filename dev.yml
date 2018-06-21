@@ -3,6 +3,8 @@ up:
   - golang_dep
   - python: 3.6.5
   - pip: [tests/requirements.txt]
+  - homebrew:
+    - curl
   - custom:
       name: Install shellcheck
       met?: test -e /usr/local/Cellar/shellcheck
