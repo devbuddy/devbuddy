@@ -1,6 +1,8 @@
 up:
   - go: 1.10.1
   - golang_dep
+  - python: 3.6.5
+  - pip: [tests/requirements.txt]
   - homebrew:
     - curl
   - custom:
@@ -18,8 +20,12 @@ commands:
     run: script/test
 
   integration:
-    desc: Run the integration tests
-    run: script/integration_test
+    desc: Run the integration tests with Bash
+    run: pytest -v tests
+
+  integration-zsh:
+    desc: Run the integration tests with Zsh
+    run: pytest --shell zsh -v tests
 
   lint:
     desc: Lint the project
@@ -27,11 +33,11 @@ commands:
 
   lint-shell:
     desc: Lint the shell scripts
-    run: shellcheck script/* tests/*.sh
+    run: shellcheck script/*
 
   ci:
     desc: Run all tests as CI would do
-    run: script/test && script/integration_test && script/lint
+    run: script/test && pytest -v tests && script/lint
 
   release:
     desc: Create a new release (bud release [VERSION])

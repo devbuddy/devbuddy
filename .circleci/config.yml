@@ -16,21 +16,15 @@ jobs:
     steps:
       - checkout
       - run: dep ensure
-      - run:
-          name: Install PyEnv
-          command: |
-            DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install git make build-essential python-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl
-            git clone git://github.com/yyuu/pyenv.git ~/.pyenv
-            echo 'export PYENV_ROOT=$HOME/.pyenv' >> $BASH_ENV
-            echo 'export PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> $BASH_ENV
-      - run:
-          name: Install Zsh
-          command: |
-            DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install zsh
-      - run:
-          command: script/integration_test
-          environment:
-            TERM: dumb
+      - run: DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install git make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl zsh
+      - run: |
+          curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash && \
+          echo 'export PATH="/home/circleci/.pyenv/bin:$PATH"' >> $BASH_ENV && \
+          echo 'export PATH="/home/circleci/.pyenv/shims:${PATH}"' >> $BASH_ENV
+      - run: pyenv install 3.6.5 && pyenv global 3.6.5
+      - run: pip install -U pip setuptools && pip install -r tests/requirements.txt
+      - run: pytest --durations=1 -v tests
+      # - run: pytest --durations=1 --shell zsh -v tests
 
   lint:
     docker:
