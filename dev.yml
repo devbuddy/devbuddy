@@ -50,7 +50,7 @@ commands:
   install-dev:
     desc: Install bud in the GOROOT
     run: |
-      go install -ldflags "-X main.Version=$(git describe --tags --dirty --always)"
+      go build -ldflags "-X main.Version=$(git describe --tags --dirty --always)" -o $GOPATH/bin/bud
       [ -e "/usr/local/bin/bud" ] && sudo rm /usr/local/bin/bud || true
 
   install-release:
