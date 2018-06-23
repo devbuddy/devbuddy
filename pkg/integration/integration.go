@@ -8,6 +8,7 @@ import (
 	color "github.com/logrusorgru/aurora"
 )
 
+// Print prints the integration code for the user's shell
 func Print() {
 	var currentShell = os.Getenv("SHELL")
 
@@ -25,6 +26,7 @@ func Print() {
 	}
 }
 
+// AddFinalizerCd declares a "cd" finalizer (change directory)
 func AddFinalizerCd(path string) error {
 	return addFinalizer("cd", path)
 }
@@ -39,7 +41,11 @@ func addFinalizer(action, arg string) (err error) {
 		return nil
 	}
 
-	f, err := os.OpenFile(finalizerPath, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	return writeFile(finalizerPath, content)
+}
+
+func writeFile(path string, content string) (err error) {
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
 		return
 	}
