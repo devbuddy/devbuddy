@@ -1,7 +1,6 @@
 package store
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,7 +12,12 @@ import (
 )
 
 func touch(t *testing.T, path string) {
-	err := ioutil.WriteFile(path, []byte(""), 0644)
+	f, err := os.OpenFile(path, os.O_RDONLY|os.O_CREATE, 0644)
+	require.NoError(t, err)
+	require.NoError(t, f.Close())
+
+	now := time.Now()
+	err = os.Chtimes(path, now, now)
 	require.NoError(t, err)
 }
 
@@ -58,26 +62,7 @@ func TestRecord(t *testing.T) {
 
 	require.False(t, s.HasFileChanged("testfile"))
 
-	time.Sleep(100 * time.Millisecond)
+	// time.Sleep(100 * time.Millisecond)
 	touch(t, path)
 	require.True(t, s.HasFileChanged("testfile"))
-}
-
-func TestMtimeProperties(t *testing.T) {
-	defer filet.CleanUp(t)
-	tmpdir := filet.TmpDir(t, "")
-
-	test1 := filepath.Join(tmpdir, "test1")
-	test2 := filepath.Join(tmpdir, "test2")
-
-	ioutil.WriteFile(test1, []byte(""), 0644)
-	// time.Sleep(0)
-	ioutil.WriteFile(test2, []byte(""), 0644)
-
-	info1, err := os.Stat(test1)
-	require.NoError(t, err)
-	info2, err := os.Stat(test2)
-	require.NoError(t, err)
-
-	require.NotEqual(t, info1.ModTime(), info2.ModTime())
 }
