@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -56,6 +57,7 @@ func TestRecord(t *testing.T) {
 
 	require.False(t, s.HasFileChanged("testfile"))
 
+	time.Sleep(100 * time.Millisecond)
 	touch(t, path)
 	require.True(t, s.HasFileChanged("testfile"))
 }
