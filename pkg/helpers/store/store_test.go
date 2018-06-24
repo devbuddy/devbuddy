@@ -56,7 +56,6 @@ func TestRecord(t *testing.T) {
 
 	require.False(t, s.HasFileChanged("testfile"))
 
-	// time.Sleep(100 * time.Millisecond)
 	touchNow(t, path)
 	require.True(t, s.HasFileChanged("testfile"))
 }
