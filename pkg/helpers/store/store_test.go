@@ -2,6 +2,7 @@ package store
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -60,4 +61,23 @@ func TestRecord(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 	touch(t, path)
 	require.True(t, s.HasFileChanged("testfile"))
+}
+
+func TestMtimeProperties(t *testing.T) {
+	defer filet.CleanUp(t)
+	tmpdir := filet.TmpDir(t, "")
+
+	test1 := filepath.Join(tmpdir, "test1")
+	test2 := filepath.Join(tmpdir, "test2")
+
+	ioutil.WriteFile(test1, []byte(""), 0644)
+	// time.Sleep(0)
+	ioutil.WriteFile(test2, []byte(""), 0644)
+
+	info1, err := os.Stat(test1)
+	require.NoError(t, err)
+	info2, err := os.Stat(test2)
+	require.NoError(t, err)
+
+	require.NotEqual(t, info1.ModTime(), info2.ModTime())
 }
