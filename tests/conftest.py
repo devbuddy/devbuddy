@@ -40,7 +40,14 @@ def binary(binary_path):
 
 
 def build_pexpect_bash(workdir):
-    child = pexpect.spawn('bash', ['--norc', '--noprofile'], echo=False, encoding='utf-8', cwd=str(workdir))
+    child = pexpect.spawn(
+        'bash',
+        ['--norc', '--noprofile'],
+        echo=False,
+        encoding='utf-8',
+        cwd=str(workdir),
+        timeout=120,
+    )
 
     # If the user runs 'env', the value of PS1 will be in the output. To avoid
     # replwrap seeing that as the next prompt, we'll embed the marker characters
@@ -60,6 +67,7 @@ def build_pexpect_zsh(workdir):
         encoding='utf-8',
         env={'PROMPT': 'ps1'},
         cwd=str(workdir),
+        timeout=120,
     )
 
     return pexpect.replwrap.REPLWrapper(
