@@ -1,7 +1,6 @@
 package store
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -11,14 +10,9 @@ import (
 	"github.com/Flaque/filet"
 )
 
-func touch(t *testing.T, path string) {
-	f, err := os.OpenFile(path, os.O_RDONLY|os.O_CREATE, 0644)
-	require.NoError(t, err)
-	require.NoError(t, f.Close())
-
+func touchNow(t *testing.T, path string) {
 	now := time.Now()
-	err = os.Chtimes(path, now, now)
-	require.NoError(t, err)
+	require.NoError(t, touch(path, now, now))
 }
 
 func TestWithoutFile(t *testing.T) {
@@ -35,7 +29,7 @@ func TestFirstTime(t *testing.T) {
 	s := New(tmpdir)
 
 	path := filepath.Join(tmpdir, "testfile")
-	touch(t, path)
+	touchNow(t, path)
 
 	require.True(t, s.HasFileChanged("testfile"))
 }
@@ -55,7 +49,7 @@ func TestRecord(t *testing.T) {
 	s := New(tmpdir)
 
 	path := filepath.Join(tmpdir, "testfile")
-	touch(t, path)
+	touchNow(t, path)
 
 	err := s.RecordFileChange("testfile")
 	require.NoError(t, err)
@@ -63,6 +57,6 @@ func TestRecord(t *testing.T) {
 	require.False(t, s.HasFileChanged("testfile"))
 
 	// time.Sleep(100 * time.Millisecond)
-	touch(t, path)
+	touchNow(t, path)
 	require.True(t, s.HasFileChanged("testfile"))
 }
