@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/devbuddy/devbuddy/pkg/utils"
 	"github.com/stretchr/testify/require"
 
 	"github.com/Flaque/filet"
@@ -12,7 +13,7 @@ import (
 
 func touchNow(t *testing.T, path string) {
 	now := time.Now()
-	require.NoError(t, touch(path, now, now))
+	require.NoError(t, utils.Touch(path, now, now))
 }
 
 func TestWithoutFile(t *testing.T) {

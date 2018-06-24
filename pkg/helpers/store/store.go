@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
@@ -53,19 +52,6 @@ func makeKeyFromPath(path string) string {
 	return strings.Replace(path, string(filepath.Separator), "--", -1)
 }
 
-func touch(path string, atime, mtime time.Time) error {
-	f, err := os.OpenFile(path, os.O_RDONLY|os.O_CREATE, 0644)
-	if err != nil {
-		return err
-	}
-	err = f.Close()
-	if err != nil {
-		return err
-	}
-
-	return os.Chtimes(path, atime, mtime)
-}
-
 // RecordFileChange stores the modification time of a file.
 func (s *Store) RecordFileChange(path string) error {
 	err := s.ensureInit()
@@ -79,7 +65,7 @@ func (s *Store) RecordFileChange(path string) error {
 	}
 
 	stateFilePath := s.stateFilePath("mtime", makeKeyFromPath(path))
-	return touch(stateFilePath, info.ModTime(), info.ModTime())
+	return utils.Touch(stateFilePath, info.ModTime(), info.ModTime())
 }
 
 // HasFileChanged detects whether a path has changed since the last call to RecordFileChange().
