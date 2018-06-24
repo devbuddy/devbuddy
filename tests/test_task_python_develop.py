@@ -14,7 +14,7 @@ def make_setuppy(version):
 def test_with_modification(cmd, project):
     project.write_devyml("""
         up:
-        - python: 3.6.3
+        - python: 3.6.5
         - python_develop
     """)
 
@@ -34,7 +34,7 @@ def test_with_modification(cmd, project):
 def test_without_modification(cmd, project):
     project.write_devyml("""
         up:
-        - python: 3.6.3
+        - python: 3.6.5
         - python_develop
     """)
 
