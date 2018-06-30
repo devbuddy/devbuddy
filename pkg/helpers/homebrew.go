@@ -23,12 +23,7 @@ type Homebrew struct {
 
 // NewHomebrew is returning a new Cellar
 func NewHomebrew() *Homebrew {
-	prefix := "/usr/local"
-
-	return &Homebrew{
-		cellar:   &cellar{prefix: prefix},
-		caskroom: &caskroom{prefix: prefix},
-	}
+	return NewHomebrewWithPrefix("/usr/local")
 }
 
 // NewHomebrewWithPrefix is returning a new Cellar at prefix
@@ -59,19 +54,13 @@ func buildFormulaPath(path string) string {
 
 // isInstalled returns true if formulua was installed in Caskrook
 func (c *caskroom) isInstalled(formula string) bool {
-	path := "/opt/homebrew-cask/Caskroom"
+	legacyPrefix := "/opt/homebrew-cask"
 
-	if !utils.PathExists(path) {
-		path = filepath.Join(c.prefix, "Caskroom")
-	}
-
-	return utils.PathExists(filepath.Join(path, formula))
+	return utils.PathExists(filepath.Join(legacyPrefix, "Caskroom", formula)) ||
+		utils.PathExists(filepath.Join(c.prefix, "Caskroom", formula))
 }
 
 // isInstalled returns true if formulua was installed in cellar
 func (c *cellar) isInstalled(formula string) bool {
-	path := filepath.Join(c.prefix, "Cellar")
-
-	path = filepath.Join(path, formula)
-	return utils.PathExists(path)
+	return utils.PathExists(filepath.Join(c.prefix, "Cellar", formula))
 }
