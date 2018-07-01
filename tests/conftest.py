@@ -13,6 +13,11 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope='session')
+def workdir(tmpdir_factory):
+    return tmpdir_factory.mktemp("workdir")
+
+
+@pytest.fixture(scope='session')
 def binary_path(tmpdir_factory):
     return tmpdir_factory.mktemp("bin")
 
@@ -34,8 +39,8 @@ def binary(binary_path):
         )
 
 
-def build_pexpect_bash():
-    child = pexpect.spawn('bash', ['--norc', '--noprofile'], echo=False, encoding='utf-8')
+def build_pexpect_bash(workdir):
+    child = pexpect.spawn('bash', ['--norc', '--noprofile'], echo=False, encoding='utf-8', cwd=str(workdir))
 
     # If the user runs 'env', the value of PS1 will be in the output. To avoid
     # replwrap seeing that as the next prompt, we'll embed the marker characters
@@ -48,12 +53,13 @@ def build_pexpect_bash():
     return pexpect.replwrap.REPLWrapper(child, u'\\$', prompt_change, extra_init_cmd="export PAGER=cat")
 
 
-def build_pexpect_zsh():
+def build_pexpect_zsh(workdir):
     child = pexpect.spawn(
         'zsh', ['--no-globalrcs', '--no-rcs', '--no-zle', '--no-promptcr'],
         echo=False,
         encoding='utf-8',
         env={'PROMPT': 'ps1'},
+        cwd=str(workdir),
     )
 
     return pexpect.replwrap.REPLWrapper(
@@ -93,11 +99,11 @@ class CommandTestHelper:
 
 
 @pytest.fixture(scope='session')
-def cmd(binary_path, request):
+def cmd(binary_path, workdir, request):
     shell_name = request.config.getoption("--shell")
 
     build_pexpect_shell = PEXPECT_SHELLS[shell_name]
-    pexpect_wrapper = build_pexpect_shell()
+    pexpect_wrapper = build_pexpect_shell(workdir)
 
     pexpect_wrapper.run_command('export PATH={}:$PATH'.format(binary_path))
 
