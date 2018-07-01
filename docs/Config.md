@@ -49,6 +49,18 @@ up:
   - python: 3.6.5
 ```
 
+### `python_develop`
+
+This task will install the Python project in development mode (`pip install -e .`).
+
+This task runs if `setup.py` has changed since the last `bud up`.
+
+
+```yaml
+up:
+  - python_develop
+```
+
 ### `pip`
 
 This task will install a pip requirements file.
