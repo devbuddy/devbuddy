@@ -58,6 +58,7 @@ This task runs if `setup.py` has changed since the last `bud up`.
 
 ```yaml
 up:
+  - python: 3.6.5
   - python_develop
 ```
 
