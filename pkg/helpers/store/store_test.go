@@ -3,25 +3,20 @@ package store
 import (
 	"path/filepath"
 	"testing"
-	"time"
 
-	"github.com/devbuddy/devbuddy/pkg/utils"
 	"github.com/stretchr/testify/require"
 
 	"github.com/Flaque/filet"
 )
-
-func touchNow(t *testing.T, path string) {
-	now := time.Now()
-	require.NoError(t, utils.Touch(path, now, now))
-}
 
 func TestWithoutFile(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
 	s := New(tmpdir)
 
-	require.True(t, s.HasFileChanged("testfile"))
+	result, err := s.HasFileChanged("testfile")
+	require.NoError(t, err)
+	require.True(t, result)
 }
 
 func TestFirstTime(t *testing.T) {
@@ -29,10 +24,11 @@ func TestFirstTime(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	s := New(tmpdir)
 
-	path := filepath.Join(tmpdir, "testfile")
-	touchNow(t, path)
+	filet.File(t, filepath.Join(tmpdir, "testfile"), "some-value")
 
-	require.True(t, s.HasFileChanged("testfile"))
+	result, err := s.HasFileChanged("testfile")
+	require.NoError(t, err)
+	require.True(t, result)
 }
 
 func TestRecordWithoutFile(t *testing.T) {
@@ -49,14 +45,18 @@ func TestRecord(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	s := New(tmpdir)
 
-	path := filepath.Join(tmpdir, "testfile")
-	touchNow(t, path)
+	filet.File(t, filepath.Join(tmpdir, "testfile"), "some-value")
 
 	err := s.RecordFileChange("testfile")
 	require.NoError(t, err)
 
-	require.False(t, s.HasFileChanged("testfile"))
+	result, err := s.HasFileChanged("testfile")
+	require.NoError(t, err)
+	require.False(t, result)
 
-	touchNow(t, path)
-	require.True(t, s.HasFileChanged("testfile"))
+	filet.File(t, filepath.Join(tmpdir, "testfile"), "some-OTHER-value")
+
+	result, err = s.HasFileChanged("testfile")
+	require.NoError(t, err)
+	require.True(t, result)
 }

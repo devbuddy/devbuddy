@@ -46,7 +46,7 @@ func (p *pythonDevelopInstall) description() string {
 }
 
 func (p *pythonDevelopInstall) needed(ctx *context) (bool, error) {
-	return store.New(ctx.proj.Path).HasFileChanged("setup.py"), nil
+	return store.New(ctx.proj.Path).HasFileChanged("setup.py")
 }
 
 func (p *pythonDevelopInstall) run(ctx *context) error {

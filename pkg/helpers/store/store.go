@@ -59,27 +59,28 @@ func (s *Store) RecordFileChange(path string) error {
 		return err
 	}
 
-	info, err := os.Stat(filepath.Join(s.projectPath, path))
+	checksum, err := utils.FileChecksum(filepath.Join(s.projectPath, path))
 	if err != nil {
 		return err
 	}
 
-	stateFilePath := s.stateFilePath("mtime", makeKeyFromPath(path))
-	return utils.Touch(stateFilePath, info.ModTime(), info.ModTime())
+	stateFilePath := s.stateFilePath("checksum", makeKeyFromPath(path))
+	return ioutil.WriteFile(stateFilePath, []byte(checksum), 0644)
 }
 
 // HasFileChanged detects whether a path has changed since the last call to RecordFileChange().
 // Defaults to true if path doesn't exists or RecordFileChange() was never called.
-func (s *Store) HasFileChanged(path string) bool {
-	info, err := os.Stat(filepath.Join(s.projectPath, path))
+func (s *Store) HasFileChanged(path string) (bool, error) {
+	checksum, err := utils.FileChecksum(filepath.Join(s.projectPath, path))
 	if err != nil {
-		return true
+		return true, nil
 	}
 
-	stateInfo, err := os.Stat(s.stateFilePath("mtime", makeKeyFromPath(path)))
+	stateFilePath := s.stateFilePath("checksum", makeKeyFromPath(path))
+	content, err := ioutil.ReadFile(stateFilePath)
 	if err != nil {
-		return true
+		return true, nil
 	}
 
-	return info.ModTime().After(stateInfo.ModTime())
+	return checksum != string(content), nil
 }
