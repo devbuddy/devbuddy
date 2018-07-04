@@ -6,38 +6,17 @@ import (
 )
 
 func init() {
-	allTasks["golang_dep"] = newGolangDep
+	t := registerTask("golang_dep")
+	t.name = "Go Dep"
+	t.requiredFeature = "golang"
+	t.parser = parserGolangDep
 }
 
-// GolangDep task manage the Go dependencies with Go Dep
-type GolangDep struct {
-}
-
-func newGolangDep(config *taskConfig) (Task, error) {
-	return &GolangDep{}, nil
-}
-
-func (d *GolangDep) name() string {
-	return "Go Dep"
-}
-
-func (d *GolangDep) header() string {
-	return "dep ensure"
-}
-
-func (d *GolangDep) preRunValidation(ctx *context) (err error) {
-	_, hasFeature := ctx.features["golang"]
-	if !hasFeature {
-		return fmt.Errorf("You must specify a Go environment to use this task")
-	}
+func parserGolangDep(config *taskConfig, task *Task) error {
+	task.header = "dep ensure"
+	task.addAction(&golangDepInstall{})
+	task.addAction(&golangDepEnsure{})
 	return nil
-}
-
-func (d *GolangDep) actions(ctx *context) []taskAction {
-	return []taskAction{
-		&golangDepInstall{},
-		&golangDepEnsure{},
-	}
 }
 
 type golangDepInstall struct {

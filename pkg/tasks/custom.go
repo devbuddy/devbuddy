@@ -7,10 +7,10 @@ import (
 func init() {
 	t := registerTask("custom")
 	t.name = "Custom"
-	t.builder = newCustom
+	t.parser = parserCustom
 }
 
-func newCustom(config *taskConfig) (*Task, error) {
+func parserCustom(config *taskConfig, task *Task) error {
 	properties := config.payload.(map[interface{}]interface{})
 
 	name, ok := properties["name"]
@@ -19,36 +19,34 @@ func newCustom(config *taskConfig) (*Task, error) {
 	}
 	command, ok := properties["meet"]
 	if !ok {
-		return nil, fmt.Errorf("missing key 'meet'")
+		return fmt.Errorf("missing key 'meet'")
 	}
 	condition, ok := properties["met?"]
 	if !ok {
-		return nil, fmt.Errorf("missing key 'met?'")
+		return fmt.Errorf("missing key 'met?'")
 	}
 
 	nameStr, err := asString(name)
 	if err != nil {
-		return nil, fmt.Errorf("invalid name value: %s", err)
+		return fmt.Errorf("invalid name value: %s", err)
 	}
 	commandStr, err := asString(command)
 	if err != nil {
-		return nil, fmt.Errorf("invalid meet value: %s", err)
+		return fmt.Errorf("invalid meet value: %s", err)
 	}
 	conditionStr, err := asString(condition)
 	if err != nil {
-		return nil, fmt.Errorf("invalid met? value: %s", err)
+		return fmt.Errorf("invalid met? value: %s", err)
 	}
 
 	if nameStr == "" {
 		nameStr = commandStr
 	}
 
-	task := &Task{
-		header: nameStr,
-	}
+	task.header = nameStr
 	task.addAction(&customAction{condition: conditionStr, command: commandStr})
 
-	return task, nil
+	return nil
 }
 
 type customAction struct {

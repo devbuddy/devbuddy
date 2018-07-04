@@ -12,32 +12,32 @@ import (
 )
 
 func init() {
-	allTasks["python"] = newPython
+	t := registerTask("python")
+	t.name = "Python"
+	t.parser = parserPython
 }
 
-// Python task: setup a virtualenv with a specified Python version
-type Python struct {
-	version string
-}
-
-func newPython(config *taskConfig) (Task, error) {
-	task := &Python{}
-
-	var err error
-	task.version, err = config.getPayloadAsString()
+func parserPython(config *taskConfig, task *Task) error {
+	version, err := config.getPayloadAsString()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return task, nil
-}
+	task.header = version
 
-func (p *Python) name() string {
-	return "Python"
-}
+	pyEnv, err := helpers.NewPyEnv()
+	if err != nil {
+		log.Fatalf("PyEnv helper failed: %s", err)
+	}
 
-func (p *Python) header() string {
-	return p.version
+	name := helpers.VirtualenvName(ctx.proj, version)
+	venv := helpers.NewVirtualenv(ctx.cfg, name)
+
+	task.addAction(&pythonPyenv{version: version, pyEnv: pyEnv})
+	task.addAction(&pythonInstallVenv{version: version, pyEnv: pyEnv})
+	task.addAction(&pythonCreateVenv{version: version, pyEnv: pyEnv, venv: venv})
+
+	return nil
 }
 
 func (p *Python) actions(ctx *context) []taskAction {

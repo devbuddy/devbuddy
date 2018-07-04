@@ -9,31 +9,30 @@ func init() {
 	t := registerTask("pip")
 	t.name = "Pip"
 	t.requiredFeature = "python"
-	t.builder = newPip
+	t.parser = parserPip
 }
 
-func newPip(config *taskConfig) (*Task, error) {
+func parserPip(config *taskConfig, task *Task) error {
 	var files []string
 
 	for _, value := range config.payload.([]interface{}) {
 		if v, ok := value.(string); ok {
 			files = append(files, v)
 		} else {
-			return nil, fmt.Errorf("invalid pip files")
+			return fmt.Errorf("invalid pip files")
 		}
 	}
 	if len(files) == 0 {
-		return nil, fmt.Errorf("no pip files specified")
+		return fmt.Errorf("no pip files specified")
 	}
 
-	task := &Task{
-		header: strings.Join(files, ", "),
-	}
+	task.header = strings.Join(files, ", ")
+
 	for _, file := range files {
 		task.addAction(&pipInstall{file: file})
 	}
 
-	return task, nil
+	return nil
 }
 
 type pipInstall struct {

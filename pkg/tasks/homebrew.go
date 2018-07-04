@@ -10,32 +10,31 @@ import (
 func init() {
 	t := registerTask("homebrew")
 	t.name = "Homebrew"
-	t.builder = newHomebrew
+	t.parser = parserHomebrew
 }
 
-func newHomebrew(config *taskConfig) (*Task, error) {
+func parserHomebrew(config *taskConfig, task *Task) error {
 	var formulas []string
 
 	for _, value := range config.payload.([]interface{}) {
 		if v, ok := value.(string); ok {
 			formulas = append(formulas, v)
 		} else {
-			return nil, fmt.Errorf("invalid homebrew formulas")
+			return fmt.Errorf("invalid homebrew formulas")
 		}
 	}
 
 	if len(formulas) == 0 {
-		return nil, fmt.Errorf("no homebrew formulas specified")
+		return fmt.Errorf("no homebrew formulas specified")
 	}
 
-	task := &Task{
-		header: strings.Join(formulas, ", "),
-	}
+	task.header = strings.Join(formulas, ", ")
+
 	for _, f := range formulas {
 		task.addAction(&brewInstall{formula: f})
 	}
 
-	return task, nil
+	return nil
 }
 
 type brewInstall struct {

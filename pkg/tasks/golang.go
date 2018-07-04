@@ -9,24 +9,23 @@ import (
 func init() {
 	t := registerTask("go")
 	t.name = "Golang"
-	t.builder = newGolang
+	t.parser = parseGolang
 }
 
-func newGolang(config *taskConfig) (*Task, error) {
+func parseGolang(config *taskConfig, task *Task) error {
 	version, err := config.getPayloadAsString()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	task := &Task{
-		header:       version,
-		featureName:  "golang",
-		featureParam: version,
-	}
+	task.header = version
+	task.featureName = "golang"
+	task.featureParam = version
+
 	task.addAction(&golangGoPath{})
 	task.addAction(&golangInstall{version: version})
 
-	return task, nil
+	return nil
 }
 
 type golangGoPath struct{}

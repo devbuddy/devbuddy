@@ -9,14 +9,12 @@ import (
 func init() {
 	t := registerTask("python_develop")
 	t.name = "Python develop"
-	t.builder = newPythonDevelop
+	t.parser = parserPythonDevelop
 }
 
-func newPythonDevelop(config *taskConfig) (*Task, error) {
-	task := &Task{}
-	task.addAction(&pythonDevelop{})
-
-	return task, nil
+func parserPythonDevelop(config *taskConfig, task *Task) error {
+	task.addAction(&pythonDevelopInstall{})
+	return nil
 }
 
 type pythonDevelopInstall struct {
