@@ -12,7 +12,7 @@ func init() {
 	t.builder = newPip
 }
 
-func newPip(config *taskConfig) (Task, error) {
+func newPip(config *taskConfig) (*Task, error) {
 	var files []string
 
 	for _, value := range config.payload.([]interface{}) {

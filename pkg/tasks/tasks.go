@@ -17,12 +17,11 @@ type taskBuilder func(*taskConfig) (*Task, error)
 // }
 
 type Task struct {
-	header           string
-	actions          []taskAction
-	preRunValidation func(*context) error
-	perform          func(*context) error
-	featureName      string
-	featureParam     string
+	header       string
+	actions      []taskAction
+	perform      func(*context) error
+	featureName  string
+	featureParam string
 }
 
 func (t *Task) addAction(action taskAction) {
