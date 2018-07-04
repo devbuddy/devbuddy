@@ -7,35 +7,16 @@ import (
 )
 
 func init() {
-	allTasks["python_develop"] = newPythonDevelop
+	t := registerTask("python_develop")
+	t.name = "Python develop"
+	t.builder = newPythonDevelop
 }
 
-type pythonDevelop struct {
-}
+func newPythonDevelop(config *taskConfig) (*Task, error) {
+	task := &Task{}
+	task.addAction(&pythonDevelop{})
 
-func newPythonDevelop(config *taskConfig) (Task, error) {
-	return &pythonDevelop{}, nil
-}
-
-func (p *pythonDevelop) name() string {
-	return "Python develop"
-}
-
-func (p *pythonDevelop) header() string {
-	return ""
-}
-
-func (p *pythonDevelop) preRunValidation(ctx *context) (err error) {
-	_, hasPythonFeature := ctx.features["python"]
-	if !hasPythonFeature {
-		return fmt.Errorf("You must specify a Python environment to use this task")
-	}
-	return nil
-}
-
-func (p *pythonDevelop) actions(ctx *context) (actions []taskAction) {
-	actions = append(actions, &pythonDevelopInstall{})
-	return
+	return task, nil
 }
 
 type pythonDevelopInstall struct {

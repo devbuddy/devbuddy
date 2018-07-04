@@ -6,28 +6,41 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
-type taskBuilder func(*taskConfig) (Task, error)
+type taskBuilder func(*taskConfig) (*Task, error)
 
-var allTasks = make(map[string]taskBuilder)
+// var allTasks = make(map[string]taskBuilder)
 
-type Task interface {
-	name() string
-	header() string
-	actions(*context) []taskAction
+// type Task interface {
+// 	name() string
+// 	header() string
+// 	actions(*context) []taskAction
+// }
+
+type Task struct {
+	header           string
+	actions          []taskAction
+	preRunValidation func(*context) error
+	perform          func(*context) error
+	featureName      string
+	featureParam     string
 }
 
-type taskWithPreRunValidation interface {
-	preRunValidation(*context) error
+func (t *Task) addAction(action taskAction) {
+	t.actions = append(t.actions, action)
 }
 
-type taskWithPerform interface {
-	perform(*context) error
-}
+// type taskWithPreRunValidation interface {
+// 	preRunValidation(*context) error
+// }
 
-type TaskWithFeature interface {
-	Task
-	feature(*project.Project) (string, string)
-}
+// type taskWithPerform interface {
+// 	perform(*context) error
+// }
+
+// type TaskWithFeature interface {
+// 	Task
+// 	feature(*project.Project) (string, string)
+// }
 
 type taskAction interface {
 	description() string
@@ -36,7 +49,7 @@ type taskAction interface {
 }
 
 func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
-	var task Task
+	var task *Task
 
 	for _, taskdef := range proj.Manifest.Up {
 		task, err = buildFromDefinition(taskdef)
@@ -49,7 +62,7 @@ func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
 	return taskList, nil
 }
 
-func GetFeaturesFromTasks(proj *project.Project, tasks []Task) map[string]string {
+func GetFeaturesFromTasks(proj *project.Project, tasks []*Task) map[string]string {
 	features := map[string]string{}
 
 	for _, task := range tasks {
@@ -62,7 +75,7 @@ func GetFeaturesFromTasks(proj *project.Project, tasks []Task) map[string]string
 	return features
 }
 
-func InspectTasks(taskList []Task, proj *project.Project) (s string) {
+func InspectTasks(taskList []*Task, proj *project.Project) (s string) {
 	for _, task := range taskList {
 		s += fmt.Sprintf("Task %s\n", task.name())
 		s += fmt.Sprintf("  Internal: %+v\n", task)
@@ -74,7 +87,7 @@ func InspectTasks(taskList []Task, proj *project.Project) (s string) {
 	return s
 }
 
-func buildFromDefinition(definition interface{}) (task Task, err error) {
+func buildFromDefinition(definition interface{}) (task *Task, err error) {
 	taskConfig, err := parseTaskConfig(definition)
 	if err == nil {
 		taskBuilder := allTasks[taskConfig.name]

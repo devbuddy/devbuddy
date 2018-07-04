@@ -2,54 +2,38 @@ package tasks
 
 import (
 	"fmt"
+	"strings"
 )
 
 func init() {
-	allTasks["pip"] = newPip
-}
-
-type Pip struct {
-	files []string
+	t := registerTask("pip")
+	t.name = "Pip"
+	t.requiredFeature = "python"
+	t.builder = newPip
 }
 
 func newPip(config *taskConfig) (Task, error) {
-	task := &Pip{}
+	var files []string
 
 	for _, value := range config.payload.([]interface{}) {
 		if v, ok := value.(string); ok {
-			task.files = append(task.files, v)
+			files = append(files, v)
 		} else {
 			return nil, fmt.Errorf("invalid pip files")
 		}
 	}
-	if len(task.files) == 0 {
+	if len(files) == 0 {
 		return nil, fmt.Errorf("no pip files specified")
 	}
 
+	task := &Task{
+		header: strings.Join(files, ", "),
+	}
+	for _, file := range files {
+		task.addAction(&pipInstall{file: file})
+	}
+
 	return task, nil
-}
-
-func (p *Pip) name() string {
-	return "Pip"
-}
-
-func (p *Pip) header() string {
-	return "" //strings.Join(p.files, ", ")
-}
-
-func (p *Pip) preRunValidation(ctx *context) (err error) {
-	_, hasPythonFeature := ctx.features["python"]
-	if !hasPythonFeature {
-		return fmt.Errorf("You must specify a Python environment to use this task")
-	}
-	return nil
-}
-
-func (p *Pip) actions(ctx *context) (actions []taskAction) {
-	for _, file := range p.files {
-		actions = append(actions, &pipInstall{file: file})
-	}
-	return
 }
 
 type pipInstall struct {
