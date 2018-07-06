@@ -27,7 +27,7 @@ func registerTask(name string) *taskDefinition {
 }
 
 type Task struct {
-	// *taskDefinition
+	*taskDefinition
 	header       string
 	actions      []taskAction
 	perform      func(*context) error
@@ -45,7 +45,7 @@ type taskAction interface {
 	run(*context) error
 }
 
-func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
+func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	var task *Task
 
 	for _, taskdef := range proj.Manifest.Up {
@@ -64,7 +64,6 @@ func GetFeaturesFromTasks(proj *project.Project, tasks []*Task) map[string]strin
 
 	for _, task := range tasks {
 		if task.featureName != "" {
-			feature, param := t.feature(proj)
 			features[task.featureName] = task.featureParam
 		}
 	}
@@ -74,10 +73,15 @@ func GetFeaturesFromTasks(proj *project.Project, tasks []*Task) map[string]strin
 
 func InspectTasks(taskList []*Task, proj *project.Project) (s string) {
 	for _, task := range taskList {
-		s += fmt.Sprintf("Task %s\n", task.name())
-		s += fmt.Sprintf("  Internal: %+v\n", task)
+		s += fmt.Sprintf("Task %s (%s)\n", task.name, task.header)
 		if task.featureName != "" {
-			s += fmt.Sprintf("  Feature: %s=%s\n", task.featureName, task.featureParam)
+			s += fmt.Sprintf("  Provides: %s=%s\n", task.featureName, task.featureParam)
+		}
+		if task.requiredFeature != "" {
+			s += fmt.Sprintf("  Requires: %s\n", task.requiredFeature)
+		}
+		for _, action := range task.actions {
+			s += fmt.Sprintf("  Action: %T %+v\n", action, action)
 		}
 	}
 	return s
@@ -86,20 +90,18 @@ func InspectTasks(taskList []*Task, proj *project.Project) (s string) {
 func buildFromDefinition(definition interface{}) (task *Task, err error) {
 	taskConfig, err := parseTaskConfig(definition)
 	if err != nil {
-		return newInvalid(definition, err), nil
+		return nil, err
 	}
 
 	taskDef := taskDefinitions[taskConfig.name]
 	if taskDef == nil {
-		taskDef = taskDefinitions["unknown"]
+		taskDef = &taskDefinition{
+			name:   "Unknown",
+			parser: parseUnknown,
+		}
 	}
 
-	// task.taskDefinition = taskDef
-
+	task = &Task{taskDefinition: taskDef}
 	err = taskDef.parser(taskConfig, task)
-	if err != nil {
-		return nil, err
-	}
-
-	return task, nil
+	return
 }

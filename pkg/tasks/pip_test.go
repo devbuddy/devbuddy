@@ -13,5 +13,6 @@ pip:
   - file2
 `)
 
-	require.Equal(t, task.(*Pip).files, []string{"file1", "file2"})
+	require.Equal(t, len(task.actions), 2)
+	require.Equal(t, task.header, "file1, file2")
 }

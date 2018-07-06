@@ -14,7 +14,9 @@ def test_invalid_manifest_with_string(cmd, project):
     output = cmd.run('bud inspect')
     cmd.assert_succeed()
 
+    assert 'Title' in output
     assert 'some-condition-command' in output
+    assert 'requirements.txt' in output
 
 
 def test_without_manifest(cmd, project):
