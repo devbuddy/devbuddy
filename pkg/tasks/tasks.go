@@ -6,27 +6,37 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
-type taskBuilder func(*taskConfig) (Task, error)
+type taskParser func(*taskConfig, *Task) error
 
-var allTasks = make(map[string]taskBuilder)
-
-type Task interface {
-	name() string
-	header() string
-	actions(*context) []taskAction
+type taskDefinition struct {
+	// key          string
+	name         string
+	requiredTask string
+	parser       taskParser
 }
 
-type taskWithPreRunValidation interface {
-	preRunValidation(*context) error
+var taskDefinitions = make(map[string]*taskDefinition)
+
+func registerTaskDefinition(name string) *taskDefinition {
+	if _, ok := taskDefinitions[name]; ok {
+		panic(fmt.Sprint("Can't re-register a taskDefinition:", name))
+	}
+	td := &taskDefinition{name: name}
+	taskDefinitions[name] = td
+	return td
 }
 
-type taskWithPerform interface {
-	perform(*context) error
+type Task struct {
+	*taskDefinition
+	header       string
+	actions      []taskAction
+	perform      func(*context) error
+	featureName  string
+	featureParam string
 }
 
-type TaskWithFeature interface {
-	Task
-	feature(*project.Project) (string, string)
+func (t *Task) addAction(action taskAction) {
+	t.actions = append(t.actions, action)
 }
 
 type taskAction interface {
@@ -35,8 +45,8 @@ type taskAction interface {
 	run(*context) error
 }
 
-func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
-	var task Task
+func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
+	var task *Task
 
 	for _, taskdef := range proj.Manifest.Up {
 		task, err = buildFromDefinition(taskdef)
@@ -49,45 +59,49 @@ func GetTasksFromProject(proj *project.Project) (taskList []Task, err error) {
 	return taskList, nil
 }
 
-func GetFeaturesFromTasks(proj *project.Project, tasks []Task) map[string]string {
+func GetFeaturesFromTasks(proj *project.Project, tasks []*Task) map[string]string {
 	features := map[string]string{}
 
 	for _, task := range tasks {
-		if t, ok := task.(TaskWithFeature); ok {
-			feature, param := t.feature(proj)
-			features[feature] = param
+		if task.featureName != "" {
+			features[task.featureName] = task.featureParam
 		}
 	}
 
 	return features
 }
 
-func InspectTasks(taskList []Task, proj *project.Project) (s string) {
+func InspectTasks(taskList []*Task, proj *project.Project) (s string) {
 	for _, task := range taskList {
-		s += fmt.Sprintf("Task %s\n", task.name())
-		s += fmt.Sprintf("  Internal: %+v\n", task)
-		if t, ok := task.(TaskWithFeature); ok {
-			featureName, featureVersion := t.feature(proj)
-			s += fmt.Sprintf("  Feature: %s=%s\n", featureName, featureVersion)
+		s += fmt.Sprintf("Task %s (%s)\n", task.name, task.header)
+		if task.featureName != "" {
+			s += fmt.Sprintf("  Provides: %s=%s\n", task.featureName, task.featureParam)
+		}
+		if task.requiredTask != "" {
+			s += fmt.Sprintf("  Requires: %s\n", task.requiredTask)
+		}
+		for _, action := range task.actions {
+			s += fmt.Sprintf("  Action: %T %+v\n", action, action)
 		}
 	}
 	return s
 }
 
-func buildFromDefinition(definition interface{}) (task Task, err error) {
+func buildFromDefinition(definition interface{}) (task *Task, err error) {
 	taskConfig, err := parseTaskConfig(definition)
-	if err == nil {
-		taskBuilder := allTasks[taskConfig.name]
-		if taskBuilder == nil {
-			taskBuilder = newUnknown
-		}
-		task, err = taskBuilder(taskConfig)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		task = newInvalid(definition, err)
+	if err != nil {
+		return nil, err
 	}
 
-	return task, nil
+	taskDef := taskDefinitions[taskConfig.name]
+	if taskDef == nil {
+		taskDef = &taskDefinition{
+			name:   "Unknown",
+			parser: parseUnknown,
+		}
+	}
+
+	task = &Task{taskDefinition: taskDef}
+	err = taskDef.parser(taskConfig, task)
+	return
 }

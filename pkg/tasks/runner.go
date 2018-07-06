@@ -35,9 +35,9 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	}
 
 	for _, task := range taskList {
-		if t, ok := task.(taskWithPreRunValidation); ok {
-			err = t.preRunValidation(ctx)
-			if err != nil {
+		if task.requiredTask != "" {
+			if _, present := ctx.features[task.requiredTask]; !present {
+				err = fmt.Errorf("You must specify a %s environment to use a %s task", task.requiredTask, task.name)
 				ctx.ui.TaskError(err)
 				return false, nil
 			}
@@ -45,7 +45,7 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	}
 
 	for _, task := range taskList {
-		ctx.ui.TaskHeader(task.name(), task.header())
+		ctx.ui.TaskHeader(task.name, task.header)
 		err = runTask(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
@@ -56,15 +56,15 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	return true, nil
 }
 
-func runTask(ctx *context, task Task) (err error) {
-	if t, ok := task.(taskWithPerform); ok {
-		err = t.perform(ctx)
+func runTask(ctx *context, task *Task) (err error) {
+	if task.perform != nil {
+		err = task.perform(ctx)
 		if err != nil {
 			return err
 		}
 	}
 
-	for _, action := range task.actions(ctx) {
+	for _, action := range task.actions {
 		err = runAction(ctx, action)
 		if err != nil {
 			return err
@@ -106,17 +106,16 @@ func runAction(ctx *context, action taskAction) error {
 	return nil
 }
 
-func activateFeature(ctx *context, task Task) (err error) {
-	t, ok := task.(TaskWithFeature)
-	if !ok {
+func activateFeature(ctx *context, task *Task) (err error) {
+	if task.featureName == "" {
 		return nil
 	}
 
-	name, param := t.feature(ctx.proj)
-	err = features.New(name, param).Activate(ctx.cfg, ctx.proj, ctx.env)
+	err = features.New(task.featureName, task.featureParam).Activate(ctx.cfg, ctx.proj, ctx.env)
 	if err != nil {
 		if err == features.DevUpNeeded {
-			ctx.ui.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", name))
+			ctx.ui.TaskWarning(
+				fmt.Sprintf("Something is wrong, the feature %s could not be activated", task.featureName))
 		} else {
 			return err
 		}

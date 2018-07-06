@@ -5,18 +5,12 @@ import (
 )
 
 func init() {
-	allTasks["custom"] = newCustom
+	t := registerTaskDefinition("custom")
+	t.name = "Custom"
+	t.parser = parserCustom
 }
 
-type Custom struct {
-	taskName  string
-	condition string
-	command   string
-}
-
-func newCustom(config *taskConfig) (Task, error) {
-	task := &Custom{}
-
+func parserCustom(config *taskConfig, task *Task) error {
 	properties := config.payload.(map[interface{}]interface{})
 
 	name, ok := properties["name"]
@@ -25,45 +19,34 @@ func newCustom(config *taskConfig) (Task, error) {
 	}
 	command, ok := properties["meet"]
 	if !ok {
-		return nil, fmt.Errorf("missing key 'meet'")
+		return fmt.Errorf("missing key 'meet'")
 	}
 	condition, ok := properties["met?"]
 	if !ok {
-		return nil, fmt.Errorf("missing key 'met?'")
+		return fmt.Errorf("missing key 'met?'")
 	}
 
-	var err error
-	task.taskName, err = asString(name)
+	nameStr, err := asString(name)
 	if err != nil {
-		return nil, fmt.Errorf("invalid name value: %s", err)
+		return fmt.Errorf("invalid name value: %s", err)
 	}
-	task.command, err = asString(command)
+	commandStr, err := asString(command)
 	if err != nil {
-		return nil, fmt.Errorf("invalid meet value: %s", err)
+		return fmt.Errorf("invalid meet value: %s", err)
 	}
-	task.condition, err = asString(condition)
+	conditionStr, err := asString(condition)
 	if err != nil {
-		return nil, fmt.Errorf("invalid met? value: %s", err)
+		return fmt.Errorf("invalid met? value: %s", err)
 	}
 
-	return task, nil
-}
-
-func (c *Custom) name() string {
-	return "Custom"
-}
-
-func (c *Custom) header() string {
-	if c.taskName != "" {
-		return c.taskName
+	if nameStr == "" {
+		nameStr = commandStr
 	}
-	return c.command
-}
 
-func (c *Custom) actions(ctx *context) []taskAction {
-	return []taskAction{
-		&customAction{condition: c.condition, command: c.command},
-	}
+	task.header = nameStr
+	task.addAction(&customAction{condition: conditionStr, command: commandStr})
+
+	return nil
 }
 
 type customAction struct {

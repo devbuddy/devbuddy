@@ -8,44 +8,33 @@ import (
 )
 
 func init() {
-	allTasks["homebrew"] = newHomebrew
+	t := registerTaskDefinition("homebrew")
+	t.name = "Homebrew"
+	t.parser = parserHomebrew
 }
 
-type Homebrew struct {
-	formulas []string
-}
-
-func newHomebrew(config *taskConfig) (Task, error) {
-	task := &Homebrew{}
+func parserHomebrew(config *taskConfig, task *Task) error {
+	var formulas []string
 
 	for _, value := range config.payload.([]interface{}) {
 		if v, ok := value.(string); ok {
-			task.formulas = append(task.formulas, v)
+			formulas = append(formulas, v)
 		} else {
-			return nil, fmt.Errorf("invalid homebrew formulas")
+			return fmt.Errorf("invalid homebrew formulas")
 		}
 	}
 
-	if len(task.formulas) == 0 {
-		return nil, fmt.Errorf("no homebrew formulas specified")
+	if len(formulas) == 0 {
+		return fmt.Errorf("no homebrew formulas specified")
 	}
 
-	return task, nil
-}
+	task.header = strings.Join(formulas, ", ")
 
-func (h *Homebrew) name() string {
-	return "Homebrew"
-}
-
-func (h *Homebrew) header() string {
-	return strings.Join(h.formulas, ", ")
-}
-
-func (h *Homebrew) actions(ctx *context) (actions []taskAction) {
-	for _, f := range h.formulas {
-		actions = append(actions, &brewInstall{formula: f})
+	for _, f := range formulas {
+		task.addAction(&brewInstall{formula: f})
 	}
-	return
+
+	return nil
 }
 
 type brewInstall struct {

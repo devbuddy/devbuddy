@@ -8,37 +8,16 @@ import (
 )
 
 func init() {
-	allTasks["pipfile"] = newPipfile
+	t := registerTaskDefinition("pipfile")
+	t.name = "Pipfile"
+	t.requiredTask = pythonTaskName
+	t.parser = parserPipfile
 }
 
-type Pipfile struct {
-}
-
-func newPipfile(config *taskConfig) (Task, error) {
-	return &Pipfile{}, nil
-}
-
-func (p *Pipfile) name() string {
-	return "Pipfile"
-}
-
-func (p *Pipfile) header() string {
-	return ""
-}
-
-func (p *Pipfile) preRunValidation(ctx *context) (err error) {
-	_, hasPythonFeature := ctx.features["python"]
-	if !hasPythonFeature {
-		return fmt.Errorf("You must specify a Python environment to use this task")
-	}
+func parserPipfile(config *taskConfig, task *Task) error {
+	task.addAction(&pipfileInstall{})
+	task.addAction(&pipfileRun{})
 	return nil
-}
-
-func (p *Pipfile) actions(ctx *context) []taskAction {
-	return []taskAction{
-		&pipfileInstall{},
-		&pipfileRun{},
-	}
 }
 
 type pipfileInstall struct {

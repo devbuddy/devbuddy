@@ -12,15 +12,16 @@ func init() {
 }
 
 type Python struct {
-	name string
+	version string
 }
 
 func newPython(param string) Feature {
-	return &Python{name: param}
+	return &Python{version: param}
 }
 
 func (p *Python) Activate(cfg *config.Config, proj *project.Project, env *env.Env) error {
-	venv := helpers.NewVirtualenv(cfg, p.name)
+	name := helpers.VirtualenvName(proj, p.version)
+	venv := helpers.NewVirtualenv(cfg, name)
 
 	if !venv.Exists() {
 		return DevUpNeeded

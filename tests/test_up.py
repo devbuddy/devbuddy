@@ -34,8 +34,6 @@ def test_invalid_task(cmd, project):
     """)
 
     output = cmd.run('bud up')
-    cmd.assert_succeed()
+    cmd.assert_failed()
 
-    assert 'Invalid task' in output
-    assert 'invalid structure: true' in output
-
+    assert 'invalid task: "true"' in output

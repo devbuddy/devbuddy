@@ -38,5 +38,5 @@ func parseTaskConfig(definition interface{}) (*taskConfig, error) {
 		return &taskConfig{name: definition.(string), payload: nil}, nil
 	}
 
-	return nil, fmt.Errorf("invalid structure")
+	return nil, fmt.Errorf("invalid task: \"%+v\"", definition)
 }

@@ -5,7 +5,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 )
 
@@ -13,7 +12,7 @@ type PyEnv struct {
 	root string
 }
 
-func NewPyEnv(cfg *config.Config) (*PyEnv, error) {
+func NewPyEnv() (*PyEnv, error) {
 	root, err := executor.New("pyenv", "root").CaptureAndTrim()
 	if err != nil {
 		return nil, fmt.Errorf("Command 'pyenv root' failed: %s", err)

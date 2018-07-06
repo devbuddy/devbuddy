@@ -4,46 +4,28 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers"
-	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 func init() {
-	allTasks["go"] = newGolang
+	t := registerTaskDefinition("go")
+	t.name = "Golang"
+	t.parser = parseGolang
 }
 
-type Golang struct {
-	version string
-}
-
-func newGolang(config *taskConfig) (Task, error) {
-	task := &Golang{}
-
-	var err error
-	task.version, err = config.getPayloadAsString()
+func parseGolang(config *taskConfig, task *Task) error {
+	version, err := config.getPayloadAsString()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return task, nil
-}
+	task.header = version
+	task.featureName = "golang"
+	task.featureParam = version
 
-func (g *Golang) name() string {
-	return "Golang"
-}
+	task.addAction(&golangGoPath{})
+	task.addAction(&golangInstall{version: version})
 
-func (g *Golang) header() string {
-	return g.version
-}
-
-func (g *Golang) actions(ctx *context) []taskAction {
-	return []taskAction{
-		&golangGoPath{},
-		&golangInstall{version: g.version},
-	}
-}
-
-func (g *Golang) feature(proj *project.Project) (string, string) {
-	return "golang", g.version
+	return nil
 }
 
 type golangGoPath struct{}
