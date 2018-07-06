@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	t := registerTask("homebrew")
+	t := registerTaskDefinition("homebrew")
 	t.name = "Homebrew"
 	t.parser = parserHomebrew
 }

@@ -7,8 +7,9 @@ import (
 )
 
 func init() {
-	t := registerTask("python_develop")
+	t := registerTaskDefinition("python_develop")
 	t.name = "Python develop"
+	t.requiredTask = pythonTaskName
 	t.parser = parserPythonDevelop
 }
 

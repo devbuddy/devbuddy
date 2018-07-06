@@ -35,9 +35,9 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	}
 
 	for _, task := range taskList {
-		if task.requiredFeature != "" {
-			if _, present := ctx.features[task.requiredFeature]; !present {
-				err = fmt.Errorf("You must specify a %s environment to use a %s task", task.requiredFeature, task.name)
+		if task.requiredTask != "" {
+			if _, present := ctx.features[task.requiredTask]; !present {
+				err = fmt.Errorf("You must specify a %s environment to use a %s task", task.requiredTask, task.name)
 				ctx.ui.TaskError(err)
 				return false, nil
 			}

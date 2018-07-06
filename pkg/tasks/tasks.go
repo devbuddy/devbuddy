@@ -9,15 +9,15 @@ import (
 type taskParser func(*taskConfig, *Task) error
 
 type taskDefinition struct {
-	key             string
-	name            string
-	requiredFeature string
-	parser          taskParser
+	// key          string
+	name         string
+	requiredTask string
+	parser       taskParser
 }
 
 var taskDefinitions = make(map[string]*taskDefinition)
 
-func registerTask(name string) *taskDefinition {
+func registerTaskDefinition(name string) *taskDefinition {
 	if _, ok := taskDefinitions[name]; ok {
 		panic(fmt.Sprint("Can't re-register a taskDefinition:", name))
 	}
@@ -77,8 +77,8 @@ func InspectTasks(taskList []*Task, proj *project.Project) (s string) {
 		if task.featureName != "" {
 			s += fmt.Sprintf("  Provides: %s=%s\n", task.featureName, task.featureParam)
 		}
-		if task.requiredFeature != "" {
-			s += fmt.Sprintf("  Requires: %s\n", task.requiredFeature)
+		if task.requiredTask != "" {
+			s += fmt.Sprintf("  Requires: %s\n", task.requiredTask)
 		}
 		for _, action := range task.actions {
 			s += fmt.Sprintf("  Action: %T %+v\n", action, action)

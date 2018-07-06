@@ -6,9 +6,9 @@ import (
 )
 
 func init() {
-	t := registerTask("pip")
+	t := registerTaskDefinition("pip")
 	t.name = "Pip"
-	t.requiredFeature = "python"
+	t.requiredTask = pythonTaskName
 	t.parser = parserPip
 }
 

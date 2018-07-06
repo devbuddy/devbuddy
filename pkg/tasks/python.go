@@ -9,8 +9,10 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
+const pythonTaskName = "python"
+
 func init() {
-	t := registerTask("python")
+	t := registerTaskDefinition(pythonTaskName)
 	t.name = "Python"
 	t.parser = parserPython
 }
@@ -34,7 +36,6 @@ func parserPython(config *taskConfig, task *Task) error {
 
 type pythonPyenv struct {
 	version string
-	pyEnv   *helpers.PyEnv
 }
 
 func (p *pythonPyenv) description() string {

@@ -6,9 +6,9 @@ import (
 )
 
 func init() {
-	t := registerTask("golang_dep")
+	t := registerTaskDefinition("golang_dep")
 	t.name = "Go Dep"
-	t.requiredFeature = "golang"
+	t.requiredTask = "golang"
 	t.parser = parserGolangDep
 }
 

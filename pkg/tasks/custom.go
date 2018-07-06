@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	t := registerTask("custom")
+	t := registerTaskDefinition("custom")
 	t.name = "Custom"
 	t.parser = parserCustom
 }
