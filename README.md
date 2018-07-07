@@ -5,6 +5,12 @@
 [![GitHub Release](https://img.shields.io/github/release/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 [![GitHub Release Date](https://img.shields.io/github/release-date/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 
+Contents:
+- [Install DevBuddy](#install)
+- [Usage](#usage)
+- [Tasks](docs/Config.md)
+- [Contributing to DevBuddy](docs/CONTRIBUTING.md)
+
 ## What is this?
 
 **DevBuddy** (previously known as "Dad") is an open-source implementation of an amazing internal tool developed at
@@ -124,24 +130,14 @@ Usage:
   bud [command]
 
 Available Commands:
-  cd              Jump to a local project
-  ci              Custom: Run all tests as CI would do
-  clone           Clone a project from github.com
-  create          Create a new project
-  godoc           Custom: Starting GoDoc server on http://0.0.0.0:6060
-  help            Help about any command
-  inspect         Inspect the project and its tasks
-  install-dev     Custom: Install bud in the GOROOT
-  install-release Custom: Remove all bud binaries and install a released version
-  integration     Custom: Run the integration tests
-  lint            Custom: Lint the project
-  lint-shell      Custom: Lint the shell scripts
-  open            Open a link about your project
-  release         Custom: Create a new release (bud release [VERSION])
-  test            Custom: Run the unittests
-  testup          Custom: Build, install and run the development version
-  up              Ensure the project is up and running
-  upgrade         [experimental] Upgrade DevBuddy to the latest available release.
+  cd          Jump to a local project
+  clone       Clone a project from github.com
+  create      Create a new project
+  help        Help about any command
+  inspect     Inspect the project and its tasks
+  open        Open a link about your project
+  up          Ensure the project is up and running
+  upgrade     [experimental] Upgrade DevBuddy to the latest available release.
 
 Flags:
   -h, --help              help for bud
@@ -152,53 +148,6 @@ Flags:
 Use "bud [command] --help" for more information about a command.
 ```
 
-## Development
-
-★ Clone the repository:
-```bash
-~ $ mkdir -p ~/src/github.com/pior
-~ $ cd ~/src/github.com/pior
-~/src/github.com/pior $ git clone git@github.com:devbuddy/devbuddy.git
-```
-
-★ Fetch the dependencies (in `vendor`)
-```bash
-~/src/github.com/pior $ dep ensure
-```
-
-★ Install the go executable somewhere in your PATH:
-```bash
-~/src/github.com/pior $ go install
-```
-
-### Debugging
-
-To show the debug messages, add this before in your environment:
-```bash
-export BUD_DEBUG=1
-```
-Or:
-```bash
-$ bud-enable-debug  # bud-disable-debug
-```
-
-### Release
-
-```bash
-$ bud release 1.0.0
-```
-
-The big idea:
-1. Create a release commit to ensure the release is visible in the git log
-2. Create an annotated tag
-3. Push the commit and tag upstream
-
-Expected:
-1. The CI process will test the release
-2. The CI process will publish macOS/Linux binaries to the Github Releases page
-
-Updating the [install.sh](https://github.com/devbuddy/devbuddy/blob/master/install.sh) script is probably a good idea.
-
 ## License
 
 [MIT](https://github.com/devbuddy/devbuddy/blob/master/LICENSE)
@@ -206,3 +155,4 @@ Updating the [install.sh](https://github.com/devbuddy/devbuddy/blob/master/insta
 Authors:
 - Pior Bastida (pior@pbastida.net)
 - Mathieu Leduc-Hamel (mathieu.leduchamel@shopify.com)
+- Emmanuel Milou <manumilou@mykolab.com>
