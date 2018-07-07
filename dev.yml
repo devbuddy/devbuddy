@@ -6,6 +6,10 @@ up:
   - homebrew:
     - curl
   - custom:
+      name: Install gometalinter
+      met?: which gometalinter.v2 > /dev/null
+      meet: go get gopkg.in/alecthomas/gometalinter.v2
+  - custom:
       name: Install shellcheck
       met?: test -e /usr/local/Cellar/shellcheck
       meet: brew install shellcheck
