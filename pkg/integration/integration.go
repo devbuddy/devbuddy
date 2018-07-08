@@ -5,25 +5,41 @@ import (
 	"os"
 	"strings"
 
-	color "github.com/logrusorgru/aurora"
+	ps "github.com/mitchellh/go-ps"
+
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 // Print prints the integration code for the user's shell
 func Print() {
-	var currentShell = os.Getenv("SHELL")
-
-	if currentShell == "" {
-		currentShell = "bash"
-		fmt.Fprintln(os.Stderr, color.Red("SHELL environment variable is empty"))
+	shell, err := detectShell()
+	if err != nil {
+		termui.HookShellDetectionError(err)
 	}
 
-	if strings.HasSuffix(currentShell, "bash") {
+	switch shell {
+	case "bash":
 		fmt.Println(shellSource, bashSource)
-	} else if strings.HasSuffix(currentShell, "zsh") {
+	case "zsh":
 		fmt.Println(shellSource, zshSource)
-	} else {
-		fmt.Fprintln(os.Stderr, color.Brown("Your shell is not supported"))
 	}
+}
+
+func detectShell() (string, error) {
+	proc, err := ps.FindProcess(os.Getppid())
+	if err != nil {
+		return "", fmt.Errorf("failed to get parent process info: %s", err)
+	}
+	parentProcessPath := proc.Executable()
+
+	switch {
+	case strings.HasSuffix(parentProcessPath, "bash"):
+		return "bash", nil
+	case strings.HasSuffix(parentProcessPath, "zsh"):
+		return "zsh", nil
+	}
+
+	return "", fmt.Errorf("parent process is not a supported shell: %s", parentProcessPath)
 }
 
 // AddFinalizerCd declares a "cd" finalizer (change directory)
@@ -37,7 +53,7 @@ func addFinalizer(action, arg string) (err error) {
 	finalizerPath := os.Getenv("BUD_FINALIZER_FILE")
 
 	if finalizerPath == "" {
-		fmt.Println(color.Red("Shell integration error:"), "can't run a finalizer action:", color.Brown(content))
+		termui.HookIntegrationError("can't run a finalizer action: " + content)
 		return nil
 	}
 

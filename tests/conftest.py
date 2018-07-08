@@ -58,7 +58,7 @@ def build_pexpect_zsh(workdir):
         'zsh', ['--no-globalrcs', '--no-rcs', '--no-zle', '--no-promptcr'],
         echo=False,
         encoding='utf-8',
-        env={'PROMPT': 'ps1'},
+        env={'PROMPT': 'ps1', 'PATH': os.getenv('PATH')},
         cwd=str(workdir),
     )
 
