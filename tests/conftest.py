@@ -87,7 +87,9 @@ class CommandTestHelper:
         return output
 
     def get_exit_code(self):
-        return int(self.run("echo $?"))
+        output = self.run("echo $?")
+        first_line = output.split('\n')[0]  # Ignore lines produced by prompt hook
+        return int(first_line)
 
     def assert_succeed(self):
         exit_code = self.get_exit_code()
