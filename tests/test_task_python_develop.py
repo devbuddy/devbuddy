@@ -21,12 +21,16 @@ def test_with_modification(cmd, project):
     project.write_file("setup.py", make_setuppy(version=42))
 
     cmd.run("bud up")
+    cmd.assert_succeed()
+
     output = cmd.run("pip show devbuddy-test-pkg")
     assert "Version: 42" in output
 
     project.write_file("setup.py", make_setuppy(version=84))
 
     cmd.run("bud up")
+    cmd.assert_succeed()
+
     output = cmd.run("pip show devbuddy-test-pkg")
     assert "Version: 84" in output
 
@@ -43,9 +47,13 @@ def test_without_modification(cmd, project):
     project.write_file("setup.py", make_setuppy(version=42))
 
     cmd.run("bud up")
+    cmd.assert_succeed()
+
     assert os.path.exists(sentinel_path)
 
     os.unlink(sentinel_path)
 
+    cmd.assert_succeed()
     cmd.run("bud up")
+
     assert not os.path.exists(sentinel_path)
