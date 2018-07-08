@@ -24,7 +24,7 @@ jobs:
       - run: pyenv install 3.6.5 && pyenv global 3.6.5
       - run: pip install -U pip setuptools && pip install -r tests/requirements.txt
       - run: pytest --durations=1 -v tests
-      # - run: pytest --durations=1 --shell zsh -v tests
+      - run: pytest --durations=1 --shell zsh -v tests
 
   lint:
     docker:
