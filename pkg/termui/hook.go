@@ -33,3 +33,11 @@ func (u *HookUI) HookFeatureFailure(name string, version string) {
 	ver := color.Sprintf("(version: %s)", version)
 	fmt.Fprintf(u.out, "🐼  %s %s\n", color.Red(msg), color.Brown(ver))
 }
+
+func HookShellDetectionError(err error) {
+	fmt.Fprintln(os.Stderr, color.Brown("Could not detect your shell:"), err.Error())
+}
+
+func HookIntegrationError(message string) {
+	fmt.Fprintf(os.Stderr, "%s: %s", color.Red("Shell integration error:"), message)
+}
