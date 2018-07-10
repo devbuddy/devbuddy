@@ -29,7 +29,8 @@ func (p *pipfileInstall) description() string {
 
 func (p *pipfileInstall) needed(ctx *context) (bool, error) {
 	pythonParam := ctx.features["python"]
-	venv := helpers.NewVirtualenv(ctx.cfg, pythonParam)
+	name := helpers.VirtualenvName(ctx.proj, pythonParam)
+	venv := helpers.NewVirtualenv(ctx.cfg, name)
 	pipenvCmd := venv.Which("pipenv")
 	return !utils.PathExists(pipenvCmd), nil
 }
