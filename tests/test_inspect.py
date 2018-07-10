@@ -20,5 +20,4 @@ def test_invalid_manifest_with_string(cmd, project):
 
 
 def test_without_manifest(cmd, project):
-    output = cmd.run('bud inspect')
-    cmd.assert_failed()
+    output = cmd.run('bud inspect', expect_exit_code=1)

@@ -8,7 +8,6 @@ def test_requirements(cmd, project):
     project.write_file("requirements.txt", "test==2.3.4.5\n")
 
     cmd.run("bud up")
-    cmd.assert_succeed()
 
     output = cmd.run("pip freeze")
     assert 'test==2.3.4.5' in output

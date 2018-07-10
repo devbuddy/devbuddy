@@ -15,7 +15,6 @@ def test_env(cmd, project, gopath):
     """)
 
     cmd.run("bud up")
-    cmd.assert_succeed()
 
     output = cmd.run("go version")
     assert "go version go1.5" in output
@@ -29,7 +28,5 @@ def test_warn_gopath_missing(cmd, project, gopath):
         - go: '1.5'
     """)
 
-    output = cmd.run("bud up")
-    cmd.assert_failed()
-
+    output = cmd.run("bud up", expect_exit_code=1)
     assert "The GOPATH environment variable should be set" in output

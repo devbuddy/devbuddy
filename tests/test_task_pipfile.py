@@ -8,7 +8,6 @@ def test_simple(cmd, project):
     project.write_file("Pipfile", """[packages]\n"test" = "==2.3.4.5"\n""")
 
     output = cmd.run("bud up")
-    cmd.assert_succeed()
 
     output = cmd.run("pip freeze")
     assert 'test==2.3.4.5' in output
