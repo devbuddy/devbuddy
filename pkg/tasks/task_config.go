@@ -10,34 +10,40 @@ type taskConfig struct {
 	payload interface{}
 }
 
-func (c *taskConfig) getPayloadAsString() (string, error) {
-	value, ok := c.payload.(string)
-	if !ok {
-		return "", fmt.Errorf("need a string, found: %T (%v)", c.payload, c.payload)
-	}
-	return value, nil
+func (c *taskConfig) getStringProperty(name string, allowSingle bool) (string, error) {
+	return c.getStringPropertyDefault(name, "", allowSingle)
 }
 
-func (c *taskConfig) getPayloadAsStringMap() (result map[string]string, err error) {
+func (c *taskConfig) getStringPropertyDefault(name string, defaultValue string, allowSingle bool) (string, error) {
+	if allowSingle {
+		if value, ok := c.payload.(string); ok {
+			return value, nil
+		}
+	}
+
 	properties, ok := c.payload.(map[interface{}]interface{})
 	if !ok {
-		return result, fmt.Errorf("not a hash: \"%+v\"", c.payload)
+		message := "not a hash"
+		if allowSingle {
+			message = "not a string"
+		}
+		return "", fmt.Errorf("%s: %T (%+v)", message, c.payload, c.payload)
 	}
 
-	result = make(map[string]string)
-	for k, v := range properties {
-		key, err := asString(k)
-		if err != nil {
-			return result, fmt.Errorf("hash key \"%v\" is not a string", k)
+	value, ok := properties[name]
+	if !ok {
+		if defaultValue != "" {
+			return defaultValue, nil
 		}
-		value, err := asString(v)
-		if err != nil {
-			return result, fmt.Errorf("hash value \"%v\" for key \"%s\" is not a string", v, key)
-		}
-		result[key] = value
+		return "", fmt.Errorf("missing key '%s'", name)
 	}
 
-	return result, nil
+	str, err := asString(value)
+	if err != nil {
+		return "", fmt.Errorf("%s: %T (%+v)", err, value, value)
+	}
+
+	return str, nil
 }
 
 func parseTaskConfig(definition interface{}) (*taskConfig, error) {

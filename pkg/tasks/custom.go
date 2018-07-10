@@ -11,22 +11,17 @@ func init() {
 }
 
 func parserCustom(config *taskConfig, task *Task) error {
-	properties, err := config.getPayloadAsStringMap()
+	command, err := config.getStringProperty("meet", false)
 	if err != nil {
 		return err
 	}
-
-	command, ok := properties["meet"]
-	if !ok {
-		return fmt.Errorf("missing key 'meet'")
+	condition, err := config.getStringProperty("met?", false)
+	if err != nil {
+		return err
 	}
-	condition, ok := properties["met?"]
-	if !ok {
-		return fmt.Errorf("missing key 'met?'")
-	}
-	name, ok := properties["name"]
-	if !ok {
-		name = command
+	name, err := config.getStringPropertyDefault("name", command, false)
+	if err != nil {
+		return err
 	}
 
 	task.header = name
