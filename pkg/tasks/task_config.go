@@ -10,12 +10,40 @@ type taskConfig struct {
 	payload interface{}
 }
 
-func (c *taskConfig) getPayloadAsString() (string, error) {
-	value, ok := c.payload.(string)
-	if !ok {
-		return "", fmt.Errorf("need a string, found: %T (%v)", c.payload, c.payload)
+func (c *taskConfig) getStringProperty(name string, allowSingle bool) (string, error) {
+	return c.getStringPropertyDefault(name, "", allowSingle)
+}
+
+func (c *taskConfig) getStringPropertyDefault(name string, defaultValue string, allowSingle bool) (string, error) {
+	if allowSingle {
+		if value, ok := c.payload.(string); ok {
+			return value, nil
+		}
 	}
-	return value, nil
+
+	properties, ok := c.payload.(map[interface{}]interface{})
+	if !ok {
+		message := "not a hash"
+		if allowSingle {
+			message = "not a string"
+		}
+		return "", fmt.Errorf("%s: %T (%+v)", message, c.payload, c.payload)
+	}
+
+	value, ok := properties[name]
+	if !ok {
+		if defaultValue != "" {
+			return defaultValue, nil
+		}
+		return "", fmt.Errorf("missing key '%s'", name)
+	}
+
+	str, err := asString(value)
+	if err != nil {
+		return "", fmt.Errorf("%s: %T (%+v)", err, value, value)
+	}
+
+	return str, nil
 }
 
 func parseTaskConfig(definition interface{}) (*taskConfig, error) {

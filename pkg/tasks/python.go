@@ -18,7 +18,7 @@ func init() {
 }
 
 func parserPython(config *taskConfig, task *Task) error {
-	version, err := config.getPayloadAsString()
+	version, err := config.getStringProperty("version", true)
 	if err != nil {
 		return err
 	}

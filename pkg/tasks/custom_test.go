@@ -1,7 +1,6 @@
 package tasks
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -36,7 +35,5 @@ custom:
 `)
 
 	require.Error(t, err, "buildFromDefinition() should have failed")
-	if !strings.Contains(err.Error(), "boolean") {
-		t.Fatal("invalid err")
-	}
+	require.Contains(t, err.Error(), "not a string")
 }

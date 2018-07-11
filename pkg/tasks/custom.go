@@ -11,40 +11,21 @@ func init() {
 }
 
 func parserCustom(config *taskConfig, task *Task) error {
-	properties := config.payload.(map[interface{}]interface{})
-
-	name, ok := properties["name"]
-	if !ok {
-		name = ""
-	}
-	command, ok := properties["meet"]
-	if !ok {
-		return fmt.Errorf("missing key 'meet'")
-	}
-	condition, ok := properties["met?"]
-	if !ok {
-		return fmt.Errorf("missing key 'met?'")
-	}
-
-	nameStr, err := asString(name)
+	command, err := config.getStringProperty("meet", false)
 	if err != nil {
-		return fmt.Errorf("invalid name value: %s", err)
+		return err
 	}
-	commandStr, err := asString(command)
+	condition, err := config.getStringProperty("met?", false)
 	if err != nil {
-		return fmt.Errorf("invalid meet value: %s", err)
+		return err
 	}
-	conditionStr, err := asString(condition)
+	name, err := config.getStringPropertyDefault("name", command, false)
 	if err != nil {
-		return fmt.Errorf("invalid met? value: %s", err)
+		return err
 	}
 
-	if nameStr == "" {
-		nameStr = commandStr
-	}
-
-	task.header = nameStr
-	task.addAction(&customAction{condition: conditionStr, command: commandStr})
+	task.header = name
+	task.addAction(&customAction{condition: condition, command: command})
 
 	return nil
 }

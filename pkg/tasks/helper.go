@@ -16,7 +16,7 @@ func asString(value interface{}) (string, error) {
 
 	_, ok = value.(bool)
 	if ok {
-		return "", errors.New("found a boolean, not a string")
+		return "", errors.New("not a string")
 	}
 
 	return "", errors.New("not a string")
