@@ -54,11 +54,18 @@ def build_pexpect_bash(workdir):
 
 
 def build_pexpect_zsh(workdir):
+    env = {
+        'PROMPT': 'ps1',
+        'PATH': os.getenv('PATH'),
+        'LANG': 'C.UTF-8',
+        'LC_ALL': 'C.UTF-8',
+    }
+
     child = pexpect.spawn(
         'zsh', ['--no-globalrcs', '--no-rcs', '--no-zle', '--no-promptcr'],
         echo=False,
         encoding='utf-8',
-        env={'PROMPT': 'ps1', 'PATH': os.getenv('PATH'), 'LANG': 'en_CA.UTF-8', 'TERM': 'xterm'},
+        env=env,
         cwd=str(workdir),
     )
 
