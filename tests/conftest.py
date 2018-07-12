@@ -54,11 +54,18 @@ def build_pexpect_bash(workdir):
 
 
 def build_pexpect_zsh(workdir):
+    env = {
+        'PROMPT': 'ps1',
+        'PATH': os.getenv('PATH'),
+        'LANG': 'C.UTF-8',
+        'LC_ALL': 'C.UTF-8',
+    }
+
     child = pexpect.spawn(
         'zsh', ['--no-globalrcs', '--no-rcs', '--no-zle', '--no-promptcr'],
         echo=False,
         encoding='utf-8',
-        env={'PROMPT': 'ps1', 'PATH': os.getenv('PATH')},
+        env=env,
         cwd=str(workdir),
     )
 
@@ -77,27 +84,24 @@ class CommandTestHelper:
     def __init__(self, pexpect_wrapper):
         self._pexpect_wrapper = pexpect_wrapper
 
-    def run(self, command):
+    def run(self, command, expect_exit_code=0):
         output = self._pexpect_wrapper.run_command(command).strip()
 
         error_lines = [l for l in output.splitlines() if 'failed to activate ' in l]
         if error_lines:
-            pytest.fail(f"Failed to activate features:\n%s" % error_lines)
+            pytest.fail(f"Failed to activate features:\n{error_lines}")
+
+        if expect_exit_code is not None:
+            code = self.get_exit_code()
+            if code != expect_exit_code:
+                pytest.fail(f"Command failed with code {code}. Output:\n{output}")
 
         return output
 
     def get_exit_code(self):
-        output = self.run("echo $?")
+        output = self.run("echo $?", expect_exit_code=None)
         first_line = output.split('\n')[0]  # Ignore lines produced by prompt hook
         return int(first_line)
-
-    def assert_succeed(self):
-        exit_code = self.get_exit_code()
-        assert exit_code == 0, "previous command failed"
-
-    def assert_failed(self):
-        exit_code = self.get_exit_code()
-        assert exit_code != 0, "previous command should have failed"
 
 
 @pytest.fixture(scope='session')

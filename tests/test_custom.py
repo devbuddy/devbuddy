@@ -31,10 +31,7 @@ def test_exit_code(cmd, project):
     """)
 
     cmd.run("bud success")
-    cmd.assert_succeed()
-
-    cmd.run("bud failure")
-    cmd.assert_failed()
+    cmd.run("bud failure", expect_exit_code=1)
 
 
 def test_with_arguments(cmd, project):

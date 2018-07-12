@@ -49,6 +49,5 @@ def test_should_run_and_fail(cmd, project):
             meet: 'false'
     """)
 
-    output = cmd.run("bud up")
-    cmd.assert_failed()
+    output = cmd.run("bud up", expect_exit_code=1)
     assert 'command failed' in output

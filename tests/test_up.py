@@ -6,8 +6,7 @@ def test_invalid_manifest_with_string(cmd, project):
         up: somestring
     """)
 
-    output = cmd.run('bud up')
-    cmd.assert_failed()
+    output = cmd.run('bud up', expect_exit_code=1)
 
     # This test exists to show how bad the output is. This should be improved.
     assert 'yaml: unmarshal errors' in output
@@ -21,7 +20,6 @@ def test_unknown_task(cmd, project):
     """)
 
     output = cmd.run('bud up')
-    cmd.assert_succeed()
 
     assert 'notatask' in output
     assert 'Unknown task' in output
@@ -33,7 +31,5 @@ def test_invalid_task(cmd, project):
           - true
     """)
 
-    output = cmd.run('bud up')
-    cmd.assert_failed()
-
+    output = cmd.run('bud up', expect_exit_code=1)
     assert 'invalid task: "true"' in output
