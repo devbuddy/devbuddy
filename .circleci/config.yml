@@ -2,7 +2,7 @@ version: 2
 jobs:
   tests:
     docker:
-      - image: devbuddy/devbuddy:dockerfile
+      - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
@@ -11,7 +11,7 @@ jobs:
 
   integration-tests:
     docker:
-      - image: devbuddy/devbuddy:dockerfile
+      - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
@@ -22,7 +22,7 @@ jobs:
 
   lint:
     docker:
-      - image: devbuddy/devbuddy:dockerfile
+      - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
@@ -31,7 +31,7 @@ jobs:
 
   deploy-release:
     docker:
-      - image: devbuddy/devbuddy:dockerfile
+      - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
