@@ -2,50 +2,52 @@ version: 2
 jobs:
   tests:
     docker:
-      - image: circleci/golang:1.10
+      - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure
+      - run: dep ensure -v -vendor-only
       - run: script/test
 
-  integration-tests:
+  tests-bash:
     docker:
-      - image: circleci/golang:1.10
+      - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure
-      - run: DEBIAN_FRONTEND=noninteractive sudo apt-get --no-install-recommends -y install git make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl zsh
-      - run: |
-          curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash && \
-          echo 'export PATH="/home/circleci/.pyenv/bin:$PATH"' >> $BASH_ENV && \
-          echo 'export PATH="/home/circleci/.pyenv/shims:${PATH}"' >> $BASH_ENV
-      - run: pyenv install 3.6.5 && pyenv global 3.6.5
-      - run: pip install -U pip setuptools && pip install -r tests/requirements.txt
+      - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
+      - run: dep ensure -v -vendor-only
+      - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 -v tests
+
+  tests-zsh:
+    docker:
+      - image: devbuddy/testing:latest
+    working_directory: /go/src/github.com/devbuddy/devbuddy
+    steps:
+      - checkout
+      - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
+      - run: dep ensure -v -vendor-only
+      - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 --shell zsh -v tests
 
   lint:
     docker:
-      - image: circleci/golang:1.10
+      - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure
-      - run: go get -u gopkg.in/alecthomas/gometalinter.v2
-      - run: gometalinter.v2 --install --update
+      - run: dep ensure -v -vendor-only
       - run: script/lint
 
   deploy-release:
     docker:
-      - image: circleci/golang:1.10
+      - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure
+      - run: dep ensure -v -vendor-only
       - run: script/buildall
-      - run: go get github.com/tcnksm/ghr
       - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME `git describe --tags` dist
 
 workflows:
@@ -56,7 +58,11 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - integration-tests:
+      - tests-bash:
+          filters:
+            tags:
+              only: /.*/
+      - tests-zsh:
           filters:
             tags:
               only: /.*/
@@ -65,7 +71,7 @@ workflows:
             tags:
               only: /.*/
       - deploy-release:
-          requires: [tests, integration-tests, lint]
+          requires: [tests, tests-bash, tests-zsh, lint]
           filters:
             branches:
               ignore: /.*/
