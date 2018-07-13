@@ -9,17 +9,26 @@ jobs:
       - run: dep ensure -v -vendor-only
       - run: script/test
 
-  integration-tests:
+  tests-bash:
     docker:
       - image: devbuddy/testing:latest
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
-      - run: echo $PATH
       - run: dep ensure -v -vendor-only
-      - run: pip install -U pip setuptools && pip install -r tests/requirements.txt
+      - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 -v tests
+
+  tests-zsh:
+    docker:
+      - image: devbuddy/testing:latest
+    working_directory: /go/src/github.com/devbuddy/devbuddy
+    steps:
+      - checkout
+      - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
+      - run: dep ensure -v -vendor-only
+      - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 --shell zsh -v tests
 
   lint:
@@ -49,7 +58,11 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - integration-tests:
+      - tests-bash:
+          filters:
+            tags:
+              only: /.*/
+      - tests-zsh:
           filters:
             tags:
               only: /.*/
@@ -58,7 +71,7 @@ workflows:
             tags:
               only: /.*/
       - deploy-release:
-          requires: [tests, integration-tests, lint]
+          requires: [tests, tests-bash, tests-zsh, lint]
           filters:
             branches:
               ignore: /.*/
