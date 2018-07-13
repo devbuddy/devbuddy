@@ -20,7 +20,7 @@
     "cassette",
     "recorder"
   ]
-  revision = "f8a7e8b9c630b486df74145bb887793a1b85459b"
+  revision = "8b144be0744f013a1b44386058f1fcb3ba98177d"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -58,14 +58,14 @@
     ".",
     "mem"
   ]
-  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
-  version = "v1.1.0"
+  revision = "787d034dfe70e44075ccc060d346146ef53270ad"
+  version = "v1.1.1"
 
 [[projects]]
+  branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "ef82de70bb3f60c65fb8eebacbb2d122ef517385"
-  version = "v0.0.3"
+  revision = "a114f312e075f65bf30d6d9a1430113f857e543b"
 
 [[projects]]
   name = "github.com/spf13/pflag"
@@ -79,8 +79,8 @@
     "assert",
     "require"
   ]
-  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
-  version = "v1.2.1"
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -104,6 +104,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5bdfa6c4938eda81401e42a1d06e813c39f41ecafcf4f749a25a502da5803679"
+  inputs-digest = "86d3538e61f3563b106d30a9cf435251db862024a4c6543ad7ada821df9919ec"
   solver-name = "gps-cdcl"
   solver-version = 1
