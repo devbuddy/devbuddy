@@ -15,7 +15,7 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: ~/.pyenv/bin/pyenv init -
+      - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
       - run: echo $PATH
       - run: dep ensure -v -vendor-only
       - run: pip install -U pip setuptools && pip install -r tests/requirements.txt
