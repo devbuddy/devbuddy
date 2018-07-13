@@ -15,10 +15,12 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
+      - run: cat ~/.bashrc
+      - run: echo $PATH
       - run: dep ensure -v -vendor-only
       - run: pip install -U pip setuptools && pip install -r tests/requirements.txt
-      - run: pytest --durations=1 -v tests
-      - run: pytest --durations=1 --shell zsh -v tests
+      - run: . ~/.bashrc; echo $PATH; pytest --durations=1 -v tests
+      - run: . ~/.bashrc; echo $PATH; pytest --durations=1 --shell zsh -v tests
 
   lint:
     docker:
