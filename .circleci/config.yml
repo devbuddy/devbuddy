@@ -6,7 +6,7 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure
+      - run: dep ensure -v -vendor-only
       - run: script/test
 
   integration-tests:
@@ -15,7 +15,7 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure
+      - run: dep ensure -v -vendor-only
       - run: pip install -U pip setuptools && pip install -r tests/requirements.txt
       - run: pytest --durations=1 -v tests
       - run: pytest --durations=1 --shell zsh -v tests
@@ -26,7 +26,7 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure
+      - run: dep ensure -v -vendor-only
       - run: script/lint
 
   deploy-release:
@@ -35,7 +35,7 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure
+      - run: dep ensure -v -vendor-only
       - run: script/buildall
       - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME `git describe --tags` dist
 
