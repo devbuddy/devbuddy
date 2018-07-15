@@ -3,6 +3,7 @@ package features
 import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/features/definitions"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
@@ -28,6 +29,8 @@ func (r *Runner) Run(features map[string]string) {
 		if want {
 			if !active || wantVersion != activeVersion {
 				r.activateFeature(name, wantVersion)
+			} else {
+				r.refreshFeature(name, wantVersion)
 			}
 		} else {
 			if active {
@@ -48,6 +51,15 @@ func (r *Runner) activateFeature(name string, param string) {
 	} else {
 		r.ui.HookFeatureActivated(name, param)
 		r.env.SetFeature(name, param)
+	}
+}
+
+func (r *Runner) refreshFeature(name string, param string) {
+	err := Refresh(name, param, r.cfg, r.proj, r.env)
+	if err != nil {
+		r.ui.Debug("failed: %s", err)
+	} else {
+		r.ui.Debug("%s refreshed", name)
 	}
 }
 

@@ -3,6 +3,7 @@ package features
 import (
 	"testing"
 
+	"github.com/devbuddy/devbuddy/pkg/features/definitions"
 	"github.com/stretchr/testify/require"
 )
 
