@@ -1,28 +1,42 @@
 package features
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/features/definitions"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
-var DevUpNeeded error
-
-func init() {
-	DevUpNeeded = errors.New("dev up needed")
+func Activate(name string, param string, conf *config.Config, proj *project.Project, env *env.Env) (bool, error) {
+	def := definitions.Get(name)
+	if def == nil {
+		panic(fmt.Sprintf("unknown feature: %s", name))
+	}
+	if def.Activate != nil {
+		return def.Activate(param, conf, proj, env)
+	}
+	return false, nil
 }
 
-type Feature interface {
-	Activate(*config.Config, *project.Project, *env.Env) error
-	Deactivate(*config.Config, *env.Env)
+func Refresh(name string, param string, conf *config.Config, proj *project.Project, env *env.Env) (bool, error) {
+	def := definitions.Get(name)
+	if def == nil {
+		panic(fmt.Sprintf("unknown feature: %s", name))
+	}
+	if def.Refresh != nil {
+		return def.Refresh(param, conf, proj, env)
+	}
+	return false, nil
 }
 
-type featureBuilder func(param string) Feature
-
-var allFeatures = make(map[string]featureBuilder)
-
-func New(name string, param string) Feature {
-	return allFeatures[name](param)
+func Deactivate(name string, param string, conf *config.Config, env *env.Env) {
+	def := definitions.Get(name)
+	if def == nil {
+		panic(fmt.Sprintf("unknown feature: %s", name))
+	}
+	if def.Deactivate != nil {
+		def.Deactivate(param, conf, env)
+	}
 }

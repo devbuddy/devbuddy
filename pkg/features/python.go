@@ -3,46 +3,41 @@ package features
 import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/features/definitions"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 func init() {
-	allFeatures["python"] = newPython
+	f := definitions.Register("python")
+	f.Activate = pythonActivate
+	f.Deactivate = pythonDeactivate
 }
 
-type Python struct {
-	version string
-}
-
-func newPython(param string) Feature {
-	return &Python{version: param}
-}
-
-func (p *Python) Activate(cfg *config.Config, proj *project.Project, env *env.Env) error {
-	name := helpers.VirtualenvName(proj, p.version)
+func pythonActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
+	name := helpers.VirtualenvName(proj, version)
 	venv := helpers.NewVirtualenv(cfg, name)
 
 	if !venv.Exists() {
-		return DevUpNeeded
+		return true, nil
 	}
 
-	p.cleanPath(cfg, env)
+	pythonCleanPath(cfg, env)
 	env.PrependToPath(venv.BinPath())
 
 	env.Set("VIRTUAL_ENV", venv.Path())
 
-	return nil
+	return false, nil
 }
 
-func (p *Python) Deactivate(cfg *config.Config, env *env.Env) {
+func pythonDeactivate(version string, cfg *config.Config, env *env.Env) {
 	env.Unset("VIRTUAL_ENV")
 
-	p.cleanPath(cfg, env)
+	pythonCleanPath(cfg, env)
 }
 
-// cleanPath removes all virtualenv path, even if multiple of them exists
-func (p *Python) cleanPath(cfg *config.Config, env *env.Env) {
+// pythonCleanPath removes all virtualenv path, even if multiple of them exists
+func pythonCleanPath(cfg *config.Config, env *env.Env) {
 	virtualenvBasePath := helpers.NewVirtualenv(cfg, "").Path()
 	env.RemoveFromPath(virtualenvBasePath)
 }
