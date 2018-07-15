@@ -21,7 +21,7 @@ func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.HookUI, env
 func (r *Runner) Run(features map[string]string) {
 	activeFeatures := r.env.GetActiveFeatures()
 
-	for name := range allFeatures {
+	for _, name := range definitions.Names() {
 		wantVersion, want := features[name]
 		activeVersion, active := activeFeatures[name]
 
@@ -37,22 +37,22 @@ func (r *Runner) Run(features map[string]string) {
 	}
 }
 
-func (r *Runner) activateFeature(name string, version string) {
-	err := New(name, version).Activate(r.cfg, r.proj, r.env)
+func (r *Runner) activateFeature(name string, param string) {
+	err := definitions.Get(name).Activate(param, r.cfg, r.proj, r.env)
 	if err != nil {
 		if err == DevUpNeeded {
-			r.ui.HookFeatureFailure(name, version)
+			r.ui.HookFeatureFailure(name, param)
 		} else {
 			r.ui.Debug("failed: %s", err)
 		}
 	} else {
-		r.ui.HookFeatureActivated(name, version)
-		r.env.SetFeature(name, version)
+		r.ui.HookFeatureActivated(name, param)
+		r.env.SetFeature(name, param)
 	}
 }
 
-func (r *Runner) deactivateFeature(name string, version string) {
-	New(name, version).Deactivate(r.cfg, r.env)
+func (r *Runner) deactivateFeature(name string, param string) {
+	definitions.Get(name).Deactivate(param, r.cfg, r.env)
 	r.env.UnsetFeature(name)
 	r.ui.Debug("%s deactivated", name)
 }

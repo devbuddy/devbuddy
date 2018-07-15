@@ -111,7 +111,7 @@ func activateFeature(ctx *context, task *Task) (err error) {
 		return nil
 	}
 
-	err = features.New(task.featureName, task.featureParam).Activate(ctx.cfg, ctx.proj, ctx.env)
+	err = features.Activate(task.featureName, task.featureParam, ctx.cfg, ctx.proj, ctx.env)
 	if err != nil {
 		if err == features.DevUpNeeded {
 			ctx.ui.TaskWarning(
