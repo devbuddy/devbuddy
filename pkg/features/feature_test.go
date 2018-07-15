@@ -34,7 +34,8 @@ func TestActivation(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, activated)
 
-	err = Refresh("test-activation", "testparam", nil, nil, nil)
+	devUpNeeded, err = Refresh("test-activation", "testparam", nil, nil, nil)
+	require.False(t, devUpNeeded)
 	require.NoError(t, err)
 
 	Deactivate("test-activation", "testparam", nil, nil)
@@ -44,17 +45,18 @@ func TestRefresh(t *testing.T) {
 	refreshed := false
 
 	d := definitions.Register("test-refresh")
-	d.Refresh = func(param string, cfg *config.Config, proj *project.Project, env *env.Env) error {
+	d.Refresh = func(param string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
 		require.Equal(t, "testparam", param)
 		refreshed = true
-		return nil
+		return true, nil
 	}
 
 	devUpNeeded, err := Activate("test-refresh", "testparam", nil, nil, nil)
 	require.False(t, devUpNeeded)
 	require.NoError(t, err)
 
-	err = Refresh("test-refresh", "testparam", nil, nil, nil)
+	devUpNeeded, err = Refresh("test-refresh", "testparam", nil, nil, nil)
+	require.True(t, devUpNeeded)
 	require.NoError(t, err)
 	require.True(t, refreshed)
 
@@ -74,7 +76,8 @@ func TestDeactivate(t *testing.T) {
 	require.False(t, devUpNeeded)
 	require.NoError(t, err)
 
-	err = Refresh("test-deactivate", "testparam", nil, nil, nil)
+	devUpNeeded, err = Refresh("test-deactivate", "testparam", nil, nil, nil)
+	require.False(t, devUpNeeded)
 	require.NoError(t, err)
 
 	Deactivate("test-deactivate", "testparam", nil, nil)

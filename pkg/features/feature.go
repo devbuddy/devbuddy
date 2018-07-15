@@ -20,7 +20,7 @@ func Activate(name string, param string, conf *config.Config, proj *project.Proj
 	return false, nil
 }
 
-func Refresh(name string, param string, conf *config.Config, proj *project.Project, env *env.Env) error {
+func Refresh(name string, param string, conf *config.Config, proj *project.Project, env *env.Env) (bool, error) {
 	def := definitions.Get(name)
 	if def == nil {
 		panic(fmt.Sprintf("unknown feature: %s", name))
@@ -28,7 +28,7 @@ func Refresh(name string, param string, conf *config.Config, proj *project.Proje
 	if def.Refresh != nil {
 		return def.Refresh(param, conf, proj, env)
 	}
-	return nil
+	return false, nil
 }
 
 func Deactivate(name string, param string, conf *config.Config, env *env.Env) {

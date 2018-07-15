@@ -55,12 +55,17 @@ func (r *Runner) activateFeature(name string, param string) {
 }
 
 func (r *Runner) refreshFeature(name string, param string) {
-	err := Refresh(name, param, r.cfg, r.proj, r.env)
+	devUpNeeded, err := Refresh(name, param, r.cfg, r.proj, r.env)
 	if err != nil {
 		r.ui.Debug("failed: %s", err)
-	} else {
-		r.ui.Debug("%s refreshed", name)
+		return
 	}
+	if devUpNeeded {
+		r.ui.HookFeatureFailure(name, param)
+		return
+	}
+
+	r.ui.Debug("%s refreshed", name)
 }
 
 func (r *Runner) deactivateFeature(name string, param string) {
