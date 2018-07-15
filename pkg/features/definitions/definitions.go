@@ -8,28 +8,28 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
-type definition struct {
+type Definition struct {
 	Name       string
 	Activate   func(string, *config.Config, *project.Project, *env.Env) (bool, error)
 	Refresh    func(string, *config.Config, *project.Project, *env.Env) error
 	Deactivate func(string, *config.Config, *env.Env)
 }
 
-var definitions map[string]*definition
+var definitions map[string]*Definition
 
 func init() {
-	definitions = map[string]*definition{}
+	definitions = map[string]*Definition{}
 }
 
-func Register(name string) *definition {
+func Register(name string) *Definition {
 	if _, ok := definitions[name]; ok {
 		panic(fmt.Sprint("Can't re-register a definition:", name))
 	}
-	definitions[name] = &definition{Name: name}
+	definitions[name] = &Definition{Name: name}
 	return definitions[name]
 }
 
-func Get(name string) *definition {
+func Get(name string) *Definition {
 	return definitions[name]
 }
 
