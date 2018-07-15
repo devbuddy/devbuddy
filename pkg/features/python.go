@@ -9,8 +9,8 @@ import (
 
 func init() {
 	f := definitions.Register("python")
-	f.Activate = pythonActivate
-	f.Deactivate = pythonDeactivate
+	f.activate = pythonActivate
+	f.deactivate = pythonDeactivate
 }
 
 func pythonActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) error {

@@ -9,8 +9,8 @@ import (
 
 func init() {
 	f := definitions.Register("golang")
-	f.Activate = golangActivate
-	f.Deactivate = golangDeactivate
+	f.activate = golangActivate
+	f.deactivate = golangDeactivate
 }
 
 func golangActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) error {

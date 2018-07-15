@@ -22,7 +22,10 @@ func Activate(name string, param string, conf *config.Config, proj *project.Proj
 	if def == nil {
 		panic(fmt.Sprintf("unknown feature: %s", name))
 	}
-	return def.Activate(param, conf, proj, env)
+	if def.activate == nil {
+		panic(fmt.Sprintf("no activate method for feature %s", name))
+	}
+	return def.activate(param, conf, proj, env)
 }
 
 func Deactivate(name string, param string, conf *config.Config, env *env.Env) {
@@ -30,5 +33,8 @@ func Deactivate(name string, param string, conf *config.Config, env *env.Env) {
 	if def == nil {
 		panic(fmt.Sprintf("unknown feature: %s", name))
 	}
-	def.Deactivate(param, conf, env)
+	if def.deactivate == nil {
+		panic(fmt.Sprintf("no deactivate method for feature %s", name))
+	}
+	def.deactivate(param, conf, env)
 }
