@@ -1,7 +1,6 @@
 package features
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
@@ -10,13 +9,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
-var DevUpNeeded error
-
-func init() {
-	DevUpNeeded = errors.New("dev up needed")
-}
-
-func Activate(name string, param string, conf *config.Config, proj *project.Project, env *env.Env) error {
+func Activate(name string, param string, conf *config.Config, proj *project.Project, env *env.Env) (bool, error) {
 	def := definitions.Get(name)
 	if def == nil {
 		panic(fmt.Sprintf("unknown feature: %s", name))

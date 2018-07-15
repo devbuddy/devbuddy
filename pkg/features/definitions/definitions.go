@@ -10,7 +10,7 @@ import (
 
 type definition struct {
 	Name       string
-	Activate   func(string, *config.Config, *project.Project, *env.Env) error
+	Activate   func(string, *config.Config, *project.Project, *env.Env) (bool, error)
 	Refresh    func(string, *config.Config, *project.Project, *env.Env) error
 	Deactivate func(string, *config.Config, *env.Env)
 }

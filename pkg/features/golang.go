@@ -14,11 +14,11 @@ func init() {
 	f.Deactivate = golangDeactivate
 }
 
-func golangActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) error {
+func golangActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
 	golang := helpers.NewGolang(cfg, version)
 
 	if !golang.Exists() {
-		return DevUpNeeded
+		return true, nil
 	}
 
 	env.PrependToPath(golang.BinPath())
@@ -28,7 +28,7 @@ func golangActivate(version string, cfg *config.Config, proj *project.Project, e
 	// TODO: decide whether we want to enable GO15VENDOREXPERIMENT
 	// Introduced in 1.5, enabled by default in 1.7
 
-	return nil
+	return false, nil
 }
 
 func golangDeactivate(version string, cfg *config.Config, env *env.Env) {

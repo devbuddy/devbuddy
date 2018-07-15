@@ -14,12 +14,12 @@ func init() {
 	f.Deactivate = pythonDeactivate
 }
 
-func pythonActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) error {
+func pythonActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
 	name := helpers.VirtualenvName(proj, version)
 	venv := helpers.NewVirtualenv(cfg, name)
 
 	if !venv.Exists() {
-		return DevUpNeeded
+		return true, nil
 	}
 
 	pythonCleanPath(cfg, env)
@@ -27,7 +27,7 @@ func pythonActivate(version string, cfg *config.Config, proj *project.Project, e
 
 	env.Set("VIRTUAL_ENV", venv.Path())
 
-	return nil
+	return false, nil
 }
 
 func pythonDeactivate(version string, cfg *config.Config, env *env.Env) {

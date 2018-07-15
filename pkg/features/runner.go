@@ -41,17 +41,17 @@ func (r *Runner) Run(features map[string]string) {
 }
 
 func (r *Runner) activateFeature(name string, param string) {
-	err := Activate(name, param, r.cfg, r.proj, r.env)
+	devUpNeeded, err := Activate(name, param, r.cfg, r.proj, r.env)
 	if err != nil {
-		if err == DevUpNeeded {
-			r.ui.HookFeatureFailure(name, param)
-		} else {
-			r.ui.Debug("failed: %s", err)
-		}
-	} else {
-		r.ui.HookFeatureActivated(name, param)
-		r.env.SetFeature(name, param)
+		r.ui.Debug("failed: %s", err)
+		return
 	}
+	if devUpNeeded {
+		r.ui.HookFeatureFailure(name, param)
+		return
+	}
+	r.ui.HookFeatureActivated(name, param)
+	r.env.SetFeature(name, param)
 }
 
 func (r *Runner) refreshFeature(name string, param string) {
