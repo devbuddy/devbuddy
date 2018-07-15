@@ -14,10 +14,10 @@ func Activate(name string, param string, conf *config.Config, proj *project.Proj
 	if def == nil {
 		panic(fmt.Sprintf("unknown feature: %s", name))
 	}
-	if def.Activate == nil {
-		panic(fmt.Sprintf("no activate method for feature %s", name))
+	if def.Activate != nil {
+		return def.Activate(param, conf, proj, env)
 	}
-	return def.Activate(param, conf, proj, env)
+	return false, nil
 }
 
 func Refresh(name string, param string, conf *config.Config, proj *project.Project, env *env.Env) error {
@@ -25,10 +25,10 @@ func Refresh(name string, param string, conf *config.Config, proj *project.Proje
 	if def == nil {
 		panic(fmt.Sprintf("unknown feature: %s", name))
 	}
-	if def.Activate == nil {
-		panic(fmt.Sprintf("no activate method for feature %s", name))
+	if def.Refresh != nil {
+		return def.Refresh(param, conf, proj, env)
 	}
-	return def.Refresh(param, conf, proj, env)
+	return nil
 }
 
 func Deactivate(name string, param string, conf *config.Config, env *env.Env) {
@@ -36,8 +36,7 @@ func Deactivate(name string, param string, conf *config.Config, env *env.Env) {
 	if def == nil {
 		panic(fmt.Sprintf("unknown feature: %s", name))
 	}
-	if def.Deactivate == nil {
-		panic(fmt.Sprintf("no deactivate method for feature %s", name))
+	if def.Deactivate != nil {
+		def.Deactivate(param, conf, env)
 	}
-	def.Deactivate(param, conf, env)
 }
