@@ -38,3 +38,20 @@ func FileChecksum(path string) (string, error) {
 	checksum := fmt.Sprint(adler32.Checksum(content))
 	return checksum, nil
 }
+
+func WriteNewFile(filename string, data []byte, perm os.FileMode) error {
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_EXCL, perm)
+	if err != nil {
+		return fmt.Errorf("creation failed: %s", err)
+	}
+
+	defer func() {
+		cerr := file.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
+
+	_, err = file.Write(data)
+	return err
+}
