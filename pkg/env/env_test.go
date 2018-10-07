@@ -45,6 +45,9 @@ func TestChanged(t *testing.T) {
 	env := New([]string{})
 	require.Equal(t, []VariableChange{}, env.Changed())
 
+	env.Set("K2", "")
+	require.Equal(t, []VariableChange{{"K2", "", false}}, env.Changed())
+
 	env.Set("K2", "1")
 	require.Equal(t, []VariableChange{{"K2", "1", false}}, env.Changed())
 

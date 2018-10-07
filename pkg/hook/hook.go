@@ -51,6 +51,8 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI
 	runner := features.NewRunner(cfg, proj, ui, env)
 	runner.Run(allFeatures)
 
+	ui.Debug("env: %+v", env.Environ())
+
 	envChanges := env.Changed()
 	for _, change := range envChanges {
 		ui.Debug("Env change: %+v", change)

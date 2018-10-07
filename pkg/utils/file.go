@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bufio"
 	"fmt"
 	"hash/adler32"
 	"io/ioutil"
@@ -37,4 +38,18 @@ func FileChecksum(path string) (string, error) {
 	}
 	checksum := fmt.Sprint(adler32.Checksum(content))
 	return checksum, nil
+}
+
+func ReadLines(path string) (lines []string, err error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return
 }
