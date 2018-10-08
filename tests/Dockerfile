@@ -21,4 +21,6 @@ RUN ~/.pyenv/bin/pyenv install 3.6.5 \
 RUN go get -u gopkg.in/alecthomas/gometalinter.v2 \
  && gometalinter.v2 --install --update
 
+RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s v1.10.2
+
 RUN go get github.com/tcnksm/ghr
