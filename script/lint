@@ -5,7 +5,7 @@ gometalinter.v2 \
     --vendor \
     --deadline=120s \
     --disable=gotype \
-    --disable=gas \
+    --disable=gas --disable=gosec \
     --enable=gofmt \
     --exclude=".*should have comment or be unexported.*" \
     ./...
