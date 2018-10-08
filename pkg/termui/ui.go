@@ -24,68 +24,68 @@ func NewUI(cfg *config.Config) *UI {
 }
 
 func (u *UI) ActionHeader(description string) {
-	fmt.Fprintf(u.out, "🐼  %s\n", color.Cyan(description))
+	Fprintf(u.out, "🐼  %s\n", color.Cyan(description))
 }
 
 func (u *UI) ActionNotice(text string) {
-	fmt.Fprintf(u.out, "⚠️   %s\n", color.Brown(text))
+	Fprintf(u.out, "⚠️   %s\n", color.Brown(text))
 }
 
 func (u *UI) ActionDone() {
-	fmt.Fprintf(u.out, "✅  %s\n", color.Green("Done!"))
+	Fprintf(u.out, "✅  %s\n", color.Green("Done!"))
 }
 
 func (u *UI) CommandHeader(cmdline string) {
-	fmt.Fprintf(os.Stderr, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
+	Fprintf(os.Stderr, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
 }
 
 func (u *UI) CommandRun(cmdline string, args ...string) {
-	fmt.Fprint(u.out, color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")), "\n")
+	Fprintf(u.out, "%s %s\n", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
 }
 
 func (u *UI) CommandActed() {
-	fmt.Fprintf(u.out, "  %s\n", color.Green("Done!"))
+	Fprintf(u.out, "  %s\n", color.Green("Done!"))
 }
 
 func (u *UI) TaskHeader(name string, param string) {
 	if param != "" {
 		param = fmt.Sprintf(" (%s)", color.Blue(param))
 	}
-	fmt.Fprintf(u.out, "%s %s%s\n", color.Brown("◼︎"), color.Magenta(name), param)
+	Fprintf(u.out, "%s %s%s\n", color.Brown("◼︎"), color.Magenta(name), param)
 }
 
 func (u *UI) TaskCommand(cmdline string, args ...string) {
-	fmt.Fprintf(u.out, "  Running: %s %s\n", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
+	Fprintf(u.out, "  Running: %s %s\n", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
 }
 
 func (u *UI) TaskShell(cmdline string) {
-	fmt.Fprintf(u.out, "  Running: %s\n", color.Cyan(cmdline))
+	Fprintf(u.out, "  Running: %s\n", color.Cyan(cmdline))
 }
 
 func (u *UI) TaskActed() {
-	fmt.Fprintf(u.out, "  %s\n", color.Green("Done!"))
+	Fprintf(u.out, "  %s\n", color.Green("Done!"))
 }
 
 func (u *UI) TaskAlreadyOk() {
-	fmt.Fprintf(u.out, "  %s\n", color.Green("Already OK!"))
+	Fprintf(u.out, "  %s\n", color.Green("Already OK!"))
 }
 
 func (u *UI) TaskError(err error) {
-	fmt.Fprintf(u.out, "  %s\n", color.Red(err.Error()))
+	Fprintf(u.out, "  %s\n", color.Red(err.Error()))
 }
 
 func (u *UI) TaskWarning(message string) {
-	fmt.Fprintf(u.out, "  Warning: %s\n", color.Brown(message))
+	Fprintf(u.out, "  Warning: %s\n", color.Brown(message))
 }
 
 func (u *UI) TaskActionHeader(desc string) {
-	fmt.Fprintf(u.out, "  %s%s\n", color.Brown("▪︎"), color.Magenta(desc))
+	Fprintf(u.out, "  %s%s\n", color.Brown("▪︎"), color.Magenta(desc))
 }
 
 func (u *UI) ProjectExists() {
-	fmt.Fprintf(u.out, "🐼  %s\n", color.Brown("project already exists locally"))
+	Fprintf(u.out, "🐼  %s\n", color.Brown("project already exists locally"))
 }
 
 func (u *UI) JumpProject(name string) {
-	fmt.Fprintf(u.out, "🐼  %s %s\n", color.Brown("jumping to"), color.Green(name))
+	Fprintf(u.out, "🐼  %s %s\n", color.Brown("jumping to"), color.Green(name))
 }
