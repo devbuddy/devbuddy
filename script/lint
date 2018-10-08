@@ -1,11 +1,6 @@
 #!/bin/sh
 set -eu
 
-gometalinter.v2 \
-    --vendor \
-    --deadline=120s \
-    --disable=gotype \
-    --disable=gas \
-    --enable=gofmt \
-    --exclude=".*should have comment or be unexported.*" \
-    ./...
+export CGO_ENABLED=0
+
+exec bin/golangci-lint run

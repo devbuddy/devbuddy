@@ -7,9 +7,9 @@ up:
     - curl
     - shellcheck
   - custom:
-      name: Install gometalinter
-      met?: which gometalinter.v2 > /dev/null
-      meet: go get gopkg.in/alecthomas/gometalinter.v2
+      name: Install golangci-lint in ./bin
+      met?: test -f bin/golangci-lint
+      meet: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s v1.10.2
 
 commands:
   testup:
