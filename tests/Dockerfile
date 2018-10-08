@@ -1,7 +1,7 @@
 # Automatic build enabled on https://hub.docker.com/r/devbuddy/testing/
 # Images are tagged with the tags and branch names, except for master: "latest".
 
-FROM circleci/golang:1.10
+FROM circleci/golang:1.11.1
 
 ENV DEBIAN_FRONTEND=noninteractive
 
