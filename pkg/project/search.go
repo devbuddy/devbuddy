@@ -43,7 +43,7 @@ func projectMatch(expr string, projects []*Project) *Project {
 	// Then, extend match to the organisation name as well
 	names = []string{}
 	for _, p := range projects {
-		names = append(names, p.id)
+		names = append(names, p.OrganisationName+"/"+p.RepositoryName)
 	}
 	matches = fuzzy.Find(expr, names)
 	if matches.Len() >= 1 {
@@ -87,7 +87,6 @@ func GetAllProjects(sourceDir string) ([]*Project, error) {
 					HostingPlatform:  hostingPlatform,
 					OrganisationName: org,
 					RepositoryName:   repo,
-					id:               filepath.Join(org, repo),
 					Path:             projPath,
 				})
 			}
