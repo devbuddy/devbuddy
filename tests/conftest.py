@@ -84,24 +84,25 @@ class CommandTestHelper:
     def __init__(self, pexpect_wrapper):
         self._pexpect_wrapper = pexpect_wrapper
 
-    def run(self, command, expect_exit_code=0):
-        output = self._pexpect_wrapper.run_command(command).strip()
+    def _run(self, command):
+        return self._pexpect_wrapper.run_command(command).strip()
+
+    def run(self, command, expect_exit_code=0, check_activation_failure=True):
+        output = self._run(command)
 
         error_lines = [l for l in output.splitlines() if 'failed to activate ' in l]
-        if error_lines:
+        if check_activation_failure and error_lines:
             pytest.fail(f"Failed to activate features:\n{error_lines}")
 
-        if expect_exit_code is not None:
-            code = self.get_exit_code()
-            if code != expect_exit_code:
-                pytest.fail(f"Command failed with code {code}. Output:\n{output}")
+        code = self.get_exit_code()
+        if code != expect_exit_code:
+            pytest.fail(f"Command failed with code {code}. Output:\n{output}")
 
         return output
 
     def get_exit_code(self):
-        output = self.run("echo $?", expect_exit_code=None)
-        first_line = output.split('\n')[0]  # Ignore lines produced by prompt hook
-        return int(first_line)
+        lines = self._run("echo $?").splitlines()
+        return int(lines[0])  # Ignore lines produced by prompt hook
 
 
 @pytest.fixture(scope='session')

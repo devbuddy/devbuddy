@@ -23,6 +23,18 @@ func NewUI(cfg *config.Config) *UI {
 	}
 }
 
+func (u *UI) ActionHeader(description string) {
+	fmt.Fprintf(u.out, "🐼  %s\n", color.Cyan(description))
+}
+
+func (u *UI) ActionNotice(text string) {
+	fmt.Fprintf(u.out, "⚠️   %s\n", color.Brown(text))
+}
+
+func (u *UI) ActionDone() {
+	fmt.Fprintf(u.out, "✅  %s\n", color.Green("Done!"))
+}
+
 func (u *UI) CommandHeader(cmdline string) {
 	fmt.Fprintf(os.Stderr, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
 }
