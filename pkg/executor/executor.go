@@ -9,6 +9,8 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 type Executor struct {
@@ -76,7 +78,7 @@ func (e *Executor) printPipe(wg *sync.WaitGroup, pipe io.Reader) {
 		if e.shouldSuppressLine(line) {
 			continue
 		}
-		fmt.Fprintf(e.outputWriter, "%s%s\n", e.outputPrefix, line)
+		termui.Fprintf(e.outputWriter, "%s%s\n", e.outputPrefix, line)
 	}
 }
 
