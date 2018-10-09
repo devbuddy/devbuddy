@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/executor"
@@ -24,11 +25,27 @@ type Project struct {
 
 // NewFromID creates an instance of Project from a short id like "org/name"
 func NewFromID(id string, conf *config.Config) (p *Project, err error) {
-	reGithubFull := regexp.MustCompile(`([^/]+)/([^/]+)`)
+	reGithubFull := regexp.MustCompile(`^([\w.-]+)/([\w.-]+)$`)
+	reGithubGitURL := regexp.MustCompile(`^git@github.com:([\w.-]+)/([\w.-]+).git$`)
+	reBitbucketGitURL := regexp.MustCompile(`^git@bitbucket.org:([\w.-]+)/([\w.-]+).git$`)
+
+	id = strings.Trim(id, " ")
 
 	if match := reGithubFull.FindStringSubmatch(id); match != nil {
 		p = &Project{
 			HostingPlatform:  "github.com",
+			OrganisationName: match[1],
+			RepositoryName:   match[2],
+		}
+	} else if match := reGithubGitURL.FindStringSubmatch(id); match != nil {
+		p = &Project{
+			HostingPlatform:  "github.com",
+			OrganisationName: match[1],
+			RepositoryName:   match[2],
+		}
+	} else if match := reBitbucketGitURL.FindStringSubmatch(id); match != nil {
+		p = &Project{
+			HostingPlatform:  "bitbucket.org",
 			OrganisationName: match[1],
 			RepositoryName:   match[2],
 		}
@@ -56,6 +73,10 @@ func (p *Project) Slug() string {
 func (p *Project) GetRemoteURL() (url string, err error) {
 	if p.HostingPlatform == "github.com" {
 		url = fmt.Sprintf("git@github.com:%s/%s.git", p.OrganisationName, p.RepositoryName)
+		return
+	}
+	if p.HostingPlatform == "bitbucket.org" {
+		url = fmt.Sprintf("git@bitbucket.org:%s/%s.git", p.OrganisationName, p.RepositoryName)
 		return
 	}
 	err = fmt.Errorf("Unknown project hosting platform: %s", p.HostingPlatform)
