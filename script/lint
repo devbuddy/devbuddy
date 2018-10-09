@@ -2,5 +2,4 @@
 set -eu
 
 export CGO_ENABLED=0
-
-exec bin/golangci-lint run
+exec golangci-lint run

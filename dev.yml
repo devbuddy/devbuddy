@@ -7,9 +7,9 @@ up:
     - curl
     - shellcheck
   - custom:
-      name: Install golangci-lint in ./bin
-      met?: test -f bin/golangci-lint
-      meet: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s v1.10.2
+      name: Install golangci-lint
+      met?: test -f $GOPATH/bin/golangci-lint
+      meet: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $GOPATH/bin v1.10.2
 
 commands:
   testup:
