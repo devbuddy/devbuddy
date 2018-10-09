@@ -15,10 +15,10 @@ import (
 
 // Project represents a project whether it exists locally or not
 type Project struct {
-	HostingPlatform  string // Name and directory name of the hosting platform like "github.com"
-	OrganisationName string // Name and directory name of the organisation owning this project
-	RepositoryName   string // Name and directory name of this project
-	Path             string // Full path of this project
+	HostingPlatform  string // Name of the hosting platform like "github.com"
+	OrganisationName string // Name of the organisation owning this project
+	RepositoryName   string // Name of this project
+	Path             string // Local path of this project on disk
 
 	Manifest *manifest.Manifest // Manifest of this project
 }
