@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/executor"
@@ -14,25 +15,39 @@ import (
 
 // Project represents a project whether it exists locally or not
 type Project struct {
-	HostingPlatform  string // Name and directory name of the hosting platform like "github.com"
-	OrganisationName string // Name and directory name of the organisation owning this project
-	RepositoryName   string // Name and directory name of this project
-	id               string // Short id like "org/name"
-	Path             string // Full path of this project
+	HostingPlatform  string // Name of the hosting platform like "github.com"
+	OrganisationName string // Name of the organisation owning this project
+	RepositoryName   string // Name of this project
+	Path             string // Local path of this project on disk
 
 	Manifest *manifest.Manifest // Manifest of this project
 }
 
 // NewFromID creates an instance of Project from a short id like "org/name"
 func NewFromID(id string, conf *config.Config) (p *Project, err error) {
-	reGithubFull := regexp.MustCompile(`([^/]+)/([^/]+)`)
+	reGithubFull := regexp.MustCompile(`^([\w.-]+)/([\w.-]+)$`)
+	reGithubGitURL := regexp.MustCompile(`^git@github.com:([\w.-]+)/([\w.-]+).git$`)
+	reBitbucketGitURL := regexp.MustCompile(`^git@bitbucket.org:([\w.-]+)/([\w.-]+).git$`)
+
+	id = strings.Trim(id, " ")
 
 	if match := reGithubFull.FindStringSubmatch(id); match != nil {
 		p = &Project{
 			HostingPlatform:  "github.com",
 			OrganisationName: match[1],
 			RepositoryName:   match[2],
-			id:               id,
+		}
+	} else if match := reGithubGitURL.FindStringSubmatch(id); match != nil {
+		p = &Project{
+			HostingPlatform:  "github.com",
+			OrganisationName: match[1],
+			RepositoryName:   match[2],
+		}
+	} else if match := reBitbucketGitURL.FindStringSubmatch(id); match != nil {
+		p = &Project{
+			HostingPlatform:  "bitbucket.org",
+			OrganisationName: match[1],
+			RepositoryName:   match[2],
 		}
 	} else {
 		err = fmt.Errorf("Unrecognized remote project: %s", id)
@@ -58,6 +73,10 @@ func (p *Project) Slug() string {
 func (p *Project) GetRemoteURL() (url string, err error) {
 	if p.HostingPlatform == "github.com" {
 		url = fmt.Sprintf("git@github.com:%s/%s.git", p.OrganisationName, p.RepositoryName)
+		return
+	}
+	if p.HostingPlatform == "bitbucket.org" {
+		url = fmt.Sprintf("git@bitbucket.org:%s/%s.git", p.OrganisationName, p.RepositoryName)
 		return
 	}
 	err = fmt.Errorf("Unknown project hosting platform: %s", p.HostingPlatform)
