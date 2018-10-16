@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -25,21 +26,27 @@ type Command struct {
 }
 
 // Load returns a Manifest struct populated from a manifest file
-func Load(path string) (m *Manifest, err error) {
+func ExistsIn(path string) bool {
+	return utils.PathExists(filepath.Join(path, manifestFilename))
+}
+
+// Load returns a Manifest struct populated from a manifest file
+func Load(path string) (*Manifest, error) {
 	manifestPath := filepath.Join(path, manifestFilename)
 	if !utils.PathExists(manifestPath) {
-		return nil, nil
+		return nil, fmt.Errorf("no manifest at %s", manifestPath)
 	}
 
 	file, err := ioutil.ReadFile(manifestPath)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	err = yaml.Unmarshal(file, &m)
+	manifest := &Manifest{}
+	err = yaml.Unmarshal(file, manifest)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	return
+	return manifest, nil
 }

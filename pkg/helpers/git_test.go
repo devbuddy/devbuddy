@@ -12,7 +12,8 @@ import (
 func TestGitGithubProjectURL(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
-	test.GitInit(t, tmpdir)
+	writer := test.Project(tmpdir)
+	writer.CreateGitRepo(t)
 
 	url, err := NewGitRepo(tmpdir).BuildGithubProjectURL()
 
@@ -23,7 +24,8 @@ func TestGitGithubProjectURL(t *testing.T) {
 func TestGitGithubPullrequestURL(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
-	test.GitInit(t, tmpdir)
+	writer := test.Project(tmpdir)
+	writer.CreateGitRepo(t)
 
 	url, err := NewGitRepo(tmpdir).BuildGithubPullrequestURL()
 

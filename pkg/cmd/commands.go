@@ -8,6 +8,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
@@ -25,8 +26,13 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	man, err := manifest.Load(proj.Path)
+	if err != nil {
+		return err
+	}
+
 	name := cmd.Annotations["name"]
-	spec, ok := proj.Manifest.Commands[name]
+	spec, ok := man.Commands[name]
 	if !ok {
 		return fmt.Errorf("custom command is not found: %s", name)
 	}
@@ -44,9 +50,14 @@ func buildCustomCommands() {
 		return
 	}
 
+	man, err := manifest.Load(proj.Path)
+	if err != nil {
+		return
+	}
+
 	var cmd *cobra.Command
 
-	for name, spec := range proj.Manifest.Commands {
+	for name, spec := range man.Commands {
 		desc := "Custom"
 		if spec.Description != "" {
 			desc = fmt.Sprintf("Custom: %s", spec.Description)
