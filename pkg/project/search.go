@@ -12,7 +12,7 @@ import (
 )
 
 func FindBestMatch(expr string, conf *config.Config) (found *Project, err error) {
-	projects, err := GetAllProjects(conf.SourceDir)
+	projects, err := getAllProjects(conf.SourceDir)
 	if err != nil {
 		return
 	}
@@ -33,7 +33,7 @@ func projectMatch(expr string, projects []*Project) *Project {
 	// First, try to match on project name only
 	names := []string{}
 	for _, p := range projects {
-		names = append(names, p.RepositoryName)
+		names = append(names, p.Name())
 	}
 	matches := fuzzy.Find(expr, names)
 	if matches.Len() >= 1 {
@@ -43,7 +43,7 @@ func projectMatch(expr string, projects []*Project) *Project {
 	// Then, extend match to the organisation name as well
 	names = []string{}
 	for _, p := range projects {
-		names = append(names, p.OrganisationName+"/"+p.RepositoryName)
+		names = append(names, p.FullName())
 	}
 	matches = fuzzy.Find(expr, names)
 	if matches.Len() >= 1 {
@@ -53,27 +53,25 @@ func projectMatch(expr string, projects []*Project) *Project {
 	return nil
 }
 
-func GetAllProjects(sourceDir string) ([]*Project, error) {
+func getAllProjects(sourceDir string) ([]*Project, error) {
 	var projects []*Project
 
-	hostingPlatforms := []string{"github.com"}
-
-	for _, hostingPlatform := range hostingPlatforms {
-		hostingPlatformPath := filepath.Join(sourceDir, hostingPlatform)
-		if !utils.PathExists(hostingPlatformPath) {
+	for _, platform := range getPlatformNames() {
+		platformPath := filepath.Join(sourceDir, platform)
+		if !utils.PathExists(platformPath) {
 			continue
 		}
 
 		var orgPath string
 		var projPath string
 
-		orgs, err := listChildDir(hostingPlatformPath)
+		orgs, err := listChildDir(platformPath)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, org := range orgs {
-			orgPath = filepath.Join(hostingPlatformPath, org)
+			orgPath = filepath.Join(platformPath, org)
 
 			repos, err := listChildDir(orgPath)
 			if err != nil {
@@ -84,10 +82,12 @@ func GetAllProjects(sourceDir string) ([]*Project, error) {
 				projPath = filepath.Join(orgPath, repo)
 
 				projects = append(projects, &Project{
-					HostingPlatform:  hostingPlatform,
-					OrganisationName: org,
-					RepositoryName:   repo,
-					Path:             projPath,
+					hosting: &hostingInfo{
+						platform:     platform,
+						organisation: org,
+						repository:   repo,
+					},
+					Path: projPath,
 				})
 			}
 		}

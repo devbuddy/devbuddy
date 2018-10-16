@@ -5,82 +5,60 @@ import (
 	"hash/adler32"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/executor"
-	"github.com/devbuddy/devbuddy/pkg/manifest"
 )
 
 // Project represents a project whether it exists locally or not
 type Project struct {
-	HostingPlatform  string // Name of the hosting platform like "github.com"
-	OrganisationName string // Name of the organisation owning this project
-	RepositoryName   string // Name of this project
-	Path             string // Local path of this project on disk
-
-	Manifest *manifest.Manifest // Manifest of this project
+	hosting *hostingInfo
+	Path    string // Local path of this project on disk
 }
 
 // NewFromID creates an instance of Project from a short id like "org/name"
 func NewFromID(id string, conf *config.Config) (p *Project, err error) {
-	reGithubFull := regexp.MustCompile(`^([\w.-]+)/([\w.-]+)$`)
-	reGithubGitURL := regexp.MustCompile(`^git@github.com:([\w.-]+)/([\w.-]+).git$`)
-	reBitbucketGitURL := regexp.MustCompile(`^git@bitbucket.org:([\w.-]+)/([\w.-]+).git$`)
-
-	id = strings.Trim(id, " ")
-
-	if match := reGithubFull.FindStringSubmatch(id); match != nil {
-		p = &Project{
-			HostingPlatform:  "github.com",
-			OrganisationName: match[1],
-			RepositoryName:   match[2],
-		}
-	} else if match := reGithubGitURL.FindStringSubmatch(id); match != nil {
-		p = &Project{
-			HostingPlatform:  "github.com",
-			OrganisationName: match[1],
-			RepositoryName:   match[2],
-		}
-	} else if match := reBitbucketGitURL.FindStringSubmatch(id); match != nil {
-		p = &Project{
-			HostingPlatform:  "bitbucket.org",
-			OrganisationName: match[1],
-			RepositoryName:   match[2],
-		}
-	} else {
-		err = fmt.Errorf("Unrecognized remote project: %s", id)
-		return
+	hosting, err := newHostingInfoByURL(id)
+	if err != nil {
+		return nil, err
 	}
 
-	p.Path = filepath.Join(conf.SourceDir, p.HostingPlatform, p.OrganisationName, p.RepositoryName)
+	path := filepath.Join(conf.SourceDir, hosting.platform, hosting.organisation, hosting.repository)
+
+	p = &Project{
+		hosting: hosting,
+		Path:    path,
+	}
 	return
+}
+
+// NewFromPath creates an instance of Project from the local path
+func NewFromPath(path string) *Project {
+	return &Project{
+		hosting: newHostingInfoByPath(path),
+		Path:    path,
+	}
+}
+
+// Name returns a logical id like platform:org/project
+func (p *Project) Name() string {
+	return p.hosting.repository
 }
 
 // FullName returns a logical id like platform:org/project
 func (p *Project) FullName() string {
-	return fmt.Sprintf("%s:%s/%s", p.HostingPlatform, p.OrganisationName, p.RepositoryName)
+	return fmt.Sprintf("%s:%s/%s", p.hosting.platform, p.hosting.organisation, p.hosting.repository)
 }
 
 // Slug returns a short, unique but humanly recognizable id based on the path
 func (p *Project) Slug() string {
 	locationToken := adler32.Checksum([]byte(filepath.Clean(p.Path)))
-	return fmt.Sprintf("%s-%d", p.RepositoryName, locationToken)
+	return fmt.Sprintf("%s-%d", p.hosting.repository, locationToken)
 }
 
 // GetRemoteURL builds the Git remote url for the project
 func (p *Project) GetRemoteURL() (url string, err error) {
-	if p.HostingPlatform == "github.com" {
-		url = fmt.Sprintf("git@github.com:%s/%s.git", p.OrganisationName, p.RepositoryName)
-		return
-	}
-	if p.HostingPlatform == "bitbucket.org" {
-		url = fmt.Sprintf("git@bitbucket.org:%s/%s.git", p.OrganisationName, p.RepositoryName)
-		return
-	}
-	err = fmt.Errorf("Unknown project hosting platform: %s", p.HostingPlatform)
-	return
+	return p.hosting.remoteURL, nil
 }
 
 // Exists checks whether the project exists locally
@@ -101,12 +79,7 @@ func (p *Project) Clone() (err error) {
 		return
 	}
 
-	url, err := p.GetRemoteURL()
-	if err != nil {
-		return
-	}
-
-	return executor.New("git", "clone", url, p.Path).Run()
+	return executor.New("git", "clone", p.hosting.remoteURL, p.Path).Run()
 }
 
 // Create creates the project directory locally

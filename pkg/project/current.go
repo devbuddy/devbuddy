@@ -20,17 +20,9 @@ func FindCurrent() (*Project, error) {
 
 func findByPath(path string) (*Project, error) {
 	for {
-		man, err := manifest.Load(path)
-		if err != nil {
-			return nil, err
-		}
-		if man != nil {
-			p := &Project{
-				RepositoryName: filepath.Base(path),
-				Path:           path,
-				Manifest:       man,
-			}
-			return p, nil
+		exists := manifest.ExistsIn(path)
+		if exists {
+			return NewFromPath(path), nil
 		}
 
 		// Continue searching in top directory

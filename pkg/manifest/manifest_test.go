@@ -1,16 +1,14 @@
 package manifest
 
 import (
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/Flaque/filet"
+	"github.com/devbuddy/devbuddy/pkg/test"
 	"github.com/stretchr/testify/require"
 )
 
-var manifestContent = []byte(`
+var manifestContent = `
 up:
   - task1
   - task2
@@ -22,27 +20,29 @@ commands:
 
 open:
   app: http://localhost:5000
-`)
-
-func createManifest(dir string) {
-	manifestPath := filepath.Join(dir, "dev.yml")
-	err := ioutil.WriteFile(manifestPath, manifestContent, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-}
+`
 
 func TestLoad(t *testing.T) {
+	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
+	writer := test.Project(tmpdir)
+	writer.Manifest().WriteString(t, manifestContent)
 
-	dir := filet.TmpDir(t, "")
-	createManifest(dir)
-
-	man, err := Load(dir)
+	man, err := Load(tmpdir)
 	require.NoError(t, err, "Load() failed")
 	require.NotEqual(t, nil, man)
 
 	require.Equal(t, []interface{}{"task1", "task2"}, man.Up)
 	require.Equal(t, map[string]*Command{"cmd1": {Run: "command1", Description: "description1"}}, man.Commands)
 	require.Equal(t, map[string]string{"app": "http://localhost:5000"}, man.Open)
+}
+
+func TestLoadErr(t *testing.T) {
+	man, err := Load("")
+	require.Error(t, err)
+	require.Nil(t, man)
+
+	man, err = Load("/dev/null")
+	require.Error(t, err)
+	require.Nil(t, man)
 }

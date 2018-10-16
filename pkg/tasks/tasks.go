@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 
+	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
@@ -48,7 +49,12 @@ type taskAction interface {
 func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	var task *Task
 
-	for _, taskdef := range proj.Manifest.Up {
+	manifest, err := manifest.Load(proj.Path)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, taskdef := range manifest.Up {
 		task, err = buildFromDefinition(taskdef)
 		if err != nil {
 			return nil, err

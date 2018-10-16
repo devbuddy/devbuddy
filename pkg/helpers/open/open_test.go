@@ -6,14 +6,17 @@ import (
 	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/require"
 
-	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/test"
 )
 
 func TestFindLink(t *testing.T) {
-	open := map[string]string{"doc": "http://doc.com", "logs": "http://logs"}
-	proj := &project.Project{Manifest: &manifest.Manifest{Open: open}}
+	tmpdir := filet.TmpDir(t, "")
+	defer filet.CleanUp(t)
+	writer := test.Project(tmpdir)
+	writer.Manifest().WriteString(t, "open: {doc: http://doc.com, logs: http://logs}")
+
+	proj := project.NewFromPath(tmpdir)
 
 	_, err := FindLink(proj, "")
 	require.Error(t, err)
@@ -27,8 +30,12 @@ func TestFindLink(t *testing.T) {
 }
 
 func TestFindLinkDefault(t *testing.T) {
-	open := map[string]string{"doc": "http://doc.com"}
-	proj := &project.Project{Manifest: &manifest.Manifest{Open: open}}
+	tmpdir := filet.TmpDir(t, "")
+	defer filet.CleanUp(t)
+	writer := test.Project(tmpdir)
+	writer.Manifest().WriteString(t, "open: {doc: http://doc.com}")
+
+	proj := project.NewFromPath(tmpdir)
 
 	url, err := FindLink(proj, "")
 	require.NoError(t, err)
@@ -38,9 +45,11 @@ func TestFindLinkDefault(t *testing.T) {
 func TestFindLinkGithub(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
+	writer := test.Project(tmpdir)
+	writer.CreateGitRepo(t)
+	writer.Manifest().Empty(t)
 
-	test.GitInit(t, tmpdir)
-	proj := &project.Project{Path: tmpdir, Manifest: &manifest.Manifest{}}
+	proj := project.NewFromPath(tmpdir)
 
 	nameToURL := map[string]string{
 		"pullrequest": "https://github.com/org1/repo1/pull/master?expand=1",
@@ -56,15 +65,18 @@ func TestFindLinkGithub(t *testing.T) {
 }
 
 func TestPrintLinks(t *testing.T) {
-	open := map[string]string{}
-	proj := &project.Project{Manifest: &manifest.Manifest{Open: open}}
+	tmpdir := filet.TmpDir(t, "")
+	defer filet.CleanUp(t)
+	writer := test.Project(tmpdir)
+
+	proj := project.NewFromPath(tmpdir)
+
+	writer.Manifest().WriteString(t, "")
 
 	err := PrintLinks(proj)
 	require.Error(t, err)
 
-	open = map[string]string{"doc": "http://doc.com"}
-	proj = &project.Project{Manifest: &manifest.Manifest{Open: open}}
-
+	writer.Manifest().WriteString(t, "open: {doc: http://doc.com}")
 	err = PrintLinks(proj)
 	require.NoError(t, err)
 }

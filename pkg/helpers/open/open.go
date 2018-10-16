@@ -6,6 +6,7 @@ import (
 	"runtime"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
 
 	color "github.com/logrusorgru/aurora"
@@ -26,16 +27,21 @@ func Open(location string) error {
 // Possible links are github/pullrequest pages and arbitrary links declared in dev.yml. In case of collision, links
 // declared in dev.yml have precedence over Github links.
 func FindLink(proj *project.Project, linkName string) (url string, err error) {
+	man, err := manifest.Load(proj.Path)
+	if err != nil {
+		return "", err
+	}
+
 	if linkName == "" {
-		if len(proj.Manifest.Open) == 1 {
-			for _, url = range proj.Manifest.Open {
+		if len(man.Open) == 1 {
+			for _, url = range man.Open {
 				return url, nil
 			}
 		}
 		return "", fmt.Errorf("which link should I open?")
 	}
 
-	url = proj.Manifest.Open[linkName]
+	url = man.Open[linkName]
 	if url != "" {
 		return
 	}
@@ -55,10 +61,15 @@ func FindLink(proj *project.Project, linkName string) (url string, err error) {
 }
 
 func PrintLinks(proj *project.Project) (err error) {
-	if len(proj.Manifest.Open) == 0 {
+	man, err := manifest.Load(proj.Path)
+	if err != nil {
+		return err
+	}
+
+	if len(man.Open) == 0 {
 		return fmt.Errorf("no links found in the project")
 	}
-	for title, url := range proj.Manifest.Open {
+	for title, url := range man.Open {
 		fmt.Println(color.Green(title), "\t", url)
 	}
 
