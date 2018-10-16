@@ -13,7 +13,7 @@ type Github struct {
 }
 
 type GithubReleaseItem struct {
-	Plateform   string `json:"name"`
+	Platform    string `json:"name"`
 	DownloadURL string `json:"browser_download_url"`
 }
 type GithubReleaseList struct {
@@ -58,19 +58,19 @@ func releaseURL() string {
 }
 
 // LatestRelease get latest release url for a specific `platform`
-func (g *Github) LatestRelease(plateform string) (*GithubReleaseItem, error) {
+func (g *Github) LatestRelease(platform string) (*GithubReleaseItem, error) {
 	releaseList, err := g.listReleases()
 	if err != nil {
 		return nil, err
 	}
 
 	for _, item := range releaseList.Items {
-		if item.Plateform == plateform {
+		if item.Platform == platform {
 			return &item, nil
 		}
 	}
 
-	return nil, fmt.Errorf("Cannot find release for %s", plateform)
+	return nil, fmt.Errorf("Cannot find release for %s", platform)
 }
 
 // Get download the content at `url`

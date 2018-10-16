@@ -21,6 +21,7 @@ func buildGithubClient(t *testing.T) (g *Github, r *recorder.Recorder) {
 	g = NewGithubWithClient(client)
 	return
 }
+
 func TestLatestReleaseOnDarwin(t *testing.T) {
 	g, r := buildGithubClient(t)
 
@@ -28,7 +29,7 @@ func TestLatestReleaseOnDarwin(t *testing.T) {
 	require.NoError(t, err, "github.LatestRelease() failed")
 
 	require.Equal(t, fmt.Sprintf("%s/bud-darwin-amd64", baseURL), darwin.DownloadURL)
-	require.Equal(t, "bud-darwin-amd64", darwin.Plateform)
+	require.Equal(t, "bud-darwin-amd64", darwin.Platform)
 
 	err = r.Stop()
 	require.NoError(t, err, "Recorder.Stop() failed")
@@ -41,7 +42,7 @@ func TestLatestReleaseOnLinux(t *testing.T) {
 	require.NoError(t, err, "github.LatestRelease() failed")
 
 	require.Equal(t, fmt.Sprintf("%s/bud-linux-amd64", baseURL), linux.DownloadURL)
-	require.Equal(t, "bud-linux-amd64", linux.Plateform)
+	require.Equal(t, "bud-linux-amd64", linux.Platform)
 
 	err = r.Stop()
 	require.NoError(t, err, "Recorder.Stop() failed")

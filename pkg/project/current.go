@@ -20,8 +20,7 @@ func FindCurrent() (*Project, error) {
 
 func findByPath(path string) (*Project, error) {
 	for {
-		exists := manifest.ExistsIn(path)
-		if exists {
+		if manifest.ExistsIn(path) {
 			return NewFromPath(path), nil
 		}
 
