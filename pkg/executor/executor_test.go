@@ -76,6 +76,13 @@ func TestSetEnv(t *testing.T) {
 	require.Equal(t, "something\n", output)
 }
 
+func TestSetEnvVar(t *testing.T) {
+	output, err := NewShell("echo $POIPOI").SetEnvVar("POIPOI", "something").Capture()
+
+	require.NoError(t, err)
+	require.Equal(t, "something\n", output)
+}
+
 func TestPrefix(t *testing.T) {
 	buf := &bytes.Buffer{}
 

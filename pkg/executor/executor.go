@@ -10,6 +10,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
@@ -39,6 +40,14 @@ func (e *Executor) SetCwd(cwd string) *Executor {
 // SetEnv changes the environment variables that will be used to run the command
 func (e *Executor) SetEnv(env []string) *Executor {
 	e.cmd.Env = env
+	return e
+}
+
+// SetEnvVar sets a single variable in the environment that will be used to run the command
+func (e *Executor) SetEnvVar(name, value string) *Executor {
+	env := env.New(e.cmd.Env)
+	env.Set(name, value)
+	e.cmd.Env = env.Environ()
 	return e
 }
 

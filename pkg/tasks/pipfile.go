@@ -56,7 +56,7 @@ func (p *pipfileRun) needed(ctx *context) (bool, error) {
 }
 
 func (p *pipfileRun) run(ctx *context) error {
-	err := command(ctx, "pipenv", "install", "--system", "--dev").Run()
+	err := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
 	if err != nil {
 		return fmt.Errorf("pipenv failed: %s", err)
 	}
