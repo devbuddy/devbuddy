@@ -77,10 +77,10 @@ func TestSetEnv(t *testing.T) {
 }
 
 func TestSetEnvVar(t *testing.T) {
-	output, err := NewShell("echo $POIPOI").SetEnvVar("POIPOI", "something").Capture()
+	output, err := NewShell("echo ${V1}-${V2}").SetEnvVar("V1", "v1").SetEnvVar("V2", "v2").Capture()
 
 	require.NoError(t, err)
-	require.Equal(t, "something\n", output)
+	require.Equal(t, "v1-v2\n", output)
 }
 
 func TestPrefix(t *testing.T) {
