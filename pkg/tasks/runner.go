@@ -49,7 +49,7 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 		err = runTask(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
-			return false, err
+			return false, nil
 		}
 	}
 
