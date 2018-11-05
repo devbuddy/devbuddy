@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -27,10 +28,51 @@ func parserPython(config *taskConfig, task *Task) error {
 	task.featureName = "python"
 	task.featureParam = version
 
+	task.addAction(&pyenvPath{})
+	task.addAction(&pyenv{})
 	task.addAction(&pythonPyenv{version: version})
 	task.addAction(&pythonInstallVenv{version: version})
 	task.addAction(&pythonCreateVenv{version: version})
 
+	return nil
+}
+
+type pyenvPath struct{}
+
+func (p *pyenvPath) description() string {
+	return ""
+}
+
+func (p *pyenvPath) needed(ctx *context) (bool, error) {
+	match, _ := regexp.MatchString("\\.pyenv/bin", ctx.env.Get("PATH"))
+	return !match, nil
+}
+
+func (p *pyenvPath) run(ctx *context) error {
+	ctx.ui.TaskWarning("The PATH environment variable should have 'pyenv' in it. Try adding the following to ~/.bashrc\n\nexport PATH=\"~/.pyenv/bin:$PATH\"")
+	return nil
+}
+
+type pyenv struct{}
+
+func (p *pyenv) description() string {
+	return "install PyEnv"
+}
+
+func (p *pyenv) needed(ctx *context) (bool, error) {
+	_, err := helpers.NewPyEnv()
+	if err == nil {
+		return false, nil
+	}
+
+	return true, err
+}
+
+func (p *pyenv) run(ctx *context) error {
+	err := command(ctx, "bash", "-c", "curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash").Run()
+	if err != nil {
+		return fmt.Errorf("failed to install pyenv: %s", err)
+	}
 	return nil
 }
 
