@@ -79,7 +79,7 @@ func runAction(ctx *context, action taskAction) error {
 	desc := action.description()
 
 	needed, err := action.needed(ctx)
-	if err != nil {
+	if !needed && err != nil {
 		return fmt.Errorf("The task action (%s) failed to detect whether it need to run: %s", desc, err)
 	}
 
