@@ -47,11 +47,11 @@ func (p *pyenv) needed(ctx *context) (bool, error) {
 		return false, nil
 	}
 
-	return true, err
+	return true, nil
 }
 
 func (p *pyenv) run(ctx *context) error {
-	err := command(ctx, "bash", "-c", "curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash").Run()
+	err := command(ctx, "brew", "install", "pyenv").Run()
 	if err != nil {
 		return fmt.Errorf("failed to install pyenv: %s", err)
 	}
