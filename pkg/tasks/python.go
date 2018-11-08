@@ -47,7 +47,7 @@ func (p *pyenv) needed(ctx *context) (bool, error) {
 		return false, nil
 	}
 
-	return true, nil
+	return true, err
 }
 
 func (p *pyenv) run(ctx *context) error {
