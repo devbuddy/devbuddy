@@ -27,10 +27,34 @@ func parserPython(config *taskConfig, task *Task) error {
 	task.featureName = "python"
 	task.featureParam = version
 
+	task.addAction(&pyenv{})
 	task.addAction(&pythonPyenv{version: version})
 	task.addAction(&pythonInstallVenv{version: version})
 	task.addAction(&pythonCreateVenv{version: version})
 
+	return nil
+}
+
+type pyenv struct{}
+
+func (p *pyenv) description() string {
+	return "install PyEnv"
+}
+
+func (p *pyenv) needed(ctx *context) (bool, error) {
+	_, err := helpers.NewPyEnv()
+	if err == nil {
+		return false, nil
+	}
+
+	return true, err
+}
+
+func (p *pyenv) run(ctx *context) error {
+	err := command(ctx, "brew", "install", "pyenv").Run()
+	if err != nil {
+		return fmt.Errorf("failed to install pyenv: %s", err)
+	}
 	return nil
 }
 
