@@ -157,3 +157,4 @@ Authors:
 - Pior Bastida (pior@pbastida.net)
 - Mathieu Leduc-Hamel (mathieu.leduchamel@shopify.com)
 - Emmanuel Milou <manumilou@mykolab.com>
+- John Duff @jduff
