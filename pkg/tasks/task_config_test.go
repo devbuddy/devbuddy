@@ -62,7 +62,8 @@ func TestTaskConfigMapWithInvalidValues(t *testing.T) {
 }
 
 func TestTaskConfigListOfStrings(t *testing.T) {
-	config := &taskConfig{name: "test", payload: []string{"one", "two"}}
+	value := []interface{}{"one", "two"}
+	config := &taskConfig{name: "test", payload: value}
 
 	result, err := config.getListOfStrings()
 	require.NoError(t, err)
@@ -70,26 +71,25 @@ func TestTaskConfigListOfStrings(t *testing.T) {
 }
 
 func TestTaskConfigListOfStringsEmpty(t *testing.T) {
-	config := &taskConfig{name: "test", payload: []string{}}
+	config := &taskConfig{name: "test", payload: []interface{}{}}
 
 	result, err := config.getListOfStrings()
 	require.NoError(t, err)
-	require.Equal(t, []string{}, result)
+	require.Equal(t, []string(nil), result)
 }
 
-func TestTaskConfigListOfStringsInvalid(t *testing.T) {
+func TestTaskConfigListOfStringsInvalidElement(t *testing.T) {
+	config := &taskConfig{name: "test", payload: []interface{}{"one", 2}}
+
+	_, err := config.getListOfStrings()
+	require.Error(t, err)
+	require.Equal(t, "not a list of strings: invalid element: type int (\"2\")", err.Error())
+}
+
+func TestTaskConfigListOfStringsInvalidType(t *testing.T) {
 	config := &taskConfig{name: "test", payload: "plop"}
+
 	_, err := config.getListOfStrings()
 	require.Error(t, err)
 	require.Equal(t, "not a list of strings: type string (\"plop\")", err.Error())
-
-	config = &taskConfig{name: "test", payload: true}
-	_, err = config.getListOfStrings()
-	require.Error(t, err)
-	require.Equal(t, "not a list of strings: type bool (\"true\")", err.Error())
-
-	config = &taskConfig{name: "test", payload: 1.23}
-	_, err = config.getListOfStrings()
-	require.Error(t, err)
-	require.Equal(t, "not a list of strings: type float64 (\"1.23\")", err.Error())
 }
