@@ -40,6 +40,17 @@ jobs:
       - run: dep ensure -v -vendor-only
       - run: script/lint
 
+  binaries:
+    docker:
+      - image: devbuddy/testing:latest
+    working_directory: /go/src/github.com/devbuddy/devbuddy
+    steps:
+      - checkout
+      - run: dep ensure -v -vendor-only
+      - run: script/buildall
+      - store_artifacts:
+          path: dist/
+
   deploy-release:
     docker:
       - image: devbuddy/testing:latest
@@ -67,6 +78,10 @@ workflows:
             tags:
               only: /.*/
       - lint:
+          filters:
+            tags:
+              only: /.*/
+      - binaries:
           filters:
             tags:
               only: /.*/
