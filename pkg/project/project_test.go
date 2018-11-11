@@ -48,6 +48,20 @@ func TestNewFromIDGithubFullURL(t *testing.T) {
 	require.Equal(t, "go-1999178051", proj.Slug())
 }
 
+func TestNewFromIDGithubFullHTTPURL(t *testing.T) {
+	proj, err := NewFromID("https://github.com/golang/go.git", cfg)
+	require.NoError(t, err, "NewFromID() failed")
+	require.NotEqual(t, nil, proj)
+	require.Equal(t, "go", proj.Name())
+	require.Equal(t, "github.com:golang/go", proj.FullName())
+	require.Equal(t, "/src/github.com/golang/go", proj.Path)
+
+	url, err := proj.GetRemoteURL()
+	require.Equal(t, "https://github.com/golang/go.git", url)
+
+	require.Equal(t, "go-1999178051", proj.Slug())
+}
+
 func TestNewFromIDBitbucketFullURL(t *testing.T) {
 	proj, err := NewFromID("git@bitbucket.org:zzzeek/dogpile.cache.git", cfg)
 	require.NoError(t, err, "NewFromID() failed")
