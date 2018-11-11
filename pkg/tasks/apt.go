@@ -40,7 +40,7 @@ func (a *aptInstall) description() string {
 
 func (a *aptInstall) needed(ctx *context) (bool, error) {
 	result := commandSilent(ctx, "dpkg", "-s", a.packageName).Capture()
-	if result.Error != nil {
+	if result.Code == -1 {
 		return false, fmt.Errorf("failed to check if package is installed: %s", result.Error)
 	}
 	return result.Code != 0, nil
