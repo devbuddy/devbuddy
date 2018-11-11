@@ -39,18 +39,18 @@ func (a *aptInstall) description() string {
 }
 
 func (a *aptInstall) needed(ctx *context) (bool, error) {
-	code, err := commandSilent(ctx, "dpkg", "-s", a.packageName).RunWithCode()
-	if err != nil {
-		return false, fmt.Errorf("failed to check if package is installed: %s", err)
+	result := commandSilent(ctx, "dpkg", "-s", a.packageName).Capture()
+	if result.Error != nil {
+		return false, fmt.Errorf("failed to check if package is installed: %s", result.Error)
 	}
-	return code != 0, nil
+	return result.Code != 0, nil
 }
 
 func (a *aptInstall) run(ctx *context) error {
-	err := command(ctx, "apt", "install", a.packageName).Run()
+	result := command(ctx, "apt", "install", a.packageName).Run()
 
-	if err != nil {
-		return fmt.Errorf("Apt failed: %s", err)
+	if result.Error != nil {
+		return fmt.Errorf("Apt failed: %s", result.Error)
 	}
 
 	return nil
