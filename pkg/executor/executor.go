@@ -24,9 +24,8 @@ type Executor struct {
 
 // Result represents the result of a command execution
 type Result struct {
-	Code  int
-	Error error
-	// Success bool
+	Code   int
+	Error  error
 	Output string
 }
 
@@ -146,14 +145,13 @@ func (e *Executor) buildResult(output string, err error) *Result {
 		err = fmt.Errorf("command failed with exit code %d", code)
 	}
 	return &Result{
-		Error: err,
-		Code:  code,
-		// Success: err == nil && code == 0,
+		Error:  err,
+		Code:   code,
 		Output: output,
 	}
 }
 
-// Run executes the command. Returns a Result
+// Run executes the command. Returns a Result. Code is -1 if the command failed to start
 func (e *Executor) Run() *Result {
 	err := e.runWithOutputFilter()
 	return e.buildResult("", err)

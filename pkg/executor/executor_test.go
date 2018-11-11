@@ -66,12 +66,12 @@ func TestShellCapturePWD(t *testing.T) {
 }
 
 func TestCommandNotFound(t *testing.T) {
-	result := New("never-ever-cmd").Run()
+	result := New("cmd-that-does-not-exist").Run()
 
 	require.Error(t, result.Error)
 	require.Equal(t, -1, result.Code)
 	require.Equal(t,
-		"command failed with: exec: \"never-ever-cmd\": executable file not found in $PATH",
+		"command failed with: exec: \"cmd-that-does-not-exist\": executable file not found in $PATH",
 		result.Error.Error())
 	require.Equal(t, "", result.Output)
 }
