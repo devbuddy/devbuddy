@@ -79,7 +79,7 @@ func (p *Project) Clone() (err error) {
 		return
 	}
 
-	return executor.New("git", "clone", p.hosting.remoteURL, p.Path).Run()
+	return executor.New("git", "clone", p.hosting.remoteURL, p.Path).Run().Error
 }
 
 // Create creates the project directory locally

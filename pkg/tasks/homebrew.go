@@ -55,10 +55,10 @@ func (b *brewInstall) needed(ctx *context) (bool, error) {
 }
 
 func (b *brewInstall) run(ctx *context) error {
-	err := command(ctx, "brew", "install", b.formula).Run()
+	result := command(ctx, "brew", "install", b.formula).Run()
 
-	if err != nil {
-		return fmt.Errorf("Homebrew failed: %s", err)
+	if result.Error != nil {
+		return fmt.Errorf("failed to run brew install: %s", result.Error)
 	}
 
 	b.success = true

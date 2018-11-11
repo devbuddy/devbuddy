@@ -14,11 +14,20 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
+// Executor prepares and run a command execution
 type Executor struct {
 	cmd              *exec.Cmd
 	outputPrefix     string
 	filterSubstrings []string
 	outputWriter     io.Writer
+}
+
+// Result represents the result of a command execution
+type Result struct {
+	Code  int
+	Error error
+	// Success bool
+	Output string
 }
 
 // New returns an *Executor that will run the program with arguments
@@ -100,8 +109,7 @@ func (e *Executor) shouldSuppressLine(line string) bool {
 	return false
 }
 
-// RunWithCode executes the command. Return the exit code and an error.
-func (e *Executor) RunWithCode() (int, error) {
+func (e *Executor) runWithOutputFilter() error {
 	if e.outputWriter == nil {
 		e.outputWriter = os.Stdout
 	}
@@ -109,16 +117,16 @@ func (e *Executor) RunWithCode() (int, error) {
 	e.cmd.Stdin = nil
 	stdout, err := e.cmd.StdoutPipe()
 	if err != nil {
-		return -1, err
+		return err
 	}
 	stderr, err := e.cmd.StderrPipe()
 	if err != nil {
-		return -1, err
+		return err
 	}
 
 	err = e.cmd.Start()
 	if err != nil {
-		return -1, err
+		return err
 	}
 
 	outputWait := new(sync.WaitGroup)
@@ -127,34 +135,38 @@ func (e *Executor) RunWithCode() (int, error) {
 	go e.printPipe(outputWait, stderr)
 	outputWait.Wait()
 
-	err = e.cmd.Wait()
+	return e.cmd.Wait()
+}
+
+func (e *Executor) buildResult(output string, err error) *Result {
 	code, err := e.getExitCode(err)
 	if err != nil {
-		return code, fmt.Errorf("command failed with: %s", err)
+		err = fmt.Errorf("command failed with: %s", err)
+	} else if code != 0 {
+		err = fmt.Errorf("command failed with exit code %d", code)
 	}
-	return code, err
+	return &Result{
+		Error: err,
+		Code:  code,
+		// Success: err == nil && code == 0,
+		Output: output,
+	}
 }
 
-// Run executes the command. Return an error for non-zero exitcode.
-func (e *Executor) Run() error {
-	code, err := e.RunWithCode()
-	if err != nil {
-		return err
-	}
-	if code != 0 {
-		return fmt.Errorf("command failed with exit code %d", code)
-	}
-	return nil
+// Run executes the command. Returns a Result
+func (e *Executor) Run() *Result {
+	err := e.runWithOutputFilter()
+	return e.buildResult("", err)
 }
 
-// Capture executes the command and return the output and the exit code
-func (e *Executor) Capture() (string, error) {
+// Capture executes the command and return a Result
+func (e *Executor) Capture() *Result {
 	output, err := e.cmd.Output()
-	return string(output), err
+	return e.buildResult(string(output), err)
 }
 
 // CaptureAndTrim calls Capture() and trim the blank lines
-func (e *Executor) CaptureAndTrim() (string, error) {
-	output, err := e.Capture()
-	return strings.Trim(output, "\n"), err
+func (e *Executor) CaptureAndTrim() *Result {
+	output, err := e.cmd.Output()
+	return e.buildResult(strings.Trim(string(output), "\n"), err)
 }

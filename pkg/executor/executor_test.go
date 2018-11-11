@@ -7,80 +7,89 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCommandFalseWithoutCode(t *testing.T) {
-	err := New("false").Run()
-
-	require.Error(t, err)
-}
-
 func TestCommandFalse(t *testing.T) {
-	code, err := New("false").RunWithCode()
+	result := New("false").Run()
 
-	require.NoError(t, err)
-	require.Equal(t, 1, code)
+	require.Error(t, result.Error)
+	require.Equal(t, "command failed with exit code 1", result.Error.Error())
+	require.Equal(t, 1, result.Code)
+	require.Equal(t, "", result.Output)
 }
 
 func TestCommandTrue(t *testing.T) {
-	code, err := New("true").RunWithCode()
+	result := New("true").Run()
 
-	require.NoError(t, err)
-	require.Equal(t, 0, code)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
+	require.Equal(t, "", result.Output)
 }
 
 func TestShellTrue(t *testing.T) {
-	code, err := NewShell("true").RunWithCode()
+	result := NewShell("true").Run()
 
-	require.NoError(t, err)
-	require.Equal(t, 0, code)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
+	require.Equal(t, "", result.Output)
 }
 
 func TestShellFalse(t *testing.T) {
-	code, err := NewShell("false").RunWithCode()
+	result := NewShell("false").Run()
 
-	require.NoError(t, err)
-	require.Equal(t, 1, code)
+	require.Error(t, result.Error)
+	require.Equal(t, "command failed with exit code 1", result.Error.Error())
+	require.Equal(t, 1, result.Code)
+	require.Equal(t, "", result.Output)
 }
 
 func TestShellCapture(t *testing.T) {
-	output, err := NewShell("echo poipoi").Capture()
+	result := NewShell("echo poipoi").Capture()
 
-	require.NoError(t, err)
-	require.Equal(t, "poipoi\n", output)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
+	require.Equal(t, "poipoi\n", result.Output)
 }
 
 func TestShellCaptureAndTrim(t *testing.T) {
-	output, err := NewShell("echo poipoi").CaptureAndTrim()
+	result := NewShell("echo poipoi").CaptureAndTrim()
 
-	require.NoError(t, err)
-	require.Equal(t, "poipoi", output)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
+	require.Equal(t, "poipoi", result.Output)
 }
 
 func TestShellCapturePWD(t *testing.T) {
-	output, err := NewShell("echo $PWD").SetCwd("/bin").Capture()
+	result := NewShell("echo $PWD").SetCwd("/bin").Capture()
 
-	require.NoError(t, err)
-	require.Equal(t, "/bin\n", output)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
+	require.Equal(t, "/bin\n", result.Output)
 }
 
 func TestCommandNotFound(t *testing.T) {
-	code, err := New("never-ever-cmd").RunWithCode()
+	result := New("never-ever-cmd").Run()
 
-	require.Error(t, err)
-	require.Equal(t, -1, code)
+	require.Error(t, result.Error)
+	require.Equal(t, -1, result.Code)
+	require.Equal(t,
+		"command failed with: exec: \"never-ever-cmd\": executable file not found in $PATH",
+		result.Error.Error())
+	require.Equal(t, "", result.Output)
 }
 
 func TestSetEnv(t *testing.T) {
-	output, err := NewShell("echo $POIPOI").SetEnv([]string{"POIPOI=something"}).Capture()
+	result := NewShell("echo $POIPOI").SetEnv([]string{"POIPOI=something"}).Capture()
 
-	require.NoError(t, err)
-	require.Equal(t, "something\n", output)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
+	require.Equal(t, "something\n", result.Output)
 }
 
 func TestSetEnvVar(t *testing.T) {
-	output, err := NewShell("echo ${V1}-${V2}").SetEnvVar("V1", "v1").SetEnvVar("V2", "v2").Capture()
+	result := NewShell("echo ${V1}-${V2}").SetEnvVar("V1", "v1").SetEnvVar("V2", "v2").Capture()
 
-	require.NoError(t, err)
-	require.Equal(t, "v1-v2\n", output)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
+	require.Equal(t, "v1-v2\n", result.Output)
 }
 
 func TestPrefix(t *testing.T) {
@@ -89,9 +98,10 @@ func TestPrefix(t *testing.T) {
 	executor := NewShell("echo \"line1\nline2\nline3\"")
 	executor.outputWriter = buf
 	executor.SetOutputPrefix("---")
-	err := executor.Run()
+	result := executor.Run()
 
-	require.NoError(t, err)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
 	require.Equal(t, "---line1\n---line2\n---line3\n", buf.String())
 }
 
@@ -102,8 +112,9 @@ func TestFilter(t *testing.T) {
 	executor.outputWriter = buf
 	executor.AddOutputFilter("line2")
 	executor.AddOutputFilter("line4")
-	err := executor.Run()
+	result := executor.Run()
 
-	require.NoError(t, err)
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
 	require.Equal(t, "line1\nline3\n", buf.String())
 }

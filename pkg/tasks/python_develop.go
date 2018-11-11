@@ -30,9 +30,11 @@ func (p *pythonDevelopInstall) needed(ctx *context) (bool, error) {
 }
 
 func (p *pythonDevelopInstall) run(ctx *context) error {
-	err := command(ctx, "pip", "install", "--require-virtualenv", "-e", ".").AddOutputFilter("already satisfied").Run()
-	if err != nil {
-		return fmt.Errorf("Pip failed: %s", err)
+	result := command(ctx, "pip", "install", "--require-virtualenv", "-e", ".").
+		AddOutputFilter("already satisfied").Run()
+
+	if result.Error != nil {
+		return fmt.Errorf("Pip failed: %s", result.Error)
 	}
 
 	return store.New(ctx.proj.Path).RecordFileChange("setup.py")
