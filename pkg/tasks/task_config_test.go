@@ -60,3 +60,36 @@ func TestTaskConfigMapWithInvalidValues(t *testing.T) {
 	require.Contains(t, err.Error(), "3.6")
 	require.Contains(t, err.Error(), "float64")
 }
+
+func TestTaskConfigListOfStrings(t *testing.T) {
+	config := &taskConfig{name: "test", payload: []string{"one", "two"}}
+
+	result, err := config.getListOfStrings()
+	require.NoError(t, err)
+	require.Equal(t, []string{"one", "two"}, result)
+}
+
+func TestTaskConfigListOfStringsEmpty(t *testing.T) {
+	config := &taskConfig{name: "test", payload: []string{}}
+
+	result, err := config.getListOfStrings()
+	require.NoError(t, err)
+	require.Equal(t, []string{}, result)
+}
+
+func TestTaskConfigListOfStringsInvalid(t *testing.T) {
+	config := &taskConfig{name: "test", payload: "plop"}
+	_, err := config.getListOfStrings()
+	require.Error(t, err)
+	require.Equal(t, "not a list of strings: type string (\"plop\")", err.Error())
+
+	config = &taskConfig{name: "test", payload: true}
+	_, err = config.getListOfStrings()
+	require.Error(t, err)
+	require.Equal(t, "not a list of strings: type bool (\"true\")", err.Error())
+
+	config = &taskConfig{name: "test", payload: 1.23}
+	_, err = config.getListOfStrings()
+	require.Error(t, err)
+	require.Equal(t, "not a list of strings: type float64 (\"1.23\")", err.Error())
+}

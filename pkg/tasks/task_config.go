@@ -46,6 +46,15 @@ func (c *taskConfig) getStringPropertyDefault(name string, defaultValue string, 
 	return str, nil
 }
 
+func (c *taskConfig) getListOfStrings() ([]string, error) {
+	strings, ok := c.payload.([]string)
+	if ok {
+		return strings, nil
+	}
+
+	return nil, fmt.Errorf("not a list of strings: type %T (\"%+v\")", c.payload, c.payload)
+}
+
 func parseTaskConfig(definition interface{}) (*taskConfig, error) {
 	val := reflect.ValueOf(definition)
 
