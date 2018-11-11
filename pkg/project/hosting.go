@@ -24,12 +24,17 @@ func newHostingInfoByURL(url string) (*hostingInfo, error) {
 
 	reGithubFull := regexp.MustCompile(`^([\w.-]+)/([\w.-]+)$`)
 	if match := reGithubFull.FindStringSubmatch(url); match != nil {
-		return newGithubHostingInfo(match[1], match[2]), nil
+		return newGithubHostingInfo("", match[1], match[2]), nil
 	}
 
 	reGithubGitURL := regexp.MustCompile(`^git@github.com:([\w.-]+)/([\w.-]+).git$`)
 	if match := reGithubGitURL.FindStringSubmatch(url); match != nil {
-		return newGithubHostingInfo(match[1], match[2]), nil
+		return newGithubHostingInfo(url, match[1], match[2]), nil
+	}
+
+	reGithubGitHTTPURL := regexp.MustCompile(`^https://github.com/([\w.-]+)/([\w.-]+).git$`)
+	if match := reGithubGitHTTPURL.FindStringSubmatch(url); match != nil {
+		return newGithubHostingInfo(url, match[1], match[2]), nil
 	}
 
 	reBitbucketGitURL := regexp.MustCompile(`^git@bitbucket.org:([\w.-]+)/([\w.-]+).git$`)
@@ -46,12 +51,15 @@ func newHostingInfoByPath(path string) *hostingInfo {
 	}
 }
 
-func newGithubHostingInfo(organisation, repository string) *hostingInfo {
+func newGithubHostingInfo(remoteURL, organisation, repository string) *hostingInfo {
+	if remoteURL == "" {
+		remoteURL = fmt.Sprintf("git@github.com:%s/%s.git", organisation, repository)
+	}
 	return &hostingInfo{
 		platform:     "github.com",
 		organisation: organisation,
 		repository:   repository,
-		remoteURL:    fmt.Sprintf("git@github.com:%s/%s.git", organisation, repository),
+		remoteURL:    remoteURL,
 	}
 }
 
