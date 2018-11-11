@@ -67,7 +67,7 @@ func (u *Upgrader) Perform(ui *termui.UI, destinationPath string, sourceURL stri
 
 	ui.CommandHeader(cmdline)
 
-	return executor.NewShell(cmdline).Run()
+	return executor.NewShell(cmdline).Run().Error
 }
 
 // LatestRelease get latest release item for current platform

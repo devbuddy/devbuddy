@@ -41,7 +41,7 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 
 	ui.CommandHeader(cmdline)
 
-	return executor.NewShell(cmdline).SetCwd(proj.Path).Run()
+	return executor.NewShell(cmdline).SetCwd(proj.Path).Run().Error
 }
 
 func buildCustomCommands() {

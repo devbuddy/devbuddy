@@ -40,17 +40,17 @@ func (c *customAction) description() string {
 }
 
 func (c *customAction) needed(ctx *context) (bool, error) {
-	code, err := shellSilent(ctx, c.condition).RunWithCode()
-	if err != nil {
-		return false, fmt.Errorf("failed to run the condition command: %s", err)
+	result := shellSilent(ctx, c.condition).Run()
+
+	// Fail if we could not even start the command
+	if result.Code == -1 {
+		return false, fmt.Errorf("failed to run the condition command: %s", result.Error)
 	}
-	return code != 0, nil
+
+	return result.Code != 0, nil
 }
 
 func (c *customAction) run(ctx *context) error {
-	err := shell(ctx, c.command).Run()
-	if err != nil {
-		return fmt.Errorf("command failed: %s", err)
-	}
-	return nil
+	result := shell(ctx, c.command).Run()
+	return result.Error
 }
