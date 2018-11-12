@@ -47,10 +47,10 @@ func (a *aptInstall) needed(ctx *context) (bool, error) {
 }
 
 func (a *aptInstall) run(ctx *context) error {
-	result := command(ctx, "apt", "install", a.packageName).Run()
+	result := command(ctx, "apt-get", "install", "-y", a.packageName).Run()
 
 	if result.Error != nil {
-		return fmt.Errorf("Apt failed: %s", result.Error)
+		return fmt.Errorf("failed to run apt-get install: %s", result.Error)
 	}
 
 	return nil
