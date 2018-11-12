@@ -2,18 +2,17 @@ package executor
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
-	"syscall"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
+// Executor prepares and run a command execution
 type Executor struct {
 	cmd              *exec.Cmd
 	outputPrefix     string
@@ -63,21 +62,6 @@ func (e *Executor) AddOutputFilter(substring string) *Executor {
 	return e
 }
 
-func (e *Executor) getExitCode(err error) (int, error) {
-	if err == nil {
-		code := e.cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
-		return code, nil
-	}
-
-	if exitError, ok := err.(*exec.ExitError); ok {
-		code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
-		return code, nil
-	}
-
-	// There was an error but not a ExitError, just return it with an invalid exit code
-	return -1, err
-}
-
 func (e *Executor) printPipe(wg *sync.WaitGroup, pipe io.Reader) {
 	defer wg.Done()
 
@@ -100,8 +84,7 @@ func (e *Executor) shouldSuppressLine(line string) bool {
 	return false
 }
 
-// RunWithCode executes the command. Return the exit code and an error.
-func (e *Executor) RunWithCode() (int, error) {
+func (e *Executor) runWithOutputFilter() error {
 	if e.outputWriter == nil {
 		e.outputWriter = os.Stdout
 	}
@@ -109,16 +92,16 @@ func (e *Executor) RunWithCode() (int, error) {
 	e.cmd.Stdin = nil
 	stdout, err := e.cmd.StdoutPipe()
 	if err != nil {
-		return -1, err
+		return err
 	}
 	stderr, err := e.cmd.StderrPipe()
 	if err != nil {
-		return -1, err
+		return err
 	}
 
 	err = e.cmd.Start()
 	if err != nil {
-		return -1, err
+		return err
 	}
 
 	outputWait := new(sync.WaitGroup)
@@ -127,34 +110,23 @@ func (e *Executor) RunWithCode() (int, error) {
 	go e.printPipe(outputWait, stderr)
 	outputWait.Wait()
 
-	err = e.cmd.Wait()
-	code, err := e.getExitCode(err)
-	if err != nil {
-		return code, fmt.Errorf("command failed with: %s", err)
-	}
-	return code, err
+	return e.cmd.Wait()
 }
 
-// Run executes the command. Return an error for non-zero exitcode.
-func (e *Executor) Run() error {
-	code, err := e.RunWithCode()
-	if err != nil {
-		return err
-	}
-	if code != 0 {
-		return fmt.Errorf("command failed with exit code %d", code)
-	}
-	return nil
+// Run executes the command and returns a Result
+func (e *Executor) Run() *Result {
+	err := e.runWithOutputFilter()
+	return buildResult("", err)
 }
 
-// Capture executes the command and return the output and the exit code
-func (e *Executor) Capture() (string, error) {
+// Capture executes the command and return a Result
+func (e *Executor) Capture() *Result {
 	output, err := e.cmd.Output()
-	return string(output), err
+	return buildResult(string(output), err)
 }
 
 // CaptureAndTrim calls Capture() and trim the blank lines
-func (e *Executor) CaptureAndTrim() (string, error) {
-	output, err := e.Capture()
-	return strings.Trim(output, "\n"), err
+func (e *Executor) CaptureAndTrim() *Result {
+	output, err := e.cmd.Output()
+	return buildResult(strings.Trim(string(output), "\n"), err)
 }

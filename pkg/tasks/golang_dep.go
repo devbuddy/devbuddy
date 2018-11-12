@@ -32,9 +32,9 @@ func (p *golangDepInstall) needed(ctx *context) (bool, error) {
 }
 
 func (p *golangDepInstall) run(ctx *context) error {
-	err := command(ctx, "go", "get", "-u", "github.com/golang/dep/cmd/dep").Run()
-	if err != nil {
-		return fmt.Errorf("failed to install Go GolangDep: %s", err)
+	result := command(ctx, "go", "get", "-u", "github.com/golang/dep/cmd/dep").Run()
+	if result.Error != nil {
+		return fmt.Errorf("failed to install Go GolangDep: %s", result.Error)
 	}
 	return nil
 }
@@ -72,9 +72,9 @@ func (p *golangDepEnsure) needed(ctx *context) (bool, error) {
 }
 
 func (p *golangDepEnsure) run(ctx *context) error {
-	err := command(ctx, "dep", "ensure").Run()
-	if err != nil {
-		return fmt.Errorf("failed to run dep ensure: %s", err)
+	result := command(ctx, "dep", "ensure").Run()
+	if result.Error != nil {
+		return fmt.Errorf("failed to run dep ensure: %s", result.Error)
 	}
 	return nil
 }
