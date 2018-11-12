@@ -23,31 +23,40 @@ func parserApt(config *taskConfig, task *Task) error {
 
 	task.header = strings.Join(packages, ", ")
 
-	for _, p := range packages {
-		task.addAction(&aptInstall{packageName: p})
-	}
+	task.addAction(&aptInstall{packageNames: packages})
 
 	return nil
 }
 
 type aptInstall struct {
-	packageName string
+	packageNames        []string
+	missingPackageNames []string
 }
 
 func (a *aptInstall) description() string {
-	return fmt.Sprintf("installing %s", a.packageName)
+	return fmt.Sprintf("installing %s", strings.Join(a.missingPackageNames, ", "))
 }
 
 func (a *aptInstall) needed(ctx *context) (bool, error) {
-	result := commandSilent(ctx, "dpkg", "-s", a.packageName).Capture()
-	if result.LaunchError != nil {
-		return false, fmt.Errorf("failed to check if package is installed: %s", result.LaunchError)
+	a.missingPackageNames = []string{}
+
+	for _, name := range a.packageNames {
+		result := commandSilent(ctx, "dpkg", "-s", name).Capture()
+		if result.LaunchError != nil {
+			return false, fmt.Errorf("failed to check if package is installed: %s", result.LaunchError)
+		}
+		if result.Code != 0 {
+			a.missingPackageNames = append(a.missingPackageNames, name)
+		}
 	}
-	return result.Code != 0, nil
+
+	return len(a.missingPackageNames) > 0, nil
 }
 
 func (a *aptInstall) run(ctx *context) error {
-	result := command(ctx, "apt-get", "install", "-y", a.packageName).Run()
+	args := append([]string{"install", "--no-install-recommends", "-y"}, a.missingPackageNames...)
+
+	result := command(ctx, "apt-get", args...).Run()
 
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get install: %s", result.Error)
