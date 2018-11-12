@@ -66,9 +66,9 @@ Others
 ### Hosting platform:
 
 - Github: **working**
-- Any git remote-url: **planned**
+- Any git remote-url: **working**
 - Gitlab: **planned**
-- Bitbucket (with Git): **planned**
+- Bitbucket (with Git): **working**
 
 ### Shell integration
 
