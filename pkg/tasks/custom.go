@@ -42,9 +42,8 @@ func (c *customAction) description() string {
 func (c *customAction) needed(ctx *context) (bool, error) {
 	result := shellSilent(ctx, c.condition).Run()
 
-	// Fail if we could not even start the command
-	if result.Code == -1 {
-		return false, fmt.Errorf("failed to run the condition command: %s", result.Error)
+	if result.LaunchError != nil {
+		return false, fmt.Errorf("failed to run the condition command: %s", result.LaunchError)
 	}
 
 	return result.Code != 0, nil

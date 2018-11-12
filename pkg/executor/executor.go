@@ -2,13 +2,11 @@ package executor
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
-	"syscall"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
@@ -20,13 +18,6 @@ type Executor struct {
 	outputPrefix     string
 	filterSubstrings []string
 	outputWriter     io.Writer
-}
-
-// Result represents the result of a command execution
-type Result struct {
-	Code   int
-	Error  error
-	Output string
 }
 
 // New returns an *Executor that will run the program with arguments
@@ -69,21 +60,6 @@ func (e *Executor) SetOutputPrefix(prefix string) *Executor {
 func (e *Executor) AddOutputFilter(substring string) *Executor {
 	e.filterSubstrings = append(e.filterSubstrings, substring)
 	return e
-}
-
-func (e *Executor) getExitCode(err error) (int, error) {
-	if err == nil {
-		code := e.cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
-		return code, nil
-	}
-
-	if exitError, ok := err.(*exec.ExitError); ok {
-		code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
-		return code, nil
-	}
-
-	// There was an error but not a ExitError, just return it with an invalid exit code
-	return -1, err
 }
 
 func (e *Executor) printPipe(wg *sync.WaitGroup, pipe io.Reader) {
@@ -137,34 +113,20 @@ func (e *Executor) runWithOutputFilter() error {
 	return e.cmd.Wait()
 }
 
-func (e *Executor) buildResult(output string, err error) *Result {
-	code, err := e.getExitCode(err)
-	if err != nil {
-		err = fmt.Errorf("command failed with: %s", err)
-	} else if code != 0 {
-		err = fmt.Errorf("command failed with exit code %d", code)
-	}
-	return &Result{
-		Error:  err,
-		Code:   code,
-		Output: output,
-	}
-}
-
-// Run executes the command. Returns a Result. Code is -1 if the command failed to start
+// Run executes the command and returns a Result
 func (e *Executor) Run() *Result {
 	err := e.runWithOutputFilter()
-	return e.buildResult("", err)
+	return buildResult("", err)
 }
 
 // Capture executes the command and return a Result
 func (e *Executor) Capture() *Result {
 	output, err := e.cmd.Output()
-	return e.buildResult(string(output), err)
+	return buildResult(string(output), err)
 }
 
 // CaptureAndTrim calls Capture() and trim the blank lines
 func (e *Executor) CaptureAndTrim() *Result {
 	output, err := e.cmd.Output()
-	return e.buildResult(strings.Trim(string(output), "\n"), err)
+	return buildResult(strings.Trim(string(output), "\n"), err)
 }
