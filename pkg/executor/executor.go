@@ -2,13 +2,11 @@ package executor
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
-	"syscall"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
@@ -20,14 +18,6 @@ type Executor struct {
 	outputPrefix     string
 	filterSubstrings []string
 	outputWriter     io.Writer
-}
-
-// Result represents the result of a command execution
-type Result struct {
-	Code        int    // code returned by the process
-	Error       error  // error about the process launch and exit
-	LaunchError error  // error about the process launch
-	Output      string // command output if captured, otherwise empty
 }
 
 // New returns an *Executor that will run the program with arguments
@@ -123,45 +113,20 @@ func (e *Executor) runWithOutputFilter() error {
 	return e.cmd.Wait()
 }
 
-func (e *Executor) buildResult(output string, err error) *Result {
-	code := 0
-
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			code = exitError.Sys().(syscall.WaitStatus).ExitStatus()
-			err = nil
-		} else {
-			err = fmt.Errorf("command failed with: %s", err)
-		}
-	}
-
-	errForCode := err
-	if code > 0 {
-		errForCode = fmt.Errorf("command failed with exit code %d", code)
-	}
-
-	return &Result{
-		Error:       errForCode,
-		LaunchError: err,
-		Code:        code,
-		Output:      output,
-	}
-}
-
 // Run executes the command. Returns a Result. Code is -1 if the command failed to start
 func (e *Executor) Run() *Result {
 	err := e.runWithOutputFilter()
-	return e.buildResult("", err)
+	return buildResult("", err)
 }
 
 // Capture executes the command and return a Result
 func (e *Executor) Capture() *Result {
 	output, err := e.cmd.Output()
-	return e.buildResult(string(output), err)
+	return buildResult(string(output), err)
 }
 
 // CaptureAndTrim calls Capture() and trim the blank lines
 func (e *Executor) CaptureAndTrim() *Result {
 	output, err := e.cmd.Output()
-	return e.buildResult(strings.Trim(string(output), "\n"), err)
+	return buildResult(strings.Trim(string(output), "\n"), err)
 }
