@@ -113,7 +113,7 @@ func (e *Executor) runWithOutputFilter() error {
 	return e.cmd.Wait()
 }
 
-// Run executes the command. Returns a Result. Code is -1 if the command failed to start
+// Run executes the command and returns a Result
 func (e *Executor) Run() *Result {
 	err := e.runWithOutputFilter()
 	return buildResult("", err)
