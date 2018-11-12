@@ -24,9 +24,10 @@ type Executor struct {
 
 // Result represents the result of a command execution
 type Result struct {
-	Code   int
-	Error  error
-	Output string
+	Code       int    // code returned by the process
+	Error      error  // error including a non-zero return code
+	StartError error  // error when starting the process
+	Output     string // command output if captured, otherwise empty
 }
 
 // New returns an *Executor that will run the program with arguments
@@ -69,21 +70,6 @@ func (e *Executor) SetOutputPrefix(prefix string) *Executor {
 func (e *Executor) AddOutputFilter(substring string) *Executor {
 	e.filterSubstrings = append(e.filterSubstrings, substring)
 	return e
-}
-
-func (e *Executor) getExitCode(err error) (int, error) {
-	if err == nil {
-		code := e.cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
-		return code, nil
-	}
-
-	if exitError, ok := err.(*exec.ExitError); ok {
-		code := exitError.Sys().(syscall.WaitStatus).ExitStatus()
-		return code, nil
-	}
-
-	// There was an error but not a ExitError, just return it with an invalid exit code
-	return -1, err
 }
 
 func (e *Executor) printPipe(wg *sync.WaitGroup, pipe io.Reader) {
@@ -138,16 +124,31 @@ func (e *Executor) runWithOutputFilter() error {
 }
 
 func (e *Executor) buildResult(output string, err error) *Result {
-	code, err := e.getExitCode(err)
+	code := 0
+
+	// We probably don't need this:
+	// if err == nil {
+	// 	code = e.cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
+	// }
 	if err != nil {
-		err = fmt.Errorf("command failed with: %s", err)
-	} else if code != 0 {
-		err = fmt.Errorf("command failed with exit code %d", code)
+		if exitError, ok := err.(*exec.ExitError); ok {
+			code = exitError.Sys().(syscall.WaitStatus).ExitStatus()
+			err = nil
+		} else {
+			err = fmt.Errorf("command failed with: %s", err)
+		}
 	}
+
+	errForCode := err
+	if code > 0 {
+		errForCode = fmt.Errorf("command failed with exit code %d", code)
+	}
+
 	return &Result{
-		Error:  err,
-		Code:   code,
-		Output: output,
+		Error:      errForCode,
+		StartError: err,
+		Code:       code,
+		Output:     output,
 	}
 }
 
