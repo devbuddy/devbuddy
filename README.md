@@ -48,13 +48,16 @@ Go:
 
 Others
 - Custom (conditional shell command): **working**
-- Packages (Homebrew, Apt...): **planned**
+- Homebrew: **working**
+- Apt: **planned**
 - Docker Compose (manage a docker-compose setup): **planned**
 
 ### Automatic environment:
 
 - Virtualenv: **working**
 - Go: **working**
+- Node: **planned**
+- Ruby: **maybe**
 
 ### Features:
 
