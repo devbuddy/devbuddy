@@ -24,10 +24,10 @@ type Executor struct {
 
 // Result represents the result of a command execution
 type Result struct {
-	Code       int    // code returned by the process
-	Error      error  // error including a non-zero return code
-	StartError error  // error when starting the process
-	Output     string // command output if captured, otherwise empty
+	Code        int    // code returned by the process
+	Error       error  // error about the process launch and exit
+	LaunchError error  // error about the process launch
+	Output      string // command output if captured, otherwise empty
 }
 
 // New returns an *Executor that will run the program with arguments
@@ -126,10 +126,6 @@ func (e *Executor) runWithOutputFilter() error {
 func (e *Executor) buildResult(output string, err error) *Result {
 	code := 0
 
-	// We probably don't need this:
-	// if err == nil {
-	// 	code = e.cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
-	// }
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			code = exitError.Sys().(syscall.WaitStatus).ExitStatus()
@@ -145,10 +141,10 @@ func (e *Executor) buildResult(output string, err error) *Result {
 	}
 
 	return &Result{
-		Error:      errForCode,
-		StartError: err,
-		Code:       code,
-		Output:     output,
+		Error:       errForCode,
+		LaunchError: err,
+		Code:        code,
+		Output:      output,
 	}
 }
 
