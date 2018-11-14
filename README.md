@@ -81,6 +81,12 @@ Others
 
 ## Install
 
+### Homebrew
+
+Coming soon.
+
+### Automatic
+
 ```bash
 $ bash -c "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
 ```
@@ -89,6 +95,20 @@ Uninstall it:
 ```bash
 $ sudo rm /usr/local/bin/bud
 ```
+
+### Manual
+
+Older releases are available on [Github releases](https://github.com/devbuddy/devbuddy/releases).
+
+#### Linux
+
+- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.7.0/bud-linux-amd64 > /tmp/bud```
+- ```sudo install /tmp/bud /usr/local/bin/bud```
+
+#### MacOs
+
+- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.7.0/bud-darwin-amd64 > /tmp/bud```
+- ```sudo install /tmp/bud /usr/local/bin/bud```
 
 ## Setup
 
