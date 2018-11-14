@@ -44,8 +44,11 @@ func (p *pipInstall) description() string {
 	return fmt.Sprintf("install %s", p.file)
 }
 
-func (p *pipInstall) needed(ctx *context) (bool, error) {
-	return !p.success, nil
+func (p *pipInstall) needed(ctx *context) *actionResult {
+	if !p.success {
+		return actionNeeded("")
+	}
+	return actionNotNeeded()
 }
 
 func (p *pipInstall) run(ctx *context) error {

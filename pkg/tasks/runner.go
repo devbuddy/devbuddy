@@ -75,37 +75,6 @@ func runTask(ctx *context, task *Task) (err error) {
 	return err
 }
 
-func runAction(ctx *context, action taskAction) error {
-	desc := action.description()
-
-	needed, err := action.needed(ctx)
-	if !needed && err != nil {
-		return fmt.Errorf("The task action (%s) failed to detect whether it need to run: %s", desc, err)
-	}
-
-	if needed {
-		if desc != "" {
-			ctx.ui.TaskActionHeader(desc)
-		}
-
-		err = action.run(ctx)
-		if err != nil {
-			return fmt.Errorf("The task action failed to run: %s", err)
-		}
-	}
-
-	stillNeeded, err := action.needed(ctx)
-	if err != nil {
-		return fmt.Errorf("The task action failed to detect if it is resolved: %s", err)
-	}
-
-	if stillNeeded {
-		return fmt.Errorf("The task action is not resolved after running it")
-	}
-
-	return nil
-}
-
 func activateFeature(ctx *context, task *Task) (err error) {
 	if task.featureName == "" {
 		return nil

@@ -1,9 +1,5 @@
 package tasks
 
-import (
-	"fmt"
-)
-
 func init() {
 	t := registerTaskDefinition("custom")
 	t.name = "Custom"
@@ -39,14 +35,17 @@ func (c *customAction) description() string {
 	return ""
 }
 
-func (c *customAction) needed(ctx *context) (bool, error) {
+func (c *customAction) needed(ctx *context) *actionResult {
 	result := shellSilent(ctx, c.condition).Run()
 
 	if result.LaunchError != nil {
-		return false, fmt.Errorf("failed to run the condition command: %s", result.LaunchError)
+		return actionFailed("failed to run the condition command: %s", result.LaunchError)
 	}
 
-	return result.Code != 0, nil
+	if result.Code != 0 {
+		return actionNeeded("the met? command exited with a non-zero code")
+	}
+	return actionNotNeeded()
 }
 
 func (c *customAction) run(ctx *context) error {

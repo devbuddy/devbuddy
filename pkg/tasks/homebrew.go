@@ -39,28 +39,26 @@ func parserHomebrew(config *taskConfig, task *Task) error {
 
 type brewInstall struct {
 	formula string
-	success bool
 }
 
 func (b *brewInstall) description() string {
 	return fmt.Sprintf("installing %s", b.formula)
 }
 
-func (b *brewInstall) needed(ctx *context) (bool, error) {
+func (b *brewInstall) needed(ctx *context) *actionResult {
 	brew := helpers.NewHomebrew()
 
-	installed := brew.IsInstalled(b.formula)
-
-	return !installed, nil
+	if brew.IsInstalled(b.formula) {
+		return actionNotNeeded()
+	}
+	return actionNeeded("package %s is not installed", b.formula)
 }
 
 func (b *brewInstall) run(ctx *context) error {
 	result := command(ctx, "brew", "install", b.formula).Run()
-
 	if result.Error != nil {
 		return fmt.Errorf("failed to run brew install: %s", result.Error)
 	}
 
-	b.success = true
 	return nil
 }

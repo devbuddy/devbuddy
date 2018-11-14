@@ -25,8 +25,15 @@ func (p *pythonDevelopInstall) description() string {
 	return "install python package in develop mode"
 }
 
-func (p *pythonDevelopInstall) needed(ctx *context) (bool, error) {
-	return store.New(ctx.proj.Path).HasFileChanged("setup.py")
+func (p *pythonDevelopInstall) needed(ctx *context) *actionResult {
+	changed, err := store.New(ctx.proj.Path).HasFileChanged("setup.py")
+	if err != nil {
+		return actionFailed("failed to check if setup.py has changed: %s", err)
+	}
+	if changed {
+		return actionNeeded("setup.py was modified")
+	}
+	return actionNotNeeded()
 }
 
 func (p *pythonDevelopInstall) run(ctx *context) error {

@@ -27,12 +27,16 @@ func (p *pipfileInstall) description() string {
 	return "install pipfile command"
 }
 
-func (p *pipfileInstall) needed(ctx *context) (bool, error) {
+func (p *pipfileInstall) needed(ctx *context) *actionResult {
 	pythonParam := ctx.features["python"]
 	name := helpers.VirtualenvName(ctx.proj, pythonParam)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
 	pipenvCmd := venv.Which("pipenv")
-	return !utils.PathExists(pipenvCmd), nil
+
+	if !utils.PathExists(pipenvCmd) {
+		return actionNeeded("Pipenv is not installed in the virtualenv")
+	}
+	return actionNotNeeded()
 }
 
 func (p *pipfileInstall) run(ctx *context) error {
@@ -51,8 +55,11 @@ func (p *pipfileRun) description() string {
 	return "install dependencies from the Pipfile"
 }
 
-func (p *pipfileRun) needed(ctx *context) (bool, error) {
-	return !p.success, nil
+func (p *pipfileRun) needed(ctx *context) *actionResult {
+	if !p.success {
+		actionNeeded("")
+	}
+	return actionNotNeeded()
 }
 
 func (p *pipfileRun) run(ctx *context) error {
