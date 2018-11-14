@@ -50,7 +50,8 @@ func (a *aptInstall) needed(ctx *context) (bool, error) {
 		}
 	}
 
-	return len(a.missingPackageNames) > 0, nil
+	err := fmt.Errorf("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
+	return len(a.missingPackageNames) > 0, err
 }
 
 func (a *aptInstall) run(ctx *context) error {
