@@ -54,10 +54,13 @@ func (a *aptInstall) needed(ctx *context) (bool, error) {
 }
 
 func (a *aptInstall) run(ctx *context) error {
+	result := sudoCommand(ctx, "apt-get", "update").Run()
+	if result.Error != nil {
+		return fmt.Errorf("failed to run apt-get update: %s", result.Error)
+	}
+
 	args := append([]string{"install", "--no-install-recommends", "-y"}, a.missingPackageNames...)
-
-	result := command(ctx, "apt-get", args...).Run()
-
+	result = sudoCommand(ctx, "apt-get", args...).Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get install: %s", result.Error)
 	}
