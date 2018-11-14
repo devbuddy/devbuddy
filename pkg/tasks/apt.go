@@ -34,14 +34,14 @@ type aptInstall struct {
 }
 
 func (a *aptInstall) description() string {
-	return fmt.Sprintf("installing %s", strings.Join(a.missingPackageNames, ", "))
+	return ""
 }
 
 func (a *aptInstall) needed(ctx *context) (bool, error) {
 	a.missingPackageNames = []string{}
 
 	for _, name := range a.packageNames {
-		result := commandSilent(ctx, "dpkg", "-s", name).Capture()
+		result := shellSilent(ctx, fmt.Sprintf("dpkg -s \"%s\" | grep -q 'Status: install'", name)).Capture()
 		if result.LaunchError != nil {
 			return false, fmt.Errorf("failed to check if package is installed: %s", result.LaunchError)
 		}
@@ -50,8 +50,10 @@ func (a *aptInstall) needed(ctx *context) (bool, error) {
 		}
 	}
 
-	err := fmt.Errorf("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
-	return len(a.missingPackageNames) > 0, err
+	if len(a.missingPackageNames) > 0 {
+		return true, fmt.Errorf("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
+	}
+	return false, nil
 }
 
 func (a *aptInstall) run(ctx *context) error {
