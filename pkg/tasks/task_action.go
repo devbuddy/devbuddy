@@ -14,8 +14,8 @@ type actionResult struct {
 	Error  error
 }
 
-func actionFailed(error_message string, args ...interface{}) *actionResult {
-	return &actionResult{Error: fmt.Errorf(error_message, args...)}
+func actionFailed(errorMessage string, args ...interface{}) *actionResult {
+	return &actionResult{Error: fmt.Errorf(errorMessage, args...)}
 }
 
 func actionNeeded(message string, args ...interface{}) *actionResult {

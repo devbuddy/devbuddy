@@ -57,7 +57,7 @@ func (p *pipfileRun) description() string {
 
 func (p *pipfileRun) needed(ctx *context) *actionResult {
 	if !p.success {
-		actionNeeded("")
+		return actionNeeded("")
 	}
 	return actionNotNeeded()
 }
