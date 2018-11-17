@@ -34,8 +34,11 @@ func (g *golangGoPath) description() string {
 	return ""
 }
 
-func (g *golangGoPath) needed(ctx *context) (bool, error) {
-	return ctx.env.Get("GOPATH") == "", nil
+func (g *golangGoPath) needed(ctx *context) *actionResult {
+	if ctx.env.Get("GOPATH") == "" {
+		return actionNeeded("GOPATH is not set")
+	}
+	return actionNotNeeded()
 }
 
 func (g *golangGoPath) run(ctx *context) error {
@@ -51,8 +54,11 @@ func (g *golangInstall) description() string {
 	return fmt.Sprintf("Install Go version %s", g.version)
 }
 
-func (g *golangInstall) needed(ctx *context) (bool, error) {
-	return !helpers.NewGolang(ctx.cfg, g.version).Exists(), nil
+func (g *golangInstall) needed(ctx *context) *actionResult {
+	if !helpers.NewGolang(ctx.cfg, g.version).Exists() {
+		return actionNeeded("golang distribution is not installed")
+	}
+	return actionNotNeeded()
 }
 
 func (g *golangInstall) run(ctx *context) error {

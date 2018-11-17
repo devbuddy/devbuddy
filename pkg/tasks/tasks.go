@@ -40,12 +40,6 @@ func (t *Task) addAction(action taskAction) {
 	t.actions = append(t.actions, action)
 }
 
-type taskAction interface {
-	description() string
-	needed(*context) (bool, error)
-	run(*context) error
-}
-
 func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	var task *Task
 

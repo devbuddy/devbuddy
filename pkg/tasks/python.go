@@ -41,13 +41,12 @@ func (p *pyenv) description() string {
 	return "install PyEnv"
 }
 
-func (p *pyenv) needed(ctx *context) (bool, error) {
+func (p *pyenv) needed(ctx *context) *actionResult {
 	_, err := helpers.NewPyEnv()
-	if err == nil {
-		return false, nil
+	if err != nil {
+		return actionNeeded("Pyenv is not installed: %s", err)
 	}
-
-	return true, err
+	return actionNotNeeded()
 }
 
 func (p *pyenv) run(ctx *context) error {
@@ -66,14 +65,22 @@ func (p *pythonPyenv) description() string {
 	return "install Python version with PyEnv"
 }
 
-func (p *pythonPyenv) needed(ctx *context) (bool, error) {
+func (p *pythonPyenv) needed(ctx *context) *actionResult {
 	pyEnv, err := helpers.NewPyEnv()
 	if err != nil {
-		return false, err
+		return actionFailed("cannot use pyenv: %s", err)
 	}
 
 	installed, err := pyEnv.VersionInstalled(p.version)
-	return !installed, err
+	if err != nil {
+		return actionFailed("failed to check if python version is installed: %s", err)
+	}
+
+	if !installed {
+		return actionNeeded("python version is not installed")
+	}
+
+	return actionNotNeeded()
 }
 
 func (p *pythonPyenv) run(ctx *context) error {
@@ -92,13 +99,18 @@ func (p *pythonInstallVenv) description() string {
 	return "install virtualenv"
 }
 
-func (p *pythonInstallVenv) needed(ctx *context) (bool, error) {
+func (p *pythonInstallVenv) needed(ctx *context) *actionResult {
 	pyEnv, err := helpers.NewPyEnv()
 	if err != nil {
-		return false, err
+		return actionFailed("cannot use pyenv: %s", err)
 	}
+
 	installed := utils.PathExists(pyEnv.Which(p.version, "virtualenv"))
-	return !installed, nil
+	if !installed {
+		return actionNeeded("virtualenv is not installed")
+	}
+
+	return actionNotNeeded()
 }
 
 func (p *pythonInstallVenv) run(ctx *context) error {
@@ -122,10 +134,15 @@ func (p *pythonCreateVenv) description() string {
 	return "create virtualenv"
 }
 
-func (p *pythonCreateVenv) needed(ctx *context) (bool, error) {
+func (p *pythonCreateVenv) needed(ctx *context) *actionResult {
 	name := helpers.VirtualenvName(ctx.proj, p.version)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
-	return !venv.Exists(), nil
+
+	if !venv.Exists() {
+		return actionNeeded("project virtualenv does not exists")
+	}
+
+	return actionNotNeeded()
 }
 
 func (p *pythonCreateVenv) run(ctx *context) error {
