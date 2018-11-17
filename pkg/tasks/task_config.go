@@ -46,6 +46,24 @@ func (c *taskConfig) getStringPropertyDefault(name string, defaultValue string, 
 	return str, nil
 }
 
+func (c *taskConfig) getListOfStrings() ([]string, error) {
+
+	elements, ok := c.payload.([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("not a list of strings: type %T (\"%+v\")", c.payload, c.payload)
+	}
+
+	var strings []string
+	for _, element := range elements {
+		str, ok := element.(string)
+		if !ok {
+			return nil, fmt.Errorf("not a list of strings: invalid element: type %T (\"%+v\")", element, element)
+		}
+		strings = append(strings, str)
+	}
+	return strings, nil
+}
+
 func parseTaskConfig(definition interface{}) (*taskConfig, error) {
 	val := reflect.ValueOf(definition)
 

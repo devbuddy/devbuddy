@@ -24,6 +24,17 @@ func asString(value interface{}) (string, error) {
 
 func command(ctx *context, program string, args ...string) *executor.Executor {
 	ctx.ui.TaskCommand(program, args...)
+	return commandSilent(ctx, program, args...)
+}
+
+func sudoCommand(ctx *context, program string, args ...string) *executor.Executor {
+	args = append([]string{program}, args...)
+	program = "sudo"
+	ctx.ui.TaskCommand(program, args...)
+	return commandSilent(ctx, program, args...)
+}
+
+func commandSilent(ctx *context, program string, args ...string) *executor.Executor {
 	return executor.New(program, args...).SetOutputPrefix("  ").SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ())
 }
 
