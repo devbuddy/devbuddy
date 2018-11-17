@@ -19,7 +19,7 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	ui := termui.NewUI(cfg)
+	ui := termui.New(cfg)
 
 	proj, err := project.FindCurrent()
 	if err != nil {

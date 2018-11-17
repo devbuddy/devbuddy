@@ -23,7 +23,7 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
-	ui := termui.NewUI(cfg)
+	ui := termui.New(cfg)
 
 	plateform := fmt.Sprintf("bud-%s-%s", runtime.GOOS, runtime.GOARCH)
 
