@@ -41,7 +41,7 @@ func TestUpgraderLatestRelease(t *testing.T) {
 
 	u := NewUpgraderWithHTTPClient(client, false)
 
-	ui := termui.NewUI(config.NewTestConfig())
+	ui := termui.New(config.NewTestConfig())
 	err = u.Perform(ui, target.Name(), "https://github.com/devbuddy/devbuddy/releases/download/v0.1.0/bud-darwin-amd64")
 	require.NoError(t, err, "upgrader.Perform() failed")
 

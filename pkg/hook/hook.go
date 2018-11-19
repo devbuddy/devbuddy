@@ -21,7 +21,7 @@ func Hook() {
 	timerStart := time.Now()
 
 	cfg, configErr := config.Load()
-	ui := termui.NewHookUI(cfg)
+	ui := termui.NewHook(cfg)
 
 	if configErr != nil {
 		ui.Debug("error while loading the config: %s", configErr)
@@ -39,7 +39,7 @@ func Hook() {
 	ui.Debug("total time: %s", time.Since(timerStart))
 }
 
-func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI) {
+func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.UI) {
 	allFeatures, err := getFeaturesFromProject(proj)
 	if err != nil {
 		ui.Debug("error while building the project tasks: %s", err)

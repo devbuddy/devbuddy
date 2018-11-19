@@ -22,7 +22,7 @@ func upRun(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
-	ui := termui.NewUI(cfg)
+	ui := termui.New(cfg)
 
 	proj, err := project.FindCurrent()
 	checkError(err)

@@ -21,7 +21,7 @@ func initRun(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
-	ui := termui.NewUI(cfg)
+	ui := termui.New(cfg)
 
 	ui.ActionHeader("Creating a default dev.yml file.")
 

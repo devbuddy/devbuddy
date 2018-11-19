@@ -2,6 +2,8 @@ package termui
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"strings"
 
@@ -10,29 +12,37 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 )
 
-type UI struct {
-	baseUI
-}
-
-func NewUI(cfg *config.Config) *UI {
-	return &UI{
-		baseUI{
-			out:          os.Stdout,
-			debugEnabled: cfg.DebugEnabled,
-		},
+func Fprintf(w io.Writer, format string, a ...interface{}) {
+	_, err := fmt.Fprintf(w, format, a...)
+	if err != nil {
+		log.Fatalf("failed to write to console: %s", err)
 	}
 }
 
-func (u *UI) ActionHeader(description string) {
-	Fprintf(u.out, "🐼  %s\n", color.Cyan(description))
+type UI struct {
+	out          io.Writer
+	debugEnabled bool
 }
 
-func (u *UI) ActionNotice(text string) {
-	Fprintf(u.out, "⚠️   %s\n", color.Brown(text))
+func New(cfg *config.Config) *UI {
+	return &UI{
+		out:          os.Stdout,
+		debugEnabled: cfg.DebugEnabled,
+	}
 }
 
-func (u *UI) ActionDone() {
-	Fprintf(u.out, "✅  %s\n", color.Green("Done!"))
+func NewHook(cfg *config.Config) *UI {
+	return &UI{
+		out:          os.Stderr,
+		debugEnabled: cfg.DebugEnabled,
+	}
+}
+
+func (u *UI) Debug(format string, params ...interface{}) {
+	if u.debugEnabled {
+		msg := fmt.Sprintf(format, params...)
+		Fprintf(u.out, "BUD_DEBUG: %s\n", color.Gray(msg))
+	}
 }
 
 func (u *UI) CommandHeader(cmdline string) {
@@ -45,41 +55,6 @@ func (u *UI) CommandRun(cmdline string, args ...string) {
 
 func (u *UI) CommandActed() {
 	Fprintf(u.out, "  %s\n", color.Green("Done!"))
-}
-
-func (u *UI) TaskHeader(name string, param string) {
-	if param != "" {
-		param = fmt.Sprintf(" (%s)", color.Blue(param))
-	}
-	Fprintf(u.out, "%s %s%s\n", color.Brown("◼︎"), color.Magenta(name), param)
-}
-
-func (u *UI) TaskCommand(cmdline string, args ...string) {
-	Fprintf(u.out, "  Running: %s %s\n", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
-}
-
-func (u *UI) TaskShell(cmdline string) {
-	Fprintf(u.out, "  Running: %s\n", color.Cyan(cmdline))
-}
-
-func (u *UI) TaskActed() {
-	Fprintf(u.out, "  %s\n", color.Green("Done!"))
-}
-
-func (u *UI) TaskAlreadyOk() {
-	Fprintf(u.out, "  %s\n", color.Green("Already OK!"))
-}
-
-func (u *UI) TaskError(err error) {
-	Fprintf(u.out, "  %s\n", color.Red(err.Error()))
-}
-
-func (u *UI) TaskWarning(message string) {
-	Fprintf(u.out, "  Warning: %s\n", color.Brown(message))
-}
-
-func (u *UI) TaskActionHeader(desc string) {
-	Fprintf(u.out, "  %s%s\n", color.Brown("▪︎"), color.Magenta(desc))
 }
 
 func (u *UI) ProjectExists() {

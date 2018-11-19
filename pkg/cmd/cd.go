@@ -20,7 +20,7 @@ func cdRun(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
-	ui := termui.NewUI(cfg)
+	ui := termui.New(cfg)
 
 	proj, err := project.FindBestMatch(args[0], cfg)
 	checkError(err)

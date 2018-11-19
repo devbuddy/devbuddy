@@ -11,11 +11,11 @@ import (
 type Runner struct {
 	cfg  *config.Config
 	proj *project.Project
-	ui   *termui.HookUI
+	ui   *termui.UI
 	env  *env.Env
 }
 
-func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.HookUI, env *env.Env) *Runner {
+func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.UI, env *env.Env) *Runner {
 	return &Runner{cfg: cfg, proj: proj, ui: ui, env: env}
 }
 
