@@ -44,15 +44,15 @@ func runAction(ctx *context, action taskAction) error {
 		if err != nil {
 			return fmt.Errorf("The task action failed to run: %s", err)
 		}
-	}
 
-	result = action.needed(ctx)
-	if result.Error != nil {
-		return fmt.Errorf("The task action failed to detect if it is resolved: %s", result.Error)
-	}
+		result = action.needed(ctx)
+		if result.Error != nil {
+			return fmt.Errorf("The task action failed to detect if it is resolved: %s", result.Error)
+		}
 
-	if result.Needed {
-		return fmt.Errorf("The task action did not produce the expected result: %s", result.Reason)
+		if result.Needed {
+			return fmt.Errorf("The task action did not produce the expected result: %s", result.Reason)
+		}
 	}
 
 	return nil

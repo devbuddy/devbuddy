@@ -1,6 +1,7 @@
 package termui
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -35,6 +36,14 @@ func NewHook(cfg *config.Config) *UI {
 	return &UI{
 		out:          os.Stderr,
 		debugEnabled: cfg.DebugEnabled,
+	}
+}
+
+func NewTesting(debugEnabled bool) (*bytes.Buffer, *UI) {
+	buffer := bytes.NewBufferString("")
+	return buffer, &UI{
+		out:          buffer,
+		debugEnabled: debugEnabled,
 	}
 }
 
