@@ -37,13 +37,13 @@ func (a *aptInstall) description() string {
 	return ""
 }
 
-func (a *aptInstall) needed(ctx *context) (bool, error) {
+func (a *aptInstall) needed(ctx *context) *actionResult {
 	a.missingPackageNames = []string{}
 
 	for _, name := range a.packageNames {
 		result := shellSilent(ctx, fmt.Sprintf("dpkg -s \"%s\" | grep -q 'Status: install'", name)).Capture()
 		if result.LaunchError != nil {
-			return false, fmt.Errorf("failed to check if package is installed: %s", result.LaunchError)
+			return actionFailed("failed to check if package is installed: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
 			a.missingPackageNames = append(a.missingPackageNames, name)
@@ -51,9 +51,10 @@ func (a *aptInstall) needed(ctx *context) (bool, error) {
 	}
 
 	if len(a.missingPackageNames) > 0 {
-		return true, fmt.Errorf("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
+		return actionNeeded("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
 	}
-	return false, nil
+
+	return actionNotNeeded()
 }
 
 func (a *aptInstall) run(ctx *context) error {
