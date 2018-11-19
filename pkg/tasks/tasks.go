@@ -40,6 +40,15 @@ func (t *Task) addAction(action taskAction) {
 	t.actions = append(t.actions, action)
 }
 
+func (t *Task) addActionWithBuilder(description string, runFunc runFunc) *actionWithBuilder {
+	action := &actionWithBuilder{
+		desc:    description,
+		runFunc: runFunc,
+	}
+	t.actions = append(t.actions, action)
+	return action
+}
+
 func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	var task *Task
 
