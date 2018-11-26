@@ -27,7 +27,6 @@ func parserPython(config *taskConfig, task *Task) error {
 	task.featureName = "python"
 	task.featureParam = version
 
-	// task.addAction(&pyenv{})
 	task.addActionWithBuilder("install Pyenv", func(ctx *context) error {
 		result := command(ctx, "brew", "install", "pyenv").Run()
 		if result.Error != nil {
@@ -45,7 +44,6 @@ func parserPython(config *taskConfig, task *Task) error {
 	task.addAction(&pythonPyenv{version: version})
 	task.addAction(&pythonInstallVenv{version: version})
 
-	// task.addAction(&pythonCreateVenv{version: version})
 	task.addActionWithBuilder("create virtualenv", func(ctx *context) error {
 		name := helpers.VirtualenvName(ctx.proj, version)
 		venv := helpers.NewVirtualenv(ctx.cfg, name)
@@ -79,28 +77,6 @@ func parserPython(config *taskConfig, task *Task) error {
 
 	return nil
 }
-
-// type pyenv struct{}
-
-// func (p *pyenv) description() string {
-// 	return "install PyEnv"
-// }
-
-// func (p *pyenv) needed(ctx *context) *actionResult {
-// 	_, err := helpers.NewPyEnv()
-// 	if err != nil {
-// 		return actionNeeded("Pyenv is not installed: %s", err)
-// 	}
-// 	return actionNotNeeded()
-// }
-
-// func (p *pyenv) run(ctx *context) error {
-// 	result := command(ctx, "brew", "install", "pyenv").Run()
-// 	if result.Error != nil {
-// 		return fmt.Errorf("failed to install pyenv: %s", result.Error)
-// 	}
-// 	return nil
-// }
 
 type pythonPyenv struct {
 	version string
@@ -170,44 +146,3 @@ func (p *pythonInstallVenv) run(ctx *context) error {
 
 	return nil
 }
-
-// type pythonCreateVenv struct {
-// 	version string
-// }
-
-// func (p *pythonCreateVenv) description() string {
-// 	return "create virtualenv"
-// }
-
-// func (p *pythonCreateVenv) needed(ctx *context) *actionResult {
-// 	name := helpers.VirtualenvName(ctx.proj, p.version)
-// 	venv := helpers.NewVirtualenv(ctx.cfg, name)
-
-// 	if !venv.Exists() {
-// 		return actionNeeded("project virtualenv does not exists")
-// 	}
-
-// 	return actionNotNeeded()
-// }
-
-// func (p *pythonCreateVenv) run(ctx *context) error {
-// 	name := helpers.VirtualenvName(ctx.proj, p.version)
-// 	venv := helpers.NewVirtualenv(ctx.cfg, name)
-
-// 	err := os.MkdirAll(filepath.Dir(venv.Path()), 0750)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	pyEnv, err := helpers.NewPyEnv()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	result := command(ctx, pyEnv.Which(p.version, "virtualenv"), venv.Path()).Run()
-// 	if result.Error != nil {
-// 		return fmt.Errorf("failed to create the virtualenv: %s", result.Error)
-// 	}
-
-// 	return nil
-// }
