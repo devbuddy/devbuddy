@@ -40,9 +40,9 @@ func (t *Task) addAction(action taskAction) {
 	t.actions = append(t.actions, action)
 }
 
-func (t *Task) addActionWithBuilder(description string, runFunc runFunc) *actionWithBuilder {
+func (t *Task) addActionWithBuilder(desc string, runFunc actionRunFunc) *actionWithBuilder {
 	action := &actionWithBuilder{
-		desc:    description,
+		desc:    desc,
 		runFunc: runFunc,
 	}
 	t.actions = append(t.actions, action)

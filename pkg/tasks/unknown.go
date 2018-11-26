@@ -7,9 +7,10 @@ import (
 func parseUnknown(config *taskConfig, task *Task) error {
 	warning := fmt.Sprintf("Unknown task: \"%s\"", config.name)
 
-	task.addSimpleAction("", func(ctx *context) error {
+	task.addActionWithBuilder("", func(ctx *context) error {
 		ctx.ui.TaskWarning(warning)
 		return nil
 	})
+
 	return nil
 }

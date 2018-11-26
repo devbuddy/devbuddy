@@ -1,6 +1,11 @@
 package tasks
 
-import "github.com/devbuddy/devbuddy/pkg/helpers/store"
+import (
+	"path/filepath"
+
+	"github.com/devbuddy/devbuddy/pkg/helpers/store"
+	"github.com/devbuddy/devbuddy/pkg/utils"
+)
 
 type actionRunFunc func(*context) error
 
@@ -16,22 +21,22 @@ type actionWithBuilder struct {
 	ran        bool
 }
 
-func (s *actionWithBuilder) description() string {
-	return s.desc
+func (a *actionWithBuilder) description() string {
+	return a.desc
 }
 
-func (s *actionWithBuilder) needed(ctx *context) (result *actionResult) {
-	if s.ran {
-		return s.post(ctx)
+func (a *actionWithBuilder) needed(ctx *context) (result *actionResult) {
+	if a.ran {
+		return a.post(ctx)
 	}
-	return s.pre(ctx)
+	return a.pre(ctx)
 }
 
-func (s *actionWithBuilder) pre(ctx *context) (result *actionResult) {
-	if len(s.conditions) == 0 {
+func (a *actionWithBuilder) pre(ctx *context) (result *actionResult) {
+	if len(a.conditions) == 0 {
 		return actionNeeded("")
 	}
-	for _, condition := range s.conditions {
+	for _, condition := range a.conditions {
 		result = condition.pre(ctx)
 		if result.Error != nil || result.Needed {
 			return result
@@ -40,8 +45,8 @@ func (s *actionWithBuilder) pre(ctx *context) (result *actionResult) {
 	return actionNotNeeded()
 }
 
-func (s *actionWithBuilder) post(ctx *context) (result *actionResult) {
-	for _, condition := range s.conditions {
+func (a *actionWithBuilder) post(ctx *context) (result *actionResult) {
+	for _, condition := range a.conditions {
 		result = condition.post(ctx)
 		if result.Error != nil || result.Needed {
 			return result
@@ -50,37 +55,72 @@ func (s *actionWithBuilder) post(ctx *context) (result *actionResult) {
 	return actionNotNeeded()
 }
 
-func (s *actionWithBuilder) run(ctx *context) error {
-	s.ran = true
-	return s.runFunc(ctx)
+func (a *actionWithBuilder) run(ctx *context) error {
+	a.ran = true
+	return a.runFunc(ctx)
 }
 
-func (s *actionWithBuilder) addFileChangeCondition(path string) *actionWithBuilder {
+// func (a *actionWithBuilder) setDescription(desc string) *actionWithBuilder {
+// 	a.desc = desc
+// 	return a
+// }
 
-	pre := func(ctx *context) *actionResult {
-		changed, err := store.New(ctx.proj.Path).HasFileChanged("setup.py")
-		if err != nil {
-			return actionFailed("failed to check if setup.py has changed: %s", err)
-		}
-		if changed {
-			return actionNeeded("setup.py was modified")
-		}
-		return actionNotNeeded()
-	}
-	post := func(ctx *context) *actionResult {
-		err := store.New(ctx.proj.Path).RecordFileChange("setup.py")
-		// TODO ...
-	}
-
-	s.conditions = append(s.conditions, &actionCondition{pre: pre, post: post})
-	return s
+func (a *actionWithBuilder) addCondition(condition *actionCondition) *actionWithBuilder {
+	a.conditions = append(a.conditions, condition)
+	return a
 }
 
-func (s *actionWithBuilder) addFeatureCondition(name string) *actionWithBuilder {
-	return s
+func (a *actionWithBuilder) addConditionFunc(condFunc func(*context) *actionResult) *actionWithBuilder {
+	a.addCondition(&actionCondition{pre: condFunc, post: condFunc})
+	return a
 }
 
-func (s *actionWithBuilder) addCustomCondition(condFunc func(*context) *actionResult) *actionWithBuilder {
-	s.conditions = append(s.conditions, &actionCondition{pre: condFunc, post: condFunc})
-	return s
+func (a *actionWithBuilder) addFileChangeCondition(path string) *actionWithBuilder {
+	a.addCondition(&actionCondition{
+		pre: func(ctx *context) *actionResult {
+			fileChecksum, err := utils.FileChecksum(filepath.Join(ctx.proj.Path, path))
+			if err != nil {
+				return actionFailed("failed to get the file checksum: %s", err)
+			}
+
+			storedChecksum, err := ctx.store.GetString("checksum", store.KeyFromPath(path))
+			if err != nil {
+				return actionFailed("failed to read the previous file checksum: %s", err)
+			}
+
+			if fileChecksum != storedChecksum {
+				return actionNeeded("file %s changed", path)
+			}
+			return actionNotNeeded()
+		},
+
+		post: func(ctx *context) *actionResult {
+			fileChecksum, err := utils.FileChecksum(filepath.Join(ctx.proj.Path, path))
+			if err != nil {
+				return actionFailed("failed to get the file checksum: %s", err)
+			}
+
+			err = ctx.store.SetString("checksum", store.KeyFromPath(path), fileChecksum)
+			if err != nil {
+				return actionFailed("failed to store the current file checksum: %s", err)
+			}
+
+			return actionNotNeeded()
+		},
+	})
+	return a
+}
+
+func (a *actionWithBuilder) addFeatureChangeCondition(name string) *actionWithBuilder {
+	a.addCondition(&actionCondition{
+		pre: func(ctx *context) *actionResult {
+
+			return actionNotNeeded()
+		},
+		post: func(ctx *context) *actionResult {
+
+			return actionNotNeeded()
+		},
+	})
+	return a
 }

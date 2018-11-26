@@ -1,8 +1,9 @@
 package utils
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
-	"hash/adler32"
 	"io/ioutil"
 	"os"
 	"time"
@@ -35,8 +36,8 @@ func FileChecksum(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	checksum := fmt.Sprint(adler32.Checksum(content))
-	return checksum, nil
+	checksum := sha1.Sum(content)
+	return hex.EncodeToString(checksum[:]), nil
 }
 
 func WriteNewFile(filename string, data []byte, perm os.FileMode) error {

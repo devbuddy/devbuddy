@@ -7,6 +7,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/helpers/store"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
@@ -17,6 +18,7 @@ type context struct {
 	cfg      *config.Config
 	env      *env.Env
 	features map[string]string
+	store    *store.Store
 }
 
 // RunAll builds and execute all tasks found in the project
@@ -32,6 +34,7 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 		ui:       ui,
 		env:      env.NewFromOS(),
 		features: GetFeaturesFromTasks(proj, taskList),
+		store:    store.New(proj.Path),
 	}
 
 	for _, task := range taskList {
