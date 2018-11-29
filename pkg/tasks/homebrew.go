@@ -31,23 +31,23 @@ func parserHomebrew(config *taskConfig, task *Task) error {
 	task.header = strings.Join(formulas, ", ")
 
 	for _, formula := range formulas {
-		task.
-			addActionWithBuilder(fmt.Sprintf("installing %s", formula), func(ctx *context) error {
-				result := command(ctx, "brew", "install", formula).Run()
-				if result.Error != nil {
-					return fmt.Errorf("failed to run brew install: %s", result.Error)
-				}
+		action := newAction(fmt.Sprintf("installing %s", formula), func(ctx *context) error {
+			result := command(ctx, "brew", "install", formula).Run()
+			if result.Error != nil {
+				return fmt.Errorf("failed to run brew install: %s", result.Error)
+			}
 
-				return nil
-			}).
-			addConditionFunc(func(ctx *context) *actionResult {
-				brew := helpers.NewHomebrew()
+			return nil
+		})
+		action.onFunc(func(ctx *context) *actionResult {
+			brew := helpers.NewHomebrew()
 
-				if brew.IsInstalled(formula) {
-					return actionNotNeeded()
-				}
-				return actionNeeded("package %s is not installed", formula)
-			})
+			if brew.IsInstalled(formula) {
+				return actionNotNeeded()
+			}
+			return actionNeeded("package %s is not installed", formula)
+		})
+		task.addAction(action)
 	}
 
 	return nil

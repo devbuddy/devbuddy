@@ -15,19 +15,16 @@ func init() {
 }
 
 func parserPipfile(config *taskConfig, task *Task) error {
-	task.addAction(&pipfileInstall{})
-	task.addAction(&pipfileRun{})
+	task.addAction(
+		newAction("install pipfile command", pipfileInstallRun).
+			onFunc(pipfileInstallNeeded),
+	)
+	task.addAction(
+		newAction("install dependencies from the Pipfile", pipfileRun))
 	return nil
 }
 
-type pipfileInstall struct {
-}
-
-func (p *pipfileInstall) description() string {
-	return "install pipfile command"
-}
-
-func (p *pipfileInstall) needed(ctx *context) *actionResult {
+func pipfileInstallNeeded(ctx *context) *actionResult {
 	pythonParam := ctx.features["python"]
 	name := helpers.VirtualenvName(ctx.proj, pythonParam)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
@@ -39,7 +36,7 @@ func (p *pipfileInstall) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *pipfileInstall) run(ctx *context) error {
+func pipfileInstallRun(ctx *context) error {
 	result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to install pipenv: %s", result.Error)
@@ -47,26 +44,10 @@ func (p *pipfileInstall) run(ctx *context) error {
 	return nil
 }
 
-type pipfileRun struct {
-	success bool
-}
-
-func (p *pipfileRun) description() string {
-	return "install dependencies from the Pipfile"
-}
-
-func (p *pipfileRun) needed(ctx *context) *actionResult {
-	if !p.success {
-		return actionNeeded("")
-	}
-	return actionNotNeeded()
-}
-
-func (p *pipfileRun) run(ctx *context) error {
+func pipfileRun(ctx *context) error {
 	result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
 	if result.Error != nil {
 		return fmt.Errorf("pipenv failed: %s", result.Error)
 	}
-	p.success = true
 	return nil
 }

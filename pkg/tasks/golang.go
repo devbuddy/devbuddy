@@ -22,26 +22,42 @@ func parseGolang(config *taskConfig, task *Task) error {
 	task.featureName = "golang"
 	task.featureParam = version
 
-	task.addActionWithBuilder("", func(ctx *context) error {
+	action := newAction("", func(ctx *context) error {
 		ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
 		return nil
-	}).addConditionFunc(func(ctx *context) *actionResult {
+	})
+	action.onFunc(func(ctx *context) *actionResult {
 		if ctx.env.Get("GOPATH") == "" {
 			return actionNeeded("GOPATH is not set")
 		}
 		return actionNotNeeded()
 	})
+	action.onFileChange("setup.py")
+	action.onFeatureChange("feature")
+	task.addAction(action)
 
-	task.addActionWithBuilder(fmt.Sprintf("Install Go version %s", version),
+	action = newAction("", func(ctx *context) error {
+		ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
+		return nil
+	}).onFunc(func(ctx *context) *actionResult {
+		if ctx.env.Get("GOPATH") == "" {
+			return actionNeeded("GOPATH is not set")
+		}
+		return actionNotNeeded()
+	})
+	task.addAction(action)
+
+	action = newAction(fmt.Sprintf("Install Go version %s", version),
 		func(ctx *context) error {
 			return helpers.NewGolang(ctx.cfg, version).Install()
 		}).
-		addConditionFunc(func(ctx *context) *actionResult {
+		onFunc(func(ctx *context) *actionResult {
 			if !helpers.NewGolang(ctx.cfg, version).Exists() {
 				return actionNeeded("golang distribution is not installed")
 			}
 			return actionNotNeeded()
 		})
+	task.addAction(action)
 
 	return nil
 }

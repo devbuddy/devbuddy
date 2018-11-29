@@ -29,19 +29,19 @@ func parserPip(config *taskConfig, task *Task) error {
 	task.header = strings.Join(files, ", ")
 
 	for _, file := range files {
-		task.
-			addActionWithBuilder(fmt.Sprintf("install %s", file),
-				func(ctx *context) error {
-					result := command(ctx, "pip", "install", "--require-virtualenv", "-r", file).
-						AddOutputFilter("already satisfied").Run()
+		action := newAction(
+			fmt.Sprintf("install %s", file),
+			func(ctx *context) error {
+				result := command(ctx, "pip", "install", "--require-virtualenv", "-r", file).
+					AddOutputFilter("already satisfied").Run()
 
-					if result.Error != nil {
-						return fmt.Errorf("Pip failed: %s", result.Error)
-					}
-					return nil
-				}).
-			addFileChangeCondition(file).
-			addFeatureChangeCondition("python")
+				if result.Error != nil {
+					return fmt.Errorf("Pip failed: %s", result.Error)
+				}
+				return nil
+			})
+		action.onFileChange(file).onFeatureChange("python")
+		task.addAction(action)
 	}
 
 	return nil

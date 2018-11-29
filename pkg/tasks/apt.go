@@ -23,7 +23,7 @@ func parserApt(config *taskConfig, task *Task) error {
 
 	task.header = strings.Join(packages, ", ")
 
-	task.addActionWithBuilder("", func(ctx *context) error {
+	action := newAction("", func(ctx *context) error {
 		missingPackages, err := findMissingAptPackages(ctx, packages)
 		if err != nil {
 			return err
@@ -41,7 +41,7 @@ func parserApt(config *taskConfig, task *Task) error {
 		}
 
 		return nil
-	}).addConditionFunc(func(ctx *context) *actionResult {
+	}).onFunc(func(ctx *context) *actionResult {
 		missingPackages, err := findMissingAptPackages(ctx, packages)
 		if err != nil {
 			return actionFailed("failed to check if package is installed: %s", err)
@@ -53,6 +53,7 @@ func parserApt(config *taskConfig, task *Task) error {
 
 		return actionNotNeeded()
 	})
+	task.addAction(action)
 
 	return nil
 }

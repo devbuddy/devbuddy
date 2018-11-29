@@ -21,6 +21,8 @@ type actionWithBuilder struct {
 	ran        bool
 }
 
+// action API
+
 func (a *actionWithBuilder) description() string {
 	return a.desc
 }
@@ -60,23 +62,24 @@ func (a *actionWithBuilder) run(ctx *context) error {
 	return a.runFunc(ctx)
 }
 
-// func (a *actionWithBuilder) setDescription(desc string) *actionWithBuilder {
-// 	a.desc = desc
-// 	return a
-// }
+// Builder API
 
-func (a *actionWithBuilder) addCondition(condition *actionCondition) *actionWithBuilder {
+func newAction(description string, runFunc actionRunFunc) *actionWithBuilder {
+	return &actionWithBuilder{desc: description, runFunc: runFunc}
+}
+
+func (a *actionWithBuilder) on(condition *actionCondition) *actionWithBuilder {
 	a.conditions = append(a.conditions, condition)
 	return a
 }
 
-func (a *actionWithBuilder) addConditionFunc(condFunc func(*context) *actionResult) *actionWithBuilder {
-	a.addCondition(&actionCondition{pre: condFunc, post: condFunc})
+func (a *actionWithBuilder) onFunc(condFunc func(*context) *actionResult) *actionWithBuilder {
+	a.on(&actionCondition{pre: condFunc, post: condFunc})
 	return a
 }
 
-func (a *actionWithBuilder) addFileChangeCondition(path string) *actionWithBuilder {
-	a.addCondition(&actionCondition{
+func (a *actionWithBuilder) onFileChange(path string) *actionWithBuilder {
+	a.on(&actionCondition{
 		pre: func(ctx *context) *actionResult {
 			fileChecksum, err := utils.FileChecksum(filepath.Join(ctx.proj.Path, path))
 			if err != nil {
@@ -111,8 +114,8 @@ func (a *actionWithBuilder) addFileChangeCondition(path string) *actionWithBuild
 	return a
 }
 
-func (a *actionWithBuilder) addFeatureChangeCondition(name string) *actionWithBuilder {
-	a.addCondition(&actionCondition{
+func (a *actionWithBuilder) onFeatureChange(name string) *actionWithBuilder {
+	a.on(&actionCondition{
 		pre: func(ctx *context) *actionResult {
 
 			return actionNotNeeded()
