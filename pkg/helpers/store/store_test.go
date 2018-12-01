@@ -14,9 +14,8 @@ func TestProjectPathMissing(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	s := New(tmpdir + "/nopenope")
 
-	val, err := s.Get("dummy")
+	err := s.Set("dummy", []byte(""))
 	require.Error(t, err)
-	require.Equal(t, []byte(nil), val)
 }
 
 func TestInitialization(t *testing.T) {

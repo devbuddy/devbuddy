@@ -70,11 +70,6 @@ func (s *Store) SetString(key string, value string) error {
 
 // Get retrieves a byte slice for a key
 func (s *Store) Get(key string) ([]byte, error) {
-	err := s.ensureInit()
-	if err != nil {
-		return nil, err
-	}
-
 	pathForKey := s.pathForKey(key)
 
 	if _, err := os.Stat(pathForKey); os.IsNotExist(err) {
