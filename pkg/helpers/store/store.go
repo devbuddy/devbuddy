@@ -17,9 +17,6 @@ type Store struct {
 	projectPath string
 }
 
-// Key represents the key used to identify a stored
-type Key string
-
 // New returns an instance of Store
 func New(projectPath string) *Store {
 	return &Store{projectPath: projectPath}
@@ -27,6 +24,11 @@ func New(projectPath string) *Store {
 
 func (s *Store) path() string {
 	return filepath.Join(s.projectPath, dirName)
+}
+
+func (s *Store) pathForKey(key string) string {
+	filePathForKey := strings.Replace(key, string(filepath.Separator), "--", -1)
+	return filepath.Join(s.path(), filePathForKey)
 }
 
 func (s *Store) ensureInit() (err error) {
@@ -52,34 +54,34 @@ func (s *Store) ensureInit() (err error) {
 }
 
 // Set stores a byte slice for a key
-func (s *Store) Set(key Key, value []byte) error {
+func (s *Store) Set(key string, value []byte) error {
 	err := s.ensureInit()
 	if err != nil {
 		return err
 	}
 
-	return ioutil.WriteFile(filepath.Join(s.path(), string(key)), value, 0644)
+	return ioutil.WriteFile(s.pathForKey(key), value, 0644)
 }
 
 // SetString stores a string for a key
-func (s *Store) SetString(key Key, value string) error {
+func (s *Store) SetString(key string, value string) error {
 	return s.Set(key, []byte(value))
 }
 
 // Get retrieves a byte slice for a key
-func (s *Store) Get(key Key) ([]byte, error) {
+func (s *Store) Get(key string) ([]byte, error) {
 	err := s.ensureInit()
 	if err != nil {
 		return nil, err
 	}
 
-	stateFilePath := filepath.Join(s.path(), string(key))
+	pathForKey := s.pathForKey(key)
 
-	if _, err := os.Stat(stateFilePath); os.IsNotExist(err) {
+	if _, err := os.Stat(pathForKey); os.IsNotExist(err) {
 		return nil, nil
 	}
 
-	content, err := ioutil.ReadFile(stateFilePath)
+	content, err := ioutil.ReadFile(pathForKey)
 	if err != nil {
 		return nil, err
 	}
@@ -88,19 +90,17 @@ func (s *Store) Get(key Key) ([]byte, error) {
 }
 
 // GetString retrieves a string for a key
-func (s *Store) GetString(key Key) (string, error) {
+func (s *Store) GetString(key string) (string, error) {
 	value, err := s.Get(key)
 	return string(value), err
 }
 
+func normalizeKey(key string) string {
+	return
+}
+
 // DEPRECATED: don't use the RecordFileChange/HasFileChanged methods, they will be removed.
 // It should not be part of the Store
-
-// KeyFromPath builds a Key for the path of a file in the project
-func KeyFromPath(path string) Key {
-	value := strings.Replace(path, string(filepath.Separator), "--", -1)
-	return Key(value)
-}
 
 // RecordFileChange stores the modification time of a file.
 func (s *Store) RecordFileChange(path string) error {
