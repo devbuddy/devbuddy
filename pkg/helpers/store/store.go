@@ -17,6 +17,9 @@ type Store struct {
 	projectPath string
 }
 
+// Key represents the key used to identify a stored
+type Key string
+
 // New returns an instance of Store
 func New(projectPath string) *Store {
 	return &Store{projectPath: projectPath}
@@ -27,6 +30,10 @@ func (s *Store) path() string {
 }
 
 func (s *Store) ensureInit() (err error) {
+	if !utils.PathExists(s.projectPath) {
+		return fmt.Errorf("failed to initialize the store: project path does not exist: %s", s.projectPath)
+	}
+
 	if !utils.PathExists(s.path()) {
 		err = os.MkdirAll(s.path(), 0755)
 		if err != nil {
@@ -44,28 +51,64 @@ func (s *Store) ensureInit() (err error) {
 	return nil
 }
 
-func (s *Store) stateFilePath(kind, key string) string {
-	return filepath.Join(s.path(), fmt.Sprintf("%s-%s", kind, key))
-}
-
-func makeKeyFromPath(path string) string {
-	return strings.Replace(path, string(filepath.Separator), "--", -1)
-}
-
-// RecordFileChange stores the modification time of a file.
-func (s *Store) RecordFileChange(path string) error {
+// Set stores a byte slice for a key
+func (s *Store) Set(key Key, value []byte) error {
 	err := s.ensureInit()
 	if err != nil {
 		return err
 	}
 
+	return ioutil.WriteFile(filepath.Join(s.path(), string(key)), value, 0644)
+}
+
+// SetString stores a string for a key
+func (s *Store) SetString(key Key, value string) error {
+	return s.Set(key, []byte(value))
+}
+
+// Get retrieves a byte slice for a key
+func (s *Store) Get(key Key) ([]byte, error) {
+	err := s.ensureInit()
+	if err != nil {
+		return nil, err
+	}
+
+	stateFilePath := filepath.Join(s.path(), string(key))
+
+	if _, err := os.Stat(stateFilePath); os.IsNotExist(err) {
+		return nil, nil
+	}
+
+	content, err := ioutil.ReadFile(stateFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+	return content, nil
+}
+
+// GetString retrieves a string for a key
+func (s *Store) GetString(key Key) (string, error) {
+	value, err := s.Get(key)
+	return string(value), err
+}
+
+// DEPRECATED: don't use the RecordFileChange/HasFileChanged methods, they will be removed.
+// It should not be part of the Store
+
+// KeyFromPath builds a Key for the path of a file in the project
+func KeyFromPath(path string) Key {
+	value := strings.Replace(path, string(filepath.Separator), "--", -1)
+	return Key(value)
+}
+
+// RecordFileChange stores the modification time of a file.
+func (s *Store) RecordFileChange(path string) error {
 	checksum, err := utils.FileChecksum(filepath.Join(s.projectPath, path))
 	if err != nil {
 		return err
 	}
-
-	stateFilePath := s.stateFilePath("checksum", makeKeyFromPath(path))
-	return ioutil.WriteFile(stateFilePath, []byte(checksum), 0644)
+	return s.Set("checksum-"+KeyFromPath(path), []byte(checksum))
 }
 
 // HasFileChanged detects whether a path has changed since the last call to RecordFileChange().
@@ -76,8 +119,7 @@ func (s *Store) HasFileChanged(path string) (bool, error) {
 		return true, nil
 	}
 
-	stateFilePath := s.stateFilePath("checksum", makeKeyFromPath(path))
-	content, err := ioutil.ReadFile(stateFilePath)
+	content, err := s.Get("checksum-" + KeyFromPath(path))
 	if err != nil {
 		return true, nil
 	}
