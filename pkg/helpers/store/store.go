@@ -1,6 +1,7 @@
 package store
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -55,6 +56,10 @@ func (s *Store) ensureInit() (err error) {
 
 // Set stores a byte slice for a key
 func (s *Store) Set(key string, value []byte) error {
+	if key == "" {
+		return errors.New("empty string is an invalid key")
+	}
+
 	err := s.ensureInit()
 	if err != nil {
 		return err
@@ -70,6 +75,10 @@ func (s *Store) SetString(key string, value string) error {
 
 // Get retrieves a byte slice for a key
 func (s *Store) Get(key string) ([]byte, error) {
+	if key == "" {
+		return nil, errors.New("empty string is an invalid key")
+	}
+
 	pathForKey := s.pathForKey(key)
 
 	if _, err := os.Stat(pathForKey); os.IsNotExist(err) {

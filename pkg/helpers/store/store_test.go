@@ -75,6 +75,18 @@ func TestSetGetString(t *testing.T) {
 	}
 }
 
+func TestKeyEmpty(t *testing.T) {
+	defer filet.CleanUp(t)
+	tmpdir := filet.TmpDir(t, "")
+	s := New(tmpdir)
+
+	_, err := s.Get("")
+	require.Error(t, err)
+
+	err = s.Set("", []byte(""))
+	require.Error(t, err)
+}
+
 func TestGetNotFound(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
