@@ -95,10 +95,6 @@ func (s *Store) GetString(key string) (string, error) {
 	return string(value), err
 }
 
-func normalizeKey(key string) string {
-	return
-}
-
 // DEPRECATED: don't use the RecordFileChange/HasFileChanged methods, they will be removed.
 // It should not be part of the Store
 
@@ -108,7 +104,7 @@ func (s *Store) RecordFileChange(path string) error {
 	if err != nil {
 		return err
 	}
-	return s.Set("checksum-"+KeyFromPath(path), []byte(checksum))
+	return s.SetString(s.pathForKey("checksum-"+path), checksum)
 }
 
 // HasFileChanged detects whether a path has changed since the last call to RecordFileChange().
@@ -119,10 +115,10 @@ func (s *Store) HasFileChanged(path string) (bool, error) {
 		return true, nil
 	}
 
-	content, err := s.Get("checksum-" + KeyFromPath(path))
+	content, err := s.GetString(s.pathForKey("checksum-" + path))
 	if err != nil {
 		return true, nil
 	}
 
-	return checksum != string(content), nil
+	return checksum != content, nil
 }
