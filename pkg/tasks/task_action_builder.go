@@ -18,11 +18,13 @@ func actionBuilder(description string, runFunc func(*context) error) *genericTas
 	return &genericTaskActionBuilder{desc: description, runFunc: runFunc}
 }
 
+// On registers a new condition
 func (a *genericTaskActionBuilder) On(condition *genericTaskActionCondition) *genericTaskActionBuilder {
 	a.conditions = append(a.conditions, condition)
 	return a
 }
 
+// OnFunc registers a condition defined as a single function
 func (a *genericTaskActionBuilder) OnFunc(condFunc func(*context) *actionResult) *genericTaskActionBuilder {
 	a.On(&genericTaskActionCondition{pre: condFunc, post: condFunc})
 	return a
@@ -35,7 +37,7 @@ func (a *genericTaskActionBuilder) OnFileChange(path string) *genericTaskActionB
 	return a
 }
 
-//
+// Build returns a new task action with the behaviour specified by the builder
 func (a *genericTaskActionBuilder) Build() *genericTaskAction {
 	return &genericTaskAction{
 		builder: &genericTaskActionBuilder{ // Hand made copy
