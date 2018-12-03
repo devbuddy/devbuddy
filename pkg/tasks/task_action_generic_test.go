@@ -127,7 +127,7 @@ func TestTaskActionGenericOnFunc(t *testing.T) {
 }
 
 func TestTaskActionGenericFileChange(t *testing.T) {
-	// defer filet.CleanUp(t)
+	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
 
 	ctx := &context{
