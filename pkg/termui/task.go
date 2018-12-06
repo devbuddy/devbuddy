@@ -7,11 +7,14 @@ import (
 	color "github.com/logrusorgru/aurora"
 )
 
-func (u *UI) TaskHeader(name string, param string) {
+func (u *UI) TaskHeader(name, param, reason string) {
 	if param != "" {
 		param = fmt.Sprintf(" (%s)", color.Blue(param))
 	}
-	Fprintf(u.out, "%s %s%s\n", color.Brown("◼︎"), color.Magenta(name), param)
+	if reason != "" {
+		reason = fmt.Sprintf(" (%s)", color.Gray(reason))
+	}
+	Fprintf(u.out, "%s %s%s%s\n", color.Brown("◼︎"), color.Magenta(name), param, reason)
 }
 
 func (u *UI) TaskCommand(cmdline string, args ...string) {

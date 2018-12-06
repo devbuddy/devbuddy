@@ -45,7 +45,17 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	}
 
 	for _, task := range taskList {
-		ctx.ui.TaskHeader(task.name, task.header)
+		shouldRun, err := taskShouldRunOnPlatform(ctx, task)
+		if err != nil {
+			ctx.ui.TaskError(err)
+			return false, nil
+		}
+		if !shouldRun {
+			ctx.ui.TaskHeader(task.name, task.header, "disabled for this platform")
+			continue
+		}
+
+		ctx.ui.TaskHeader(task.name, task.header, "")
 		err = runTask(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
@@ -54,6 +64,14 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	}
 
 	return true, nil
+}
+
+func taskShouldRunOnPlatform(ctx *context, task *Task) (bool, error) {
+	if task.platform == "" {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func runTask(ctx *context, task *Task) (err error) {

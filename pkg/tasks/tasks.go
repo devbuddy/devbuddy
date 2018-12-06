@@ -34,6 +34,8 @@ type Task struct {
 	perform      func(*context) error
 	featureName  string
 	featureParam string
+
+	platform string // The platform this task can run on. "debian", "macos"
 }
 
 func (t *Task) addAction(action taskAction) {
