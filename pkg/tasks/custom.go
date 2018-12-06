@@ -35,7 +35,7 @@ func (c *customAction) description() string {
 	return ""
 }
 
-func (c *customAction) needed(ctx *context) *actionResult {
+func (c *customAction) needed(ctx *Context) *actionResult {
 	result := shellSilent(ctx, c.condition).Run()
 
 	if result.LaunchError != nil {
@@ -48,7 +48,7 @@ func (c *customAction) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (c *customAction) run(ctx *context) error {
+func (c *customAction) run(ctx *Context) error {
 	result := shell(ctx, c.command).Run()
 	return result.Error
 }

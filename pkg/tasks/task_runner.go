@@ -4,36 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/features"
-	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
-type context struct {
-	proj     *project.Project
-	ui       *termui.UI
-	cfg      *config.Config
-	env      *env.Env
-	features map[string]string
-}
-
-// RunAll builds and execute all tasks found in the project
-func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success bool, err error) {
-	taskList, err := GetTasksFromProject(proj)
-	if err != nil {
-		return false, err
-	}
-
-	ctx := &context{
-		cfg:      cfg,
-		proj:     proj,
-		ui:       ui,
-		env:      env.NewFromOS(),
-		features: GetFeaturesFromTasks(proj, taskList),
-	}
-
+// RunAll accepts a list of tasks and check for their requirements and runs them if their conditions are met
+func RunAll(ctx *Context, taskList []*Task) (success bool, err error) {
 	for _, task := range taskList {
 		if task.requiredTask != "" {
 			if _, present := ctx.features[task.requiredTask]; !present {
@@ -56,7 +31,7 @@ func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success b
 	return true, nil
 }
 
-func runTask(ctx *context, task *Task) (err error) {
+func runTask(ctx *Context, task *Task) (err error) {
 	if task.perform != nil {
 		err = task.perform(ctx)
 		if err != nil {
@@ -75,7 +50,7 @@ func runTask(ctx *context, task *Task) (err error) {
 	return err
 }
 
-func activateFeature(ctx *context, task *Task) (err error) {
+func activateFeature(ctx *Context, task *Task) (err error) {
 	if task.featureName == "" {
 		return nil
 	}

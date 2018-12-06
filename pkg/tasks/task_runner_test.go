@@ -26,7 +26,7 @@ func (a *testingAction) description() string {
 	return a.desc
 }
 
-func (a *testingAction) needed(ctx *context) *actionResult {
+func (a *testingAction) needed(ctx *Context) *actionResult {
 	result := a.neededResults[a.neededCallCount]
 	if result == nil {
 		panic("the task should not have been called")
@@ -35,7 +35,7 @@ func (a *testingAction) needed(ctx *context) *actionResult {
 	return result
 }
 
-func (a *testingAction) run(ctx *context) error {
+func (a *testingAction) run(ctx *Context) error {
 	a.runCallCount++
 	return a.runResult
 }
@@ -48,10 +48,10 @@ func newTestingAction(desc string, resultBefore, resultAfter *actionResult, runR
 	}
 }
 
-func setupTaskTesting() (*context, *bytes.Buffer) {
+func setupTaskTesting() (*Context, *bytes.Buffer) {
 	buf, ui := termui.NewTesting(false)
 
-	ctx := &context{
+	ctx := &Context{
 		proj:     project.NewFromPath("/srv/myproject"),
 		ui:       ui,
 		cfg:      config.NewTestConfig(),

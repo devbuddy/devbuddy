@@ -25,7 +25,7 @@ func (p *pythonDevelopInstall) description() string {
 	return "install python package in develop mode"
 }
 
-func (p *pythonDevelopInstall) needed(ctx *context) *actionResult {
+func (p *pythonDevelopInstall) needed(ctx *Context) *actionResult {
 	changed, err := store.New(ctx.proj.Path).HasFileChanged("setup.py")
 	if err != nil {
 		return actionFailed("failed to check if setup.py has changed: %s", err)
@@ -36,7 +36,7 @@ func (p *pythonDevelopInstall) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *pythonDevelopInstall) run(ctx *context) error {
+func (p *pythonDevelopInstall) run(ctx *Context) error {
 	result := command(ctx, "pip", "install", "--require-virtualenv", "-e", ".").
 		AddOutputFilter("already satisfied").Run()
 

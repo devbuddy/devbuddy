@@ -44,14 +44,14 @@ func (p *pipInstall) description() string {
 	return fmt.Sprintf("install %s", p.file)
 }
 
-func (p *pipInstall) needed(ctx *context) *actionResult {
+func (p *pipInstall) needed(ctx *Context) *actionResult {
 	if !p.success {
 		return actionNeeded("")
 	}
 	return actionNotNeeded()
 }
 
-func (p *pipInstall) run(ctx *context) error {
+func (p *pipInstall) run(ctx *Context) error {
 	result := command(ctx, "pip", "install", "--require-virtualenv", "-r", p.file).
 		AddOutputFilter("already satisfied").Run()
 

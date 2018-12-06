@@ -31,7 +31,7 @@ type Task struct {
 	*taskDefinition
 	header       string
 	actions      []taskAction
-	perform      func(*context) error
+	perform      func(*Context) error
 	featureName  string
 	featureParam string
 }
