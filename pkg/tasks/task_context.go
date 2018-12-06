@@ -7,6 +7,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
+// Context provides the context in which a Task run
 type Context struct {
 	proj     *project.Project
 	ui       *termui.UI
@@ -15,7 +16,8 @@ type Context struct {
 	features map[string]string
 }
 
-func NewContextFromEnv(cfg *config.Config, proj *project.Project, ui *termui.UI, taskList []*Task) *Context {
+// NewContext returns a *Context for a project, using the environment
+func NewContext(cfg *config.Config, proj *project.Project, ui *termui.UI, taskList []*Task) *Context {
 	return &Context{
 		cfg:      cfg,
 		proj:     proj,

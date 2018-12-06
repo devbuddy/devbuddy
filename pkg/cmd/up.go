@@ -30,9 +30,9 @@ func upRun(cmd *cobra.Command, args []string) {
 	taskList, err := tasks.GetTasksFromProject(proj)
 	checkError(err)
 
-	ctx := tasks.NewContextFromEnv(cfg, proj, ui, taskList)
+	ctx := tasks.NewContext(cfg, proj, ui, taskList)
 
-	success, err := tasks.RunAll(ctx, taskList)
+	success, err := tasks.RunTasks(ctx, taskList)
 	checkError(err)
 	if !success {
 		os.Exit(1)

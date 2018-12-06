@@ -7,8 +7,8 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/features"
 )
 
-// RunAll accepts a list of tasks and check for their requirements and runs them if their conditions are met
-func RunAll(ctx *Context, taskList []*Task) (success bool, err error) {
+// RunTasks accepts a list of tasks and check for their requirements and runs them if their conditions are met
+func RunTasks(ctx *Context, taskList []*Task) (success bool, err error) {
 	for _, task := range taskList {
 		if task.requiredTask != "" {
 			if _, present := ctx.features[task.requiredTask]; !present {
