@@ -38,12 +38,21 @@ func (g *golangGoPath) needed(ctx *context) *actionResult {
 	if ctx.env.Get("GOPATH") == "" {
 		return actionNeeded("GOPATH is not set")
 	}
+
+	if !strings.Contains(ctx.env.Get("PATH"), g.bin()) {
+		return actionNeeded(fmt.Sprintf("%s is not in PATH", g.bin()))
+	}
+
 	return actionNotNeeded()
 }
 
 func (g *golangGoPath) run(ctx *context) error {
 	ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
 	return nil
+}
+
+func (g *golangGoPath) bin() string {
+	return fmt.Sprintf("%s/bin", ctx.env.Get("GOPATH"))
 }
 
 type golangInstall struct {
