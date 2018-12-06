@@ -23,8 +23,12 @@ func asString(value interface{}) (string, error) {
 }
 
 func command(ctx *context, program string, args ...string) *executor.Executor {
-	ctx.ui.TaskCommand(program, args...)
 	return executor.New(program, args...).SetOutputPrefix("  ").SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ())
+}
+
+func run(ctx *context, exec *executor.Executor) err {
+	ctx.ui.TaskCommand(program, args...)
+	return exec.Run()
 }
 
 func shell(ctx *context, cmdline string) *executor.Executor {

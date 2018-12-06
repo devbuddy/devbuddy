@@ -7,6 +7,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks"
 	"github.com/devbuddy/devbuddy/pkg/termui"
@@ -63,13 +64,20 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.HookUI
 	}
 }
 
-func getFeaturesFromProject(proj *project.Project) (map[string]string, error) {
+func getFeaturesFromProject(proj *project.Project) (features map[string]string, err error) {
 	if proj == nil {
 		return map[string]string{}, nil
 	}
-	allTasks, err := tasks.GetTasksFromProject(proj)
+
+	var taskList []*tasks.Task
+
+	if manifest.ExistsIn(proj.Path) {
+		taskList, err = tasks.GetTasksFromProjectManifest(proj)
+	}
+
 	if err != nil {
 		return nil, err
 	}
-	return tasks.GetFeaturesFromTasks(proj, allTasks), nil
+
+	return tasks.GetFeaturesFromTasks(proj, taskList), nil
 }

@@ -4,12 +4,15 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 func init() {
 	t := registerTaskDefinition("go")
 	t.name = "Golang"
 	t.parser = parseGolang
+	t.detector = detectGolang
 }
 
 func parseGolang(config *taskConfig, task *Task) error {
@@ -26,6 +29,10 @@ func parseGolang(config *taskConfig, task *Task) error {
 	task.addAction(&golangInstall{version: version})
 
 	return nil
+}
+
+func detectGolang(proj *project.Project) (bool, error) {
+	return utils.PathExists("Gopkg.lock"), nil
 }
 
 type golangGoPath struct{}

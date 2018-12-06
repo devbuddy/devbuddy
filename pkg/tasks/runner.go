@@ -21,7 +21,7 @@ type context struct {
 
 // RunAll builds and execute all tasks found in the project
 func RunAll(cfg *config.Config, proj *project.Project, ui *termui.UI) (success bool, err error) {
-	taskList, err := GetTasksFromProject(proj)
+	taskList, err := GetTasksFromProjectManifest(proj)
 	if err != nil {
 		return false, err
 	}

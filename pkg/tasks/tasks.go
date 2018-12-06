@@ -8,12 +8,14 @@ import (
 )
 
 type taskParser func(*taskConfig, *Task) error
+type taskDetector func(*project.Project) (bool, error)
 
 type taskDefinition struct {
 	// key          string
 	name         string
 	requiredTask string
 	parser       taskParser
+	detector     taskDetector
 }
 
 var taskDefinitions = make(map[string]*taskDefinition)
@@ -46,10 +48,12 @@ type taskAction interface {
 	run(*context) error
 }
 
-func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
+// GetTasksFromProjectManifest Parse manifest from project and all tasks found in the project.
+func GetTasksFromProjectManifest(proj *project.Project) (taskList []*Task, err error) {
 	var task *Task
 
 	manifest, err := manifest.Load(proj.Path)
+
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +66,28 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 		taskList = append(taskList, task)
 	}
 
+	return taskList, nil
+}
+
+// InferTasksFromProject Infer tasks from the structure of the project.
+func DetectTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
+	var task *Task
+
+	for _, taskdef := range taskDefinitions {
+		detected, err := taskdef.detector(proj)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if detected {
+			task, err = buildFromDefinition(taskdef)
+			if err != nil {
+				return nil, err
+			}
+			taskList = append(taskList, task)
+		}
+	}
 	return taskList, nil
 }
 

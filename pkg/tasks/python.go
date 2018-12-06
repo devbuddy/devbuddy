@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
@@ -15,6 +16,7 @@ func init() {
 	t := registerTaskDefinition(pythonTaskName)
 	t.name = "Python"
 	t.parser = parserPython
+	t.detector = detectPython
 }
 
 func parserPython(config *taskConfig, task *Task) error {
@@ -36,6 +38,10 @@ func parserPython(config *taskConfig, task *Task) error {
 
 type pythonPyenv struct {
 	version string
+}
+
+func detectPython(proj *project.Project) (bool, error) {
+	return utils.PathExists("setup.py"), nil
 }
 
 func (p *pythonPyenv) description() string {

@@ -28,6 +28,7 @@ func build(version string) {
 	rootCmd.AddCommand(cdCmd)
 	rootCmd.AddCommand(cloneCmd)
 	rootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(detectCmd)
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(inspectCmd)
 	rootCmd.AddCommand(openCmd)

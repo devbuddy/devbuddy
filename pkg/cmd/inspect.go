@@ -23,7 +23,7 @@ func inspectRun(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("Found project at %s\n", proj.Path)
 
-	projectTasks, err := tasks.GetTasksFromProject(proj)
+	projectTasks, err := tasks.GetTasksFromProjectManifest(proj)
 	checkError(err)
 
 	fmt.Print(tasks.InspectTasks(projectTasks, proj))
