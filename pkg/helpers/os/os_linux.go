@@ -1,6 +1,7 @@
 package os
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 )
@@ -16,4 +17,13 @@ func NewOS() (*OS, error) {
 	}
 
 	return &OS{runtime.GOOS, variant}, nil
+}
+
+// GetVariant returns the variant of the os identified by `runtime`.
+func (o *OS) GetVariant() (string, error) {
+	if o.release == "debian" {
+		return "debian", nil
+	}
+
+	return "", fmt.Errorf("Cannot identify variant for linux")
 }
