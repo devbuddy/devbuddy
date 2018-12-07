@@ -27,7 +27,12 @@ func upRun(cmd *cobra.Command, args []string) {
 	proj, err := project.FindCurrent()
 	checkError(err)
 
-	success, err := tasks.RunAll(cfg, proj, ui)
+	taskList, err := tasks.GetTasksFromProject(proj)
+	checkError(err)
+
+	ctx := tasks.NewContext(cfg, proj, ui, taskList)
+
+	success, err := tasks.Run(ctx, &tasks.TaskRunnerImpl{}, taskList)
 	checkError(err)
 	if !success {
 		os.Exit(1)

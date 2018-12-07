@@ -4,8 +4,8 @@ import "fmt"
 
 type taskAction interface {
 	description() string
-	needed(*context) *actionResult
-	run(*context) error
+	needed(*Context) *actionResult
+	run(*Context) error
 }
 
 type actionResult struct {
@@ -26,7 +26,7 @@ func actionNotNeeded() *actionResult {
 	return &actionResult{Needed: false}
 }
 
-func runAction(ctx *context, action taskAction) error {
+func runAction(ctx *Context, action taskAction) error {
 	desc := action.description()
 
 	result := action.needed(ctx)

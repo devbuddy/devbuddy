@@ -41,7 +41,7 @@ func (p *pyenv) description() string {
 	return "install PyEnv"
 }
 
-func (p *pyenv) needed(ctx *context) *actionResult {
+func (p *pyenv) needed(ctx *Context) *actionResult {
 	_, err := helpers.NewPyEnv()
 	if err != nil {
 		return actionNeeded("Pyenv is not installed: %s", err)
@@ -49,7 +49,7 @@ func (p *pyenv) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *pyenv) run(ctx *context) error {
+func (p *pyenv) run(ctx *Context) error {
 	result := command(ctx, "brew", "install", "pyenv").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to install pyenv: %s", result.Error)
@@ -65,7 +65,7 @@ func (p *pythonPyenv) description() string {
 	return "install Python version with PyEnv"
 }
 
-func (p *pythonPyenv) needed(ctx *context) *actionResult {
+func (p *pythonPyenv) needed(ctx *Context) *actionResult {
 	pyEnv, err := helpers.NewPyEnv()
 	if err != nil {
 		return actionFailed("cannot use pyenv: %s", err)
@@ -83,7 +83,7 @@ func (p *pythonPyenv) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *pythonPyenv) run(ctx *context) error {
+func (p *pythonPyenv) run(ctx *Context) error {
 	result := command(ctx, "pyenv", "install", p.version).Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to install the required python version: %s", result.Error)
@@ -99,7 +99,7 @@ func (p *pythonInstallVenv) description() string {
 	return "install virtualenv"
 }
 
-func (p *pythonInstallVenv) needed(ctx *context) *actionResult {
+func (p *pythonInstallVenv) needed(ctx *Context) *actionResult {
 	pyEnv, err := helpers.NewPyEnv()
 	if err != nil {
 		return actionFailed("cannot use pyenv: %s", err)
@@ -113,7 +113,7 @@ func (p *pythonInstallVenv) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *pythonInstallVenv) run(ctx *context) error {
+func (p *pythonInstallVenv) run(ctx *Context) error {
 	pyEnv, err := helpers.NewPyEnv()
 	if err != nil {
 		return err
@@ -134,7 +134,7 @@ func (p *pythonCreateVenv) description() string {
 	return "create virtualenv"
 }
 
-func (p *pythonCreateVenv) needed(ctx *context) *actionResult {
+func (p *pythonCreateVenv) needed(ctx *Context) *actionResult {
 	name := helpers.VirtualenvName(ctx.proj, p.version)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
 
@@ -145,7 +145,7 @@ func (p *pythonCreateVenv) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *pythonCreateVenv) run(ctx *context) error {
+func (p *pythonCreateVenv) run(ctx *Context) error {
 	name := helpers.VirtualenvName(ctx.proj, p.version)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
 

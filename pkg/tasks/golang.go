@@ -34,14 +34,14 @@ func (g *golangGoPath) description() string {
 	return ""
 }
 
-func (g *golangGoPath) needed(ctx *context) *actionResult {
+func (g *golangGoPath) needed(ctx *Context) *actionResult {
 	if ctx.env.Get("GOPATH") == "" {
 		return actionNeeded("GOPATH is not set")
 	}
 	return actionNotNeeded()
 }
 
-func (g *golangGoPath) run(ctx *context) error {
+func (g *golangGoPath) run(ctx *Context) error {
 	ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
 	return nil
 }
@@ -54,13 +54,13 @@ func (g *golangInstall) description() string {
 	return fmt.Sprintf("Install Go version %s", g.version)
 }
 
-func (g *golangInstall) needed(ctx *context) *actionResult {
+func (g *golangInstall) needed(ctx *Context) *actionResult {
 	if !helpers.NewGolang(ctx.cfg, g.version).Exists() {
 		return actionNeeded("golang distribution is not installed")
 	}
 	return actionNotNeeded()
 }
 
-func (g *golangInstall) run(ctx *context) error {
+func (g *golangInstall) run(ctx *Context) error {
 	return helpers.NewGolang(ctx.cfg, g.version).Install()
 }
