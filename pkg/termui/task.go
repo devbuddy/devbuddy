@@ -12,7 +12,7 @@ func (u *UI) TaskHeader(name, param, reason string) {
 		param = fmt.Sprintf(" (%s)", color.Blue(param))
 	}
 	if reason != "" {
-		reason = fmt.Sprintf(" (%s)", color.Gray(reason))
+		reason = fmt.Sprintf(" (%s)", color.Brown(reason))
 	}
 	Fprintf(u.out, "%s %s%s%s\n", color.Brown("◼︎"), color.Magenta(name), param, reason)
 }

@@ -42,7 +42,7 @@ func Run(ctx *Context, taskExecutor TaskRunner, taskList []*Task) (success bool,
 }
 
 func taskShouldRun(ctx *Context, task *Task) (bool, error) {
-	if task.platform == "" {
+	if task.osRequirement == "" {
 		return true, nil
 	}
 

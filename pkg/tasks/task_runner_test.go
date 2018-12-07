@@ -205,3 +205,23 @@ func TestRunWithTaskError(t *testing.T) {
 	require.Equal(t, 1, len(taskRunner.tasks))
 	require.Equal(t, task1, taskRunner.tasks[0])
 }
+
+func TestRunWithTaskWithOsRequirement(t *testing.T) {
+	ctx, _ := setupTaskTesting()
+
+	task1 := &Task{
+		taskDefinition: &taskDefinition{name: "task1"},
+		osRequirement:  "megadrive",
+	}
+	task2 := &Task{taskDefinition: &taskDefinition{name: "task2"}}
+	tasks := []*Task{task1, task2}
+
+	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
+
+	success, err := Run(ctx, taskRunner, tasks)
+	require.NoError(t, err)
+	require.False(t, success)
+
+	require.Equal(t, 1, len(taskRunner.tasks))
+	require.Equal(t, task2, taskRunner.tasks[0])
+}
