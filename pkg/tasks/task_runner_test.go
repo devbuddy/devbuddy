@@ -174,15 +174,12 @@ func TestTaskRunnerWithError(t *testing.T) {
 
 func TestRun(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-
-	tasks := []*Task{
-		&Task{taskDefinition: &taskDefinition{}},
-		&Task{taskDefinition: &taskDefinition{}},
-	}
+	tasks := []*Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{}
+	taskSelector := &taskSelectorMock{true}
 
-	success, err := Run(ctx, taskRunner, tasks)
+	success, err := Run(ctx, taskRunner, taskSelector, tasks)
 	require.NoError(t, err)
 	require.True(t, success)
 
@@ -191,37 +188,29 @@ func TestRun(t *testing.T) {
 
 func TestRunWithTaskError(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-
-	task1 := &Task{taskDefinition: &taskDefinition{name: "task1"}}
-	task2 := &Task{taskDefinition: &taskDefinition{name: "task2"}}
-	tasks := []*Task{task1, task2}
+	tasks := []*Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
+	taskSelector := &taskSelectorMock{true}
 
-	success, err := Run(ctx, taskRunner, tasks)
+	success, err := Run(ctx, taskRunner, taskSelector, tasks)
 	require.NoError(t, err)
 	require.False(t, success)
 
 	require.Equal(t, 1, len(taskRunner.tasks))
-	require.Equal(t, task1, taskRunner.tasks[0])
+	require.Equal(t, tasks[0], taskRunner.tasks[0])
 }
 
 func TestRunWithTaskWithOsRequirement(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-
-	task1 := &Task{
-		taskDefinition: &taskDefinition{name: "task1"},
-		osRequirement:  "megadrive",
-	}
-	task2 := &Task{taskDefinition: &taskDefinition{name: "task2"}}
-	tasks := []*Task{task1, task2}
+	tasks := []*Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
+	taskSelector := &taskSelectorMock{false}
 
-	success, err := Run(ctx, taskRunner, tasks)
+	success, err := Run(ctx, taskRunner, taskSelector, tasks)
 	require.NoError(t, err)
-	require.False(t, success)
+	require.True(t, success)
 
-	require.Equal(t, 1, len(taskRunner.tasks))
-	require.Equal(t, task2, taskRunner.tasks[0])
+	require.Equal(t, 0, len(taskRunner.tasks))
 }
