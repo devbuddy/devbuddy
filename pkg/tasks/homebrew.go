@@ -11,6 +11,7 @@ func init() {
 	t := registerTaskDefinition("homebrew")
 	t.name = "Homebrew"
 	t.parser = parserHomebrew
+	t.osRequirement = "macos"
 }
 
 func parserHomebrew(config *taskConfig, task *Task) error {
