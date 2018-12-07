@@ -1,7 +1,7 @@
 package os
 
 // OS represent the os and it's corresponding release.
-type OS struct {
+type Identity struct {
 	platform string
 	release  string
 }

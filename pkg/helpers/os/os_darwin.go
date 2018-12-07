@@ -8,19 +8,19 @@ import (
 )
 
 // New returns an OS identifier.
-func New() (o *OS, err error) {
+func New() (i *Identity, err error) {
 	variant := "unknown"
 
 	if variant, err = syscall.Sysctl("kern.osrelease"); err != nil {
 		return nil, err
 	}
 
-	return &OS{runtime.GOOS, variant}, nil
+	return &Identity{runtime.GOOS, variant}, nil
 }
 
 // GetVariant returns the variant of the os identified by `runtime`.
-func (o *OS) GetVariant() (string, error) {
-	versiomNumberList := strings.Split(o.release, ":")
+func (i *Identity) GetVariant() (string, error) {
+	versiomNumberList := strings.Split(i.release, ":")
 	versiomNumber := versiomNumberList[len(versiomNumberList)-1]
 	versiomNumber = strings.TrimSpace(versiomNumber)
 
