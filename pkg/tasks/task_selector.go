@@ -33,7 +33,7 @@ func (s *TaskSelectorImpl) ShouldRun(ctx *Context, task *Task) (bool, error) {
 func (s *TaskSelectorImpl) osRequirementMatch(ctx *Context, task *Task) (bool, error) {
 	switch task.osRequirement {
 	case "":
-		return true, nil
+		break
 	case "debian":
 		if !s.osIdent.IsDebianLike() {
 			return false, nil
