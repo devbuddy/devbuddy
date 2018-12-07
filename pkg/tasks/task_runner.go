@@ -78,13 +78,3 @@ func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) (err error) {
 	// itself with the PATH value from the specified Env.
 	return os.Setenv("PATH", ctx.env.Get("PATH"))
 }
-
-type taskRunnerMock struct {
-	taskError error
-	tasks     []*Task
-}
-
-func (r *taskRunnerMock) Run(ctx *Context, task *Task) error {
-	r.tasks = append(r.tasks, task)
-	return r.taskError
-}
