@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetVariant(t *testing.T) {
-	identity := Identity{"linux", "debian"}
+	identity := DetectFromReleaseId("debian")
 
 	variant, err := identity.GetVariant()
 
@@ -17,7 +17,7 @@ func TestGetVariant(t *testing.T) {
 }
 
 func TestInvalidGetVariant(t *testing.T) {
-	identity := Identity{"linux", "invalid"}
+	identity := DetectFromReleaseId("invalid")
 
 	variant, err := identity.GetVariant()
 

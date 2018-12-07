@@ -4,19 +4,22 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"github.com/cobaugh/osrelease"
 )
 
 // New returns an OS identifier.
 func Detect() (*Identity, error) {
-	variant := "unknown"
+	release, err := osrelease.Read()
 
-	if _, err := os.Stat("/etc/debian_version"); !os.IsNotExist(err) {
-		variant = "debian"
-	} else {
-		return nil, err
+	if err != nil {
+		return err
 	}
 
-	return &Identity{runtime.GOOS, variant}, nil
+	return DetectFromReleaseId(release['id']), nil
+}
+
+func DetectFromReleaseId(releaseId string) (*Identity, error) {
+	return &Identity{runtime.GOOS, releaseId}, nil
 }
 
 // GetVariant returns the variant of the os identified by `runtime`.
