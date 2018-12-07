@@ -8,7 +8,7 @@ import (
 )
 
 // Run accepts a list of tasks and check for their requirements and runs them if their conditions are met
-func Run(ctx *Context, taskExecutor TaskRunner, taskList []*Task) (success bool, err error) {
+func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*Task) (success bool, err error) {
 	for _, task := range taskList {
 		if task.requiredTask != "" {
 			if _, present := ctx.features[task.requiredTask]; !present {
@@ -20,8 +20,18 @@ func Run(ctx *Context, taskExecutor TaskRunner, taskList []*Task) (success bool,
 	}
 
 	for _, task := range taskList {
-		ctx.ui.TaskHeader(task.name, task.header)
-		err = taskExecutor.Run(ctx, task)
+		shouldRun, err := selector.ShouldRun(ctx, task)
+		if err != nil {
+			ctx.ui.TaskError(err)
+			return false, nil
+		}
+		if !shouldRun {
+			ctx.ui.TaskHeader(task.name, task.header, "disabled")
+			continue
+		}
+
+		ctx.ui.TaskHeader(task.name, task.header, "")
+		err = executor.Run(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
 			return false, nil
@@ -35,8 +45,7 @@ type TaskRunner interface {
 	Run(*Context, *Task) error
 }
 
-type TaskRunnerImpl struct {
-}
+type TaskRunnerImpl struct{}
 
 func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
 	if task.perform != nil {
