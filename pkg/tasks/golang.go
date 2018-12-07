@@ -40,8 +40,8 @@ func (g *golangGoPath) needed(ctx *Context) *actionResult {
 		return actionNeeded("GOPATH is not set")
 	}
 
-	if !strings.Contains(ctx.env.Get("PATH"), g.bin()) {
-		return actionNeeded(fmt.Sprintf("%s is not in PATH", g.bin()))
+	if !strings.Contains(ctx.env.Get("PATH"), g.binPath(ctx)) {
+		return actionNeeded(fmt.Sprintf("%s is not in PATH", g.binPath()))
 	}
 
 	return actionNotNeeded()
@@ -52,7 +52,7 @@ func (g *golangGoPath) run(ctx *Context) error {
 	return nil
 }
 
-func (g *golangGoPath) bin() string {
+func (g *golangGoPath) binPath(ctx *Context) string {
 	return fmt.Sprintf("%s/bin", ctx.env.Get("GOPATH"))
 }
 
