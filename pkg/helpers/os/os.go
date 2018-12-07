@@ -1,36 +1,14 @@
-package helpers
+package os
 
 import (
 	"fmt"
-	"os"
-	"runtime"
 	"strings"
-	"syscall"
 )
 
 // OS represent the os and it's corresponding release.
 type OS struct {
 	platform string
 	release  string
-}
-
-// NewOS returns an OS identifier.
-func NewOS() (*OS, error) {
-	variant := "unknown"
-
-	if runtime.GOOS == "darwin" {
-		if variant, err := syscall.Sysctl("kern.osrelease"); err != nil {
-			return nil, err
-		}
-	} else if runtime.GOOS == "linux" {
-		if _, err := os.Stat("/etc/debian_version"); !os.IsNotExist(err) {
-			variant = "debian"
-		} else {
-			return nil, err
-		}
-	}
-
-	return &OS{runtime.GOOS, variant}, nil
 }
 
 func NewOSWithRelease(platform string, release string) *OS {
