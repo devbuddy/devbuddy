@@ -21,7 +21,6 @@ func TestOSInvalidGetVariant(t *testing.T) {
 
 	variant, err := os.GetVariant()
 
-	require.Error(t, err, fmt.Errorf("Cannot identify variant '1' for darwin")
+	require.Error(t, err, fmt.Errorf("Cannot identify variant '1' for darwin"))
 	require.Equal(t, "", variant)
 }
-
