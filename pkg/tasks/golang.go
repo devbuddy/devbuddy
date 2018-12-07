@@ -41,7 +41,7 @@ func (g *golangGoPath) needed(ctx *Context) *actionResult {
 	}
 
 	if !strings.Contains(ctx.env.Get("PATH"), g.binPath(ctx)) {
-		return actionNeeded(fmt.Sprintf("%s is not in PATH", g.binPath()))
+		return actionNeeded(fmt.Sprintf("%s is not in PATH", g.binPath(ctx)))
 	}
 
 	return actionNotNeeded()
