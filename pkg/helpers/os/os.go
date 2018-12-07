@@ -5,7 +5,3 @@ type OS struct {
 	platform string
 	release  string
 }
-
-func NewOSWithRelease(platform string, release string) *OS {
-	return &OS{platform, release}
-}

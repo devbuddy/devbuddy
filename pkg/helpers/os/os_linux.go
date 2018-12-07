@@ -6,8 +6,8 @@ import (
 	"runtime"
 )
 
-// NewOS returns an OS identifier.
-func NewOS() (*OS, error) {
+// New returns an OS identifier.
+func New() (*OS, error) {
 	variant := "unknown"
 
 	if _, err := os.Stat("/etc/debian_version"); !os.IsNotExist(err) {

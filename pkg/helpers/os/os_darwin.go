@@ -7,8 +7,8 @@ import (
 	"syscall"
 )
 
-// NewOS returns an OS identifier.
-func NewOS() (o *OS, err error) {
+// New returns an OS identifier.
+func New() (o *OS, err error) {
 	variant := "unknown"
 
 	if variant, err = syscall.Sysctl("kern.osrelease"); err != nil {
