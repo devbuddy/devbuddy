@@ -19,7 +19,8 @@ func TestOSGetVariant(t *testing.T) {
 func TestOSInvalidGetVariant(t *testing.T) {
 	os := OS{"linux", "invalid"}
 
-	_, err := os.GetVariant()
+	variant, err := os.GetVariant()
 
 	require.Error(t, err, fmt.Errorf("Cannot identify variant 'invalid' for linux"))
+	require.Equal(t, "", variant)
 }
