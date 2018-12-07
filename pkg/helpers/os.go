@@ -10,34 +10,42 @@ import (
 
 // OS represent the os and it's corresponding release.
 type OS struct {
-	version string
-	release string
+	platform string
+	release  string
 }
 
 // NewOS returns an OS identifier.
-func NewOS() (os *OS, err error) {
-	if runtime.GOOS == "darwin" {
-		osRelease, err := syscall.Sysctl("kern.osrelease")
+func NewOS() (*OS, error) {
+	variant := "unknown"
 
-		if err != nil {
+	if runtime.GOOS == "darwin" {
+		if variant, err := syscall.Sysctl("kern.osrelease"); err != nil {
 			return nil, err
 		}
-
-		return &OS{"darwin", osRelease}, nil
+	} else if runtime.GOOS == "linux" {
+		if _, err := os.Stat("/etc/debian_version"); !os.IsNotExist(err) {
+			variant = "debian"
+		} else {
+			return nil, err
+		}
 	}
 
-	return &OS{runtime.GOOS, ""}, nil
+	return &OS{runtime.GOOS, variant}, nil
+}
+
+func NewOSWithRelease(platform string, release string) *OS {
+	return &OS{platform, release}
 }
 
 // GetVariant returns the variant of the os identified by `runtime`.
 func (o *OS) GetVariant() (string, error) {
-	if o.version == "darwin" {
+	if o.platform == "darwin" {
 		return o.getDarwinVariant()
-	} else if o.version == "linux" {
+	} else if o.platform == "linux" {
 		return o.getDarwinVariant()
 	}
 
-	return "", fmt.Errorf("Cannot identify %s", o.version)
+	return "", fmt.Errorf("Cannot identify %s", o.platform)
 }
 
 func (o *OS) getDarwinVariant() (string, error) {
@@ -81,7 +89,7 @@ func (o *OS) getDarwinVariant() (string, error) {
 }
 
 func (o *OS) getLinuxVariant() (string, error) {
-	if _, err := os.Stat("/etc/debian_version"); !os.IsNotExist(err) {
+	if o.release == "debian" {
 		return "debian", nil
 	}
 
