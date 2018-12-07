@@ -3,23 +3,19 @@ package tasks
 import (
 	"fmt"
 
-	osidentity "github.com/devbuddy/devbuddy/pkg/helpers/os"
+	"github.com/devbuddy/devbuddy/pkg/helpers/osidentity"
 )
 
 type TaskSelector interface {
-	ShouldRun(*Context, *Task) error
+	ShouldRun(*Context, *Task) (bool, error)
 }
 
 type TaskSelectorImpl struct {
-	osIdent osidentity.Identity
+	osIdent *osidentity.Identity
 }
 
-func NewTaskSelector() (*TaskSelectorImpl, error) {
-	osIdent, err := osidentity.Detect()
-	if err != nil {
-		return nil, err
-	}
-	return nil, &TaskSelectorImpl{osIdent: osIdent}
+func NewTaskSelector() *TaskSelectorImpl {
+	return &TaskSelectorImpl{osIdent: osidentity.Detect()}
 }
 
 func (s *TaskSelectorImpl) ShouldRun(ctx *Context, task *Task) (bool, error) {
@@ -39,11 +35,11 @@ func (s *TaskSelectorImpl) osRequirementMatch(ctx *Context, task *Task) (bool, e
 	case "":
 		return true, nil
 	case "debian":
-		if !ident.isDebianLike() {
+		if !s.osIdent.IsDebianLike() {
 			return false, nil
 		}
 	case "macos":
-		if !ident.isMacOS() {
+		if !s.osIdent.IsMacOS() {
 			return false, nil
 		}
 	default:

@@ -32,8 +32,7 @@ func upRun(cmd *cobra.Command, args []string) {
 
 	ctx := tasks.NewContext(cfg, proj, ui, taskList)
 	runner := &tasks.TaskRunnerImpl{}
-	selector, err := tasks.NewTaskSelector()
-	checkError(err)
+	selector := tasks.NewTaskSelector()
 
 	success, err := tasks.Run(ctx, runner, selector, taskList)
 	checkError(err)
