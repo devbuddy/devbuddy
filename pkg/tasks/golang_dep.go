@@ -26,7 +26,7 @@ func (p *golangDepInstall) description() string {
 	return "Install Go Dep"
 }
 
-func (p *golangDepInstall) needed(ctx *context) *actionResult {
+func (p *golangDepInstall) needed(ctx *Context) *actionResult {
 	_, err := exec.LookPath("dep") // Just check if `dep` is in the PATH for now
 	if err != nil {
 		return actionNeeded("could not find the dep command in the PATH")
@@ -34,7 +34,7 @@ func (p *golangDepInstall) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *golangDepInstall) run(ctx *context) error {
+func (p *golangDepInstall) run(ctx *Context) error {
 	result := command(ctx, "go", "get", "-u", "github.com/golang/dep/cmd/dep").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to install Go GolangDep: %s", result.Error)
@@ -49,7 +49,7 @@ func (p *golangDepEnsure) description() string {
 	return "Run dep ensure"
 }
 
-func (p *golangDepEnsure) needed(ctx *context) *actionResult {
+func (p *golangDepEnsure) needed(ctx *Context) *actionResult {
 	if !fileExists(ctx, "vendor") {
 		return actionNeeded("the vendor directory does not exist")
 	}
@@ -74,7 +74,7 @@ func (p *golangDepEnsure) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *golangDepEnsure) run(ctx *context) error {
+func (p *golangDepEnsure) run(ctx *Context) error {
 	result := command(ctx, "dep", "ensure").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run dep ensure: %s", result.Error)

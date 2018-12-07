@@ -11,9 +11,10 @@ type taskParser func(*taskConfig, *Task) error
 
 type taskDefinition struct {
 	// key          string
-	name         string
-	requiredTask string
-	parser       taskParser
+	name          string
+	requiredTask  string
+	parser        taskParser
+	osRequirement string // The platform this task can run on. "debian", "macos"
 }
 
 var taskDefinitions = make(map[string]*taskDefinition)
@@ -27,11 +28,12 @@ func registerTaskDefinition(name string) *taskDefinition {
 	return td
 }
 
+// Task represents a task created by a taskDefinition.parser and specified by the TaskInfo
 type Task struct {
 	*taskDefinition
 	header       string
 	actions      []taskAction
-	perform      func(*context) error
+	perform      func(*Context) error
 	featureName  string
 	featureParam string
 }

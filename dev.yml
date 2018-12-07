@@ -6,6 +6,9 @@ up:
   - homebrew:
     - curl
     - shellcheck
+  - apt:
+    - curl
+    - shellcheck
   - custom:
       name: Install golangci-lint
       met?: test -f $GOPATH/bin/golangci-lint

@@ -3,6 +3,7 @@ package tasks
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
@@ -26,7 +27,7 @@ func (a *testingAction) description() string {
 	return a.desc
 }
 
-func (a *testingAction) needed(ctx *context) *actionResult {
+func (a *testingAction) needed(ctx *Context) *actionResult {
 	result := a.neededResults[a.neededCallCount]
 	if result == nil {
 		panic("the task should not have been called")
@@ -35,7 +36,7 @@ func (a *testingAction) needed(ctx *context) *actionResult {
 	return result
 }
 
-func (a *testingAction) run(ctx *context) error {
+func (a *testingAction) run(ctx *Context) error {
 	a.runCallCount++
 	return a.runResult
 }
@@ -48,10 +49,10 @@ func newTestingAction(desc string, resultBefore, resultAfter *actionResult, runR
 	}
 }
 
-func setupTaskTesting() (*context, *bytes.Buffer) {
+func setupTaskTesting() (*Context, *bytes.Buffer) {
 	buf, ui := termui.NewTesting(false)
 
-	ctx := &context{
+	ctx := &Context{
 		proj:     project.NewFromPath("/srv/myproject"),
 		ui:       ui,
 		cfg:      config.NewTestConfig(),
@@ -126,7 +127,7 @@ func TestRunActionStillNeeded(t *testing.T) {
 	require.Equal(t, 1, action.runCallCount)
 }
 
-func TestRunTask(t *testing.T) {
+func TestTaskRunner(t *testing.T) {
 	ctx, output := setupTaskTesting()
 	action1 := newTestingAction("Action 1", actionNeeded("some-reason"), actionNotNeeded(), nil)
 	action2 := newTestingAction("Action 2", actionNeeded("some-reason"), actionNotNeeded(), nil)
@@ -136,7 +137,8 @@ func TestRunTask(t *testing.T) {
 		actions:        []taskAction{action1, action2},
 	}
 
-	err := runTask(ctx, task)
+	taskRunner := &TaskRunnerImpl{}
+	err := taskRunner.Run(ctx, task)
 	require.NoError(t, err)
 
 	require.Equal(t, 2, action1.neededCallCount)
@@ -148,7 +150,7 @@ func TestRunTask(t *testing.T) {
 	require.Contains(t, output.String(), "Action 1")
 }
 
-func TestRunTaskWithError(t *testing.T) {
+func TestTaskRunnerWithError(t *testing.T) {
 	ctx, _ := setupTaskTesting()
 	action1 := newTestingAction("Action 1", actionFailed("CRASH 1"), nil, nil)
 	action2 := newTestingAction("Action 2", nil, nil, nil)
@@ -158,7 +160,8 @@ func TestRunTaskWithError(t *testing.T) {
 		actions:        []taskAction{action1, action2},
 	}
 
-	err := runTask(ctx, task)
+	taskRunner := &TaskRunnerImpl{}
+	err := taskRunner.Run(ctx, task)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "The task action (Action 1) failed to detect whether it need to run: CRASH 1")
 
@@ -167,4 +170,47 @@ func TestRunTaskWithError(t *testing.T) {
 
 	require.Equal(t, 0, action2.neededCallCount)
 	require.Equal(t, 0, action2.runCallCount)
+}
+
+func TestRun(t *testing.T) {
+	ctx, _ := setupTaskTesting()
+	tasks := []*Task{dummyTask("1"), dummyTask("2")}
+
+	taskRunner := &taskRunnerMock{}
+	taskSelector := &taskSelectorMock{true}
+
+	success, err := Run(ctx, taskRunner, taskSelector, tasks)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	require.Equal(t, tasks, taskRunner.tasks)
+}
+
+func TestRunWithTaskError(t *testing.T) {
+	ctx, _ := setupTaskTesting()
+	tasks := []*Task{dummyTask("1"), dummyTask("2")}
+
+	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
+	taskSelector := &taskSelectorMock{true}
+
+	success, err := Run(ctx, taskRunner, taskSelector, tasks)
+	require.NoError(t, err)
+	require.False(t, success)
+
+	require.Equal(t, 1, len(taskRunner.tasks))
+	require.Equal(t, tasks[0], taskRunner.tasks[0])
+}
+
+func TestRunWithTaskWithOsRequirement(t *testing.T) {
+	ctx, _ := setupTaskTesting()
+	tasks := []*Task{dummyTask("1"), dummyTask("2")}
+
+	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
+	taskSelector := &taskSelectorMock{false}
+
+	success, err := Run(ctx, taskRunner, taskSelector, tasks)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	require.Equal(t, 0, len(taskRunner.tasks))
 }
