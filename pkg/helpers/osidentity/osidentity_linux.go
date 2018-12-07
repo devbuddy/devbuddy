@@ -1,4 +1,4 @@
-package os
+package osidentity
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 )
 
 // New returns an OS identifier.
-func New() (*OS, error) {
+func Detect() (*Identity, error) {
 	variant := "unknown"
 
 	if _, err := os.Stat("/etc/debian_version"); !os.IsNotExist(err) {
@@ -16,14 +16,14 @@ func New() (*OS, error) {
 		return nil, err
 	}
 
-	return &OS{runtime.GOOS, variant}, nil
+	return &Identity{runtime.GOOS, variant}, nil
 }
 
 // GetVariant returns the variant of the os identified by `runtime`.
-func (o *OS) GetVariant() (string, error) {
-	if o.release == "debian" {
+func (i *Identity) GetVariant() (string, error) {
+	if i.Release == "debian" {
 		return "debian", nil
 	}
 
-	return "", fmt.Errorf("Cannot identify variant '%s' for linux", o.release)
+	return "", fmt.Errorf("Cannot identify variant '%s' for linux", i.Release)
 }
