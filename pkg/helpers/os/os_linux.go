@@ -25,5 +25,5 @@ func (i *Identity) GetVariant() (string, error) {
 		return "debian", nil
 	}
 
-	return "", fmt.Errorf("Cannot identify variant '%s' for linux", o.release)
+	return "", fmt.Errorf("Cannot identify variant '%s' for linux", i.release)
 }
