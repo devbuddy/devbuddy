@@ -51,7 +51,7 @@ func (o *OS) GetVariant() (string, error) {
 	} else if version == "7" {
 		return "panther", nil
 	} else if version == "6" {
-		return "JAGUAR", nil
+		return "jaguar", nil
 	} else if version == "5" {
 		return "puma", nil
 	}

@@ -14,6 +14,14 @@ func TestOSGetVariant(t *testing.T) {
 
 	require.NoError(t, err, "GetVariant() failed")
 	require.Equal(t, "mojave", variant)
+
+	os = OS{"darwin", "6.0.2"}
+
+	variant, err = os.GetVariant()
+
+	require.NoError(t, err, "GetVariant() failed")
+	require.Equal(t, "jaguar", variant)
+
 }
 
 func TestOSInvalidGetVariant(t *testing.T) {
