@@ -6,6 +6,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestNewMacOSForTest(t *testing.T) {
+	i := NewMacOSForTest()
+
+	require.True(t, i.IsMacOS())
+	require.False(t, i.IsDebianLike())
+}
+
 func TestIsDebianLike(t *testing.T) {
 	i := Identity{"linux", "debian"}
 
