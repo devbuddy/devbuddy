@@ -18,12 +18,14 @@ func TestIsDebianLike(t *testing.T) {
 	i = Identity{"other", "redhat"}
 
 	require.False(t, i.IsDebianLike())
+
+	i = Identity{"darwin", ""}
+
+	require.False(t, i.IsDebianLike())
 }
 
 func TestIsMacOS(t *testing.T) {
 	i := Identity{"darwin", ""}
-
-	require.False(t, i.IsDebianLike())
 
 	require.True(t, i.IsMacOS())
 
