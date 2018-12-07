@@ -7,8 +7,8 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/features"
 )
 
-// RunTasks accepts a list of tasks and check for their requirements and runs them if their conditions are met
-func RunTasks(ctx *Context, taskList []*Task) (success bool, err error) {
+// Run accepts a list of tasks and check for their requirements and runs them if their conditions are met
+func Run(ctx *Context, taskExecutor TaskRunner, taskList []*Task) (success bool, err error) {
 	for _, task := range taskList {
 		if task.requiredTask != "" {
 			if _, present := ctx.features[task.requiredTask]; !present {
@@ -21,7 +21,7 @@ func RunTasks(ctx *Context, taskList []*Task) (success bool, err error) {
 
 	for _, task := range taskList {
 		ctx.ui.TaskHeader(task.name, task.header)
-		err = runTask(ctx, task)
+		err = taskExecutor.Run(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
 			return false, nil
@@ -31,7 +31,14 @@ func RunTasks(ctx *Context, taskList []*Task) (success bool, err error) {
 	return true, nil
 }
 
-func runTask(ctx *Context, task *Task) (err error) {
+type TaskRunner interface {
+	Run(*Context, *Task) error
+}
+
+type TaskRunnerImpl struct {
+}
+
+func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
 	if task.perform != nil {
 		err = task.perform(ctx)
 		if err != nil {
@@ -46,11 +53,11 @@ func runTask(ctx *Context, task *Task) (err error) {
 		}
 	}
 
-	err = activateFeature(ctx, task)
+	err = r.activateFeature(ctx, task)
 	return err
 }
 
-func activateFeature(ctx *Context, task *Task) (err error) {
+func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) (err error) {
 	if task.featureName == "" {
 		return nil
 	}
@@ -70,4 +77,14 @@ func activateFeature(ctx *Context, task *Task) (err error) {
 	// There is no problem when executing a shell command since the shell process will do the executable lookup
 	// itself with the PATH value from the specified Env.
 	return os.Setenv("PATH", ctx.env.Get("PATH"))
+}
+
+type taskRunnerMock struct {
+	taskError error
+	tasks     []*Task
+}
+
+func (r *taskRunnerMock) Run(ctx *Context, task *Task) error {
+	r.tasks = append(r.tasks, task)
+	return r.taskError
 }

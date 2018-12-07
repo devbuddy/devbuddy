@@ -32,7 +32,7 @@ func upRun(cmd *cobra.Command, args []string) {
 
 	ctx := tasks.NewContext(cfg, proj, ui, taskList)
 
-	success, err := tasks.RunTasks(ctx, taskList)
+	success, err := tasks.Run(ctx, &tasks.TaskRunnerImpl{}, taskList)
 	checkError(err)
 	if !success {
 		os.Exit(1)
