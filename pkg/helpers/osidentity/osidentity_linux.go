@@ -1,4 +1,4 @@
-package os
+package osidentity
 
 import (
 	"fmt"
@@ -21,9 +21,9 @@ func Detect() (*Identity, error) {
 
 // GetVariant returns the variant of the os identified by `runtime`.
 func (i *Identity) GetVariant() (string, error) {
-	if i.release == "debian" {
+	if i.Release == "debian" {
 		return "debian", nil
 	}
 
-	return "", fmt.Errorf("Cannot identify variant '%s' for linux", i.release)
+	return "", fmt.Errorf("Cannot identify variant '%s' for linux", i.Release)
 }

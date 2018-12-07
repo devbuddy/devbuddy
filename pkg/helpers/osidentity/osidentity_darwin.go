@@ -1,4 +1,4 @@
-package os
+package osidentity
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func New() (i *Identity, err error) {
 
 // GetVariant returns the variant of the os identified by `runtime`.
 func (i *Identity) GetVariant() (string, error) {
-	versiomNumberList := strings.Split(i.release, ":")
+	versiomNumberList := strings.Split(i.Release, ":")
 	versiomNumber := versiomNumberList[len(versiomNumberList)-1]
 	versiomNumber = strings.TrimSpace(versiomNumber)
 
