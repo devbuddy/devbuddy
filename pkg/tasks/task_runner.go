@@ -20,7 +20,7 @@ func Run(ctx *Context, taskExecutor TaskRunner, taskList []*Task) (success bool,
 	}
 
 	for _, task := range taskList {
-		shouldRun, err := taskShouldRunOnPlatform(ctx, task)
+		shouldRun, err := taskShouldRun(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)
 			return false, nil
@@ -41,11 +41,12 @@ func Run(ctx *Context, taskExecutor TaskRunner, taskList []*Task) (success bool,
 	return true, nil
 }
 
-func taskShouldRunOnPlatform(ctx *Context, task *Task) (bool, error) {
+func taskShouldRun(ctx *Context, task *Task) (bool, error) {
 	if task.platform == "" {
 		return true, nil
 	}
 
+	// Implement logic here
 	return false, nil
 }
 
