@@ -26,7 +26,7 @@ func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*T
 			return false, nil
 		}
 		if !shouldRun {
-			ctx.ui.TaskHeader(task.name, task.header, "disabled for this platform")
+			ctx.ui.TaskHeader(task.name, task.header, "disabled")
 			continue
 		}
 
