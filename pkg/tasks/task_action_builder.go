@@ -1,8 +1,8 @@
 package tasks
 
 type genericTaskActionCondition struct {
-	pre  func(*context) *actionResult
-	post func(*context) *actionResult
+	pre  func(*Context) *actionResult
+	post func(*Context) *actionResult
 }
 
 type genericTaskActionBuilder struct {
@@ -11,10 +11,10 @@ type genericTaskActionBuilder struct {
 	conditions     []*genericTaskActionCondition
 	monitoredFiles []string
 
-	runFunc func(*context) error
+	runFunc func(*Context) error
 }
 
-func actionBuilder(description string, runFunc func(*context) error) *genericTaskActionBuilder {
+func actionBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
 	return &genericTaskActionBuilder{desc: description, runFunc: runFunc}
 }
 
@@ -25,7 +25,7 @@ func (a *genericTaskActionBuilder) On(condition *genericTaskActionCondition) *ge
 }
 
 // OnFunc registers a condition defined as a single function
-func (a *genericTaskActionBuilder) OnFunc(condFunc func(*context) *actionResult) *genericTaskActionBuilder {
+func (a *genericTaskActionBuilder) OnFunc(condFunc func(*Context) *actionResult) *genericTaskActionBuilder {
 	a.On(&genericTaskActionCondition{pre: condFunc, post: condFunc})
 	return a
 }

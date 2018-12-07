@@ -12,7 +12,7 @@ func init() {
 }
 
 func parserPythonDevelop(config *taskConfig, task *Task) error {
-	builder := actionBuilder("install python package in develop mode", func(ctx *context) error {
+	builder := actionBuilder("install python package in develop mode", func(ctx *Context) error {
 		result := command(ctx, "pip", "install", "--require-virtualenv", "-e", ".").
 			AddOutputFilter("already satisfied").Run()
 

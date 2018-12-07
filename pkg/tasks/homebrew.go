@@ -45,7 +45,7 @@ func (b *brewInstall) description() string {
 	return fmt.Sprintf("installing %s", b.formula)
 }
 
-func (b *brewInstall) needed(ctx *context) *actionResult {
+func (b *brewInstall) needed(ctx *Context) *actionResult {
 	brew := helpers.NewHomebrew()
 
 	if brew.IsInstalled(b.formula) {
@@ -54,7 +54,7 @@ func (b *brewInstall) needed(ctx *context) *actionResult {
 	return actionNeeded("package %s is not installed", b.formula)
 }
 
-func (b *brewInstall) run(ctx *context) error {
+func (b *brewInstall) run(ctx *Context) error {
 	result := command(ctx, "brew", "install", b.formula).Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run brew install: %s", result.Error)

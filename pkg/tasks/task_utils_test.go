@@ -23,3 +23,13 @@ func ensureLoadTestTask(t *testing.T, payload string) *Task {
 	require.NoError(t, err, "buildFromDefinition() failed")
 	return task
 }
+
+type taskRunnerMock struct {
+	taskError error
+	tasks     []*Task
+}
+
+func (r *taskRunnerMock) Run(ctx *Context, task *Task) error {
+	r.tasks = append(r.tasks, task)
+	return r.taskError
+}

@@ -27,7 +27,7 @@ func (p *pipfileInstall) description() string {
 	return "install pipfile command"
 }
 
-func (p *pipfileInstall) needed(ctx *context) *actionResult {
+func (p *pipfileInstall) needed(ctx *Context) *actionResult {
 	pythonParam := ctx.features["python"]
 	name := helpers.VirtualenvName(ctx.proj, pythonParam)
 	venv := helpers.NewVirtualenv(ctx.cfg, name)
@@ -39,7 +39,7 @@ func (p *pipfileInstall) needed(ctx *context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (p *pipfileInstall) run(ctx *context) error {
+func (p *pipfileInstall) run(ctx *Context) error {
 	result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to install pipenv: %s", result.Error)
@@ -55,14 +55,14 @@ func (p *pipfileRun) description() string {
 	return "install dependencies from the Pipfile"
 }
 
-func (p *pipfileRun) needed(ctx *context) *actionResult {
+func (p *pipfileRun) needed(ctx *Context) *actionResult {
 	if !p.success {
 		return actionNeeded("")
 	}
 	return actionNotNeeded()
 }
 
-func (p *pipfileRun) run(ctx *context) error {
+func (p *pipfileRun) run(ctx *Context) error {
 	result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
 	if result.Error != nil {
 		return fmt.Errorf("pipenv failed: %s", result.Error)
