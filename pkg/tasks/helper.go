@@ -1,7 +1,7 @@
 package tasks
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -14,12 +14,30 @@ func asString(value interface{}) (string, error) {
 		return result, nil
 	}
 
-	_, ok = value.(bool)
-	if ok {
-		return "", errors.New("not a string")
+	return "", fmt.Errorf("not a string: %T (%+v)", value, value)
+}
+
+func asListOfStrings(value interface{}) ([]string, error) {
+	if v, ok := value.([]string); ok {
+		return v, nil
 	}
 
-	return "", errors.New("not a string")
+	elements, ok := value.([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("not a list of strings: type %T (%+v)", value, value)
+	}
+
+	listOfStrings := []string{}
+
+	for _, element := range elements {
+		str, ok := element.(string)
+		if !ok {
+			return nil, fmt.Errorf("not a list of strings: invalid element: type %T (%+v)", element, element)
+		}
+		listOfStrings = append(listOfStrings, str)
+	}
+
+	return listOfStrings, nil
 }
 
 func command(ctx *Context, program string, args ...string) *executor.Executor {
