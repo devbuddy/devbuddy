@@ -13,7 +13,7 @@ func init() {
 }
 
 func parseGolang(config *taskConfig, task *Task) error {
-	version, err := config.getStringProperty("version", true)
+	version, err := config.getStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
 	}

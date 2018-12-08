@@ -10,58 +10,75 @@ type taskConfig struct {
 	payload interface{}
 }
 
-func (c *taskConfig) getStringProperty(name string, allowSingle bool) (string, error) {
-	return c.getStringPropertyDefault(name, "", allowSingle)
+type propertyNotFoundError struct {
+	name string
 }
 
-func (c *taskConfig) getStringPropertyDefault(name string, defaultValue string, allowSingle bool) (string, error) {
-	if allowSingle {
-		if value, ok := c.payload.(string); ok {
-			return value, nil
-		}
+func (e propertyNotFoundError) Error() string {
+	return fmt.Sprintf("property \"%s\" not found", e.name)
+}
+
+func (c *taskConfig) getListOfStrings() ([]string, error) {
+	return asListOfStrings(c.payload)
+}
+
+func (c *taskConfig) getProperty(name string) (interface{}, error) {
+	if c.payload == nil {
+		return nil, propertyNotFoundError{name: name}
 	}
 
 	properties, ok := c.payload.(map[interface{}]interface{})
 	if !ok {
-		message := "not a hash"
-		if allowSingle {
-			message = "not a string"
-		}
-		return "", fmt.Errorf("%s: %T (%+v)", message, c.payload, c.payload)
+		return "", fmt.Errorf("not a hash: %T (%+v)", c.payload, c.payload)
 	}
 
-	value, ok := properties[name]
-	if !ok {
-		if defaultValue != "" {
-			return defaultValue, nil
-		}
-		return "", fmt.Errorf("missing key '%s'", name)
+	value, present := properties[name]
+	if present {
+		return value, nil
 	}
-
-	str, err := asString(value)
-	if err != nil {
-		return "", fmt.Errorf("%s: %T (%+v)", err, value, value)
-	}
-
-	return str, nil
+	return nil, propertyNotFoundError{name: name}
 }
 
-func (c *taskConfig) getListOfStrings() ([]string, error) {
-
-	elements, ok := c.payload.([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("not a list of strings: type %T (\"%+v\")", c.payload, c.payload)
+func (c *taskConfig) getPropertyDefault(name string, defaultValue interface{}) (interface{}, error) {
+	value, err := c.getProperty(name)
+	if err == nil {
+		return value, nil
 	}
-
-	var strings []string
-	for _, element := range elements {
-		str, ok := element.(string)
-		if !ok {
-			return nil, fmt.Errorf("not a list of strings: invalid element: type %T (\"%+v\")", element, element)
-		}
-		strings = append(strings, str)
+	if _, ok := err.(propertyNotFoundError); ok {
+		return defaultValue, nil
 	}
-	return strings, nil
+	return nil, err
+}
+
+func (c *taskConfig) getStringPropertyAllowSingle(name string) (string, error) {
+	if value, ok := c.payload.(string); ok {
+		return value, nil
+	}
+	return c.getStringProperty(name)
+}
+
+func (c *taskConfig) getStringProperty(name string) (string, error) {
+	value, err := c.getProperty(name)
+	if err != nil {
+		return "", err
+	}
+	return asString(value)
+}
+
+func (c *taskConfig) getStringPropertyDefault(name string, defaultValue string) (string, error) {
+	value, err := c.getPropertyDefault(name, defaultValue)
+	if err != nil {
+		return "", err
+	}
+	return asString(value)
+}
+
+func (c *taskConfig) getListOfStringsPropertyDefault(name string, defaultValue []string) ([]string, error) {
+	value, err := c.getPropertyDefault(name, defaultValue)
+	if err != nil {
+		return nil, err
+	}
+	return asListOfStrings(value)
 }
 
 func parseTaskConfig(definition interface{}) (*taskConfig, error) {
