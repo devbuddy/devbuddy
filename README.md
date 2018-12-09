@@ -14,7 +14,7 @@ Contents:
 
 ## What is this?
 
-**DevBuddy** (previously known as "Dad") is an open-source implementation of an amazing internal tool developed at
+**DevBuddy** is an open-source implementation of an amazing internal tool developed at
 [Shopify](https://engineering.shopify.com) called "**Dev**".
 
 The first goal of this tools is to automate the **setup** tasks required to work on a project.
