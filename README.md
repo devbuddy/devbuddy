@@ -38,26 +38,22 @@ See the project config [documentation](docs/Config.md).
 ### Tasks:
 
 Python:
-- Python (version + virtualenv): **working**
-- Pip (requirements file): **simple**
-- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile)): **simple**
+- Python environment (pyenv + virtualenv)
+- Pip (requirements file)
+- Pipenv (support for [Pipfile](https://github.com/pypa/pipfile))
 
 Go:
-- Go (version): **working**
-- Dep (support for [Go Dep](https://github.com/golang/dep)): **simple**
+- Go environment (with GOPATH)
+- Dep (support for [Go Dep](https://github.com/golang/dep))
 
-Others
-- Custom (conditional shell command): **working**
-- Homebrew: **working**
-- Apt: **planned**
+Node: **planned**
+Ruby: **planned**
+
+Others:
+- Homebrew
+- Apt
+- Custom (conditional shell command)
 - Docker Compose (manage a docker-compose setup): **planned**
-
-### Automatic environment:
-
-- Virtualenv: **working**
-- Go: **working**
-- Node: **planned**
-- Ruby: **maybe**
 
 ### Features:
 
@@ -66,18 +62,16 @@ Others
 - A `help` command to guide a new developer based on `dev.yml`
 - A `upgrade` command to auto-upgrade **DevBuddy**
 
-### Hosting platform:
+### Code hosting platform:
 
-- Github: **working**
-- Any git remote-url: **working**
-- Gitlab: **planned**
-- Bitbucket (with Git): **working**
+- Github
+- Gitlab
+- Bitbucket (with Git)
 
 ### Shell integration
 
-- Bash: **working**
-- Zsh: **working**
-- Fish: **planned**
+- Bash
+- Zsh
 
 ## Install
 
