@@ -77,7 +77,9 @@ Others:
 
 ### Homebrew
 
-Coming soon.
+```bash
+$ brew install devbuddy/devbuddy/devbuddy
+```
 
 ### Automatic
 
