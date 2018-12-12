@@ -27,10 +27,14 @@ func (r *Runner) Run(features map[string]string) {
 		activeVersion, active := activeFeatures[name]
 
 		if want {
-			if !active || wantVersion != activeVersion {
-				r.activateFeature(name, wantVersion)
+			if active {
+				if wantVersion != activeVersion {
+					// r.refreshFeature(name, wantVersion)
+					r.deactivateFeature(name, activeVersion)
+					r.activateFeature(name, wantVersion)
+				}
 			} else {
-				r.refreshFeature(name, wantVersion)
+				r.activateFeature(name, wantVersion)
 			}
 		} else {
 			if active {
