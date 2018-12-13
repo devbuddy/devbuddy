@@ -4,9 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/stretchr/testify/require"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
@@ -22,66 +21,85 @@ func (r *recorder) record(s ...string) {
 	r.entries = append(r.entries, strings.Join(s, " "))
 }
 
-func (r *recorder) assert(t *testing.T, s ...string) {
-	require.Equal(t, s, r.entries)
-}
-
-func (r *recorder) reset() {
+func (r *recorder) getCallsAndReset() []string {
+	val := r.entries
 	r.entries = []string{}
+	return val
 }
 
-var featureCalls *recorder
+var rustCalls *recorder
+var elixirCalls *recorder
 
 func init() {
-	featureCalls = &recorder{}
+	rustCalls = &recorder{entries: []string{}}
+	elixirCalls = &recorder{entries: []string{}}
 
 	rust := definitions.Register("rust")
 	rust.Activate = func(param string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
-		featureCalls.record("activate", "rust", param)
+		rustCalls.record("activate", param)
 		return false, nil
 	}
 	rust.Deactivate = func(param string, cfg *config.Config, env *env.Env) {
-		featureCalls.record("deactivate", "rust", param)
+		rustCalls.record("deactivate", param)
 	}
 
 	elixir := definitions.Register("elixir")
 	elixir.Activate = func(param string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
-		featureCalls.record("activate", "elixir", param)
+		elixirCalls.record("activate", param)
 		return false, nil
 	}
 	elixir.Deactivate = func(param string, cfg *config.Config, env *env.Env) {
-		featureCalls.record("deactivate", "elixir", param)
+		elixirCalls.record("deactivate", param)
 	}
 }
 
 func TestRunner(t *testing.T) {
 	_, ui := termui.NewTesting(false)
+	testEnv := env.New([]string{})
 
-	runner := &Runner{
-		cfg:  nil,
-		proj: nil,
-		ui:   ui,
-		env:  env.New([]string{}),
-	}
+	runner := &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{})
+	require.Equal(t, []string{}, rustCalls.getCallsAndReset())
 
-	wantedFeatures := map[string]string{}
-	runner.Run(wantedFeatures)
+	runner = &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{"rust": "1.0"})
+	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 
-	featureCalls.assert(t)
+	runner = &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{"rust": "2.0"})
+	require.Equal(t, []string{"deactivate 1.0", "activate 2.0"}, rustCalls.getCallsAndReset())
 
-	wantedFeatures["rust"] = "1.0"
-	runner.Run(wantedFeatures)
-	featureCalls.assert(t, "activate rust 1.0")
+	runner = &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{})
+	require.Equal(t, []string{"deactivate 2.0"}, rustCalls.getCallsAndReset())
+}
 
-	featureCalls.reset()
+func TestRunnerWithTwoFeatures(t *testing.T) {
+	_, ui := termui.NewTesting(false)
+	testEnv := env.New([]string{})
 
-	wantedFeatures["rust"] = "2.0"
-	runner.Run(wantedFeatures)
-	featureCalls.assert(t, "deactivate rust 1.0", "activate rust 2.0")
+	runner := &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{"rust": "1.0", "elixir": "0.4"})
+	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
+	require.Equal(t, []string{"activate 0.4"}, elixirCalls.getCallsAndReset())
 
-	featureCalls.reset()
+	runner = &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{"elixir": "0.4"})
+	require.Equal(t, []string{"deactivate 1.0"}, rustCalls.getCallsAndReset())
+	require.Equal(t, []string{}, elixirCalls.getCallsAndReset())
 
-	delete(wantedFeatures, "rust")
-	runner.Run(wantedFeatures)
-	featureCalls.assert(t, "deactivate rust 2.0")
+	runner = &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{"rust": "1.0", "elixir": "0.4"})
+	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
+	require.Equal(t, []string{}, elixirCalls.getCallsAndReset())
+
+	runner = &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{"rust": "1.0", "elixir": "0.5"})
+	require.Equal(t, []string{}, rustCalls.getCallsAndReset())
+	require.Equal(t, []string{"deactivate 0.4", "activate 0.5"}, elixirCalls.getCallsAndReset())
+
+	runner = &Runner{cfg: nil, proj: nil, ui: ui, env: testEnv}
+	runner.Run(map[string]string{})
+	require.Equal(t, []string{"deactivate 1.0"}, rustCalls.getCallsAndReset())
+	require.Equal(t, []string{"deactivate 0.5"}, elixirCalls.getCallsAndReset())
 }
