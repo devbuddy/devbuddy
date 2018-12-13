@@ -12,7 +12,7 @@ import (
 
 func TestRegister(t *testing.T) {
 	names := definitions.Names()
-	require.ElementsMatch(t, []string{"python", "golang"}, names)
+	require.ElementsMatch(t, []string{"python", "golang", "node"}, names)
 
 	for _, name := range names {
 		require.NotNil(t, definitions.Get(name))
