@@ -50,10 +50,6 @@ func TestDeactivate(t *testing.T) {
 	require.False(t, devUpNeeded)
 	require.NoError(t, err)
 
-	devUpNeeded, err = Refresh("test-deactivate", "testparam", nil, nil, nil)
-	require.False(t, devUpNeeded)
-	require.NoError(t, err)
-
 	Deactivate("test-deactivate", "testparam", nil, nil)
 	require.True(t, deactivated)
 }
