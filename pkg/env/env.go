@@ -80,6 +80,16 @@ func (e *Env) RemoveFromPath(substring string) {
 	e.setPathParts(newElems...)
 }
 
+// IsInPath returns true if one path of $PATH is exactly equal to the path provided
+func (e *Env) IsInPath(path string) bool {
+	for _, elem := range e.getPathParts() {
+		if elem == path {
+			return true
+		}
+	}
+	return false
+}
+
 // Changed returns all changes made on the variables
 func (e *Env) Changed() []VariableChange {
 	c := []VariableChange{}
