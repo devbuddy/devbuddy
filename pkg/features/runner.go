@@ -44,6 +44,8 @@ func (r *Runner) Run(features map[string]string) {
 }
 
 func (r *Runner) activateFeature(name string, param string) {
+	r.ui.Debug("activating %s (%s)", name, param)
+
 	devUpNeeded, err := Activate(name, param, r.cfg, r.proj, r.env)
 	if err != nil {
 		r.ui.Debug("failed: %s", err)
@@ -58,7 +60,8 @@ func (r *Runner) activateFeature(name string, param string) {
 }
 
 func (r *Runner) deactivateFeature(name string, param string) {
+	r.ui.Debug("deactivating %s (%s)", name, param)
+
 	Deactivate(name, param, r.cfg, r.env)
 	r.env.UnsetFeature(name)
-	r.ui.Debug("%s deactivated", name)
 }
