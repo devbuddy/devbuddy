@@ -29,7 +29,6 @@ func (r *Runner) Run(features map[string]string) {
 		if want {
 			if active {
 				if wantVersion != activeVersion {
-					// r.refreshFeature(name, wantVersion)
 					r.deactivateFeature(name, activeVersion)
 					r.activateFeature(name, wantVersion)
 				}
@@ -56,20 +55,6 @@ func (r *Runner) activateFeature(name string, param string) {
 	}
 	r.ui.HookFeatureActivated(name, param)
 	r.env.SetFeature(name, param)
-}
-
-func (r *Runner) refreshFeature(name string, param string) {
-	devUpNeeded, err := Refresh(name, param, r.cfg, r.proj, r.env)
-	if err != nil {
-		r.ui.Debug("failed: %s", err)
-		return
-	}
-	if devUpNeeded {
-		r.ui.HookFeatureFailure(name, param)
-		return
-	}
-
-	r.ui.Debug("%s refreshed", name)
 }
 
 func (r *Runner) deactivateFeature(name string, param string) {
