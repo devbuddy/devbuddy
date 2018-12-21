@@ -20,6 +20,8 @@ up:
   - go: 1.10.1
   - golang_dep
   - python: 3.6.5
+  - apt: [git, curl]
+  - homebrew: [git, curl]
   - pip:
       - python/requirements-dev.txt
   - custom:
@@ -38,6 +40,28 @@ open:
 ```
 
 ## Tasks
+
+### `apt`
+
+This task will install the Debian packages specified if DevBuddy is running on Debian.
+Otherwise the task will be ignored.
+
+```yaml
+up:
+  - apt:
+    - python3-dev
+```
+
+### `homebrew`
+
+This task will install the Homebrew recipes if DevBuddy is running on macOS.
+Otherwise the task will be ignored.
+
+```yaml
+up:
+  - homebrew:
+    - cmake
+```
 
 ### `python`
 
