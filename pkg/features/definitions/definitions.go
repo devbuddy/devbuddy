@@ -11,7 +11,6 @@ import (
 type Definition struct {
 	Name       string
 	Activate   func(string, *config.Config, *project.Project, *env.Env) (bool, error)
-	Refresh    func(string, *config.Config, *project.Project, *env.Env) (bool, error)
 	Deactivate func(string, *config.Config, *env.Env)
 }
 
