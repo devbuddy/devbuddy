@@ -41,6 +41,8 @@ func parserPipfile(config *taskConfig, task *Task) error {
 		}
 		return nil
 	})
+	builder.OnFileChange("Pipfile")
+	builder.OnFileChange("Pipfile.lock")
 	task.addAction(builder.Build())
 
 	return nil
