@@ -27,10 +27,13 @@ func (r *Runner) Run(features map[string]string) {
 		activeVersion, active := activeFeatures[name]
 
 		if want {
-			if !active || wantVersion != activeVersion {
-				r.activateFeature(name, wantVersion)
+			if active {
+				if wantVersion != activeVersion {
+					r.deactivateFeature(name, activeVersion)
+					r.activateFeature(name, wantVersion)
+				}
 			} else {
-				r.refreshFeature(name, wantVersion)
+				r.activateFeature(name, wantVersion)
 			}
 		} else {
 			if active {
@@ -41,6 +44,8 @@ func (r *Runner) Run(features map[string]string) {
 }
 
 func (r *Runner) activateFeature(name string, param string) {
+	r.ui.Debug("activating %s (%s)", name, param)
+
 	devUpNeeded, err := Activate(name, param, r.cfg, r.proj, r.env)
 	if err != nil {
 		r.ui.Debug("failed: %s", err)
@@ -54,22 +59,9 @@ func (r *Runner) activateFeature(name string, param string) {
 	r.env.SetFeature(name, param)
 }
 
-func (r *Runner) refreshFeature(name string, param string) {
-	devUpNeeded, err := Refresh(name, param, r.cfg, r.proj, r.env)
-	if err != nil {
-		r.ui.Debug("failed: %s", err)
-		return
-	}
-	if devUpNeeded {
-		r.ui.HookFeatureFailure(name, param)
-		return
-	}
-
-	r.ui.Debug("%s refreshed", name)
-}
-
 func (r *Runner) deactivateFeature(name string, param string) {
+	r.ui.Debug("deactivating %s (%s)", name, param)
+
 	Deactivate(name, param, r.cfg, r.env)
 	r.env.UnsetFeature(name)
-	r.ui.Debug("%s deactivated", name)
 }
