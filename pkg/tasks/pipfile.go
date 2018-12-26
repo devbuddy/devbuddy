@@ -15,58 +15,33 @@ func init() {
 }
 
 func parserPipfile(config *taskConfig, task *Task) error {
-	task.addAction(&pipfileInstall{})
-	task.addAction(&pipfileRun{})
-	return nil
-}
+	builder := actionBuilder("install pipfile command", func(ctx *Context) error {
+		result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
+		if result.Error != nil {
+			return fmt.Errorf("failed to install pipenv: %s", result.Error)
+		}
+		return nil
+	})
+	builder.OnFunc(func(ctx *Context) *actionResult {
+		pythonParam := ctx.features["python"]
+		name := helpers.VirtualenvName(ctx.proj, pythonParam)
+		venv := helpers.NewVirtualenv(ctx.cfg, name)
+		pipenvCmd := venv.Which("pipenv")
+		if !utils.PathExists(pipenvCmd) {
+			return actionNeeded("Pipenv is not installed in the virtualenv")
+		}
+		return actionNotNeeded()
+	})
+	task.addAction(builder.Build())
 
-type pipfileInstall struct {
-}
+	builder = actionBuilder("install dependencies from the Pipfile", func(ctx *Context) error {
+		result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
+		if result.Error != nil {
+			return fmt.Errorf("pipenv failed: %s", result.Error)
+		}
+		return nil
+	})
+	task.addAction(builder.Build())
 
-func (p *pipfileInstall) description() string {
-	return "install pipfile command"
-}
-
-func (p *pipfileInstall) needed(ctx *Context) *actionResult {
-	pythonParam := ctx.features["python"]
-	name := helpers.VirtualenvName(ctx.proj, pythonParam)
-	venv := helpers.NewVirtualenv(ctx.cfg, name)
-	pipenvCmd := venv.Which("pipenv")
-
-	if !utils.PathExists(pipenvCmd) {
-		return actionNeeded("Pipenv is not installed in the virtualenv")
-	}
-	return actionNotNeeded()
-}
-
-func (p *pipfileInstall) run(ctx *Context) error {
-	result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
-	if result.Error != nil {
-		return fmt.Errorf("failed to install pipenv: %s", result.Error)
-	}
-	return nil
-}
-
-type pipfileRun struct {
-	success bool
-}
-
-func (p *pipfileRun) description() string {
-	return "install dependencies from the Pipfile"
-}
-
-func (p *pipfileRun) needed(ctx *Context) *actionResult {
-	if !p.success {
-		return actionNeeded("")
-	}
-	return actionNotNeeded()
-}
-
-func (p *pipfileRun) run(ctx *Context) error {
-	result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
-	if result.Error != nil {
-		return fmt.Errorf("pipenv failed: %s", result.Error)
-	}
-	p.success = true
 	return nil
 }
