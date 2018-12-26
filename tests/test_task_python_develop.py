@@ -55,6 +55,20 @@ def test_without_modification(cmd, project):
     assert not os.path.exists(sentinel_path)
 
 
+def test_without_extra(cmd, project):
+    project.write_devyml("""
+        up:
+        - python: 3.6.5
+        - python_develop
+    """)
+    project.write_file("setup.py", make_setuppy())
+
+    cmd.run("bud up")
+
+    output = cmd.run("pip freeze")
+    assert 'test==2.3.4.5' not in output.splitlines(False)
+
+
 def test_with_extra(cmd, project):
     project.write_devyml("""
         up:
@@ -68,3 +82,17 @@ def test_with_extra(cmd, project):
 
     output = cmd.run("pip freeze")
     assert 'test==2.3.4.5' in output.splitlines(False)
+
+
+def test_with_unknown_extra(cmd, project):
+    # Unknown extra are ignored: https://github.com/devbuddy/devbuddy/issues/229
+
+    project.write_devyml("""
+        up:
+        - python: 3.6.5
+        - python_develop:
+            extras: [nope]
+    """)
+    project.write_file("setup.py", make_setuppy())
+
+    cmd.run("bud up")
