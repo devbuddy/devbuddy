@@ -43,7 +43,7 @@ func (n *Node) Which(program string) string {
 
 func (n *Node) Install() error {
 	if runtime.GOARCH != "amd64" {
-		return fmt.Errorf("Binary distribution are not available for %s architecture", runtime.GOARCH)
+		return fmt.Errorf("NodeJS installation is only supported on %s by DevBuddy", runtime.GOARCH)
 	}
 
 	archiveName := fmt.Sprintf("node-%s-%s-x64.tar.gz", n.version, runtime.GOOS)

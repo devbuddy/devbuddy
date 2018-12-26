@@ -24,6 +24,6 @@ func nodeActivate(version string, cfg *config.Config, proj *project.Project, env
 }
 
 func nodeDeactivate(version string, cfg *config.Config, env *env.Env) {
-	node := helpers.NewNode(cfg, version) // Not great: we use specify an empty version to get the base path with .Path()
+	node := helpers.NewNode(cfg, version)
 	env.RemoveFromPath(node.Path())
 }
