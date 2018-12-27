@@ -50,6 +50,9 @@ func (p *pyenv) needed(ctx *Context) *actionResult {
 }
 
 func (p *pyenv) run(ctx *Context) error {
+	if !ctx.identity.IsMacOS() {
+		return fmt.Errorf("Please install `pyenv` using your favorite package manager")
+	}
 	result := command(ctx, "brew", "install", "pyenv").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to install pyenv: %s", result.Error)
