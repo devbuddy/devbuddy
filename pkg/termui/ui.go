@@ -8,8 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
 	color "github.com/logrusorgru/aurora"
+
+	"github.com/devbuddy/devbuddy/pkg/config"
 )
 
 func Fprintf(w io.Writer, format string, a ...interface{}) {
@@ -49,7 +50,7 @@ func NewTesting(debugEnabled bool) (*bytes.Buffer, *UI) {
 func (u *UI) Debug(format string, params ...interface{}) {
 	if u.debugEnabled {
 		msg := fmt.Sprintf(format, params...)
-		Fprintf(u.out, "BUD_DEBUG: %s\n", msg)
+		Fprintf(u.out, "BUD_DEBUG: %s\n", color.Gray(msg))
 	}
 }
 
