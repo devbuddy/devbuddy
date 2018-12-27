@@ -61,7 +61,7 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	return taskList, nil
 }
 
-func GetFeaturesFromTasks(proj *project.Project, tasks []*Task) map[string]string {
+func GetFeaturesFromTasks(tasks []*Task) map[string]string {
 	features := map[string]string{}
 
 	for _, task := range tasks {
