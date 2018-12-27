@@ -48,13 +48,6 @@ type TaskRunner interface {
 type TaskRunnerImpl struct{}
 
 func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
-	if task.perform != nil {
-		err = task.perform(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
 	for _, action := range task.actions {
 		err = runAction(ctx, action)
 		if err != nil {

@@ -5,9 +5,10 @@ import (
 )
 
 func parseUnknown(config *taskConfig, task *Task) error {
-	task.perform = func(ctx *Context) (err error) {
+	builder := actionBuilder("", func(ctx *Context) error {
 		ctx.ui.TaskWarning(fmt.Sprintf("Unknown task: \"%s\"", config.name))
 		return nil
-	}
+	})
+	task.addAction(builder.Build())
 	return nil
 }
