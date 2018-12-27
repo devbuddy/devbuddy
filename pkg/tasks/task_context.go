@@ -23,6 +23,6 @@ func NewContext(cfg *config.Config, proj *project.Project, ui *termui.UI, taskLi
 		proj:     proj,
 		ui:       ui,
 		env:      env.NewFromOS(),
-		features: GetFeaturesFromTasks(proj, taskList),
+		features: GetFeaturesFromTasks(taskList),
 	}
 }
