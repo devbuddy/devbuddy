@@ -5,7 +5,6 @@ type Task struct {
 	*taskDefinition
 	header       string
 	actions      []taskAction
-	perform      func(*Context) error
 	featureName  string
 	featureParam string
 }
