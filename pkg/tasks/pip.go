@@ -13,14 +13,9 @@ func init() {
 }
 
 func parserPip(config *taskConfig, task *Task) error {
-	var files []string
-
-	for _, value := range config.payload.([]interface{}) {
-		if v, ok := value.(string); ok {
-			files = append(files, v)
-		} else {
-			return fmt.Errorf("invalid pip files")
-		}
+	files, err := config.getListOfStrings()
+	if err != nil {
+		return err
 	}
 	if len(files) == 0 {
 		return fmt.Errorf("no pip files specified")
@@ -29,35 +24,17 @@ func parserPip(config *taskConfig, task *Task) error {
 	task.header = strings.Join(files, ", ")
 
 	for _, file := range files {
-		task.addAction(&pipInstall{file: file})
+		builder := actionBuilder(fmt.Sprintf("install %s", file), func(ctx *Context) error {
+			pipArgs := []string{"install", "--require-virtualenv", "-r", file}
+			result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
+			if result.Error != nil {
+				return fmt.Errorf("Pip failed: %s", result.Error)
+			}
+			return nil
+		})
+		builder.OnFileChange(file)
+		task.addAction(builder.Build())
 	}
 
-	return nil
-}
-
-type pipInstall struct {
-	file    string
-	success bool
-}
-
-func (p *pipInstall) description() string {
-	return fmt.Sprintf("install %s", p.file)
-}
-
-func (p *pipInstall) needed(ctx *Context) *actionResult {
-	if !p.success {
-		return actionNeeded("")
-	}
-	return actionNotNeeded()
-}
-
-func (p *pipInstall) run(ctx *Context) error {
-	result := command(ctx, "pip", "install", "--require-virtualenv", "-r", p.file).
-		AddOutputFilter("already satisfied").Run()
-
-	if result.Error != nil {
-		return fmt.Errorf("Pip failed: %s", result.Error)
-	}
-	p.success = true
 	return nil
 }
