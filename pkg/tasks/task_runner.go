@@ -12,8 +12,7 @@ func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*T
 	for _, task := range taskList {
 		if task.requiredTask != "" {
 			if _, present := ctx.features[task.requiredTask]; !present {
-				err = fmt.Errorf("You must specify a %s environment to use a %s task", task.requiredTask, task.name)
-				ctx.ui.TaskError(err)
+				ctx.ui.TaskErrorf("You must specify a %s environment to use a %s task", task.requiredTask, task.name)
 				return false, nil
 			}
 		}

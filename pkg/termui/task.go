@@ -37,6 +37,10 @@ func (u *UI) TaskError(err error) {
 	Fprintf(u.out, "  %s\n", color.Red(err.Error()))
 }
 
+func (u *UI) TaskErrorf(message string, a ...interface{}) {
+	u.TaskError(fmt.Errorf(message, a))
+}
+
 func (u *UI) TaskWarning(message string) {
 	Fprintf(u.out, "  Warning: %s\n", color.Brown(message))
 }
