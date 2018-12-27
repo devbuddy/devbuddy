@@ -12,9 +12,9 @@ def test_invalid_manifest_with_string(cmd, project):
     """)
 
     output = cmd.run('bud inspect')
-    assert 'Title' in output
-    assert 'some-condition-command' in output
-    assert 'requirements.txt' in output
+    assert 'Task Custom (Title)' in output
+    assert 'Task Pip (requirements.txt)' in output
+    assert 'Requires: python' in output
 
 
 def test_without_manifest(cmd, project):

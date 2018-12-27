@@ -21,34 +21,22 @@ func parserCustom(config *taskConfig, task *Task) error {
 	}
 
 	task.header = name
-	task.addAction(&customAction{condition: condition, command: command})
+
+	builder := actionBuilder("", func(ctx *Context) error {
+		result := shell(ctx, command).Run()
+		return result.Error
+	})
+	builder.OnFunc(func(ctx *Context) *actionResult {
+		result := shellSilent(ctx, condition).Capture()
+		if result.LaunchError != nil {
+			return actionFailed("failed to run the condition command: %s", result.LaunchError)
+		}
+		if result.Code != 0 {
+			return actionNeeded("the met? command exited with a non-zero code")
+		}
+		return actionNotNeeded()
+	})
+	task.addAction(builder.Build())
 
 	return nil
-}
-
-type customAction struct {
-	condition string
-	command   string
-}
-
-func (c *customAction) description() string {
-	return ""
-}
-
-func (c *customAction) needed(ctx *Context) *actionResult {
-	result := shellSilent(ctx, c.condition).Run()
-
-	if result.LaunchError != nil {
-		return actionFailed("failed to run the condition command: %s", result.LaunchError)
-	}
-
-	if result.Code != 0 {
-		return actionNeeded("the met? command exited with a non-zero code")
-	}
-	return actionNotNeeded()
-}
-
-func (c *customAction) run(ctx *Context) error {
-	result := shell(ctx, c.command).Run()
-	return result.Error
 }
