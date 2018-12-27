@@ -3,6 +3,7 @@ package tasks
 import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/helpers/osidentity"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
@@ -14,6 +15,7 @@ type Context struct {
 	cfg      *config.Config
 	env      *env.Env
 	features map[string]string
+	identity *osidentity.Identity
 }
 
 // NewContext returns a *Context for a project, using the environment
@@ -24,5 +26,6 @@ func NewContext(cfg *config.Config, proj *project.Project, ui *termui.UI, taskLi
 		ui:       ui,
 		env:      env.NewFromOS(),
 		features: GetFeaturesFromTasks(taskList),
+		identity: osidentity.Detect(),
 	}
 }
