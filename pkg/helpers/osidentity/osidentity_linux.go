@@ -1,8 +1,6 @@
 package osidentity
 
 import (
-	"runtime"
-
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
@@ -14,5 +12,5 @@ func Detect() *Identity {
 		variant = "debian"
 	}
 
-	return &Identity{runtime.GOOS, variant}
+	return NewFromRuntimeWithVariant(variant)
 }
