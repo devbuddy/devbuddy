@@ -71,5 +71,5 @@ func getFeaturesFromProject(proj *project.Project) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tasks.GetFeaturesFromTasks(proj, allTasks), nil
+	return tasks.GetFeaturesFromTasks(allTasks), nil
 }
