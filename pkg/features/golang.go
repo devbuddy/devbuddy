@@ -3,15 +3,12 @@ package features
 import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/features/definitions"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 func init() {
-	f := definitions.Register("golang")
-	f.Activate = golangActivate
-	f.Deactivate = golangDeactivate
+	register("golang", golangActivate, golangDeactivate)
 }
 
 func golangActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
