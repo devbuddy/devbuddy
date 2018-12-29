@@ -26,11 +26,13 @@ func TestRegister(t *testing.T) {
 
 	env, err := reg.get("env1")
 	require.NoError(t, err)
+	require.Equal(t, env.Name, "env1")
 	require.NotNil(t, env.Activate)
 	require.NotNil(t, env.Deactivate)
 
 	env, err = reg.get("env2")
 	require.NoError(t, err)
+	require.Equal(t, env.Name, "env2")
 	require.NotNil(t, env.Activate)
 	require.NotNil(t, env.Deactivate)
 }
