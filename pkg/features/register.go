@@ -55,7 +55,7 @@ func (e *featureRegister) register(name string, activate activateFunc, deactivat
 func (e *featureRegister) get(name string) (*Feature, error) {
 	env := e.nameToEnv[name]
 	if env == nil {
-		return nil, fmt.Errorf("unknown environment: %s", name)
+		return nil, fmt.Errorf("unknown feature: %s", name)
 	}
 	return env, nil
 }
