@@ -15,6 +15,7 @@ type runner struct {
 	reg  *featureRegister
 }
 
+// Sync activates / deactivates the features in the instance of env.Env
 func Sync(cfg *config.Config, proj *project.Project, ui *termui.UI, env *env.Env, features map[string]string) {
 	runner := &runner{cfg: cfg, proj: proj, ui: ui, env: env, reg: globalRegister}
 	runner.sync(features)
