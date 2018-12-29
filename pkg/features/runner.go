@@ -7,7 +7,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
-type Runner struct {
+type runner struct {
 	cfg  *config.Config
 	proj *project.Project
 	ui   *termui.UI
@@ -16,11 +16,11 @@ type Runner struct {
 }
 
 func Sync(cfg *config.Config, proj *project.Project, ui *termui.UI, env *env.Env, features map[string]string) {
-	runner := &Runner{cfg: cfg, proj: proj, ui: ui, env: env, reg: globalRegister}
+	runner := &runner{cfg: cfg, proj: proj, ui: ui, env: env, reg: globalRegister}
 	runner.sync(features)
 }
 
-func (r *Runner) sync(features map[string]string) {
+func (r *runner) sync(features map[string]string) {
 	activeFeatures := r.env.GetActiveFeatures()
 
 	for _, name := range r.reg.names() {
@@ -44,7 +44,7 @@ func (r *Runner) sync(features map[string]string) {
 	}
 }
 
-func (r *Runner) activateFeature(name string, param string) {
+func (r *runner) activateFeature(name string, param string) {
 	r.ui.Debug("activating %s (%s)", name, param)
 
 	environment, err := r.reg.get(name)
@@ -66,7 +66,7 @@ func (r *Runner) activateFeature(name string, param string) {
 	r.env.SetFeature(name, param)
 }
 
-func (r *Runner) deactivateFeature(name string, param string) {
+func (r *runner) deactivateFeature(name string, param string) {
 	r.ui.Debug("deactivating %s (%s)", name, param)
 
 	environment, err := r.reg.get(name)

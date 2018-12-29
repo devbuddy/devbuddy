@@ -2,27 +2,14 @@ package features
 
 import (
 	"fmt"
-
-	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
-type activateFunc func(string, *config.Config, *project.Project, *env.Env) (bool, error)
-type deactivateFunc func(string, *config.Config, *env.Env)
-
-type Feature struct {
-	Name       string
-	Activate   activateFunc
-	Deactivate deactivateFunc
-}
-
 type featureRegister struct {
-	nameToEnv map[string]*Feature
+	nameToFeature map[string]*Feature
 }
 
 func newFeatureRegister() *featureRegister {
-	return &featureRegister{nameToEnv: make(map[string]*Feature)}
+	return &featureRegister{nameToFeature: make(map[string]*Feature)}
 }
 
 var globalRegister *featureRegister
@@ -34,12 +21,8 @@ func register(name string, activate activateFunc, deactivate deactivateFunc) {
 	globalRegister.register(name, activate, deactivate)
 }
 
-func Get(name string) (*Feature, error) {
-	return globalRegister.get(name)
-}
-
 func (e *featureRegister) register(name string, activate activateFunc, deactivate deactivateFunc) {
-	if _, ok := e.nameToEnv[name]; ok {
+	if _, ok := e.nameToFeature[name]; ok {
 		panic(fmt.Sprint("Can't re-register a definition:", name))
 	}
 	if activate == nil {
@@ -49,11 +32,11 @@ func (e *featureRegister) register(name string, activate activateFunc, deactivat
 		panic("deactivate can't be nil")
 	}
 
-	e.nameToEnv[name] = &Feature{Name: name, Activate: activate, Deactivate: deactivate}
+	e.nameToFeature[name] = &Feature{Name: name, Activate: activate, Deactivate: deactivate}
 }
 
 func (e *featureRegister) get(name string) (*Feature, error) {
-	env := e.nameToEnv[name]
+	env := e.nameToFeature[name]
 	if env == nil {
 		return nil, fmt.Errorf("unknown feature: %s", name)
 	}
@@ -61,7 +44,7 @@ func (e *featureRegister) get(name string) (*Feature, error) {
 }
 
 func (e *featureRegister) names() (names []string) {
-	for name := range e.nameToEnv {
+	for name := range e.nameToFeature {
 		names = append(names, string(name))
 	}
 	return
