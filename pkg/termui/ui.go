@@ -54,6 +54,11 @@ func (u *UI) Debug(format string, params ...interface{}) {
 	}
 }
 
+func (u *UI) Warningf(format string, params ...interface{}) {
+	msg := fmt.Sprintf(format, params...)
+	Fprintf(u.out, "%s: %s\n", color.Bold(color.Brown("WARNING")), msg)
+}
+
 func (u *UI) CommandHeader(cmdline string) {
 	Fprintf(os.Stderr, "🐼  %s %s\n", color.Blue("running"), color.Cyan(cmdline))
 }

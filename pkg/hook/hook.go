@@ -48,8 +48,7 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.UI) {
 
 	env := env.NewFromOS()
 
-	runner := features.NewRunner(cfg, proj, ui, env)
-	runner.Run(allFeatures)
+	features.Sync(cfg, proj, ui, env, allFeatures)
 
 	envChanges := env.Changed()
 	for _, change := range envChanges {
