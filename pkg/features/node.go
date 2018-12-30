@@ -3,15 +3,12 @@ package features
 import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/features/definitions"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 func init() {
-	f := definitions.Register("node")
-	f.Activate = nodeActivate
-	f.Deactivate = nodeDeactivate
+	register("node", nodeActivate, nodeDeactivate)
 }
 
 func nodeActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
