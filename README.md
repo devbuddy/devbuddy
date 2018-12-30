@@ -46,8 +46,12 @@ Go:
 - Go environment (with GOPATH)
 - Dep (support for [Go Dep](https://github.com/golang/dep))
 
-Node: **planned**
+Node:
+- Node environment
+- Npm/Yarn **planned**
+
 Ruby: **planned**
+Rust: **planned**
 
 Others:
 - Homebrew
