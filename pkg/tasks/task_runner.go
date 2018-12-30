@@ -58,12 +58,17 @@ func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
 	return err
 }
 
-func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) (err error) {
+func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) error {
 	if task.featureName == "" {
 		return nil
 	}
 
-	devUpNeeded, err := features.Activate(task.featureName, task.featureParam, ctx.cfg, ctx.proj, ctx.env)
+	def, err := features.Get(task.featureName)
+	if err != nil {
+		return err
+	}
+
+	devUpNeeded, err := def.Activate(task.featureParam, ctx.cfg, ctx.proj, ctx.env)
 	if err != nil {
 		return err
 	}

@@ -3,26 +3,22 @@ package features
 import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/features/definitions"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
-type Runner struct {
+type runner struct {
 	cfg  *config.Config
 	proj *project.Project
 	ui   *termui.UI
 	env  *env.Env
+	reg  *featureRegister
 }
 
-func NewRunner(cfg *config.Config, proj *project.Project, ui *termui.UI, env *env.Env) *Runner {
-	return &Runner{cfg: cfg, proj: proj, ui: ui, env: env}
-}
-
-func (r *Runner) Run(features map[string]string) {
+func (r *runner) sync(features map[string]string) {
 	activeFeatures := r.env.GetActiveFeatures()
 
-	for _, name := range definitions.Names() {
+	for _, name := range r.reg.names() {
 		wantVersion, want := features[name]
 		activeVersion, active := activeFeatures[name]
 
@@ -43,10 +39,16 @@ func (r *Runner) Run(features map[string]string) {
 	}
 }
 
-func (r *Runner) activateFeature(name string, param string) {
+func (r *runner) activateFeature(name string, param string) {
 	r.ui.Debug("activating %s (%s)", name, param)
 
-	devUpNeeded, err := Activate(name, param, r.cfg, r.proj, r.env)
+	environment, err := r.reg.get(name)
+	if err != nil {
+		r.ui.Warningf("%s (ignoring)", err)
+		return
+	}
+
+	devUpNeeded, err := environment.Activate(param, r.cfg, r.proj, r.env)
 	if err != nil {
 		r.ui.Debug("failed: %s", err)
 		return
@@ -59,9 +61,15 @@ func (r *Runner) activateFeature(name string, param string) {
 	r.env.SetFeature(name, param)
 }
 
-func (r *Runner) deactivateFeature(name string, param string) {
+func (r *runner) deactivateFeature(name string, param string) {
 	r.ui.Debug("deactivating %s (%s)", name, param)
 
-	Deactivate(name, param, r.cfg, r.env)
+	environment, err := r.reg.get(name)
+	if err != nil {
+		r.ui.Warningf("%s (ignoring)", err)
+		return
+	}
+
+	environment.Deactivate(param, r.cfg, r.env)
 	r.env.UnsetFeature(name)
 }
