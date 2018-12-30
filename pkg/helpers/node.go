@@ -46,7 +46,7 @@ func (n *Node) Install() error {
 		return fmt.Errorf("NodeJS installation is only supported on %s by DevBuddy", runtime.GOARCH)
 	}
 
-	archiveName := fmt.Sprintf("node-%s-%s-x64.tar.gz", n.version, runtime.GOOS)
+	archiveName := fmt.Sprintf("node-v%s-%s-x64.tar.gz", n.version, runtime.GOOS)
 	tarPath := path.Join(n.tarDir, archiveName)
 
 	if !utils.PathExists(tarPath) {
@@ -55,7 +55,7 @@ func (n *Node) Install() error {
 			return err
 		}
 
-		url := fmt.Sprintf("https://nodejs.org/dist/%s/%s", n.version, archiveName)
+		url := fmt.Sprintf("https://nodejs.org/dist/v%s/%s", n.version, archiveName)
 		err = utils.DownloadFile(tarPath, url)
 		if err != nil {
 			return fmt.Errorf("failed to download NodeJS %s from %s: %s", n.version, url, err)
