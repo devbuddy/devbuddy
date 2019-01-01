@@ -1,6 +1,9 @@
 package tasks
 
-import "github.com/devbuddy/devbuddy/pkg/helpers"
+import (
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/utils"
+)
 
 func init() {
 	t := registerTaskDefinition("node")
@@ -27,6 +30,16 @@ func parseNode(config *taskConfig, task *Task) error {
 		}
 		return actionNotNeeded()
 	})
+	task.addAction(builder.Build())
+
+	builder = actionBuilder("install dependencies", func(ctx *Context) error {
+		if !utils.PathExists("package.json") {
+			ctx.ui.TaskWarning("No package.json found.")
+			return nil
+		}
+		return command(ctx, "npm", "install", "--no-progress").Run().Error
+	})
+	builder.OnFileChange("package.json")
 	task.addAction(builder.Build())
 
 	return nil
