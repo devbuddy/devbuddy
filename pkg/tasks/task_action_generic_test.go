@@ -143,8 +143,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	result := action.needed(ctx)
 	require.NoError(t, result.Error)
-	require.True(t, result.Needed)
-	require.Equal(t, "file testfile does not exist", result.Reason)
+	require.False(t, result.Needed)
 
 	action.run(ctx)
 

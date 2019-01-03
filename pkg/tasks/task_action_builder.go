@@ -30,7 +30,8 @@ func (a *genericTaskActionBuilder) OnFunc(condFunc func(*Context) *actionResult)
 	return a
 }
 
-// OnFileChange specifies that the action will run when a file changes or does not exist.
+// OnFileChange specifies that the action will run when a file changes.
+// The action will NOT run if the file does not exist.
 // The action will NOT fail if the file is not created.
 func (a *genericTaskActionBuilder) OnFileChange(path string) *genericTaskActionBuilder {
 	a.monitoredFiles = append(a.monitoredFiles, path)

@@ -77,7 +77,7 @@ func genericTaskActionPreConditionForFile(ctx *Context, path string) *actionResu
 	fullPath := filepath.Join(ctx.proj.Path, path)
 
 	if !utils.PathExists(fullPath) {
-		return actionNeeded("file %s does not exist", path)
+		return actionNotNeeded()
 	}
 
 	fileChecksum, err := utils.FileChecksum(fullPath)
