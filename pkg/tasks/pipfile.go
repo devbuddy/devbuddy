@@ -23,8 +23,8 @@ func parserPipfile(config *taskConfig, task *Task) error {
 		return nil
 	})
 	builder.OnFunc(func(ctx *Context) *actionResult {
-		pythonParam := ctx.features["python"]
-		name := helpers.VirtualenvName(ctx.proj, pythonParam)
+		featureInfo := ctx.features["python"]
+		name := helpers.VirtualenvName(ctx.proj, featureInfo.Param)
 		venv := helpers.NewVirtualenv(ctx.cfg, name)
 		pipenvCmd := venv.Which("pipenv")
 		if !utils.PathExists(pipenvCmd) {

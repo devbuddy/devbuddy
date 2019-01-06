@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 
+	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 )
 
@@ -19,8 +20,7 @@ func parseGolang(config *taskConfig, task *Task) error {
 	}
 
 	task.header = version
-	task.featureName = "golang"
-	task.featureParam = version
+	task.feature = features.NewFeatureInfo("golang", version)
 
 	task.addAction(&golangGoPath{})
 	task.addAction(&golangInstall{version: version})

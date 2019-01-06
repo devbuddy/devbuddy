@@ -45,7 +45,7 @@ func newMockEnv(name string, reg *featureRegister, rec *recorder) {
 
 func newRunner(env *env.Env, reg *featureRegister) *runner {
 	_, ui := termui.NewTesting(false)
-	return &runner{cfg: nil, proj: nil, ui: ui, env: env, reg: reg}
+	return &runner{cfg: nil, proj: nil, ui: ui, env: env, state: &FeatureState{env}, reg: reg}
 }
 
 func TestRunner(t *testing.T) {
@@ -60,19 +60,19 @@ func TestRunner(t *testing.T) {
 	newMockEnv("elixir", reg, elixirCalls)
 
 	runner := newRunner(testEnv, reg)
-	runner.sync(map[string]string{})
+	runner.sync(NewFeatureSet())
 	require.Equal(t, []string{}, rustCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(map[string]string{"rust": "1.0"})
+	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
 	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(map[string]string{"rust": "2.0"})
+	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "2.0"}))
 	require.Equal(t, []string{"deactivate 1.0", "activate 2.0"}, rustCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(map[string]string{})
+	runner.sync(NewFeatureSet())
 	require.Equal(t, []string{"deactivate 2.0"}, rustCalls.getCallsAndReset())
 }
 
@@ -88,27 +88,27 @@ func TestRunnerWithTwoFeatures(t *testing.T) {
 	newMockEnv("elixir", reg, elixirCalls)
 
 	runner := newRunner(testEnv, reg)
-	runner.sync(map[string]string{"rust": "1.0", "elixir": "0.4"})
+	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}).With(FeatureInfo{"elixir", "0.4"}))
 	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{"activate 0.4"}, elixirCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(map[string]string{"elixir": "0.4"})
+	runner.sync(NewFeatureSet().With(FeatureInfo{"elixir", "0.4"}))
 	require.Equal(t, []string{"deactivate 1.0"}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{}, elixirCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(map[string]string{"rust": "1.0", "elixir": "0.4"})
+	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}).With(FeatureInfo{"elixir", "0.4"}))
 	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{}, elixirCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(map[string]string{"rust": "1.0", "elixir": "0.5"})
+	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}).With(FeatureInfo{"elixir", "0.5"}))
 	require.Equal(t, []string{}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{"deactivate 0.4", "activate 0.5"}, elixirCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(map[string]string{})
+	runner.sync(NewFeatureSet())
 	require.Equal(t, []string{"deactivate 1.0"}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{"deactivate 0.5"}, elixirCalls.getCallsAndReset())
 }

@@ -6,41 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetActiveFeatures(t *testing.T) {
-	envs := [][]string{
-		{},
-		{"BUD_AUTO_ENV_FEATURES="},
-		{"BUD_AUTO_ENV_FEATURES=f1=v1"},
-		{"BUD_AUTO_ENV_FEATURES=f1=v1:f2=v2"},
-	}
-	features := []map[string]string{
-		{},
-		{},
-		{"f1": "v1"},
-		{"f1": "v1", "f2": "v2"},
-	}
-
-	for idx := range envs {
-		env := New(envs[idx])
-		require.Equal(t, features[idx], env.GetActiveFeatures())
-	}
-}
-
-func TestSetFeatures(t *testing.T) {
-	features := []map[string]string{
-		{},
-		{},
-		{"f1": "v1"},
-		{"f1": "v1", "f2": "v2"},
-	}
-
-	for idx := range features {
-		env := New([]string{})
-		env.setActiveFeatures(features[idx])
-		require.Equal(t, features[idx], env.GetActiveFeatures())
-	}
-}
-
 func TestChanged(t *testing.T) {
 	env := New([]string{})
 	require.Equal(t, []VariableChange{}, env.Changed())

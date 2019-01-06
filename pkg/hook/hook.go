@@ -62,9 +62,9 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.UI) {
 	}
 }
 
-func getFeaturesFromProject(proj *project.Project) (map[string]string, error) {
+func getFeaturesFromProject(proj *project.Project) (features.FeatureSet, error) {
 	if proj == nil {
-		return map[string]string{}, nil
+		return features.NewFeatureSet(), nil
 	}
 	allTasks, err := tasks.GetTasksFromProject(proj)
 	if err != nil {

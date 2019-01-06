@@ -8,68 +8,69 @@ import (
 )
 
 type runner struct {
-	cfg  *config.Config
-	proj *project.Project
-	ui   *termui.UI
-	env  *env.Env
-	reg  *featureRegister
+	cfg   *config.Config
+	proj  *project.Project
+	ui    *termui.UI
+	env   *env.Env
+	state *FeatureState
+	reg   *featureRegister
 }
 
-func (r *runner) sync(features map[string]string) {
-	activeFeatures := r.env.GetActiveFeatures()
+func (r *runner) sync(featureSet FeatureSet) {
+	activeFeatures := r.state.GetActiveFeatures()
 
 	for _, name := range r.reg.names() {
-		wantVersion, want := features[name]
-		activeVersion, active := activeFeatures[name]
+		wantFeatureInfo, want := featureSet[name]
+		activeFeatureInfo, active := activeFeatures[name]
 
 		if want {
 			if active {
-				if wantVersion != activeVersion {
-					r.deactivateFeature(name, activeVersion)
-					r.activateFeature(name, wantVersion)
+				if wantFeatureInfo.Param != activeFeatureInfo.Param {
+					r.deactivateFeature(activeFeatureInfo)
+					r.activateFeature(wantFeatureInfo)
 				}
 			} else {
-				r.activateFeature(name, wantVersion)
+				r.activateFeature(wantFeatureInfo)
 			}
 		} else {
 			if active {
-				r.deactivateFeature(name, activeVersion)
+				r.deactivateFeature(activeFeatureInfo)
 			}
 		}
 	}
 }
 
-func (r *runner) activateFeature(name string, param string) {
-	r.ui.Debug("activating %s (%s)", name, param)
+func (r *runner) activateFeature(featureInfo FeatureInfo) {
+	r.ui.Debug("activating %s (%s)", featureInfo.Name, featureInfo.Param)
 
-	environment, err := r.reg.get(name)
+	environment, err := r.reg.get(featureInfo.Name)
 	if err != nil {
 		r.ui.Warningf("%s (ignoring)", err)
 		return
 	}
 
-	devUpNeeded, err := environment.Activate(param, r.cfg, r.proj, r.env)
+	devUpNeeded, err := environment.Activate(featureInfo.Param, r.cfg, r.proj, r.env)
 	if err != nil {
 		r.ui.Debug("failed: %s", err)
 		return
 	}
 	if devUpNeeded {
-		r.ui.HookFeatureFailure(name, param)
+		r.ui.HookFeatureFailure(featureInfo.Name, featureInfo.Param)
 		return
 	}
-	r.ui.HookFeatureActivated(name, param)
-	r.env.SetFeature(name, param)
+	r.ui.HookFeatureActivated(featureInfo.Name, featureInfo.Param)
+	r.state.SetFeature(featureInfo)
 }
 
-func (r *runner) deactivateFeature(name string, param string) {
-	r.ui.Debug("deactivating %s (%s)", name, param)
+func (r *runner) deactivateFeature(featureInfo FeatureInfo) {
+	r.ui.Debug("deactivating %s (%s)", featureInfo.Name, featureInfo.Param)
 
-	environment, err := r.reg.get(name)
+	environment, err := r.reg.get(featureInfo.Name)
 	if err != nil {
 		r.ui.Warningf("%s (ignoring)", err)
 		return
 	}
 
-	environment.Deactivate(param, r.cfg, r.env)
-	r.env.UnsetFeature(name)
+	environment.Deactivate(featureInfo.Param, r.cfg, r.env)
+	r.state.UnsetFeature(featureInfo.Name)
 }
