@@ -9,13 +9,15 @@ import (
 
 // Run accepts a list of tasks and check for their requirements and runs them if their conditions are met
 func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*Task) (success bool, err error) {
+	tasksSeen := map[string]bool{}
 	for _, task := range taskList {
 		if task.requiredTask != "" {
-			if _, present := ctx.features[task.requiredTask]; !present {
-				ctx.ui.TaskErrorf("You must specify a %s environment to use a %s task", task.requiredTask, task.name)
+			if !tasksSeen[task.requiredTask] {
+				ctx.ui.TaskErrorf("You must specify a %s task before a %s task", task.requiredTask, task.name)
 				return false, nil
 			}
 		}
+		tasksSeen[task.requiredTask] = true
 	}
 
 	for _, task := range taskList {
