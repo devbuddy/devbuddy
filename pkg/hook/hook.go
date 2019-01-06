@@ -32,20 +32,33 @@ func Run() {
 
 func run(cfg *config.Config, ui *termui.UI) error {
 	proj, err := project.FindCurrent()
-	if err != nil {
+	if err != nil && err != project.ErrProjectNotFound {
 		return err
 	}
+	ui.Debug("project: %+v", proj)
 
-	allTasks, err := tasks.GetTasksFromProject(proj)
+	allFeatures, err := getFeaturesFromProject(proj)
 	if err != nil {
 		return err
 	}
+	ui.Debug("features: %+v", allFeatures)
 
 	env := env.NewFromOS()
-	features.Sync(cfg, proj, ui, env, tasks.GetFeaturesFromTasks(allTasks))
+	features.Sync(cfg, proj, ui, env, allFeatures)
 	printEnvironmentChangeAsShellCommands(ui, env)
 
 	return nil
+}
+
+func getFeaturesFromProject(proj *project.Project) (map[string]string, error) {
+	if proj == nil {
+		return map[string]string{}, nil
+	}
+	allTasks, err := tasks.GetTasksFromProject(proj)
+	if err != nil {
+		return nil, err
+	}
+	return tasks.GetFeaturesFromTasks(allTasks), nil
 }
 
 func printEnvironmentChangeAsShellCommands(ui *termui.UI, env *env.Env) {
