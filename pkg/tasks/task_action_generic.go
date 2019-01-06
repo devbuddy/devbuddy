@@ -8,12 +8,16 @@ import (
 )
 
 type genericTaskAction struct {
-	builder   *genericTaskActionBuilder
+	desc           string
+	conditions     []*genericTaskActionCondition
+	monitoredFiles []string
+	runFunc        func(*Context) error
+
 	runCalled bool
 }
 
 func (a *genericTaskAction) description() string {
-	return a.builder.desc
+	return a.desc
 }
 
 func (a *genericTaskAction) needed(ctx *Context) (result *actionResult) {
@@ -25,7 +29,7 @@ func (a *genericTaskAction) needed(ctx *Context) (result *actionResult) {
 
 func (a *genericTaskAction) run(ctx *Context) error {
 	a.runCalled = true
-	return a.builder.runFunc(ctx)
+	return a.runFunc(ctx)
 }
 
 // internals
@@ -33,7 +37,7 @@ func (a *genericTaskAction) run(ctx *Context) error {
 func (a *genericTaskAction) pre(ctx *Context) (result *actionResult) {
 	hasConditions := false
 
-	for _, condition := range a.builder.conditions {
+	for _, condition := range a.conditions {
 		hasConditions = true
 
 		result = condition.pre(ctx)
@@ -42,7 +46,7 @@ func (a *genericTaskAction) pre(ctx *Context) (result *actionResult) {
 		}
 	}
 
-	for _, filePath := range a.builder.monitoredFiles {
+	for _, filePath := range a.monitoredFiles {
 		hasConditions = true
 
 		result = genericTaskActionPreConditionForFile(ctx, filePath)
@@ -58,13 +62,13 @@ func (a *genericTaskAction) pre(ctx *Context) (result *actionResult) {
 }
 
 func (a *genericTaskAction) post(ctx *Context) (result *actionResult) {
-	for _, condition := range a.builder.conditions {
+	for _, condition := range a.conditions {
 		result = condition.post(ctx)
 		if result.Error != nil || result.Needed {
 			return result
 		}
 	}
-	for _, filePath := range a.builder.monitoredFiles {
+	for _, filePath := range a.monitoredFiles {
 		result = genericTaskActionPostConditionForFile(ctx, filePath)
 		if result.Error != nil || result.Needed {
 			return result

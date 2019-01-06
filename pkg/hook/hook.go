@@ -52,6 +52,8 @@ func run(cfg *config.Config, ui *termui.UI) error {
 
 func getFeaturesFromProject(proj *project.Project) (map[string]string, error) {
 	if proj == nil {
+		// When no project was found, we must deactivate all potentially active features
+		// So we continue with an empty feature map
 		return map[string]string{}, nil
 	}
 	allTasks, err := tasks.GetTasksFromProject(proj)
