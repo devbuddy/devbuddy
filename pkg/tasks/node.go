@@ -1,6 +1,9 @@
 package tasks
 
-import "github.com/devbuddy/devbuddy/pkg/helpers"
+import (
+	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+)
 
 func init() {
 	t := registerTaskDefinition("node")
@@ -15,8 +18,7 @@ func parseNode(config *taskConfig, task *Task) error {
 	}
 
 	task.header = version
-	task.featureName = "node"
-	task.featureParam = version
+	task.feature = features.NewFeatureInfo("node", version)
 
 	builder := actionBuilder("install nodejs from https://nodejs.org", func(ctx *Context) error {
 		return helpers.NewNode(ctx.cfg, version).Install()

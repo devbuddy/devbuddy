@@ -59,21 +59,21 @@ func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
 }
 
 func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) error {
-	if task.featureName == "" {
+	if task.feature.Name == "" {
 		return nil
 	}
 
-	def, err := features.Get(task.featureName)
+	def, err := features.Get(task.feature)
 	if err != nil {
 		return err
 	}
 
-	devUpNeeded, err := def.Activate(task.featureParam, ctx.cfg, ctx.proj, ctx.env)
+	devUpNeeded, err := def.Activate(task.feature.Param, ctx.cfg, ctx.proj, ctx.env)
 	if err != nil {
 		return err
 	}
 	if devUpNeeded {
-		ctx.ui.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", task.featureName))
+		ctx.ui.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", task.feature))
 	}
 
 	// Special case, we want the bud process to get PATH updates from features to call the right processes.

@@ -3,6 +3,7 @@ package tasks
 import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
@@ -13,7 +14,7 @@ type Context struct {
 	ui       *termui.UI
 	cfg      *config.Config
 	env      *env.Env
-	features map[string]string
+	features features.FeatureSet
 }
 
 // NewContext returns a *Context for a project, using the environment
