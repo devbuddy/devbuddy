@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
@@ -24,8 +25,7 @@ func parserPython(config *taskConfig, task *Task) error {
 	}
 
 	task.header = version
-	task.featureName = "python"
-	task.featureParam = version
+	task.feature = features.NewFeatureInfo("python", version)
 
 	task.addAction(&pyenv{})
 	task.addAction(&pythonPyenv{version: version})

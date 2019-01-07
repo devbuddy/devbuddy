@@ -1,12 +1,13 @@
 package tasks
 
+import "github.com/devbuddy/devbuddy/pkg/features"
+
 // Task represents a task created by a taskDefinition.parser and specified by the TaskInfo
 type Task struct {
 	*taskDefinition
-	header       string
-	actions      []taskAction
-	featureName  string
-	featureParam string
+	header  string
+	actions []taskAction
+	feature features.FeatureInfo
 }
 
 func (t *Task) addAction(action taskAction) {
