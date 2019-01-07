@@ -23,11 +23,6 @@ func NewFeatureSet() FeatureSet {
 	return FeatureSet{}
 }
 
-// Add adds a FeatureInfo to a FeatureSet
-func (s FeatureSet) Add(featureInfo FeatureInfo) {
-	s[featureInfo.Name] = featureInfo
-}
-
 // With returns a new FeatureSet augmented with the featureInfo provided
 func (s FeatureSet) With(featureInfo FeatureInfo) FeatureSet {
 	s[featureInfo.Name] = featureInfo
