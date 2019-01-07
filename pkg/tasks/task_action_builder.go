@@ -41,11 +41,9 @@ func (a *genericTaskActionBuilder) OnFileChange(path string) *genericTaskActionB
 // Build returns a new task action with the behaviour specified by the builder
 func (a *genericTaskActionBuilder) Build() *genericTaskAction {
 	return &genericTaskAction{
-		builder: &genericTaskActionBuilder{ // Hand made copy
-			desc:           a.desc,
-			conditions:     append(a.conditions[:0:0], a.conditions...),
-			monitoredFiles: append(a.monitoredFiles[:0:0], a.monitoredFiles...),
-			runFunc:        a.runFunc,
-		},
+		desc:           a.desc,
+		conditions:     append(a.conditions[:0:0], a.conditions...),
+		monitoredFiles: append(a.monitoredFiles[:0:0], a.monitoredFiles...),
+		runFunc:        a.runFunc,
 	}
 }

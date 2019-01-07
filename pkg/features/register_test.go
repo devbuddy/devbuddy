@@ -22,7 +22,7 @@ func TestRegister(t *testing.T) {
 	reg.register("env1", activate, deactivate1)
 	reg.register("env2", activate, deactivate2)
 
-	require.Equal(t, reg.names(), []string{"env1", "env2"})
+	require.ElementsMatch(t, reg.names(), []string{"env1", "env2"})
 
 	env, err := reg.get("env1")
 	require.NoError(t, err)

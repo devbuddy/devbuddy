@@ -2,6 +2,7 @@ package project
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -13,7 +14,7 @@ var ErrProjectNotFound = errors.New("project not found")
 func FindCurrent() (*Project, error) {
 	path, err := os.Getwd()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error while searching for project: %s", err)
 	}
 	return findByPath(path)
 }

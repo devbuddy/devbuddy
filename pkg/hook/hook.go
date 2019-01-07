@@ -2,7 +2,6 @@ package hook
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
@@ -12,46 +11,60 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
-func Hook() {
+func Run() {
 	// In the shell hook, the stdout is evaluated by the shell
 	// stderr is used to display messages to the user
 
 	// Also, we can't annoy the user here, so we always just quit silently
 
-	timerStart := time.Now()
+	cfg, err := config.Load()
+	if err != nil {
+		return
+	}
 
-	cfg, configErr := config.Load()
 	ui := termui.NewHook(cfg)
 
-	if configErr != nil {
-		ui.Debug("error while loading the config: %s", configErr)
-		return
+	err = run(cfg, ui)
+	if err != nil {
+		ui.Debug("%s", err)
 	}
-
-	proj, err := project.FindCurrent()
-	if err != nil && err != project.ErrProjectNotFound {
-		ui.Debug("error while searching for current project: %s", err)
-		return
-	}
-
-	handleFeatures(cfg, proj, ui)
-
-	ui.Debug("total time: %s", time.Since(timerStart))
 }
 
-func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.UI) {
+func run(cfg *config.Config, ui *termui.UI) error {
+	proj, err := project.FindCurrent()
+	if err != nil && err != project.ErrProjectNotFound {
+		return err
+	}
+	ui.Debug("project: %+v", proj)
+
 	allFeatures, err := getFeaturesFromProject(proj)
 	if err != nil {
-		ui.Debug("error while building the project tasks: %s", err)
-		return
+		return err
 	}
+	ui.Debug("features: %+v", allFeatures)
 
 	env := env.NewFromOS()
-
 	features.Sync(cfg, proj, ui, env, allFeatures)
+	printEnvironmentChangeAsShellCommands(ui, env)
 
-	envChanges := env.Changed()
-	for _, change := range envChanges {
+	return nil
+}
+
+func getFeaturesFromProject(proj *project.Project) (features.FeatureSet, error) {
+	if proj == nil {
+		// When no project was found, we must deactivate all potentially active features
+		// So we continue with an empty feature map
+		return features.NewFeatureSet(), nil
+	}
+	allTasks, err := tasks.GetTasksFromProject(proj)
+	if err != nil {
+		return nil, err
+	}
+	return tasks.GetFeaturesFromTasks(allTasks), nil
+}
+
+func printEnvironmentChangeAsShellCommands(ui *termui.UI, env *env.Env) {
+	for _, change := range env.Changed() {
 		ui.Debug("Env change: %+v", change)
 
 		if change.Deleted {
@@ -60,15 +73,4 @@ func handleFeatures(cfg *config.Config, proj *project.Project, ui *termui.UI) {
 			fmt.Printf("export %s=\"%s\"\n", change.Name, change.Value)
 		}
 	}
-}
-
-func getFeaturesFromProject(proj *project.Project) (features.FeatureSet, error) {
-	if proj == nil {
-		return features.NewFeatureSet(), nil
-	}
-	allTasks, err := tasks.GetTasksFromProject(proj)
-	if err != nil {
-		return nil, err
-	}
-	return tasks.GetFeaturesFromTasks(allTasks), nil
 }
