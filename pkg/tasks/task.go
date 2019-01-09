@@ -14,6 +14,15 @@ func (t *Task) addAction(action taskAction) {
 	t.actions = append(t.actions, action)
 }
 
+func (t *Task) addActionWithBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
+	if runFunc == nil {
+		panic("runFunc cannot be nil")
+	}
+	action := &genericTaskAction{desc: description, runFunc: runFunc}
+	t.actions = append(t.actions, action)
+	return &genericTaskActionBuilder{action}
+}
+
 func buildFromDefinition(definition interface{}) (task *Task, err error) {
 	taskConfig, err := parseTaskConfig(definition)
 	if err != nil {
