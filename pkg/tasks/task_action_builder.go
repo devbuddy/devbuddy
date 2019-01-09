@@ -6,16 +6,11 @@ type genericTaskActionCondition struct {
 }
 
 type genericTaskActionBuilder struct {
-	desc string
-
-	conditions     []*genericTaskActionCondition
-	monitoredFiles []string
-
-	runFunc func(*Context) error
+	*genericTaskAction
 }
 
 func actionBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
-	return &genericTaskActionBuilder{desc: description, runFunc: runFunc}
+	return &genericTaskActionBuilder{&genericTaskAction{desc: description, runFunc: runFunc}}
 }
 
 // On registers a new condition
@@ -40,10 +35,5 @@ func (a *genericTaskActionBuilder) OnFileChange(path string) *genericTaskActionB
 
 // Build returns a new task action with the behaviour specified by the builder
 func (a *genericTaskActionBuilder) Build() *genericTaskAction {
-	return &genericTaskAction{
-		desc:           a.desc,
-		conditions:     append(a.conditions[:0:0], a.conditions...),
-		monitoredFiles: append(a.monitoredFiles[:0:0], a.monitoredFiles...),
-		runFunc:        a.runFunc,
-	}
+	return a.genericTaskAction
 }
