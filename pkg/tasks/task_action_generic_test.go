@@ -134,12 +134,11 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 		proj: project.NewFromPath(tmpdir),
 	}
 
-	builder := actionBuilder("", func(ctx *Context) error { return nil })
-	builder.OnFileChange("testfile")
+	runFunc := func(ctx *Context) error { return nil }
 
 	// Without file
 
-	action := builder.Build()
+	action := actionBuilder("", runFunc).OnFileChange("testfile").Build()
 
 	result := action.needed(ctx)
 	require.NoError(t, result.Error)
@@ -155,7 +154,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	filet.File(t, tmpdir+"/testfile", "content-A")
 
-	action = builder.Build()
+	action = actionBuilder("", runFunc).OnFileChange("testfile").Build()
 
 	result = action.needed(ctx)
 	require.NoError(t, result.Error)
@@ -170,7 +169,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	// The file did not change
 
-	action = builder.Build()
+	action = actionBuilder("", runFunc).OnFileChange("testfile").Build()
 
 	result = action.needed(ctx)
 	require.NoError(t, result.Error)
@@ -180,7 +179,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	filet.File(t, tmpdir+"/testfile", "content-B")
 
-	action = builder.Build()
+	action = actionBuilder("", runFunc).OnFileChange("testfile").Build()
 
 	result = action.needed(ctx)
 	require.NoError(t, result.Error)
