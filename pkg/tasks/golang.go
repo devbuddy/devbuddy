@@ -1,8 +1,6 @@
 package tasks
 
 import (
-	"fmt"
-
 	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 )
@@ -22,45 +20,28 @@ func parseGolang(config *taskConfig, task *Task) error {
 	task.header = version
 	task.feature = features.NewFeatureInfo("golang", version)
 
-	task.addAction(&golangGoPath{})
-	task.addAction(&golangInstall{version: version})
+	checkPATHVar := func(ctx *Context) *actionResult {
+		if ctx.env.Get("GOPATH") == "" {
+			return actionNeeded("GOPATH is not set")
+		}
+		return actionNotNeeded()
+	}
+	showPATHWarning := func(ctx *Context) error {
+		ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
+		return nil
+	}
+	task.addActionWithBuilder("", showPATHWarning).OnFunc(checkPATHVar)
+
+	installNeeded := func(ctx *Context) *actionResult {
+		if !helpers.NewGolang(ctx.cfg, version).Exists() {
+			return actionNeeded("golang distribution is not installed")
+		}
+		return actionNotNeeded()
+	}
+	installGo := func(ctx *Context) error {
+		return helpers.NewGolang(ctx.cfg, version).Install()
+	}
+	task.addActionWithBuilder("install golang distribution", installGo).OnFunc(installNeeded)
 
 	return nil
-}
-
-type golangGoPath struct{}
-
-func (g *golangGoPath) description() string {
-	return ""
-}
-
-func (g *golangGoPath) needed(ctx *Context) *actionResult {
-	if ctx.env.Get("GOPATH") == "" {
-		return actionNeeded("GOPATH is not set")
-	}
-	return actionNotNeeded()
-}
-
-func (g *golangGoPath) run(ctx *Context) error {
-	ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
-	return nil
-}
-
-type golangInstall struct {
-	version string
-}
-
-func (g *golangInstall) description() string {
-	return fmt.Sprintf("Install Go version %s", g.version)
-}
-
-func (g *golangInstall) needed(ctx *Context) *actionResult {
-	if !helpers.NewGolang(ctx.cfg, g.version).Exists() {
-		return actionNeeded("golang distribution is not installed")
-	}
-	return actionNotNeeded()
-}
-
-func (g *golangInstall) run(ctx *Context) error {
-	return helpers.NewGolang(ctx.cfg, g.version).Install()
 }

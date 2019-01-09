@@ -20,16 +20,16 @@ func parseNode(config *taskConfig, task *Task) error {
 	task.header = version
 	task.feature = features.NewFeatureInfo("node", version)
 
-	builder := actionBuilder("install nodejs from https://nodejs.org", func(ctx *Context) error {
+	run := func(ctx *Context) error {
 		return helpers.NewNode(ctx.cfg, version).Install()
-	})
-	builder.OnFunc(func(ctx *Context) *actionResult {
+	}
+	condition := func(ctx *Context) *actionResult {
 		if !helpers.NewNode(ctx.cfg, version).Exists() {
 			return actionNeeded("node version is not installed")
 		}
 		return actionNotNeeded()
-	})
-	task.addAction(builder.Build())
+	}
+	task.addActionWithBuilder("install nodejs from https://nodejs.org", run).OnFunc(condition)
 
 	return nil
 }
