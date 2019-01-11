@@ -1,42 +1,44 @@
 package tasks
 
+import (
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+)
+
 func init() {
-	t := registerTaskDefinition("custom")
-	t.name = "Custom"
-	t.parser = parserCustom
+	taskapi.RegisterTaskDefinition("custom", "Custom", parserCustom)
 }
 
-func parserCustom(config *taskConfig, task *Task) error {
-	command, err := config.getStringProperty("meet")
+func parserCustom(config *taskapi.TaskConfig, task *taskapi.Task) error {
+	command, err := config.GetStringProperty("meet")
 	if err != nil {
 		return err
 	}
-	condition, err := config.getStringProperty("met?")
+	condition, err := config.GetStringProperty("met?")
 	if err != nil {
 		return err
 	}
-	name, err := config.getStringPropertyDefault("name", command)
+	name, err := config.GetStringPropertyDefault("name", command)
 	if err != nil {
 		return err
 	}
 
-	task.header = name
+	task.Header = name
 
-	builder := actionBuilder("", func(ctx *Context) error {
+	run := func(ctx *taskapi.Context) error {
 		result := shell(ctx, command).Run()
 		return result.Error
-	})
-	builder.OnFunc(func(ctx *Context) *actionResult {
+	}
+	needed := func(ctx *taskapi.Context) *taskapi.ActionResult {
 		result := shellSilent(ctx, condition).Capture()
 		if result.LaunchError != nil {
-			return actionFailed("failed to run the condition command: %s", result.LaunchError)
+			return taskapi.ActionFailed("failed to run the condition command: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
-			return actionNeeded("the met? command exited with a non-zero code")
+			return taskapi.ActionNeeded("the met? command exited with a non-zero code")
 		}
-		return actionNotNeeded()
-	})
-	task.addAction(builder.Build())
+		return taskapi.ActionNotNeeded()
+	}
+	task.AddActionWithBuilder("", run).OnFunc(needed)
 
 	return nil
 }

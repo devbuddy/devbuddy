@@ -1,14 +1,28 @@
-package tasks
+package engine
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/tasks"
+	"github.com/devbuddy/devbuddy/pkg/tasks/task"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 // Run accepts a list of tasks and check for their requirements and runs them if their conditions are met
-func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*Task) (success bool, err error) {
+func Run(cfg *config.Config, proj *project.Project, ui *termui.UI, executor TaskRunner, selector TaskSelector, taskList []*tasks.Task) (success bool, err error) {
+	ctx := &taskapi.Context{
+		cfg:      cfg,
+		proj:     proj,
+		ui:       ui,
+		env:      env.NewFromOS(),
+		features: GetFeaturesFromTasks(taskList),
+	}
+
 	for _, task := range taskList {
 		if task.requiredTask != "" {
 			if _, present := ctx.features[task.requiredTask]; !present {
@@ -41,12 +55,12 @@ func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*T
 }
 
 type TaskRunner interface {
-	Run(*Context, *Task) error
+	Run(*tasks.Context, *Task) error
 }
 
 type TaskRunnerImpl struct{}
 
-func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
+func (r *TaskRunnerImpl) Run(ctx *tasks.Context, task *tasks.Task) (err error) {
 	for _, action := range task.actions {
 		err = runAction(ctx, action)
 		if err != nil {
@@ -58,7 +72,7 @@ func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
 	return err
 }
 
-func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) error {
+func (r *TaskRunnerImpl) activateFeature(ctx *tasks.Context, task *tasks.Task) error {
 	if task.feature.Name == "" {
 		return nil
 	}

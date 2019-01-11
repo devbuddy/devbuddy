@@ -3,17 +3,17 @@ package tasks
 import (
 	"fmt"
 	"strings"
+
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	t := registerTaskDefinition("python_develop")
-	t.name = "Python develop"
-	t.requiredTask = pythonTaskName
-	t.parser = parserPythonDevelop
+	taskapi.RegisterTaskDefinition("python_develop", "Python develop", parserPythonDevelop).
+		AddRequiredTask(pythonTaskName)
 }
 
-func parserPythonDevelop(config *taskConfig, task *Task) error {
-	extras, err := config.getListOfStringsPropertyDefault("extras", []string{})
+func parserPythonDevelop(config *taskapi.TaskConfig, task *taskapi.Task) error {
+	extras, err := config.GetListOfStringsPropertyDefault("extras", []string{})
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func parserPythonDevelop(config *taskConfig, task *Task) error {
 	}
 	pipArgs := []string{"install", "--require-virtualenv", "-e", pipTarget}
 
-	builder := actionBuilder("install python package in develop mode", func(ctx *Context) error {
+	builder := actionBuilder("install python package in develop mode", func(ctx *taskapi.Context) error {
 		result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
 		if result.Error != nil {
 			return fmt.Errorf("Pip failed: %s", result.Error)
@@ -35,6 +35,6 @@ func parserPythonDevelop(config *taskConfig, task *Task) error {
 	builder.OnFileChange("setup.py")
 	builder.OnFileChange("setup.cfg")
 
-	task.addAction(builder.Build())
+	task.AddAction(builder.Build())
 	return nil
 }

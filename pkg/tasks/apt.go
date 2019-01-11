@@ -3,17 +3,16 @@ package tasks
 import (
 	"fmt"
 	"strings"
+
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	t := registerTaskDefinition("apt")
-	t.name = "Apt"
-	t.parser = parserApt
-	t.osRequirement = "debian"
+	taskapi.RegisterTaskDefinition("apt", "Apt", parserApt).SetOsRequirement("debian")
 }
 
-func parserApt(config *taskConfig, task *Task) error {
-	packages, err := config.getListOfStrings()
+func parserApt(config *taskapi.TaskConfig, task *taskapi.Task) error {
+	packages, err := config.GetListOfStrings()
 	if err != nil {
 		return err
 	}
@@ -22,9 +21,9 @@ func parserApt(config *taskConfig, task *Task) error {
 		return fmt.Errorf("no Apt packages specified")
 	}
 
-	task.header = strings.Join(packages, ", ")
+	task.Header = strings.Join(packages, ", ")
 
-	task.addAction(&aptInstall{packageNames: packages})
+	task.AddAction(&aptInstall{packageNames: packages})
 
 	return nil
 }
@@ -34,17 +33,17 @@ type aptInstall struct {
 	missingPackageNames []string
 }
 
-func (a *aptInstall) description() string {
+func (a *aptInstall) Description() string {
 	return ""
 }
 
-func (a *aptInstall) needed(ctx *Context) *actionResult {
+func (a *aptInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	a.missingPackageNames = []string{}
 
 	for _, name := range a.packageNames {
 		result := shellSilent(ctx, fmt.Sprintf("dpkg -s \"%s\" | grep -q 'Status: install'", name)).Capture()
 		if result.LaunchError != nil {
-			return actionFailed("failed to check if package is installed: %s", result.LaunchError)
+			return taskapi.ActionFailed("failed to check if package is installed: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
 			a.missingPackageNames = append(a.missingPackageNames, name)
@@ -52,13 +51,13 @@ func (a *aptInstall) needed(ctx *Context) *actionResult {
 	}
 
 	if len(a.missingPackageNames) > 0 {
-		return actionNeeded("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
+		return taskapi.ActionNeeded("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
 	}
 
-	return actionNotNeeded()
+	return taskapi.ActionNotNeeded()
 }
 
-func (a *aptInstall) run(ctx *Context) error {
+func (a *aptInstall) Run(ctx *taskapi.Context) error {
 	result := sudoCommand(ctx, "apt-get", "update").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get update: %s", result.Error)

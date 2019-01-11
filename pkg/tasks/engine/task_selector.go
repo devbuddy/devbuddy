@@ -1,13 +1,14 @@
-package tasks
+package engine
 
 import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers/osidentity"
+	"github.com/devbuddy/devbuddy/pkg/tasks"
 )
 
 type TaskSelector interface {
-	ShouldRun(*Context, *Task) (bool, error)
+	ShouldRun(*tasks.Context, *tasks.Task) (bool, error)
 }
 
 type TaskSelectorImpl struct {
@@ -18,7 +19,7 @@ func NewTaskSelector() *TaskSelectorImpl {
 	return &TaskSelectorImpl{osIdent: osidentity.Detect()}
 }
 
-func (s *TaskSelectorImpl) ShouldRun(ctx *Context, task *Task) (bool, error) {
+func (s *TaskSelectorImpl) ShouldRun(ctx *tasks.Context, task *tasks.Task) (bool, error) {
 	shouldRun, err := s.osRequirementMatch(ctx, task)
 	if err != nil {
 		return false, err
@@ -30,7 +31,7 @@ func (s *TaskSelectorImpl) ShouldRun(ctx *Context, task *Task) (bool, error) {
 	return true, nil
 }
 
-func (s *TaskSelectorImpl) osRequirementMatch(ctx *Context, task *Task) (bool, error) {
+func (s *TaskSelectorImpl) osRequirementMatch(ctx *tasks.Context, task *tasks.Task) (bool, error) {
 	switch task.osRequirement {
 	case "":
 		break

@@ -1,20 +1,20 @@
-package tasks
+package taskapi
 
 import "github.com/devbuddy/devbuddy/pkg/features"
 
-// Task represents a task created by a taskDefinition.parser and specified by the TaskInfo
+// Task represents a task created by a TaskDefinition.parser and specified by the TaskInfo
 type Task struct {
 	*taskDefinition
-	header  string
+	Header  string
 	actions []taskAction
-	feature features.FeatureInfo
+	Feature features.FeatureInfo
 }
 
-func (t *Task) addAction(action taskAction) {
+func (t *Task) AddAction(action taskAction) {
 	t.actions = append(t.actions, action)
 }
 
-func (t *Task) addActionWithBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
+func (t *Task) AddActionWithBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
 	if runFunc == nil {
 		panic("runFunc cannot be nil")
 	}

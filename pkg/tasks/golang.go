@@ -3,45 +3,44 @@ package tasks
 import (
 	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	t := registerTaskDefinition("go")
-	t.name = "Golang"
-	t.parser = parseGolang
+	taskapi.RegisterTaskDefinition("go", "Golang", parseGolang)
 }
 
-func parseGolang(config *taskConfig, task *Task) error {
-	version, err := config.getStringPropertyAllowSingle("version")
+func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
+	version, err := config.GetStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
 	}
 
-	task.header = version
-	task.feature = features.NewFeatureInfo("golang", version)
+	task.Header = version
+	task.Feature = features.NewFeatureInfo("golang", version)
 
-	checkPATHVar := func(ctx *Context) *actionResult {
+	checkPATHVar := func(ctx *taskapi.Context) *taskapi.ActionResult {
 		if ctx.env.Get("GOPATH") == "" {
-			return actionNeeded("GOPATH is not set")
+			return taskapi.ActionNeeded("GOPATH is not set")
 		}
 		return actionNotNeeded()
 	}
-	showPATHWarning := func(ctx *Context) error {
+	showPATHWarning := func(ctx *taskapi.Context) error {
 		ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
 		return nil
 	}
-	task.addActionWithBuilder("", showPATHWarning).OnFunc(checkPATHVar)
+	task.AddActionWithBuilder("", showPATHWarning).OnFunc(checkPATHVar)
 
-	installNeeded := func(ctx *Context) *actionResult {
+	installNeeded := func(ctx *taskapi.Context) *taskapi.ActionResult {
 		if !helpers.NewGolang(ctx.cfg, version).Exists() {
-			return actionNeeded("golang distribution is not installed")
+			return taskapi.ActionNeeded("golang distribution is not installed")
 		}
 		return actionNotNeeded()
 	}
-	installGo := func(ctx *Context) error {
+	installGo := func(ctx *taskapi.Context) error {
 		return helpers.NewGolang(ctx.cfg, version).Install()
 	}
-	task.addActionWithBuilder("install golang distribution", installGo).OnFunc(installNeeded)
+	task.AddActionWithBuilder("install golang distribution", installGo).OnFunc(installNeeded)
 
 	return nil
 }

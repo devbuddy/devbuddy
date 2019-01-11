@@ -1,4 +1,4 @@
-package tasks
+package taskapi
 
 import (
 	"errors"
@@ -65,21 +65,21 @@ func TestTaskActionGenericConditions(t *testing.T) {
 	pre3Calls := 0
 	post3Calls := 0
 
-	result1 := actionNeeded("pre reason")
-	result2 := actionNeeded("post reason")
+	result1 := ActionNeeded("pre reason")
+	result2 := ActionNeeded("post reason")
 
 	builder := actionBuilder("", func(ctx *Context) error { return nil })
 	builder.On(&genericTaskActionCondition{
-		pre:  func(ctx *Context) *actionResult { pre1Calls++; return actionNotNeeded() },
-		post: func(ctx *Context) *actionResult { post1Calls++; return actionNotNeeded() },
+		pre:  func(ctx *Context) *ActionResult { pre1Calls++; return ActionNotNeeded() },
+		post: func(ctx *Context) *ActionResult { post1Calls++; return ActionNotNeeded() },
 	})
 	builder.On(&genericTaskActionCondition{
-		pre:  func(ctx *Context) *actionResult { pre2Calls++; return result1 },
-		post: func(ctx *Context) *actionResult { post2Calls++; return result2 },
+		pre:  func(ctx *Context) *ActionResult { pre2Calls++; return result1 },
+		post: func(ctx *Context) *ActionResult { post2Calls++; return result2 },
 	})
 	builder.On(&genericTaskActionCondition{
-		pre:  func(ctx *Context) *actionResult { pre3Calls++; return actionNotNeeded() },
-		post: func(ctx *Context) *actionResult { post3Calls++; return actionNotNeeded() },
+		pre:  func(ctx *Context) *ActionResult { pre3Calls++; return ActionNotNeeded() },
+		post: func(ctx *Context) *ActionResult { post3Calls++; return ActionNotNeeded() },
 	})
 	action := builder.Build()
 
@@ -106,10 +106,10 @@ func TestTaskActionGenericConditions(t *testing.T) {
 
 func TestTaskActionGenericOnFunc(t *testing.T) {
 	calls := 0
-	results := []*actionResult{actionNeeded("reason 1"), actionNotNeeded()}
+	results := []*ActionResult{ActionNeeded("reason 1"), ActionNotNeeded()}
 
 	builder := actionBuilder("", func(ctx *Context) error { return nil })
-	builder.OnFunc(func(ctx *Context) *actionResult {
+	builder.OnFunc(func(ctx *Context) *ActionResult {
 		index := calls
 		calls++
 		return results[index]
@@ -140,13 +140,13 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	action := actionBuilder("", runFunc).OnFileChange("testfile").Build()
 
-	result := action.needed(ctx)
+	result := action.Needed(ctx)
 	require.NoError(t, result.Error)
 	require.False(t, result.Needed)
 
 	action.run(ctx)
 
-	result = action.needed(ctx)
+	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
 	require.False(t, result.Needed)
 
@@ -156,14 +156,14 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	action = actionBuilder("", runFunc).OnFileChange("testfile").Build()
 
-	result = action.needed(ctx)
+	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
 	require.True(t, result.Needed)
 	require.Equal(t, "file testfile has changed", result.Reason)
 
 	action.run(ctx)
 
-	result = action.needed(ctx)
+	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
 	require.False(t, result.Needed)
 
@@ -171,7 +171,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	action = actionBuilder("", runFunc).OnFileChange("testfile").Build()
 
-	result = action.needed(ctx)
+	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
 	require.False(t, result.Needed)
 
@@ -181,7 +181,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	action = actionBuilder("", runFunc).OnFileChange("testfile").Build()
 
-	result = action.needed(ctx)
+	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
 	require.True(t, result.Needed)
 	require.Equal(t, "file testfile has changed", result.Reason)

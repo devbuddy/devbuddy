@@ -4,25 +4,23 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 func init() {
-	t := registerTaskDefinition("pipfile")
-	t.name = "Pipfile"
-	t.requiredTask = pythonTaskName
-	t.parser = parserPipfile
+	taskapi.RegisterTaskDefinition("pipfile", "Pipfile", parserPipfile).AddRequiredTask(pythonTaskName)
 }
 
-func parserPipfile(config *taskConfig, task *Task) error {
-	builder := actionBuilder("install pipfile command", func(ctx *Context) error {
+func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
+	builder := actionBuilder("install pipfile command", func(ctx *taskapi.Context) error {
 		result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
 		if result.Error != nil {
 			return fmt.Errorf("failed to install pipenv: %s", result.Error)
 		}
 		return nil
 	})
-	builder.OnFunc(func(ctx *Context) *actionResult {
+	builder.OnFunc(func(ctx *taskapi.Context) *actionResult {
 		featureInfo := ctx.features["python"]
 		name := helpers.VirtualenvName(ctx.proj, featureInfo.Param)
 		venv := helpers.NewVirtualenv(ctx.cfg, name)
@@ -32,9 +30,9 @@ func parserPipfile(config *taskConfig, task *Task) error {
 		}
 		return actionNotNeeded()
 	})
-	task.addAction(builder.Build())
+	task.AddAction(builder.Build())
 
-	builder = actionBuilder("install dependencies from the Pipfile", func(ctx *Context) error {
+	builder = actionBuilder("install dependencies from the Pipfile", func(ctx *taskapi.Context) error {
 		result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
 		if result.Error != nil {
 			return fmt.Errorf("pipenv failed: %s", result.Error)
@@ -43,7 +41,7 @@ func parserPipfile(config *taskConfig, task *Task) error {
 	})
 	builder.OnFileChange("Pipfile")
 	builder.OnFileChange("Pipfile.lock")
-	task.addAction(builder.Build())
+	task.AddAction(builder.Build())
 
 	return nil
 }

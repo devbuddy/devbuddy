@@ -1,4 +1,4 @@
-package tasks
+package taskapi
 
 import (
 	"fmt"
@@ -9,15 +9,13 @@ import (
 )
 
 func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
-	var task *Task
-
 	manifest, err := manifest.Load(proj.Path)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, taskdef := range manifest.Up {
-		task, err = buildFromDefinition(taskdef)
+		task, err := buildFromDefinition(taskdef)
 		if err != nil {
 			return nil, err
 		}
@@ -31,8 +29,8 @@ func GetFeaturesFromTasks(tasks []*Task) features.FeatureSet {
 	featureSet := features.FeatureSet{}
 
 	for _, task := range tasks {
-		if task.feature.Name != "" {
-			featureSet = featureSet.With(task.feature)
+		if task.Feature.Name != "" {
+			featureSet = featureSet.With(task.Feature)
 		}
 	}
 
@@ -41,9 +39,9 @@ func GetFeaturesFromTasks(tasks []*Task) features.FeatureSet {
 
 func InspectTasks(taskList []*Task, proj *project.Project) (s string) {
 	for _, task := range taskList {
-		s += fmt.Sprintf("Task %s (%s)\n", task.name, task.header)
-		if task.feature.Name != "" {
-			s += fmt.Sprintf("  Provides: %s\n", task.feature)
+		s += fmt.Sprintf("Task %s (%s)\n", task.name, task.Header)
+		if task.Feature.Name != "" {
+			s += fmt.Sprintf("  Provides: %s\n", task.Feature)
 		}
 		if task.requiredTask != "" {
 			s += fmt.Sprintf("  Requires: %s\n", task.requiredTask)

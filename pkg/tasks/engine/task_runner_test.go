@@ -1,4 +1,4 @@
-package tasks
+package engine
 
 import (
 	"bytes"
@@ -24,11 +24,11 @@ type testingAction struct {
 	runCallCount int
 }
 
-func (a *testingAction) description() string {
+func (a *testingAction) Description() string {
 	return a.desc
 }
 
-func (a *testingAction) needed(ctx *Context) *actionResult {
+func (a *testingAction) Needed(ctx *Context) *actionResult {
 	result := a.neededResults[a.neededCallCount]
 	if result == nil {
 		panic("the task should not have been called")
@@ -37,7 +37,7 @@ func (a *testingAction) needed(ctx *Context) *actionResult {
 	return result
 }
 
-func (a *testingAction) run(ctx *Context) error {
+func (a *testingAction) Run(ctx *Context) error {
 	a.runCallCount++
 	return a.runResult
 }
@@ -134,7 +134,7 @@ func TestTaskRunner(t *testing.T) {
 	action2 := newTestingAction("Action 2", actionNeeded("some-reason"), actionNotNeeded(), nil)
 
 	task := &Task{
-		taskDefinition: &taskDefinition{name: "testtask"},
+		TaskDefinition: &TaskDefinition{name: "testtask"},
 		actions:        []taskAction{action1, action2},
 	}
 
@@ -157,7 +157,7 @@ func TestTaskRunnerWithError(t *testing.T) {
 	action2 := newTestingAction("Action 2", nil, nil, nil)
 
 	task := &Task{
-		taskDefinition: &taskDefinition{name: "testtask"},
+		TaskDefinition: &TaskDefinition{name: "testtask"},
 		actions:        []taskAction{action1, action2},
 	}
 

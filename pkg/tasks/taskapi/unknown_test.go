@@ -1,4 +1,4 @@
-package tasks
+package taskapi
 
 import (
 	"testing"
@@ -7,10 +7,8 @@ import (
 )
 
 func TestRegistryUnknown(t *testing.T) {
-	task, err := loadTestTask(t, `nopenope`)
-
-	require.NoError(t, err)
-	require.NotNil(t, task)
+	task := &Task{}
+	parseUnknown(&TaskConfig{"sometask", "somevalue"}, task)
 
 	// require.Equal(t, "nopenope", task.name)
 	require.Equal(t, "", task.header)

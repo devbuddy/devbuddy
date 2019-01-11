@@ -1,4 +1,4 @@
-package tasks
+package taskapi
 
 import (
 	"path/filepath"
@@ -16,25 +16,25 @@ type genericTaskAction struct {
 	runCalled bool
 }
 
-func (a *genericTaskAction) description() string {
+func (a *genericTaskAction) Description() string {
 	return a.desc
 }
 
-func (a *genericTaskAction) needed(ctx *Context) (result *actionResult) {
+func (a *genericTaskAction) Needed(ctx *Context) (result *ActionResult) {
 	if a.runCalled {
 		return a.post(ctx)
 	}
 	return a.pre(ctx)
 }
 
-func (a *genericTaskAction) run(ctx *Context) error {
+func (a *genericTaskAction) Run(ctx *Context) error {
 	a.runCalled = true
 	return a.runFunc(ctx)
 }
 
 // internals
 
-func (a *genericTaskAction) pre(ctx *Context) (result *actionResult) {
+func (a *genericTaskAction) pre(ctx *Context) (result *ActionResult) {
 	hasConditions := false
 
 	for _, condition := range a.conditions {
@@ -56,12 +56,12 @@ func (a *genericTaskAction) pre(ctx *Context) (result *actionResult) {
 	}
 
 	if hasConditions {
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
-	return actionNeeded("action without conditions")
+	return ActionNeeded("action without conditions")
 }
 
-func (a *genericTaskAction) post(ctx *Context) (result *actionResult) {
+func (a *genericTaskAction) post(ctx *Context) (result *ActionResult) {
 	for _, condition := range a.conditions {
 		result = condition.post(ctx)
 		if result.Error != nil || result.Needed {
@@ -74,48 +74,48 @@ func (a *genericTaskAction) post(ctx *Context) (result *actionResult) {
 			return result
 		}
 	}
-	return actionNotNeeded()
+	return ActionNotNeeded()
 }
 
-func genericTaskActionPreConditionForFile(ctx *Context, path string) *actionResult {
+func genericTaskActionPreConditionForFile(ctx *Context, path string) *ActionResult {
 	fullPath := filepath.Join(ctx.proj.Path, path)
 
 	if !utils.PathExists(fullPath) {
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 
 	fileChecksum, err := utils.FileChecksum(fullPath)
 	if err != nil {
-		return actionFailed("failed to get the file checksum: %s", err)
+		return ActionFailed("failed to get the file checksum: %s", err)
 	}
 
 	storedChecksum, err := store.New(ctx.proj.Path).GetString("checksum" + path)
 	if err != nil {
-		return actionFailed("failed to read the previous file checksum: %s", err)
+		return ActionFailed("failed to read the previous file checksum: %s", err)
 	}
 
 	if fileChecksum != storedChecksum {
-		return actionNeeded("file %s has changed", path)
+		return ActionNeeded("file %s has changed", path)
 	}
-	return actionNotNeeded()
+	return ActionNotNeeded()
 }
 
-func genericTaskActionPostConditionForFile(ctx *Context, path string) *actionResult {
+func genericTaskActionPostConditionForFile(ctx *Context, path string) *ActionResult {
 	fullPath := filepath.Join(ctx.proj.Path, path)
 
 	if !utils.PathExists(fullPath) {
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 
 	fileChecksum, err := utils.FileChecksum(fullPath)
 	if err != nil {
-		return actionFailed("failed to get the file checksum: %s", err)
+		return ActionFailed("failed to get the file checksum: %s", err)
 	}
 
 	err = store.New(ctx.proj.Path).SetString("checksum"+path, fileChecksum)
 	if err != nil {
-		return actionFailed("failed to store the current file checksum: %s", err)
+		return ActionFailed("failed to store the current file checksum: %s", err)
 	}
 
-	return actionNotNeeded()
+	return ActionNotNeeded()
 }

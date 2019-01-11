@@ -1,4 +1,4 @@
-package tasks
+package taskapi
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/config"
@@ -15,15 +15,4 @@ type Context struct {
 	cfg      *config.Config
 	env      *env.Env
 	features features.FeatureSet
-}
-
-// NewContext returns a *Context for a project, using the environment
-func NewContext(cfg *config.Config, proj *project.Project, ui *termui.UI, taskList []*Task) *Context {
-	return &Context{
-		cfg:      cfg,
-		proj:     proj,
-		ui:       ui,
-		env:      env.NewFromOS(),
-		features: GetFeaturesFromTasks(taskList),
-	}
 }

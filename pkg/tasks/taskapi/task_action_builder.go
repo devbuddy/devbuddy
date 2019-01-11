@@ -1,8 +1,8 @@
-package tasks
+package taskapi
 
 type genericTaskActionCondition struct {
-	pre  func(*Context) *actionResult
-	post func(*Context) *actionResult
+	pre  func(*Context) *ActionResult
+	post func(*Context) *ActionResult
 }
 
 type genericTaskActionBuilder struct {
@@ -20,7 +20,7 @@ func (a *genericTaskActionBuilder) On(condition *genericTaskActionCondition) *ge
 }
 
 // OnFunc registers a condition defined as a single function
-func (a *genericTaskActionBuilder) OnFunc(condFunc func(*Context) *actionResult) *genericTaskActionBuilder {
+func (a *genericTaskActionBuilder) OnFunc(condFunc func(*Context) *ActionResult) *genericTaskActionBuilder {
 	a.On(&genericTaskActionCondition{pre: condFunc, post: condFunc})
 	return a
 }

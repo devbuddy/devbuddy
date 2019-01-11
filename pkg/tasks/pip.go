@@ -3,17 +3,16 @@ package tasks
 import (
 	"fmt"
 	"strings"
+
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	t := registerTaskDefinition("pip")
-	t.name = "Pip"
-	t.requiredTask = pythonTaskName
-	t.parser = parserPip
+	taskapi.RegisterTaskDefinition("pip", "Pip", parserPip).AddRequiredTask(pythonTaskName)
 }
 
-func parserPip(config *taskConfig, task *Task) error {
-	files, err := config.getListOfStrings()
+func parserPip(config *taskapi.TaskConfig, task *taskapi.Task) error {
+	files, err := config.GetListOfStrings()
 	if err != nil {
 		return err
 	}
@@ -21,10 +20,10 @@ func parserPip(config *taskConfig, task *Task) error {
 		return fmt.Errorf("no pip files specified")
 	}
 
-	task.header = strings.Join(files, ", ")
+	task.Header = strings.Join(files, ", ")
 
 	for _, file := range files {
-		builder := actionBuilder(fmt.Sprintf("install %s", file), func(ctx *Context) error {
+		builder := actionBuilder(fmt.Sprintf("install %s", file), func(ctx *taskapi.Context) error {
 			pipArgs := []string{"install", "--require-virtualenv", "-r", file}
 			result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
 			if result.Error != nil {
@@ -33,7 +32,7 @@ func parserPip(config *taskConfig, task *Task) error {
 			return nil
 		})
 		builder.OnFileChange(file)
-		task.addAction(builder.Build())
+		task.AddAction(builder.Build())
 	}
 
 	return nil

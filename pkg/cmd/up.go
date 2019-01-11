@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/engine"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks"
 	"github.com/devbuddy/devbuddy/pkg/termui"
@@ -30,11 +31,10 @@ func upRun(cmd *cobra.Command, args []string) {
 	taskList, err := tasks.GetTasksFromProject(proj)
 	checkError(err)
 
-	ctx := tasks.NewContext(cfg, proj, ui, taskList)
 	runner := &tasks.TaskRunnerImpl{}
 	selector := tasks.NewTaskSelector()
 
-	success, err := tasks.Run(ctx, runner, selector, taskList)
+	success, err := engine.Run(cfg, proj, ui, runner, selector, taskList)
 	checkError(err)
 	if !success {
 		os.Exit(1)
