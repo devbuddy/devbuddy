@@ -21,7 +21,7 @@ func parserPip(config *TaskConfig, task *Task) error {
 		return fmt.Errorf("no pip files specified")
 	}
 
-	task.header = strings.Join(files, ", ")
+	task.SetInfo(strings.Join(files, ", "))
 
 	for _, file := range files {
 		builder := actionBuilder(fmt.Sprintf("install %s", file), func(ctx *Context) error {

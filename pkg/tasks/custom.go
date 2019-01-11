@@ -20,7 +20,7 @@ func parserCustom(config *TaskConfig, task *Task) error {
 		return err
 	}
 
-	task.header = name
+	task.SetInfo(name)
 
 	builder := actionBuilder("", func(ctx *Context) error {
 		result := shell(ctx, command).Run()

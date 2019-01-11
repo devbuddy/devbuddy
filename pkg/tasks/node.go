@@ -17,7 +17,7 @@ func parseNode(config *TaskConfig, task *Task) error {
 		return err
 	}
 
-	task.header = version
+	task.SetInfo(version)
 	task.feature = features.NewFeatureInfo("node", version)
 
 	run := func(ctx *Context) error {

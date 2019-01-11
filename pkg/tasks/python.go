@@ -24,7 +24,7 @@ func parserPython(config *TaskConfig, task *Task) error {
 		return err
 	}
 
-	task.header = version
+	task.SetInfo(version)
 	task.feature = features.NewFeatureInfo("python", version)
 
 	parserPythonInstallPyenv(task, version)

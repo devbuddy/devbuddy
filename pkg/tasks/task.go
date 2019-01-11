@@ -10,6 +10,10 @@ type Task struct {
 	feature features.FeatureInfo
 }
 
+func (t *Task) SetInfo(info string) {
+	t.header = info
+}
+
 func (t *Task) AddAction(action taskAction) {
 	t.actions = append(t.actions, action)
 }
