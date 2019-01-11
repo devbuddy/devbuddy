@@ -12,5 +12,5 @@ homebrew:
   - file1
   - file2
 `)
-	require.Equal(t, task.header, "file1, file2")
+	require.Equal(t, "Task Homebrew (file1, file2) has 2 actions", task.Describe())
 }

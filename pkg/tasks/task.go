@@ -1,6 +1,10 @@
 package tasks
 
-import "github.com/devbuddy/devbuddy/pkg/features"
+import (
+	"fmt"
+
+	"github.com/devbuddy/devbuddy/pkg/features"
+)
 
 // Task represents a task created by a taskDefinition.parser and specified by the TaskInfo
 type Task struct {
@@ -25,6 +29,18 @@ func (t *Task) AddActionWithBuilder(description string, runFunc func(*Context) e
 	action := &genericTaskAction{desc: description, runFunc: runFunc}
 	t.actions = append(t.actions, action)
 	return &genericTaskActionBuilder{action}
+}
+
+func (t *Task) Describe() string {
+	description := fmt.Sprintf("Task %s (%s)", t.name, t.header)
+
+	if t.feature.Name != "" {
+		description += fmt.Sprintf(" has feature %s:%s and", t.feature.Name, t.feature.Param)
+	}
+
+	description += fmt.Sprintf(" has %d actions", len(t.actions))
+
+	return description
 }
 
 func buildFromDefinition(definition interface{}) (task *Task, err error) {

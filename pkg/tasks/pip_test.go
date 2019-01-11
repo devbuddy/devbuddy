@@ -13,6 +13,5 @@ pip:
   - file2
 `)
 
-	require.Equal(t, len(task.actions), 2)
-	require.Equal(t, task.header, "file1, file2")
+	require.Equal(t, "Task Pip (file1, file2) has 2 actions", task.Describe())
 }
