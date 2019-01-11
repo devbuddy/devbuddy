@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-type taskConfig struct {
+type TaskConfig struct {
 	name    string
 	payload interface{}
 }
@@ -18,11 +18,11 @@ func (e propertyNotFoundError) Error() string {
 	return fmt.Sprintf("property \"%s\" not found", e.name)
 }
 
-func (c *taskConfig) getListOfStrings() ([]string, error) {
+func (c *TaskConfig) getListOfStrings() ([]string, error) {
 	return asListOfStrings(c.payload)
 }
 
-func (c *taskConfig) getProperty(name string) (interface{}, error) {
+func (c *TaskConfig) getProperty(name string) (interface{}, error) {
 	if c.payload == nil {
 		return nil, propertyNotFoundError{name: name}
 	}
@@ -39,7 +39,7 @@ func (c *taskConfig) getProperty(name string) (interface{}, error) {
 	return nil, propertyNotFoundError{name: name}
 }
 
-func (c *taskConfig) getPropertyDefault(name string, defaultValue interface{}) (interface{}, error) {
+func (c *TaskConfig) getPropertyDefault(name string, defaultValue interface{}) (interface{}, error) {
 	value, err := c.getProperty(name)
 	if err == nil {
 		return value, nil
@@ -50,14 +50,14 @@ func (c *taskConfig) getPropertyDefault(name string, defaultValue interface{}) (
 	return nil, err
 }
 
-func (c *taskConfig) getStringPropertyAllowSingle(name string) (string, error) {
+func (c *TaskConfig) getStringPropertyAllowSingle(name string) (string, error) {
 	if value, ok := c.payload.(string); ok {
 		return value, nil
 	}
 	return c.getStringProperty(name)
 }
 
-func (c *taskConfig) getStringProperty(name string) (string, error) {
+func (c *TaskConfig) getStringProperty(name string) (string, error) {
 	value, err := c.getProperty(name)
 	if err != nil {
 		return "", err
@@ -65,7 +65,7 @@ func (c *taskConfig) getStringProperty(name string) (string, error) {
 	return asString(value)
 }
 
-func (c *taskConfig) getStringPropertyDefault(name string, defaultValue string) (string, error) {
+func (c *TaskConfig) getStringPropertyDefault(name string, defaultValue string) (string, error) {
 	value, err := c.getPropertyDefault(name, defaultValue)
 	if err != nil {
 		return "", err
@@ -73,7 +73,7 @@ func (c *taskConfig) getStringPropertyDefault(name string, defaultValue string) 
 	return asString(value)
 }
 
-func (c *taskConfig) getListOfStringsPropertyDefault(name string, defaultValue []string) ([]string, error) {
+func (c *TaskConfig) getListOfStringsPropertyDefault(name string, defaultValue []string) ([]string, error) {
 	value, err := c.getPropertyDefault(name, defaultValue)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (c *taskConfig) getListOfStringsPropertyDefault(name string, defaultValue [
 	return asListOfStrings(value)
 }
 
-func parseTaskConfig(definition interface{}) (*taskConfig, error) {
+func parseTaskConfig(definition interface{}) (*TaskConfig, error) {
 	val := reflect.ValueOf(definition)
 
 	if val.Kind() == reflect.Map {
@@ -94,11 +94,11 @@ func parseTaskConfig(definition interface{}) (*taskConfig, error) {
 			return nil, fmt.Errorf("task name should be a string")
 		}
 		payload := val.MapIndex(keys[0]).Interface()
-		return &taskConfig{name: name, payload: payload}, nil
+		return &TaskConfig{name: name, payload: payload}, nil
 	}
 
 	if val.Kind() == reflect.String {
-		return &taskConfig{name: definition.(string), payload: nil}, nil
+		return &TaskConfig{name: definition.(string), payload: nil}, nil
 	}
 
 	return nil, fmt.Errorf("invalid task: \"%+v\"", definition)

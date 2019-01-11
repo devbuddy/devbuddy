@@ -6,7 +6,7 @@ func init() {
 	t.parser = parserCustom
 }
 
-func parserCustom(config *taskConfig, task *Task) error {
+func parserCustom(config *TaskConfig, task *Task) error {
 	command, err := config.getStringProperty("meet")
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func parserCustom(config *taskConfig, task *Task) error {
 		}
 		return actionNotNeeded()
 	})
-	task.addAction(builder.Build())
+	task.AddAction(builder.Build())
 
 	return nil
 }

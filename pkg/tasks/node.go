@@ -11,7 +11,7 @@ func init() {
 	t.parser = parseNode
 }
 
-func parseNode(config *taskConfig, task *Task) error {
+func parseNode(config *TaskConfig, task *Task) error {
 	version, err := config.getStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func parseNode(config *taskConfig, task *Task) error {
 		}
 		return actionNotNeeded()
 	}
-	task.addActionWithBuilder("install nodejs from https://nodejs.org", run).OnFunc(condition)
+	task.AddActionWithBuilder("install nodejs from https://nodejs.org", run).OnFunc(condition)
 
 	return nil
 }

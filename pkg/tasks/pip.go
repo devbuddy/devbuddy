@@ -12,7 +12,7 @@ func init() {
 	t.parser = parserPip
 }
 
-func parserPip(config *taskConfig, task *Task) error {
+func parserPip(config *TaskConfig, task *Task) error {
 	files, err := config.getListOfStrings()
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func parserPip(config *taskConfig, task *Task) error {
 			return nil
 		})
 		builder.OnFileChange(file)
-		task.addAction(builder.Build())
+		task.AddAction(builder.Build())
 	}
 
 	return nil

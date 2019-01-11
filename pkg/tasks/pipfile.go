@@ -14,7 +14,7 @@ func init() {
 	t.parser = parserPipfile
 }
 
-func parserPipfile(config *taskConfig, task *Task) error {
+func parserPipfile(config *TaskConfig, task *Task) error {
 	builder := actionBuilder("install pipfile command", func(ctx *Context) error {
 		result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
 		if result.Error != nil {
@@ -32,7 +32,7 @@ func parserPipfile(config *taskConfig, task *Task) error {
 		}
 		return actionNotNeeded()
 	})
-	task.addAction(builder.Build())
+	task.AddAction(builder.Build())
 
 	builder = actionBuilder("install dependencies from the Pipfile", func(ctx *Context) error {
 		result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
@@ -43,7 +43,7 @@ func parserPipfile(config *taskConfig, task *Task) error {
 	})
 	builder.OnFileChange("Pipfile")
 	builder.OnFileChange("Pipfile.lock")
-	task.addAction(builder.Build())
+	task.AddAction(builder.Build())
 
 	return nil
 }

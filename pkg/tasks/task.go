@@ -10,11 +10,11 @@ type Task struct {
 	feature features.FeatureInfo
 }
 
-func (t *Task) addAction(action taskAction) {
+func (t *Task) AddAction(action taskAction) {
 	t.actions = append(t.actions, action)
 }
 
-func (t *Task) addActionWithBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
+func (t *Task) AddActionWithBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
 	if runFunc == nil {
 		panic("runFunc cannot be nil")
 	}

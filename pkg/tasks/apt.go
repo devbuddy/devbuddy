@@ -12,7 +12,7 @@ func init() {
 	t.osRequirement = "debian"
 }
 
-func parserApt(config *taskConfig, task *Task) error {
+func parserApt(config *TaskConfig, task *Task) error {
 	packages, err := config.getListOfStrings()
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func parserApt(config *taskConfig, task *Task) error {
 
 	task.header = strings.Join(packages, ", ")
 
-	task.addAction(&aptInstall{packageNames: packages})
+	task.AddAction(&aptInstall{packageNames: packages})
 
 	return nil
 }

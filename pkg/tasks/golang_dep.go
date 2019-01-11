@@ -12,10 +12,10 @@ func init() {
 	t.parser = parserGolangDep
 }
 
-func parserGolangDep(config *taskConfig, task *Task) error {
+func parserGolangDep(config *TaskConfig, task *Task) error {
 	task.header = "dep ensure"
-	task.addAction(&golangDepInstall{})
-	task.addAction(&golangDepEnsure{})
+	task.AddAction(&golangDepInstall{})
+	task.AddAction(&golangDepEnsure{})
 	return nil
 }
 

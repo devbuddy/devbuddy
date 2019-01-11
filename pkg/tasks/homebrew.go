@@ -14,7 +14,7 @@ func init() {
 	t.osRequirement = "macos"
 }
 
-func parserHomebrew(config *taskConfig, task *Task) error {
+func parserHomebrew(config *TaskConfig, task *Task) error {
 	var formulas []string
 
 	for _, value := range config.payload.([]interface{}) {
@@ -32,7 +32,7 @@ func parserHomebrew(config *taskConfig, task *Task) error {
 	task.header = strings.Join(formulas, ", ")
 
 	for _, f := range formulas {
-		task.addAction(&brewInstall{formula: f})
+		task.AddAction(&brewInstall{formula: f})
 	}
 
 	return nil
