@@ -11,7 +11,7 @@ func init() {
 	t.parser = parseGolang
 }
 
-func parseGolang(config *taskConfig, task *Task) error {
+func parseGolang(config *TaskConfig, task *Task) error {
 	version, err := config.getStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func parseGolang(config *taskConfig, task *Task) error {
 		ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
 		return nil
 	}
-	task.addActionWithBuilder("", showPATHWarning).OnFunc(checkPATHVar)
+	task.AddActionWithBuilder("", showPATHWarning).OnFunc(checkPATHVar)
 
 	installNeeded := func(ctx *Context) *actionResult {
 		if !helpers.NewGolang(ctx.cfg, version).Exists() {
@@ -41,7 +41,7 @@ func parseGolang(config *taskConfig, task *Task) error {
 	installGo := func(ctx *Context) error {
 		return helpers.NewGolang(ctx.cfg, version).Install()
 	}
-	task.addActionWithBuilder("install golang distribution", installGo).OnFunc(installNeeded)
+	task.AddActionWithBuilder("install golang distribution", installGo).OnFunc(installNeeded)
 
 	return nil
 }

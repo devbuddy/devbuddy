@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type taskParser func(*taskConfig, *Task) error
+type taskParser func(*TaskConfig, *Task) error
 
 type taskDefinition struct {
 	name          string

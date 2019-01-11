@@ -12,7 +12,7 @@ func init() {
 	t.parser = parserPythonDevelop
 }
 
-func parserPythonDevelop(config *taskConfig, task *Task) error {
+func parserPythonDevelop(config *TaskConfig, task *Task) error {
 	extras, err := config.getListOfStringsPropertyDefault("extras", []string{})
 	if err != nil {
 		return err
@@ -35,6 +35,6 @@ func parserPythonDevelop(config *taskConfig, task *Task) error {
 	builder.OnFileChange("setup.py")
 	builder.OnFileChange("setup.cfg")
 
-	task.addAction(builder.Build())
+	task.AddAction(builder.Build())
 	return nil
 }

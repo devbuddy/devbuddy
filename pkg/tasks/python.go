@@ -18,7 +18,7 @@ func init() {
 	t.parser = parserPython
 }
 
-func parserPython(config *taskConfig, task *Task) error {
+func parserPython(config *TaskConfig, task *Task) error {
 	version, err := config.getStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func parserPythonInstallPyenv(task *Task, version string) {
 		}
 		return nil
 	}
-	task.addActionWithBuilder("install PyEnv", run).OnFunc(needed)
+	task.AddActionWithBuilder("install PyEnv", run).OnFunc(needed)
 }
 
 func parserPythonInstallPythonVersion(task *Task, version string) {
@@ -74,7 +74,7 @@ func parserPythonInstallPythonVersion(task *Task, version string) {
 		}
 		return nil
 	}
-	task.addActionWithBuilder("install Python version with PyEnv", run).OnFunc(needed)
+	task.AddActionWithBuilder("install Python version with PyEnv", run).OnFunc(needed)
 }
 
 func parserPythonInstallVirtualenv(task *Task, version string) {
@@ -100,7 +100,7 @@ func parserPythonInstallVirtualenv(task *Task, version string) {
 		}
 		return nil
 	}
-	task.addActionWithBuilder("install virtualenv", run).OnFunc(needed)
+	task.AddActionWithBuilder("install virtualenv", run).OnFunc(needed)
 }
 
 func parserPythonCreateVirtualenv(task *Task, version string) {
@@ -129,5 +129,5 @@ func parserPythonCreateVirtualenv(task *Task, version string) {
 		}
 		return nil
 	}
-	task.addActionWithBuilder("create virtualenv", run).OnFunc(needed)
+	task.AddActionWithBuilder("create virtualenv", run).OnFunc(needed)
 }
