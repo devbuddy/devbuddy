@@ -29,7 +29,7 @@ func parserHomebrew(config *TaskConfig, task *Task) error {
 		return fmt.Errorf("no homebrew formulas specified")
 	}
 
-	task.header = strings.Join(formulas, ", ")
+	task.SetInfo(strings.Join(formulas, ", "))
 
 	for _, f := range formulas {
 		task.AddAction(&brewInstall{formula: f})

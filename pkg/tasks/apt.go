@@ -22,7 +22,7 @@ func parserApt(config *TaskConfig, task *Task) error {
 		return fmt.Errorf("no Apt packages specified")
 	}
 
-	task.header = strings.Join(packages, ", ")
+	task.SetInfo(strings.Join(packages, ", "))
 
 	task.AddAction(&aptInstall{packageNames: packages})
 
