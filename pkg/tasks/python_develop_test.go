@@ -11,9 +11,7 @@ func TestPythonDevelop(t *testing.T) {
 python_develop
 `)
 
-	require.Equal(t, taskDefinitions["python_develop"], task.taskDefinition)
-	require.Equal(t, 1, len(task.actions))
-	require.Equal(t, "install python package in develop mode", task.actions[0].description())
+	require.Equal(t, "Task Python develop () has 1 actions", task.Describe())
 }
 
 func TestPythonDevelopWithExtras(t *testing.T) {
@@ -22,8 +20,5 @@ python_develop:
   extras: [dev, test]
 `)
 
-	require.Equal(t, taskDefinitions["python_develop"], task.taskDefinition)
-	require.Equal(t, 1, len(task.actions))
-	require.Equal(t, "install python package in develop mode", task.actions[0].description())
-
+	require.Equal(t, "Task Python develop () has 1 actions", task.Describe())
 }
