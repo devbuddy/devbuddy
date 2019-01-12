@@ -81,19 +81,3 @@ func GetFeaturesFromTasks(tasks []*Task) features.FeatureSet {
 
 	return featureSet
 }
-
-func InspectTasks(taskList []*Task, proj *project.Project) (s string) {
-	for _, task := range taskList {
-		s += fmt.Sprintf("Task %s (%s)\n", task.Name, task.header)
-		if task.feature.Name != "" {
-			s += fmt.Sprintf("  Provides: %s\n", task.feature)
-		}
-		if task.RequiredTask != "" {
-			s += fmt.Sprintf("  Requires: %s\n", task.RequiredTask)
-		}
-		for _, action := range task.actions {
-			s += fmt.Sprintf("  Action: %T %+v\n", action, action)
-		}
-	}
-	return s
-}

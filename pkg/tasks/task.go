@@ -38,11 +38,15 @@ func (t *Task) AddActionWithBuilder(description string, runFunc func(*Context) e
 func (t *Task) Describe() string {
 	description := fmt.Sprintf("Task %s (%s)", t.Name, t.header)
 
-	if t.feature.Name != "" {
-		description += fmt.Sprintf(" has feature %s:%s and", t.feature.Name, t.feature.Param)
+	if t.RequiredTask != "" {
+		description += fmt.Sprintf(" required_task=%s", t.RequiredTask)
 	}
 
-	description += fmt.Sprintf(" has %d actions", len(t.actions))
+	if t.feature.Name != "" {
+		description += fmt.Sprintf(" feature=%s:%s", t.feature.Name, t.feature.Param)
+	}
+
+	description += fmt.Sprintf(" actions=%d", len(t.actions))
 
 	return description
 }

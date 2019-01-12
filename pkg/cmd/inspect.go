@@ -26,5 +26,7 @@ func inspectRun(cmd *cobra.Command, args []string) {
 	projectTasks, err := tasks.GetTasksFromProject(proj)
 	checkError(err)
 
-	fmt.Print(tasks.InspectTasks(projectTasks, proj))
+	for _, task := range projectTasks {
+		fmt.Printf("- %s\n", task.Describe())
+	}
 }
