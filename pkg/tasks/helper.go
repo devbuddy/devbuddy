@@ -41,39 +41,39 @@ func asListOfStrings(value interface{}) ([]string, error) {
 }
 
 func command(ctx *Context, program string, args ...string) *executor.Executor {
-	ctx.ui.TaskCommand(program, args...)
+	ctx.UI.TaskCommand(program, args...)
 	return commandSilent(ctx, program, args...)
 }
 
 func sudoCommand(ctx *Context, program string, args ...string) *executor.Executor {
 	args = append([]string{program}, args...)
 	program = "sudo"
-	ctx.ui.TaskCommand(program, args...)
+	ctx.UI.TaskCommand(program, args...)
 	return commandSilent(ctx, program, args...)
 }
 
 func commandSilent(ctx *Context, program string, args ...string) *executor.Executor {
-	return executor.New(program, args...).SetOutputPrefix("  ").SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ())
+	return executor.New(program, args...).SetOutputPrefix("  ").SetCwd(ctx.Project.Path).SetEnv(ctx.Env.Environ())
 }
 
 func shell(ctx *Context, cmdline string) *executor.Executor {
-	ctx.ui.TaskShell(cmdline)
+	ctx.UI.TaskShell(cmdline)
 	return shellSilent(ctx, cmdline)
 }
 
 func shellSilent(ctx *Context, cmdline string) *executor.Executor {
-	return executor.NewShell(cmdline).SetOutputPrefix("  ").SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ())
+	return executor.NewShell(cmdline).SetOutputPrefix("  ").SetCwd(ctx.Project.Path).SetEnv(ctx.Env.Environ())
 }
 
 func fileExists(ctx *Context, path string) bool {
-	if _, err := os.Stat(filepath.Join(ctx.proj.Path, path)); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(ctx.Project.Path, path)); os.IsNotExist(err) {
 		return false
 	}
 	return true
 }
 
 func fileModTime(ctx *Context, path string) (int64, error) {
-	s, err := os.Stat(filepath.Join(ctx.proj.Path, path))
+	s, err := os.Stat(filepath.Join(ctx.Project.Path, path))
 	if err != nil {
 		return 0, err
 	}

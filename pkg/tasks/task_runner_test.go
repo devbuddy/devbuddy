@@ -54,11 +54,11 @@ func setupTaskTesting() (*Context, *bytes.Buffer) {
 	buf, ui := termui.NewTesting(false)
 
 	ctx := &Context{
-		proj:     project.NewFromPath("/src/myproject"),
-		ui:       ui,
-		cfg:      config.NewTestConfig(),
-		env:      env.New([]string{}),
-		features: features.NewFeatureSet(),
+		Project:  project.NewFromPath("/src/myproject"),
+		UI:       ui,
+		Cfg:      config.NewTestConfig(),
+		Env:      env.New([]string{}),
+		Features: features.NewFeatureSet(),
 	}
 
 	return ctx, buf

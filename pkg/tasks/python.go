@@ -102,16 +102,16 @@ func parserPythonInstallVirtualenv(task *Task, version string) {
 
 func parserPythonCreateVirtualenv(task *Task, version string) {
 	needed := func(ctx *Context) *ActionResult {
-		name := helpers.VirtualenvName(ctx.proj, version)
-		venv := helpers.NewVirtualenv(ctx.cfg, name)
+		name := helpers.VirtualenvName(ctx.Project, version)
+		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		if !venv.Exists() {
 			return ActionNeeded("project virtualenv does not exists")
 		}
 		return ActionNotNeeded()
 	}
 	run := func(ctx *Context) error {
-		name := helpers.VirtualenvName(ctx.proj, version)
-		venv := helpers.NewVirtualenv(ctx.cfg, name)
+		name := helpers.VirtualenvName(ctx.Project, version)
+		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		err := os.MkdirAll(filepath.Dir(venv.Path()), 0750)
 		if err != nil {
 			return err

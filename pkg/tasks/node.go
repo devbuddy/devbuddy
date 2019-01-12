@@ -18,10 +18,10 @@ func parseNode(config *TaskConfig, task *Task) error {
 	task.SetFeature("node", version)
 
 	run := func(ctx *Context) error {
-		return helpers.NewNode(ctx.cfg, version).Install()
+		return helpers.NewNode(ctx.Cfg, version).Install()
 	}
 	condition := func(ctx *Context) *ActionResult {
-		if !helpers.NewNode(ctx.cfg, version).Exists() {
+		if !helpers.NewNode(ctx.Cfg, version).Exists() {
 			return ActionNeeded("node version is not installed")
 		}
 		return ActionNotNeeded()

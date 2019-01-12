@@ -131,7 +131,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 
 	ctx := &Context{
-		proj: project.NewFromPath(tmpdir),
+		Project: project.NewFromPath(tmpdir),
 	}
 
 	runFunc := func(ctx *Context) error { return nil }
