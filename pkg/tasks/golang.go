@@ -17,7 +17,7 @@ func parseGolang(config *TaskConfig, task *Task) error {
 	task.SetInfo(version)
 	task.SetFeature("golang", version)
 
-	checkPATHVar := func(ctx *Context) *actionResult {
+	checkPATHVar := func(ctx *Context) *ActionResult {
 		if ctx.env.Get("GOPATH") == "" {
 			return actionNeeded("GOPATH is not set")
 		}
@@ -29,7 +29,7 @@ func parseGolang(config *TaskConfig, task *Task) error {
 	}
 	task.AddActionWithBuilder("", showPATHWarning).OnFunc(checkPATHVar)
 
-	installNeeded := func(ctx *Context) *actionResult {
+	installNeeded := func(ctx *Context) *ActionResult {
 		if !helpers.NewGolang(ctx.cfg, version).Exists() {
 			return actionNeeded("golang distribution is not installed")
 		}

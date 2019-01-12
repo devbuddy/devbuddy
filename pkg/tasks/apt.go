@@ -35,7 +35,7 @@ func (a *aptInstall) description() string {
 	return ""
 }
 
-func (a *aptInstall) needed(ctx *Context) *actionResult {
+func (a *aptInstall) Needed(ctx *Context) *ActionResult {
 	a.missingPackageNames = []string{}
 
 	for _, name := range a.packageNames {
@@ -55,7 +55,7 @@ func (a *aptInstall) needed(ctx *Context) *actionResult {
 	return actionNotNeeded()
 }
 
-func (a *aptInstall) run(ctx *Context) error {
+func (a *aptInstall) Run(ctx *Context) error {
 	result := sudoCommand(ctx, "apt-get", "update").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get update: %s", result.Error)

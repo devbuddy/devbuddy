@@ -32,7 +32,7 @@ func parserPython(config *TaskConfig, task *Task) error {
 }
 
 func parserPythonInstallPyenv(task *Task, version string) {
-	needed := func(ctx *Context) *actionResult {
+	needed := func(ctx *Context) *ActionResult {
 		_, err := helpers.NewPyEnv()
 		if err != nil {
 			return actionNeeded("Pyenv is not installed: %s", err)
@@ -50,7 +50,7 @@ func parserPythonInstallPyenv(task *Task, version string) {
 }
 
 func parserPythonInstallPythonVersion(task *Task, version string) {
-	needed := func(ctx *Context) *actionResult {
+	needed := func(ctx *Context) *ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
 			return actionFailed("cannot use pyenv: %s", err)
@@ -75,7 +75,7 @@ func parserPythonInstallPythonVersion(task *Task, version string) {
 }
 
 func parserPythonInstallVirtualenv(task *Task, version string) {
-	needed := func(ctx *Context) *actionResult {
+	needed := func(ctx *Context) *ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
 			return actionFailed("cannot use pyenv: %s", err)
@@ -101,7 +101,7 @@ func parserPythonInstallVirtualenv(task *Task, version string) {
 }
 
 func parserPythonCreateVirtualenv(task *Task, version string) {
-	needed := func(ctx *Context) *actionResult {
+	needed := func(ctx *Context) *ActionResult {
 		name := helpers.VirtualenvName(ctx.proj, version)
 		venv := helpers.NewVirtualenv(ctx.cfg, name)
 		if !venv.Exists() {

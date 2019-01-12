@@ -19,7 +19,7 @@ func parserPipfile(config *TaskConfig, task *Task) error {
 		}
 		return nil
 	})
-	builder.OnFunc(func(ctx *Context) *actionResult {
+	builder.OnFunc(func(ctx *Context) *ActionResult {
 		featureInfo := ctx.features["python"]
 		name := helpers.VirtualenvName(ctx.proj, featureInfo.Param)
 		venv := helpers.NewVirtualenv(ctx.cfg, name)
