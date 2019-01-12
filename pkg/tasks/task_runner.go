@@ -10,9 +10,9 @@ import (
 // Run accepts a list of tasks and check for their requirements and runs them if their conditions are met
 func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*Task) (success bool, err error) {
 	for _, task := range taskList {
-		if task.requiredTask != "" {
-			if _, present := ctx.features[task.requiredTask]; !present {
-				ctx.ui.TaskErrorf("You must specify a %s environment to use a %s task", task.requiredTask, task.name)
+		if task.RequiredTask != "" {
+			if _, present := ctx.features[task.RequiredTask]; !present {
+				ctx.ui.TaskErrorf("You must specify a %s environment to use a %s task", task.RequiredTask, task.Name)
 				return false, nil
 			}
 		}
@@ -25,11 +25,11 @@ func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*T
 			return false, nil
 		}
 		if !shouldRun {
-			ctx.ui.TaskHeader(task.name, task.header, "disabled")
+			ctx.ui.TaskHeader(task.Name, task.header, "disabled")
 			continue
 		}
 
-		ctx.ui.TaskHeader(task.name, task.header, "")
+		ctx.ui.TaskHeader(task.Name, task.header, "")
 		err = executor.Run(ctx, task)
 		if err != nil {
 			ctx.ui.TaskError(err)

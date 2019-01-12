@@ -6,17 +6,17 @@ import (
 
 type taskParser func(*TaskConfig, *Task) error
 
-type taskDefinition struct {
-	key           string     // the value used in dev.yml to identify a task
-	name          string     // the displayed name of the task
-	requiredTask  string     // another task that should be declared before this task
-	parser        taskParser // the config parser for this task
-	osRequirement string     // The platform this task can run on. "debian", "macos"
+type TaskDefinition struct {
+	Key           string     // the value used in dev.yml to identify a task
+	Name          string     // the displayed name of the task
+	RequiredTask  string     // another task that should be declared before this task
+	Parser        taskParser // the config parser for this task
+	OSRequirement string     // The platform this task can run on. "debian", "macos"
 }
 
-var taskDefinitions = make(map[string]*taskDefinition)
+var taskDefinitions = make(map[string]*TaskDefinition)
 
-func Register(key, name string, parserFunc taskParser) *taskDefinition {
+func Register(key, name string, parserFunc taskParser) *TaskDefinition {
 	if _, ok := taskDefinitions[key]; ok {
 		panic(fmt.Sprint("Can't re-register a taskDefinition:", name))
 	}
@@ -24,23 +24,23 @@ func Register(key, name string, parserFunc taskParser) *taskDefinition {
 		panic("key and name cannot be empty")
 	}
 
-	td := &taskDefinition{key: key, name: name, parser: parserFunc}
+	td := &TaskDefinition{Key: key, Name: name, Parser: parserFunc}
 	taskDefinitions[key] = td
 	return td
 }
 
-func (t *taskDefinition) SetRequiredTask(name string) *taskDefinition {
+func (t *TaskDefinition) SetRequiredTask(name string) *TaskDefinition {
 	if name == "" {
 		panic("name cannot be empty")
 	}
-	t.requiredTask = name
+	t.RequiredTask = name
 	return t
 }
 
-func (t *taskDefinition) SetOsRequirement(requirement string) *taskDefinition {
+func (t *TaskDefinition) SetOSRequirement(requirement string) *TaskDefinition {
 	if requirement == "" {
 		panic("requirement cannot be empty")
 	}
-	t.osRequirement = requirement
+	t.OSRequirement = requirement
 	return t
 }

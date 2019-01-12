@@ -31,7 +31,7 @@ func (s *TaskSelectorImpl) ShouldRun(ctx *Context, task *Task) (bool, error) {
 }
 
 func (s *TaskSelectorImpl) osRequirementMatch(ctx *Context, task *Task) (bool, error) {
-	switch task.osRequirement {
+	switch task.OSRequirement {
 	case "":
 		break
 	case "debian":
@@ -43,7 +43,7 @@ func (s *TaskSelectorImpl) osRequirementMatch(ctx *Context, task *Task) (bool, e
 			return false, nil
 		}
 	default:
-		return false, fmt.Errorf("invalid value for osRequirement: %s", task.osRequirement)
+		return false, fmt.Errorf("invalid value for osRequirement: %s", task.OSRequirement)
 	}
 
 	return true, nil
