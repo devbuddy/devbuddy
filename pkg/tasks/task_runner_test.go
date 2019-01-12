@@ -135,7 +135,7 @@ func TestTaskRunner(t *testing.T) {
 
 	task := &Task{
 		TaskDefinition: &TaskDefinition{Name: "testtask"},
-		actions:        []taskAction{action1, action2},
+		actions:        []TaskAction{action1, action2},
 	}
 
 	taskRunner := &TaskRunnerImpl{}
@@ -158,7 +158,7 @@ func TestTaskRunnerWithError(t *testing.T) {
 
 	task := &Task{
 		TaskDefinition: &TaskDefinition{Name: "testtask"},
-		actions:        []taskAction{action1, action2},
+		actions:        []TaskAction{action1, action2},
 	}
 
 	taskRunner := &TaskRunnerImpl{}

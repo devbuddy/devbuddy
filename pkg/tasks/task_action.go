@@ -2,7 +2,7 @@ package tasks
 
 import "fmt"
 
-type taskAction interface {
+type TaskAction interface {
 	Description() string
 	Needed(*Context) *ActionResult
 	Run(*Context) error
@@ -26,7 +26,7 @@ func actionNotNeeded() *ActionResult {
 	return &ActionResult{Needed: false}
 }
 
-func runAction(ctx *Context, action taskAction) error {
+func runAction(ctx *Context, action TaskAction) error {
 	desc := action.Description()
 
 	result := action.Needed(ctx)
