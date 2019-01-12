@@ -66,7 +66,7 @@ func setupTaskTesting() (*Context, *bytes.Buffer) {
 
 func TestRunActionNeeded(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", actionNeeded("some-reason"), actionNotNeeded(), nil)
+	action := newTestingAction("Action X", ActionNeeded("some-reason"), ActionNotNeeded(), nil)
 
 	err := runAction(ctx, action)
 	require.NoError(t, err)
@@ -79,7 +79,7 @@ func TestRunActionNeeded(t *testing.T) {
 
 func TestRunActionNotNeeded(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", actionNotNeeded(), nil, nil)
+	action := newTestingAction("Action X", ActionNotNeeded(), nil, nil)
 
 	err := runAction(ctx, action)
 	require.NoError(t, err)
@@ -92,7 +92,7 @@ func TestRunActionNotNeeded(t *testing.T) {
 
 func TestRunActionFailureOnNeeded(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action := newTestingAction("Action X", actionFailed("ERROR_X"), nil, nil)
+	action := newTestingAction("Action X", ActionFailed("ERROR_X"), nil, nil)
 
 	err := runAction(ctx, action)
 	require.Error(t, err)
@@ -104,7 +104,7 @@ func TestRunActionFailureOnNeeded(t *testing.T) {
 
 func TestRunActionFailureOnRun(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", actionNeeded("some-reason"), nil, errors.New("RunFailed"))
+	action := newTestingAction("Action X", ActionNeeded("some-reason"), nil, errors.New("RunFailed"))
 
 	err := runAction(ctx, action)
 	require.Error(t, err)
@@ -118,7 +118,7 @@ func TestRunActionFailureOnRun(t *testing.T) {
 
 func TestRunActionStillNeeded(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action := newTestingAction("Action X", actionNeeded("some-reason"), actionNeeded("some-reason"), nil)
+	action := newTestingAction("Action X", ActionNeeded("some-reason"), ActionNeeded("some-reason"), nil)
 
 	err := runAction(ctx, action)
 	require.Error(t, err)
@@ -130,8 +130,8 @@ func TestRunActionStillNeeded(t *testing.T) {
 
 func TestTaskRunner(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action1 := newTestingAction("Action 1", actionNeeded("some-reason"), actionNotNeeded(), nil)
-	action2 := newTestingAction("Action 2", actionNeeded("some-reason"), actionNotNeeded(), nil)
+	action1 := newTestingAction("Action 1", ActionNeeded("some-reason"), ActionNotNeeded(), nil)
+	action2 := newTestingAction("Action 2", ActionNeeded("some-reason"), ActionNotNeeded(), nil)
 
 	task := &Task{
 		TaskDefinition: &TaskDefinition{Name: "testtask"},
@@ -153,7 +153,7 @@ func TestTaskRunner(t *testing.T) {
 
 func TestTaskRunnerWithError(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action1 := newTestingAction("Action 1", actionFailed("CRASH 1"), nil, nil)
+	action1 := newTestingAction("Action 1", ActionFailed("CRASH 1"), nil, nil)
 	action2 := newTestingAction("Action 2", nil, nil, nil)
 
 	task := &Task{

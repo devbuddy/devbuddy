@@ -26,9 +26,9 @@ func (p *golangDepInstall) Description() string {
 func (p *golangDepInstall) Needed(ctx *Context) *ActionResult {
 	_, err := exec.LookPath("dep") // Just check if `dep` is in the PATH for now
 	if err != nil {
-		return actionNeeded("could not find the dep command in the PATH")
+		return ActionNeeded("could not find the dep command in the PATH")
 	}
-	return actionNotNeeded()
+	return ActionNotNeeded()
 }
 
 func (p *golangDepInstall) Run(ctx *Context) error {
@@ -48,27 +48,27 @@ func (p *golangDepEnsure) Description() string {
 
 func (p *golangDepEnsure) Needed(ctx *Context) *ActionResult {
 	if !fileExists(ctx, "vendor") {
-		return actionNeeded("the vendor directory does not exist")
+		return ActionNeeded("the vendor directory does not exist")
 	}
 
 	// Is the vendor dir out dated?
 	vendorMod, err := fileModTime(ctx, "vendor")
 	if err != nil {
-		return actionFailed("failed to get the modification of the vendor directory", err)
+		return ActionFailed("failed to get the modification of the vendor directory", err)
 	}
 	tomlMod, err := fileModTime(ctx, "Gopkg.toml")
 	if err != nil {
-		return actionFailed("failed to get the modification of Gopkg.toml", err)
+		return ActionFailed("failed to get the modification of Gopkg.toml", err)
 	}
 	lockMod, err := fileModTime(ctx, "Gopkg.lock")
 	if err != nil {
-		return actionFailed("failed to get the modification of Gopkg.lock", err)
+		return ActionFailed("failed to get the modification of Gopkg.lock", err)
 	}
 	if tomlMod > vendorMod || lockMod > vendorMod {
-		return actionNeeded("Gopkg.toml or Gopkg.lock has been changed")
+		return ActionNeeded("Gopkg.toml or Gopkg.lock has been changed")
 	}
 
-	return actionNotNeeded()
+	return ActionNotNeeded()
 }
 
 func (p *golangDepEnsure) Run(ctx *Context) error {

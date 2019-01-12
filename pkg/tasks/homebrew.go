@@ -42,9 +42,9 @@ func (b *brewInstall) Needed(ctx *Context) *ActionResult {
 	brew := helpers.NewHomebrew()
 
 	if brew.IsInstalled(b.formula) {
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
-	return actionNeeded("package %s is not installed", b.formula)
+	return ActionNeeded("package %s is not installed", b.formula)
 }
 
 func (b *brewInstall) Run(ctx *Context) error {

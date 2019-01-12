@@ -65,21 +65,21 @@ func TestTaskActionGenericConditions(t *testing.T) {
 	pre3Calls := 0
 	post3Calls := 0
 
-	result1 := actionNeeded("pre reason")
-	result2 := actionNeeded("post reason")
+	result1 := ActionNeeded("pre reason")
+	result2 := ActionNeeded("post reason")
 
 	builder := actionBuilder("", func(ctx *Context) error { return nil })
 	builder.On(&genericTaskActionCondition{
-		pre:  func(ctx *Context) *ActionResult { pre1Calls++; return actionNotNeeded() },
-		post: func(ctx *Context) *ActionResult { post1Calls++; return actionNotNeeded() },
+		pre:  func(ctx *Context) *ActionResult { pre1Calls++; return ActionNotNeeded() },
+		post: func(ctx *Context) *ActionResult { post1Calls++; return ActionNotNeeded() },
 	})
 	builder.On(&genericTaskActionCondition{
 		pre:  func(ctx *Context) *ActionResult { pre2Calls++; return result1 },
 		post: func(ctx *Context) *ActionResult { post2Calls++; return result2 },
 	})
 	builder.On(&genericTaskActionCondition{
-		pre:  func(ctx *Context) *ActionResult { pre3Calls++; return actionNotNeeded() },
-		post: func(ctx *Context) *ActionResult { post3Calls++; return actionNotNeeded() },
+		pre:  func(ctx *Context) *ActionResult { pre3Calls++; return ActionNotNeeded() },
+		post: func(ctx *Context) *ActionResult { post3Calls++; return ActionNotNeeded() },
 	})
 	action := builder.Build()
 
@@ -106,7 +106,7 @@ func TestTaskActionGenericConditions(t *testing.T) {
 
 func TestTaskActionGenericOnFunc(t *testing.T) {
 	calls := 0
-	results := []*ActionResult{actionNeeded("reason 1"), actionNotNeeded()}
+	results := []*ActionResult{ActionNeeded("reason 1"), ActionNotNeeded()}
 
 	builder := actionBuilder("", func(ctx *Context) error { return nil })
 	builder.OnFunc(func(ctx *Context) *ActionResult {

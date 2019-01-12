@@ -25,9 +25,9 @@ func parserPipfile(config *TaskConfig, task *Task) error {
 		venv := helpers.NewVirtualenv(ctx.cfg, name)
 		pipenvCmd := venv.Which("pipenv")
 		if !utils.PathExists(pipenvCmd) {
-			return actionNeeded("Pipenv is not installed in the virtualenv")
+			return ActionNeeded("Pipenv is not installed in the virtualenv")
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	})
 	task.AddAction(builder.Build())
 

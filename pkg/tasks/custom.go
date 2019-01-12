@@ -27,12 +27,12 @@ func parserCustom(config *TaskConfig, task *Task) error {
 	builder.OnFunc(func(ctx *Context) *ActionResult {
 		result := shellSilent(ctx, condition).Capture()
 		if result.LaunchError != nil {
-			return actionFailed("failed to run the condition command: %s", result.LaunchError)
+			return ActionFailed("failed to run the condition command: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
-			return actionNeeded("the met? command exited with a non-zero code")
+			return ActionNeeded("the met? command exited with a non-zero code")
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	})
 	task.AddAction(builder.Build())
 

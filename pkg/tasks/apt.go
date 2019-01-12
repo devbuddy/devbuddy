@@ -41,7 +41,7 @@ func (a *aptInstall) Needed(ctx *Context) *ActionResult {
 	for _, name := range a.packageNames {
 		result := shellSilent(ctx, fmt.Sprintf("dpkg -s \"%s\" | grep -q 'Status: install'", name)).Capture()
 		if result.LaunchError != nil {
-			return actionFailed("failed to check if package is installed: %s", result.LaunchError)
+			return ActionFailed("failed to check if package is installed: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
 			a.missingPackageNames = append(a.missingPackageNames, name)
@@ -49,10 +49,10 @@ func (a *aptInstall) Needed(ctx *Context) *ActionResult {
 	}
 
 	if len(a.missingPackageNames) > 0 {
-		return actionNeeded("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
+		return ActionNeeded("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
 	}
 
-	return actionNotNeeded()
+	return ActionNotNeeded()
 }
 
 func (a *aptInstall) Run(ctx *Context) error {
