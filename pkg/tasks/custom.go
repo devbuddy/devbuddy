@@ -5,15 +5,15 @@ func init() {
 }
 
 func parserCustom(config *TaskConfig, task *Task) error {
-	command, err := config.getStringProperty("meet")
+	command, err := config.GetStringProperty("meet")
 	if err != nil {
 		return err
 	}
-	condition, err := config.getStringProperty("met?")
+	condition, err := config.GetStringProperty("met?")
 	if err != nil {
 		return err
 	}
-	name, err := config.getStringPropertyDefault("name", command)
+	name, err := config.GetStringPropertyDefault("name", command)
 	if err != nil {
 		return err
 	}

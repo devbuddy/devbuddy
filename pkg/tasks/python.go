@@ -16,7 +16,7 @@ func init() {
 }
 
 func parserPython(config *TaskConfig, task *Task) error {
-	version, err := config.getStringPropertyAllowSingle("version")
+	version, err := config.GetStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
 	}
