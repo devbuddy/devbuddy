@@ -10,7 +10,7 @@ func init() {
 }
 
 func parserApt(config *TaskConfig, task *Task) error {
-	packages, err := config.getListOfStrings()
+	packages, err := config.GetListOfStrings()
 	if err != nil {
 		return err
 	}

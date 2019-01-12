@@ -12,14 +12,9 @@ func init() {
 }
 
 func parserHomebrew(config *TaskConfig, task *Task) error {
-	var formulas []string
-
-	for _, value := range config.payload.([]interface{}) {
-		if v, ok := value.(string); ok {
-			formulas = append(formulas, v)
-		} else {
-			return fmt.Errorf("invalid homebrew formulas")
-		}
+	formulas, err := config.GetListOfStrings()
+	if err != nil {
+		return err
 	}
 
 	if len(formulas) == 0 {

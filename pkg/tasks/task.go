@@ -46,22 +46,3 @@ func (t *Task) Describe() string {
 
 	return description
 }
-
-func buildFromDefinition(definition interface{}) (task *Task, err error) {
-	taskConfig, err := parseTaskConfig(definition)
-	if err != nil {
-		return nil, err
-	}
-
-	taskDef := taskDefinitions[taskConfig.name]
-	if taskDef == nil {
-		taskDef = &taskDefinition{
-			name:   "Unknown",
-			parser: parseUnknown,
-		}
-	}
-
-	task = &Task{taskDefinition: taskDef}
-	err = taskDef.parser(taskConfig, task)
-	return
-}

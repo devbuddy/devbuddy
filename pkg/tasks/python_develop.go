@@ -10,7 +10,7 @@ func init() {
 }
 
 func parserPythonDevelop(config *TaskConfig, task *Task) error {
-	extras, err := config.getListOfStringsPropertyDefault("extras", []string{})
+	extras, err := config.GetListOfStringsPropertyDefault("extras", []string{})
 	if err != nil {
 		return err
 	}

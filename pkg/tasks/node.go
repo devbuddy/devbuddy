@@ -9,7 +9,7 @@ func init() {
 }
 
 func parseNode(config *TaskConfig, task *Task) error {
-	version, err := config.getStringPropertyAllowSingle("version")
+	version, err := config.GetStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
 	}

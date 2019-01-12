@@ -10,7 +10,7 @@ func init() {
 }
 
 func parserPip(config *TaskConfig, task *Task) error {
-	files, err := config.getListOfStrings()
+	files, err := config.GetListOfStrings()
 	if err != nil {
 		return err
 	}
