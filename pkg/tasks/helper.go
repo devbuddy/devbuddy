@@ -8,6 +8,9 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
+// RegisterTasks is a hack to force the execution of the task registration (in the init functions)
+func RegisterTasks() {}
+
 func command(ctx *taskapi.Context, program string, args ...string) *executor.Executor {
 	ctx.UI.TaskCommand(program, args...)
 	return commandSilent(ctx, program, args...)

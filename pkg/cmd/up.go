@@ -8,9 +8,14 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/tasks"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
+
+func init() {
+	tasks.RegisterTasks()
+}
 
 var upCmd = &cobra.Command{
 	Use:   "up",
