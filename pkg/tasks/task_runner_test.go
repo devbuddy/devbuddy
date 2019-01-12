@@ -17,7 +17,7 @@ import (
 
 type testingAction struct {
 	desc            string
-	neededResults   []*actionResult
+	neededResults   []*ActionResult
 	neededCallCount int
 
 	runResult    error
@@ -28,7 +28,7 @@ func (a *testingAction) description() string {
 	return a.desc
 }
 
-func (a *testingAction) needed(ctx *Context) *actionResult {
+func (a *testingAction) Needed(ctx *Context) *ActionResult {
 	result := a.neededResults[a.neededCallCount]
 	if result == nil {
 		panic("the task should not have been called")
@@ -37,15 +37,15 @@ func (a *testingAction) needed(ctx *Context) *actionResult {
 	return result
 }
 
-func (a *testingAction) run(ctx *Context) error {
+func (a *testingAction) Run(ctx *Context) error {
 	a.runCallCount++
 	return a.runResult
 }
 
-func newTestingAction(desc string, resultBefore, resultAfter *actionResult, runResult error) *testingAction {
+func newTestingAction(desc string, resultBefore, resultAfter *ActionResult, runResult error) *testingAction {
 	return &testingAction{
 		desc:          desc,
-		neededResults: []*actionResult{resultBefore, resultAfter},
+		neededResults: []*ActionResult{resultBefore, resultAfter},
 		runResult:     runResult,
 	}
 }

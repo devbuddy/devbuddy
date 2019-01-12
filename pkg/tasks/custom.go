@@ -24,7 +24,7 @@ func parserCustom(config *TaskConfig, task *Task) error {
 		result := shell(ctx, command).Run()
 		return result.Error
 	})
-	builder.OnFunc(func(ctx *Context) *actionResult {
+	builder.OnFunc(func(ctx *Context) *ActionResult {
 		result := shellSilent(ctx, condition).Capture()
 		if result.LaunchError != nil {
 			return actionFailed("failed to run the condition command: %s", result.LaunchError)

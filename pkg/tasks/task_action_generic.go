@@ -20,21 +20,21 @@ func (a *genericTaskAction) description() string {
 	return a.desc
 }
 
-func (a *genericTaskAction) needed(ctx *Context) (result *actionResult) {
+func (a *genericTaskAction) Needed(ctx *Context) (result *ActionResult) {
 	if a.runCalled {
 		return a.post(ctx)
 	}
 	return a.pre(ctx)
 }
 
-func (a *genericTaskAction) run(ctx *Context) error {
+func (a *genericTaskAction) Run(ctx *Context) error {
 	a.runCalled = true
 	return a.runFunc(ctx)
 }
 
 // internals
 
-func (a *genericTaskAction) pre(ctx *Context) (result *actionResult) {
+func (a *genericTaskAction) pre(ctx *Context) (result *ActionResult) {
 	hasConditions := false
 
 	for _, condition := range a.conditions {
@@ -61,7 +61,7 @@ func (a *genericTaskAction) pre(ctx *Context) (result *actionResult) {
 	return actionNeeded("action without conditions")
 }
 
-func (a *genericTaskAction) post(ctx *Context) (result *actionResult) {
+func (a *genericTaskAction) post(ctx *Context) (result *ActionResult) {
 	for _, condition := range a.conditions {
 		result = condition.post(ctx)
 		if result.Error != nil || result.Needed {
@@ -77,7 +77,7 @@ func (a *genericTaskAction) post(ctx *Context) (result *actionResult) {
 	return actionNotNeeded()
 }
 
-func genericTaskActionPreConditionForFile(ctx *Context, path string) *actionResult {
+func genericTaskActionPreConditionForFile(ctx *Context, path string) *ActionResult {
 	fullPath := filepath.Join(ctx.proj.Path, path)
 
 	if !utils.PathExists(fullPath) {
@@ -100,7 +100,7 @@ func genericTaskActionPreConditionForFile(ctx *Context, path string) *actionResu
 	return actionNotNeeded()
 }
 
-func genericTaskActionPostConditionForFile(ctx *Context, path string) *actionResult {
+func genericTaskActionPostConditionForFile(ctx *Context, path string) *ActionResult {
 	fullPath := filepath.Join(ctx.proj.Path, path)
 
 	if !utils.PathExists(fullPath) {
