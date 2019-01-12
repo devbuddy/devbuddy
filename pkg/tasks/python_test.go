@@ -9,7 +9,7 @@ import (
 func TestPythonOk(t *testing.T) {
 	task := ensureLoadTestTask(t, `python: 3.6.3`)
 
-	require.Equal(t, "Task Python (3.6.3) has feature python:3.6.3 and has 4 actions", task.Describe())
+	require.Equal(t, "Task Python (3.6.3) feature=python:3.6.3 actions=4", task.Describe())
 }
 
 func TestPythonInvalid(t *testing.T) {

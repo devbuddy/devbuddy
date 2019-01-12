@@ -11,7 +11,7 @@ func TestPythonDevelop(t *testing.T) {
 python_develop
 `)
 
-	require.Equal(t, "Task Python develop () has 1 actions", task.Describe())
+	require.Equal(t, "Task Python develop () required_task=python actions=1", task.Describe())
 }
 
 func TestPythonDevelopWithExtras(t *testing.T) {
@@ -20,5 +20,5 @@ python_develop:
   extras: [dev, test]
 `)
 
-	require.Equal(t, "Task Python develop () has 1 actions", task.Describe())
+	require.Equal(t, "Task Python develop () required_task=python actions=1", task.Describe())
 }

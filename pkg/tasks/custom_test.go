@@ -13,7 +13,7 @@ custom:
   meet: custom-command
 `)
 
-	require.Equal(t, "Task Custom (custom-command) has 1 actions", task.Describe())
+	require.Equal(t, "Task Custom (custom-command) actions=1", task.Describe())
 }
 
 func TestCustomName(t *testing.T) {
@@ -24,7 +24,7 @@ custom:
   meet: custom-command
 `)
 
-	require.Equal(t, "Task Custom (NAMENAME) has 1 actions", task.Describe())
+	require.Equal(t, "Task Custom (NAMENAME) actions=1", task.Describe())
 }
 
 func TestCustomWithBoolean(t *testing.T) {

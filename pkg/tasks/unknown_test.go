@@ -12,5 +12,5 @@ func TestRegistryUnknown(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, task)
 
-	require.Equal(t, "Task Unknown () has 1 actions", task.Describe())
+	require.Equal(t, "Task Unknown () actions=1", task.Describe())
 }
