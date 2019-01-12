@@ -10,20 +10,20 @@ import (
 
 // Context provides the context in which a Task run
 type Context struct {
-	proj     *project.Project
-	ui       *termui.UI
-	cfg      *config.Config
-	env      *env.Env
-	features features.FeatureSet
+	Project  *project.Project
+	UI       *termui.UI
+	Cfg      *config.Config
+	Env      *env.Env
+	Features features.FeatureSet
 }
 
 // NewContext returns a *Context for a project, using the environment
 func NewContext(cfg *config.Config, proj *project.Project, ui *termui.UI, taskList []*Task) *Context {
 	return &Context{
-		cfg:      cfg,
-		proj:     proj,
-		ui:       ui,
-		env:      env.NewFromOS(),
-		features: GetFeaturesFromTasks(taskList),
+		Cfg:      cfg,
+		Project:  proj,
+		UI:       ui,
+		Env:      env.NewFromOS(),
+		Features: GetFeaturesFromTasks(taskList),
 	}
 }

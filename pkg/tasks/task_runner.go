@@ -11,8 +11,8 @@ import (
 func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*Task) (success bool, err error) {
 	for _, task := range taskList {
 		if task.RequiredTask != "" {
-			if _, present := ctx.features[task.RequiredTask]; !present {
-				ctx.ui.TaskErrorf("You must specify a %s environment to use a %s task", task.RequiredTask, task.Name)
+			if _, present := ctx.Features[task.RequiredTask]; !present {
+				ctx.UI.TaskErrorf("You must specify a %s environment to use a %s task", task.RequiredTask, task.Name)
 				return false, nil
 			}
 		}
@@ -21,18 +21,18 @@ func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*T
 	for _, task := range taskList {
 		shouldRun, err := selector.ShouldRun(ctx, task)
 		if err != nil {
-			ctx.ui.TaskError(err)
+			ctx.UI.TaskError(err)
 			return false, nil
 		}
 		if !shouldRun {
-			ctx.ui.TaskHeader(task.Name, task.header, "disabled")
+			ctx.UI.TaskHeader(task.Name, task.header, "disabled")
 			continue
 		}
 
-		ctx.ui.TaskHeader(task.Name, task.header, "")
+		ctx.UI.TaskHeader(task.Name, task.header, "")
 		err = executor.Run(ctx, task)
 		if err != nil {
-			ctx.ui.TaskError(err)
+			ctx.UI.TaskError(err)
 			return false, nil
 		}
 	}
@@ -68,12 +68,12 @@ func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) error {
 		return err
 	}
 
-	devUpNeeded, err := def.Activate(task.feature.Param, ctx.cfg, ctx.proj, ctx.env)
+	devUpNeeded, err := def.Activate(task.feature.Param, ctx.Cfg, ctx.Project, ctx.Env)
 	if err != nil {
 		return err
 	}
 	if devUpNeeded {
-		ctx.ui.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", task.feature))
+		ctx.UI.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", task.feature))
 	}
 
 	// Special case, we want the bud process to get PATH updates from features to call the right processes.
@@ -82,7 +82,7 @@ func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) error {
 	// the process itself.
 	// There is no problem when executing a shell command since the shell process will do the executable lookup
 	// itself with the PATH value from the specified Env.
-	return os.Setenv("PATH", ctx.env.Get("PATH"))
+	return os.Setenv("PATH", ctx.Env.Get("PATH"))
 }
 
 func runAction(ctx *Context, action TaskAction) error {
@@ -95,9 +95,9 @@ func runAction(ctx *Context, action TaskAction) error {
 
 	if result.Needed {
 		if desc != "" {
-			ctx.ui.TaskActionHeader(desc)
+			ctx.UI.TaskActionHeader(desc)
 		}
-		ctx.ui.Debug("Reason: \"%s\"", result.Reason)
+		ctx.UI.Debug("Reason: \"%s\"", result.Reason)
 
 		err := action.Run(ctx)
 		if err != nil {

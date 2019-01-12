@@ -78,7 +78,7 @@ func (a *genericTaskAction) post(ctx *Context) (result *ActionResult) {
 }
 
 func genericTaskActionPreConditionForFile(ctx *Context, path string) *ActionResult {
-	fullPath := filepath.Join(ctx.proj.Path, path)
+	fullPath := filepath.Join(ctx.Project.Path, path)
 
 	if !utils.PathExists(fullPath) {
 		return ActionNotNeeded()
@@ -89,7 +89,7 @@ func genericTaskActionPreConditionForFile(ctx *Context, path string) *ActionResu
 		return ActionFailed("failed to get the file checksum: %s", err)
 	}
 
-	storedChecksum, err := store.New(ctx.proj.Path).GetString("checksum" + path)
+	storedChecksum, err := store.New(ctx.Project.Path).GetString("checksum" + path)
 	if err != nil {
 		return ActionFailed("failed to read the previous file checksum: %s", err)
 	}
@@ -101,7 +101,7 @@ func genericTaskActionPreConditionForFile(ctx *Context, path string) *ActionResu
 }
 
 func genericTaskActionPostConditionForFile(ctx *Context, path string) *ActionResult {
-	fullPath := filepath.Join(ctx.proj.Path, path)
+	fullPath := filepath.Join(ctx.Project.Path, path)
 
 	if !utils.PathExists(fullPath) {
 		return ActionNotNeeded()
@@ -112,7 +112,7 @@ func genericTaskActionPostConditionForFile(ctx *Context, path string) *ActionRes
 		return ActionFailed("failed to get the file checksum: %s", err)
 	}
 
-	err = store.New(ctx.proj.Path).SetString("checksum"+path, fileChecksum)
+	err = store.New(ctx.Project.Path).SetString("checksum"+path, fileChecksum)
 	if err != nil {
 		return ActionFailed("failed to store the current file checksum: %s", err)
 	}

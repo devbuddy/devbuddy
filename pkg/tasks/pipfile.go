@@ -20,9 +20,9 @@ func parserPipfile(config *TaskConfig, task *Task) error {
 		return nil
 	})
 	builder.OnFunc(func(ctx *Context) *ActionResult {
-		featureInfo := ctx.features["python"]
-		name := helpers.VirtualenvName(ctx.proj, featureInfo.Param)
-		venv := helpers.NewVirtualenv(ctx.cfg, name)
+		featureInfo := ctx.Features["python"]
+		name := helpers.VirtualenvName(ctx.Project, featureInfo.Param)
+		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		pipenvCmd := venv.Which("pipenv")
 		if !utils.PathExists(pipenvCmd) {
 			return ActionNeeded("Pipenv is not installed in the virtualenv")
