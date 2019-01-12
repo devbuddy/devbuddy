@@ -16,7 +16,7 @@ type genericTaskAction struct {
 	runCalled bool
 }
 
-func (a *genericTaskAction) description() string {
+func (a *genericTaskAction) Description() string {
 	return a.desc
 }
 

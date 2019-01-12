@@ -24,7 +24,7 @@ type testingAction struct {
 	runCallCount int
 }
 
-func (a *testingAction) description() string {
+func (a *testingAction) Description() string {
 	return a.desc
 }
 

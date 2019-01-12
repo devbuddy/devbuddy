@@ -31,7 +31,7 @@ type aptInstall struct {
 	missingPackageNames []string
 }
 
-func (a *aptInstall) description() string {
+func (a *aptInstall) Description() string {
 	return ""
 }
 
