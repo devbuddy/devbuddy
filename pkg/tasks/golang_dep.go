@@ -19,7 +19,7 @@ func parserGolangDep(config *TaskConfig, task *Task) error {
 type golangDepInstall struct {
 }
 
-func (p *golangDepInstall) description() string {
+func (p *golangDepInstall) Description() string {
 	return "Install Go Dep"
 }
 
@@ -42,7 +42,7 @@ func (p *golangDepInstall) Run(ctx *Context) error {
 type golangDepEnsure struct {
 }
 
-func (p *golangDepEnsure) description() string {
+func (p *golangDepEnsure) Description() string {
 	return "Run dep ensure"
 }
 

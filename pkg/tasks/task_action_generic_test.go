@@ -39,7 +39,7 @@ func TestTaskActionGenericDescription(t *testing.T) {
 	builder := actionBuilder("dummy desc", nil)
 	action := builder.Build()
 
-	require.Equal(t, "dummy desc", action.description())
+	require.Equal(t, "dummy desc", action.Description())
 }
 
 func TestTaskActionGenericNoConditions(t *testing.T) {

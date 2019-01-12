@@ -34,7 +34,7 @@ type brewInstall struct {
 	formula string
 }
 
-func (b *brewInstall) description() string {
+func (b *brewInstall) Description() string {
 	return fmt.Sprintf("installing %s", b.formula)
 }
 

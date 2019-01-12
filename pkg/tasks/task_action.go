@@ -3,7 +3,7 @@ package tasks
 import "fmt"
 
 type taskAction interface {
-	description() string
+	Description() string
 	Needed(*Context) *ActionResult
 	Run(*Context) error
 }
@@ -27,7 +27,7 @@ func actionNotNeeded() *ActionResult {
 }
 
 func runAction(ctx *Context, action taskAction) error {
-	desc := action.description()
+	desc := action.Description()
 
 	result := action.Needed(ctx)
 	if result.Error != nil {
