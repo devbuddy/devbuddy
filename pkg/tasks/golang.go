@@ -19,9 +19,9 @@ func parseGolang(config *TaskConfig, task *Task) error {
 
 	checkPATHVar := func(ctx *Context) *ActionResult {
 		if ctx.env.Get("GOPATH") == "" {
-			return actionNeeded("GOPATH is not set")
+			return ActionNeeded("GOPATH is not set")
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 	showPATHWarning := func(ctx *Context) error {
 		ctx.ui.TaskWarning("The GOPATH environment variable should be set to ~/")
@@ -31,9 +31,9 @@ func parseGolang(config *TaskConfig, task *Task) error {
 
 	installNeeded := func(ctx *Context) *ActionResult {
 		if !helpers.NewGolang(ctx.cfg, version).Exists() {
-			return actionNeeded("golang distribution is not installed")
+			return ActionNeeded("golang distribution is not installed")
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 	installGo := func(ctx *Context) error {
 		return helpers.NewGolang(ctx.cfg, version).Install()

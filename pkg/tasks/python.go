@@ -35,9 +35,9 @@ func parserPythonInstallPyenv(task *Task, version string) {
 	needed := func(ctx *Context) *ActionResult {
 		_, err := helpers.NewPyEnv()
 		if err != nil {
-			return actionNeeded("Pyenv is not installed: %s", err)
+			return ActionNeeded("Pyenv is not installed: %s", err)
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 	run := func(ctx *Context) error {
 		result := command(ctx, "brew", "install", "pyenv").Run()
@@ -53,16 +53,16 @@ func parserPythonInstallPythonVersion(task *Task, version string) {
 	needed := func(ctx *Context) *ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
-			return actionFailed("cannot use pyenv: %s", err)
+			return ActionFailed("cannot use pyenv: %s", err)
 		}
 		installed, err := pyEnv.VersionInstalled(version)
 		if err != nil {
-			return actionFailed("failed to check if python version is installed: %s", err)
+			return ActionFailed("failed to check if python version is installed: %s", err)
 		}
 		if !installed {
-			return actionNeeded("python version is not installed")
+			return ActionNeeded("python version is not installed")
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 	run := func(ctx *Context) error {
 		result := command(ctx, "pyenv", "install", version).Run()
@@ -78,13 +78,13 @@ func parserPythonInstallVirtualenv(task *Task, version string) {
 	needed := func(ctx *Context) *ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
-			return actionFailed("cannot use pyenv: %s", err)
+			return ActionFailed("cannot use pyenv: %s", err)
 		}
 		installed := utils.PathExists(pyEnv.Which(version, "virtualenv"))
 		if !installed {
-			return actionNeeded("virtualenv is not installed")
+			return ActionNeeded("virtualenv is not installed")
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 	run := func(ctx *Context) error {
 		pyEnv, err := helpers.NewPyEnv()
@@ -105,9 +105,9 @@ func parserPythonCreateVirtualenv(task *Task, version string) {
 		name := helpers.VirtualenvName(ctx.proj, version)
 		venv := helpers.NewVirtualenv(ctx.cfg, name)
 		if !venv.Exists() {
-			return actionNeeded("project virtualenv does not exists")
+			return ActionNeeded("project virtualenv does not exists")
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 	run := func(ctx *Context) error {
 		name := helpers.VirtualenvName(ctx.proj, version)

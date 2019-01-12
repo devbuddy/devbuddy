@@ -14,14 +14,14 @@ type ActionResult struct {
 	Error  error
 }
 
-func actionFailed(errorMessage string, args ...interface{}) *ActionResult {
+func ActionFailed(errorMessage string, args ...interface{}) *ActionResult {
 	return &ActionResult{Error: fmt.Errorf(errorMessage, args...)}
 }
 
-func actionNeeded(message string, args ...interface{}) *ActionResult {
+func ActionNeeded(message string, args ...interface{}) *ActionResult {
 	return &ActionResult{Needed: true, Reason: fmt.Sprintf(message, args...)}
 }
 
-func actionNotNeeded() *ActionResult {
+func ActionNotNeeded() *ActionResult {
 	return &ActionResult{Needed: false}
 }

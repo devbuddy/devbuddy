@@ -22,9 +22,9 @@ func parseNode(config *TaskConfig, task *Task) error {
 	}
 	condition := func(ctx *Context) *ActionResult {
 		if !helpers.NewNode(ctx.cfg, version).Exists() {
-			return actionNeeded("node version is not installed")
+			return ActionNeeded("node version is not installed")
 		}
-		return actionNotNeeded()
+		return ActionNotNeeded()
 	}
 	task.AddActionWithBuilder("install nodejs from https://nodejs.org", run).OnFunc(condition)
 
