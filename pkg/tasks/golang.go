@@ -6,9 +6,7 @@ import (
 )
 
 func init() {
-	t := registerTaskDefinition("go")
-	t.name = "Golang"
-	t.parser = parseGolang
+	Register("go", "Golang", parseGolang)
 }
 
 func parseGolang(config *TaskConfig, task *Task) error {

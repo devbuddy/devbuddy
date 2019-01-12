@@ -6,10 +6,7 @@ import (
 )
 
 func init() {
-	t := registerTaskDefinition("pip")
-	t.name = "Pip"
-	t.requiredTask = pythonTaskName
-	t.parser = parserPip
+	Register("pip", "Pip", parserPip).SetRequiredTask(pythonTaskName)
 }
 
 func parserPip(config *TaskConfig, task *Task) error {

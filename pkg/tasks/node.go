@@ -6,9 +6,7 @@ import (
 )
 
 func init() {
-	t := registerTaskDefinition("node")
-	t.name = "NodeJS"
-	t.parser = parseNode
+	Register("node", "NodeJS", parseNode)
 }
 
 func parseNode(config *TaskConfig, task *Task) error {
