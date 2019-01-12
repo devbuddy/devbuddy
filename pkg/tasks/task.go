@@ -10,7 +10,7 @@ import (
 type Task struct {
 	*TaskDefinition
 	header  string
-	actions []taskAction
+	actions []TaskAction
 	feature features.FeatureInfo
 }
 
@@ -22,7 +22,7 @@ func (t *Task) SetFeature(name, param string) {
 	t.feature = features.NewFeatureInfo(name, param)
 }
 
-func (t *Task) AddAction(action taskAction) {
+func (t *Task) AddAction(action TaskAction) {
 	t.actions = append(t.actions, action)
 }
 
