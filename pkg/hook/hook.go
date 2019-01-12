@@ -7,7 +7,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/tasks"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
@@ -56,11 +56,11 @@ func getFeaturesFromProject(proj *project.Project) (features.FeatureSet, error) 
 		// So we continue with an empty feature map
 		return features.NewFeatureSet(), nil
 	}
-	allTasks, err := tasks.GetTasksFromProject(proj)
+	allTasks, err := taskapi.GetTasksFromProject(proj)
 	if err != nil {
 		return nil, err
 	}
-	return tasks.GetFeaturesFromTasks(allTasks), nil
+	return taskapi.GetFeaturesFromTasks(allTasks), nil
 }
 
 func printEnvironmentChangeAsShellCommands(ui *termui.UI, env *env.Env) {

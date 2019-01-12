@@ -1,4 +1,4 @@
-package tasks
+package taskapi
 
 type genericTaskActionCondition struct {
 	pre  func(*Context) *ActionResult

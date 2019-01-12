@@ -5,13 +5,14 @@ import (
 	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	Register("homebrew", "Homebrew", parserHomebrew).SetOSRequirement("macos")
+	taskapi.Register("homebrew", "Homebrew", parserHomebrew).SetOSRequirement("macos")
 }
 
-func parserHomebrew(config *TaskConfig, task *Task) error {
+func parserHomebrew(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	formulas, err := config.GetListOfStrings()
 	if err != nil {
 		return err
@@ -38,16 +39,16 @@ func (b *brewInstall) Description() string {
 	return fmt.Sprintf("installing %s", b.formula)
 }
 
-func (b *brewInstall) Needed(ctx *Context) *ActionResult {
+func (b *brewInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	brew := helpers.NewHomebrew()
 
 	if brew.IsInstalled(b.formula) {
-		return ActionNotNeeded()
+		return taskapi.ActionNotNeeded()
 	}
-	return ActionNeeded("package %s is not installed", b.formula)
+	return taskapi.ActionNeeded("package %s is not installed", b.formula)
 }
 
-func (b *brewInstall) Run(ctx *Context) error {
+func (b *brewInstall) Run(ctx *taskapi.Context) error {
 	result := command(ctx, "brew", "install", b.formula).Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run brew install: %s", result.Error)

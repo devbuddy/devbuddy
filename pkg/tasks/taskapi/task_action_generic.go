@@ -1,4 +1,4 @@
-package tasks
+package taskapi
 
 import (
 	"path/filepath"

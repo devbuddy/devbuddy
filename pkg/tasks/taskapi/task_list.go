@@ -1,8 +1,7 @@
-package tasks
+package taskapi
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
@@ -18,7 +17,7 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	}
 
 	for _, taskdef := range manifest.Up {
-		task, err = buildFromDefinition(taskdef)
+		task, err = NewTaskFromDefinition(taskdef)
 		if err != nil {
 			return nil, err
 		}
@@ -28,8 +27,8 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	return taskList, nil
 }
 
-func buildFromDefinition(definition interface{}) (task *Task, err error) {
-	taskConfig, err := parseTaskConfig(definition)
+func NewTaskFromDefinition(definition interface{}) (task *Task, err error) {
+	taskConfig, err := NewTaskConfig(definition)
 	if err != nil {
 		return nil, err
 	}
@@ -47,27 +46,13 @@ func buildFromDefinition(definition interface{}) (task *Task, err error) {
 	return
 }
 
-func parseTaskConfig(definition interface{}) (*TaskConfig, error) {
-	val := reflect.ValueOf(definition)
-
-	if val.Kind() == reflect.Map {
-		keys := val.MapKeys()
-		if len(keys) != 1 {
-			return nil, fmt.Errorf("invalid map length")
-		}
-		name, ok := keys[0].Interface().(string)
-		if !ok {
-			return nil, fmt.Errorf("task name should be a string")
-		}
-		payload := val.MapIndex(keys[0]).Interface()
-		return &TaskConfig{name: name, payload: payload}, nil
-	}
-
-	if val.Kind() == reflect.String {
-		return &TaskConfig{name: definition.(string), payload: nil}, nil
-	}
-
-	return nil, fmt.Errorf("invalid task: \"%+v\"", definition)
+func parseUnknown(config *TaskConfig, task *Task) error {
+	builder := actionBuilder("", func(ctx *Context) error {
+		ctx.UI.TaskWarning(fmt.Sprintf("Unknown task: \"%s\"", config.name))
+		return nil
+	})
+	task.AddAction(builder.Build())
+	return nil
 }
 
 func GetFeaturesFromTasks(tasks []*Task) features.FeatureSet {

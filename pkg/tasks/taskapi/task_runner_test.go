@@ -1,4 +1,4 @@
-package tasks
+package taskapi
 
 import (
 	"bytes"
@@ -14,6 +14,28 @@ import (
 
 	"github.com/stretchr/testify/require"
 )
+
+func dummyTask(name string) *Task {
+	return &Task{TaskDefinition: &TaskDefinition{Name: name}}
+}
+
+type taskRunnerMock struct {
+	taskError error
+	tasks     []*Task
+}
+
+func (r *taskRunnerMock) Run(ctx *Context, task *Task) error {
+	r.tasks = append(r.tasks, task)
+	return r.taskError
+}
+
+type taskSelectorMock struct {
+	should bool
+}
+
+func (s *taskSelectorMock) ShouldRun(ctx *Context, task *Task) (bool, error) {
+	return s.should, nil
+}
 
 type testingAction struct {
 	desc            string

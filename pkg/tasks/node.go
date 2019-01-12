@@ -2,13 +2,14 @@ package tasks
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	Register("node", "NodeJS", parseNode)
+	taskapi.Register("node", "NodeJS", parseNode)
 }
 
-func parseNode(config *TaskConfig, task *Task) error {
+func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	version, err := config.GetStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
@@ -17,14 +18,14 @@ func parseNode(config *TaskConfig, task *Task) error {
 	task.SetInfo(version)
 	task.SetFeature("node", version)
 
-	run := func(ctx *Context) error {
+	run := func(ctx *taskapi.Context) error {
 		return helpers.NewNode(ctx.Cfg, version).Install()
 	}
-	condition := func(ctx *Context) *ActionResult {
+	condition := func(ctx *taskapi.Context) *taskapi.ActionResult {
 		if !helpers.NewNode(ctx.Cfg, version).Exists() {
-			return ActionNeeded("node version is not installed")
+			return taskapi.ActionNeeded("node version is not installed")
 		}
-		return ActionNotNeeded()
+		return taskapi.ActionNotNeeded()
 	}
 	task.AddActionWithBuilder("install nodejs from https://nodejs.org", run).OnFunc(condition)
 
