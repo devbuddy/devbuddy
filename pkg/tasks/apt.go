@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	Register("apt", "Apt", parserApt).SetOsRequirement("debian")
+	Register("apt", "Apt", parserApt).SetOSRequirement("debian")
 }
 
 func parserApt(config *TaskConfig, task *Task) error {

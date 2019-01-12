@@ -36,14 +36,14 @@ func buildFromDefinition(definition interface{}) (task *Task, err error) {
 
 	taskDef := taskDefinitions[taskConfig.name]
 	if taskDef == nil {
-		taskDef = &taskDefinition{
-			name:   "Unknown",
-			parser: parseUnknown,
+		taskDef = &TaskDefinition{
+			Name:   "Unknown",
+			Parser: parseUnknown,
 		}
 	}
 
-	task = &Task{taskDefinition: taskDef}
-	err = taskDef.parser(taskConfig, task)
+	task = &Task{TaskDefinition: taskDef}
+	err = taskDef.Parser(taskConfig, task)
 	return
 }
 
@@ -84,12 +84,12 @@ func GetFeaturesFromTasks(tasks []*Task) features.FeatureSet {
 
 func InspectTasks(taskList []*Task, proj *project.Project) (s string) {
 	for _, task := range taskList {
-		s += fmt.Sprintf("Task %s (%s)\n", task.name, task.header)
+		s += fmt.Sprintf("Task %s (%s)\n", task.Name, task.header)
 		if task.feature.Name != "" {
 			s += fmt.Sprintf("  Provides: %s\n", task.feature)
 		}
-		if task.requiredTask != "" {
-			s += fmt.Sprintf("  Requires: %s\n", task.requiredTask)
+		if task.RequiredTask != "" {
+			s += fmt.Sprintf("  Requires: %s\n", task.RequiredTask)
 		}
 		for _, action := range task.actions {
 			s += fmt.Sprintf("  Action: %T %+v\n", action, action)

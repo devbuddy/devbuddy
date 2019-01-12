@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func loadTestTask(t *testing.T, payload string) (*Task, error) {
@@ -25,7 +25,7 @@ func ensureLoadTestTask(t *testing.T, payload string) *Task {
 }
 
 func dummyTask(name string) *Task {
-	return &Task{taskDefinition: &taskDefinition{name: name}}
+	return &Task{TaskDefinition: &TaskDefinition{Name: name}}
 }
 
 type taskRunnerMock struct {

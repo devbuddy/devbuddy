@@ -8,7 +8,7 @@ import (
 
 // Task represents a task created by a taskDefinition.parser and specified by the TaskInfo
 type Task struct {
-	*taskDefinition
+	*TaskDefinition
 	header  string
 	actions []taskAction
 	feature features.FeatureInfo
@@ -36,7 +36,7 @@ func (t *Task) AddActionWithBuilder(description string, runFunc func(*Context) e
 }
 
 func (t *Task) Describe() string {
-	description := fmt.Sprintf("Task %s (%s)", t.name, t.header)
+	description := fmt.Sprintf("Task %s (%s)", t.Name, t.header)
 
 	if t.feature.Name != "" {
 		description += fmt.Sprintf(" has feature %s:%s and", t.feature.Name, t.feature.Param)
