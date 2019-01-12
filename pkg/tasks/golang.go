@@ -1,7 +1,6 @@
 package tasks
 
 import (
-	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 )
 
@@ -16,7 +15,7 @@ func parseGolang(config *TaskConfig, task *Task) error {
 	}
 
 	task.SetInfo(version)
-	task.feature = features.NewFeatureInfo("golang", version)
+	task.SetFeature("golang", version)
 
 	checkPATHVar := func(ctx *Context) *actionResult {
 		if ctx.env.Get("GOPATH") == "" {

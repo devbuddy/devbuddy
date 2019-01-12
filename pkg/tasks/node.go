@@ -1,7 +1,6 @@
 package tasks
 
 import (
-	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 )
 
@@ -16,7 +15,7 @@ func parseNode(config *TaskConfig, task *Task) error {
 	}
 
 	task.SetInfo(version)
-	task.feature = features.NewFeatureInfo("node", version)
+	task.SetFeature("node", version)
 
 	run := func(ctx *Context) error {
 		return helpers.NewNode(ctx.cfg, version).Install()
