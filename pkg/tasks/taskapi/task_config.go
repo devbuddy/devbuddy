@@ -1,7 +1,8 @@
-package tasks
+package taskapi
 
 import (
 	"fmt"
+	"reflect"
 )
 
 type propertyNotFoundError struct {
@@ -16,6 +17,29 @@ func (e propertyNotFoundError) Error() string {
 type TaskConfig struct {
 	name    string
 	payload interface{}
+}
+
+func NewTaskConfig(definition interface{}) (*TaskConfig, error) {
+	val := reflect.ValueOf(definition)
+
+	if val.Kind() == reflect.Map {
+		keys := val.MapKeys()
+		if len(keys) != 1 {
+			return nil, fmt.Errorf("invalid map length")
+		}
+		name, ok := keys[0].Interface().(string)
+		if !ok {
+			return nil, fmt.Errorf("task name should be a string")
+		}
+		payload := val.MapIndex(keys[0]).Interface()
+		return &TaskConfig{name: name, payload: payload}, nil
+	}
+
+	if val.Kind() == reflect.String {
+		return &TaskConfig{name: definition.(string), payload: nil}, nil
+	}
+
+	return nil, fmt.Errorf("invalid task: \"%+v\"", definition)
 }
 
 // GetListOfStrings expects the payload to be a list of string, returns it.

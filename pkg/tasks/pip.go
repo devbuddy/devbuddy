@@ -3,13 +3,15 @@ package tasks
 import (
 	"fmt"
 	"strings"
+
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	Register("pip", "Pip", parserPip).SetRequiredTask(pythonTaskName)
+	taskapi.Register("pip", "Pip", parserPip).SetRequiredTask(pythonTaskName)
 }
 
-func parserPip(config *TaskConfig, task *Task) error {
+func parserPip(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	files, err := config.GetListOfStrings()
 	if err != nil {
 		return err
@@ -21,16 +23,16 @@ func parserPip(config *TaskConfig, task *Task) error {
 	task.SetInfo(strings.Join(files, ", "))
 
 	for _, file := range files {
-		builder := actionBuilder(fmt.Sprintf("install %s", file), func(ctx *Context) error {
+		pipInstall := func(ctx *taskapi.Context) error {
 			pipArgs := []string{"install", "--require-virtualenv", "-r", file}
 			result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
 			if result.Error != nil {
 				return fmt.Errorf("Pip failed: %s", result.Error)
 			}
 			return nil
-		})
-		builder.OnFileChange(file)
-		task.AddAction(builder.Build())
+		}
+		task.AddActionWithBuilder(fmt.Sprintf("install %s", file), pipInstall).
+			OnFileChange(file)
 	}
 
 	return nil

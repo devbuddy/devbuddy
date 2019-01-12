@@ -2,13 +2,14 @@ package tasks
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	Register("go", "Golang", parseGolang)
+	taskapi.Register("go", "Golang", parseGolang)
 }
 
-func parseGolang(config *TaskConfig, task *Task) error {
+func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	version, err := config.GetStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
@@ -17,25 +18,25 @@ func parseGolang(config *TaskConfig, task *Task) error {
 	task.SetInfo(version)
 	task.SetFeature("golang", version)
 
-	checkPATHVar := func(ctx *Context) *ActionResult {
+	checkPATHVar := func(ctx *taskapi.Context) *taskapi.ActionResult {
 		if ctx.Env.Get("GOPATH") == "" {
-			return ActionNeeded("GOPATH is not set")
+			return taskapi.ActionNeeded("GOPATH is not set")
 		}
-		return ActionNotNeeded()
+		return taskapi.ActionNotNeeded()
 	}
-	showPATHWarning := func(ctx *Context) error {
+	showPATHWarning := func(ctx *taskapi.Context) error {
 		ctx.UI.TaskWarning("The GOPATH environment variable should be set to ~/")
 		return nil
 	}
 	task.AddActionWithBuilder("", showPATHWarning).OnFunc(checkPATHVar)
 
-	installNeeded := func(ctx *Context) *ActionResult {
+	installNeeded := func(ctx *taskapi.Context) *taskapi.ActionResult {
 		if !helpers.NewGolang(ctx.Cfg, version).Exists() {
-			return ActionNeeded("golang distribution is not installed")
+			return taskapi.ActionNeeded("golang distribution is not installed")
 		}
-		return ActionNotNeeded()
+		return taskapi.ActionNotNeeded()
 	}
-	installGo := func(ctx *Context) error {
+	installGo := func(ctx *taskapi.Context) error {
 		return helpers.NewGolang(ctx.Cfg, version).Install()
 	}
 	task.AddActionWithBuilder("install golang distribution", installGo).OnFunc(installNeeded)
