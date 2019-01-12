@@ -1,9 +1,7 @@
 package tasks
 
 func init() {
-	t := registerTaskDefinition("custom")
-	t.name = "Custom"
-	t.parser = parserCustom
+	Register("custom", "Custom", parserCustom)
 }
 
 func parserCustom(config *TaskConfig, task *Task) error {

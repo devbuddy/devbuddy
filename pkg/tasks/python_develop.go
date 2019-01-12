@@ -6,10 +6,7 @@ import (
 )
 
 func init() {
-	t := registerTaskDefinition("python_develop")
-	t.name = "Python develop"
-	t.requiredTask = pythonTaskName
-	t.parser = parserPythonDevelop
+	Register("python_develop", "Python develop", parserPythonDevelop).SetRequiredTask(pythonTaskName)
 }
 
 func parserPythonDevelop(config *TaskConfig, task *Task) error {

@@ -8,10 +8,7 @@ import (
 )
 
 func init() {
-	t := registerTaskDefinition("homebrew")
-	t.name = "Homebrew"
-	t.parser = parserHomebrew
-	t.osRequirement = "macos"
+	Register("homebrew", "Homebrew", parserHomebrew).SetOsRequirement("macos")
 }
 
 func parserHomebrew(config *TaskConfig, task *Task) error {

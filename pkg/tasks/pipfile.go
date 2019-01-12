@@ -8,10 +8,7 @@ import (
 )
 
 func init() {
-	t := registerTaskDefinition("pipfile")
-	t.name = "Pipfile"
-	t.requiredTask = pythonTaskName
-	t.parser = parserPipfile
+	Register("pipfile", "Pipfile", parserPipfile).SetRequiredTask(pythonTaskName)
 }
 
 func parserPipfile(config *TaskConfig, task *Task) error {

@@ -13,9 +13,7 @@ import (
 const pythonTaskName = "python"
 
 func init() {
-	t := registerTaskDefinition(pythonTaskName)
-	t.name = "Python"
-	t.parser = parserPython
+	Register(pythonTaskName, "Python", parserPython)
 }
 
 func parserPython(config *TaskConfig, task *Task) error {

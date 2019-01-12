@@ -6,10 +6,7 @@ import (
 )
 
 func init() {
-	t := registerTaskDefinition("golang_dep")
-	t.name = "Go Dep"
-	t.requiredTask = "golang"
-	t.parser = parserGolangDep
+	Register("golang_dep", "Go Dep", parserGolangDep).SetRequiredTask("golang")
 }
 
 func parserGolangDep(config *TaskConfig, task *Task) error {
