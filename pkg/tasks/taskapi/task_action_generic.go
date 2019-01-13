@@ -16,6 +16,11 @@ type genericTaskAction struct {
 	runCalled bool
 }
 
+type genericTaskActionCondition struct {
+	pre  func(*Context) *ActionResult
+	post func(*Context) *ActionResult
+}
+
 func (a *genericTaskAction) Description() string {
 	return a.desc
 }
