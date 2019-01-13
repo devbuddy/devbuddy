@@ -209,6 +209,17 @@ func TestRun(t *testing.T) {
 	require.Equal(t, tasks, taskRunner.tasks)
 }
 
+func TestRunRequiredTaskCheck(t *testing.T) {
+	ctx, _ := setupTaskTesting()
+	tasks := []*Task{
+		&Task{TaskDefinition: &TaskDefinition{Key: "pip", RequiredTask: "python"}},
+	}
+
+	success, err := Run(ctx, nil, nil, tasks)
+	require.EqualError(t, err, "You must specify a python task before a pip task")
+	require.False(t, success)
+}
+
 func TestRunWithTaskError(t *testing.T) {
 	ctx, _ := setupTaskTesting()
 	tasks := []*Task{dummyTask("1"), dummyTask("2")}
