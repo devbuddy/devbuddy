@@ -1,14 +1,15 @@
-package taskapi
+package taskengine
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 // Run accepts a list of tasks and check for their requirements and runs them if their conditions are met
-func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*Task) (bool, error) {
+func Run(ctx *taskapi.Context, executor TaskRunner, selector TaskSelector, taskList []*taskapi.Task) (bool, error) {
 	err := checkRequiredTasks(taskList)
 	if err != nil {
 		return false, err
@@ -36,7 +37,7 @@ func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*T
 	return true, nil
 }
 
-func checkRequiredTasks(taskList []*Task) error {
+func checkRequiredTasks(taskList []*taskapi.Task) error {
 	seen := map[string]bool{}
 	for _, task := range taskList {
 		if task.RequiredTask != "" && !seen[task.RequiredTask] {
@@ -48,12 +49,12 @@ func checkRequiredTasks(taskList []*Task) error {
 }
 
 type TaskRunner interface {
-	Run(*Context, *Task) error
+	Run(*taskapi.Context, *taskapi.Task) error
 }
 
 type TaskRunnerImpl struct{}
 
-func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
+func (r *TaskRunnerImpl) Run(ctx *taskapi.Context, task *taskapi.Task) (err error) {
 	for _, action := range task.Actions {
 		err = runAction(ctx, action)
 		if err != nil {
@@ -65,7 +66,7 @@ func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
 	return err
 }
 
-func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) error {
+func (r *TaskRunnerImpl) activateFeature(ctx *taskapi.Context, task *taskapi.Task) error {
 	if task.Feature.Name == "" {
 		return nil
 	}
@@ -92,7 +93,7 @@ func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) error {
 	return os.Setenv("PATH", ctx.Env.Get("PATH"))
 }
 
-func runAction(ctx *Context, action TaskAction) error {
+func runAction(ctx *taskapi.Context, action taskapi.TaskAction) error {
 	desc := action.Description()
 
 	result := action.Needed(ctx)
