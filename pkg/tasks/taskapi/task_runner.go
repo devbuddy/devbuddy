@@ -21,11 +21,11 @@ func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*T
 			return false, nil
 		}
 		if !shouldRun {
-			ctx.UI.TaskHeader(task.Name, task.header, "disabled")
+			ctx.UI.TaskHeader(task.Name, task.Info, "disabled")
 			continue
 		}
 
-		ctx.UI.TaskHeader(task.Name, task.header, "")
+		ctx.UI.TaskHeader(task.Name, task.Info, "")
 		err = executor.Run(ctx, task)
 		if err != nil {
 			ctx.UI.TaskError(err)
@@ -54,7 +54,7 @@ type TaskRunner interface {
 type TaskRunnerImpl struct{}
 
 func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
-	for _, action := range task.actions {
+	for _, action := range task.Actions {
 		err = runAction(ctx, action)
 		if err != nil {
 			return err
@@ -66,21 +66,21 @@ func (r *TaskRunnerImpl) Run(ctx *Context, task *Task) (err error) {
 }
 
 func (r *TaskRunnerImpl) activateFeature(ctx *Context, task *Task) error {
-	if task.feature.Name == "" {
+	if task.Feature.Name == "" {
 		return nil
 	}
 
-	def, err := features.Get(task.feature)
+	def, err := features.Get(task.Feature)
 	if err != nil {
 		return err
 	}
 
-	devUpNeeded, err := def.Activate(task.feature.Param, ctx.Cfg, ctx.Project, ctx.Env)
+	devUpNeeded, err := def.Activate(task.Feature.Param, ctx.Cfg, ctx.Project, ctx.Env)
 	if err != nil {
 		return err
 	}
 	if devUpNeeded {
-		ctx.UI.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", task.feature))
+		ctx.UI.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", task.Feature))
 	}
 
 	// Special case, we want the bud process to get PATH updates from features to call the right processes.

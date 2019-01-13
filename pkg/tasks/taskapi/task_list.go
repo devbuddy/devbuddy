@@ -59,8 +59,8 @@ func GetFeaturesFromTasks(tasks []*Task) features.FeatureSet {
 	featureSet := features.FeatureSet{}
 
 	for _, task := range tasks {
-		if task.feature.Name != "" {
-			featureSet = featureSet.With(task.feature)
+		if task.Feature.Name != "" {
+			featureSet = featureSet.With(task.Feature)
 		}
 	}
 

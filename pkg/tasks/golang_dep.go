@@ -12,7 +12,7 @@ func init() {
 }
 
 func parserGolangDep(config *taskapi.TaskConfig, task *taskapi.Task) error {
-	task.SetInfo("dep ensure")
+	task.Info = "dep ensure"
 	task.AddAction(&golangDepInstall{})
 	task.AddAction(&golangDepEnsure{})
 	return nil

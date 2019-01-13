@@ -15,7 +15,7 @@ func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return err
 	}
 
-	task.SetInfo(version)
+	task.Info = version
 	task.SetFeature("golang", version)
 
 	checkPATHVar := func(ctx *taskapi.Context) *taskapi.ActionResult {

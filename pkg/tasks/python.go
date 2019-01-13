@@ -22,7 +22,7 @@ func parserPython(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return err
 	}
 
-	task.SetInfo(version)
+	task.Info = version
 	task.SetFeature("python", version)
 
 	parserPythonInstallPyenv(task, version)
