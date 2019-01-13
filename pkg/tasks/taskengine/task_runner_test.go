@@ -1,4 +1,4 @@
-package taskapi
+package taskengine
 
 import (
 	"bytes"
@@ -10,21 +10,22 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 
 	"github.com/stretchr/testify/require"
 )
 
-func dummyTask(name string) *Task {
-	return &Task{TaskDefinition: &TaskDefinition{Name: name}}
+func dummyTask(name string) *taskapi.Task {
+	return &taskapi.Task{TaskDefinition: &taskapi.TaskDefinition{Name: name}}
 }
 
 type taskRunnerMock struct {
 	taskError error
-	tasks     []*Task
+	tasks     []*taskapi.Task
 }
 
-func (r *taskRunnerMock) Run(ctx *Context, task *Task) error {
+func (r *taskRunnerMock) Run(ctx *taskapi.Context, task *taskapi.Task) error {
 	r.tasks = append(r.tasks, task)
 	return r.taskError
 }
@@ -33,13 +34,13 @@ type taskSelectorMock struct {
 	should bool
 }
 
-func (s *taskSelectorMock) ShouldRun(ctx *Context, task *Task) (bool, error) {
+func (s *taskSelectorMock) ShouldRun(ctx *taskapi.Context, task *taskapi.Task) (bool, error) {
 	return s.should, nil
 }
 
 type testingAction struct {
 	desc            string
-	neededResults   []*ActionResult
+	neededResults   []*taskapi.ActionResult
 	neededCallCount int
 
 	runResult    error
@@ -50,7 +51,7 @@ func (a *testingAction) Description() string {
 	return a.desc
 }
 
-func (a *testingAction) Needed(ctx *Context) *ActionResult {
+func (a *testingAction) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	result := a.neededResults[a.neededCallCount]
 	if result == nil {
 		panic("the task should not have been called")
@@ -59,23 +60,23 @@ func (a *testingAction) Needed(ctx *Context) *ActionResult {
 	return result
 }
 
-func (a *testingAction) Run(ctx *Context) error {
+func (a *testingAction) Run(ctx *taskapi.Context) error {
 	a.runCallCount++
 	return a.runResult
 }
 
-func newTestingAction(desc string, resultBefore, resultAfter *ActionResult, runResult error) *testingAction {
+func newTestingAction(desc string, resultBefore, resultAfter *taskapi.ActionResult, runResult error) *testingAction {
 	return &testingAction{
 		desc:          desc,
-		neededResults: []*ActionResult{resultBefore, resultAfter},
+		neededResults: []*taskapi.ActionResult{resultBefore, resultAfter},
 		runResult:     runResult,
 	}
 }
 
-func setupTaskTesting() (*Context, *bytes.Buffer) {
+func setupTaskTesting() (*taskapi.Context, *bytes.Buffer) {
 	buf, ui := termui.NewTesting(false)
 
-	ctx := &Context{
+	ctx := &taskapi.Context{
 		Project:  project.NewFromPath("/src/myproject"),
 		UI:       ui,
 		Cfg:      config.NewTestConfig(),
@@ -88,7 +89,7 @@ func setupTaskTesting() (*Context, *bytes.Buffer) {
 
 func TestRunActionNeeded(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", ActionNeeded("some-reason"), ActionNotNeeded(), nil)
+	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), taskapi.ActionNotNeeded(), nil)
 
 	err := runAction(ctx, action)
 	require.NoError(t, err)
@@ -101,7 +102,7 @@ func TestRunActionNeeded(t *testing.T) {
 
 func TestRunActionNotNeeded(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", ActionNotNeeded(), nil, nil)
+	action := newTestingAction("Action X", taskapi.ActionNotNeeded(), nil, nil)
 
 	err := runAction(ctx, action)
 	require.NoError(t, err)
@@ -114,7 +115,7 @@ func TestRunActionNotNeeded(t *testing.T) {
 
 func TestRunActionFailureOnNeeded(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action := newTestingAction("Action X", ActionFailed("ERROR_X"), nil, nil)
+	action := newTestingAction("Action X", taskapi.ActionFailed("ERROR_X"), nil, nil)
 
 	err := runAction(ctx, action)
 	require.Error(t, err)
@@ -126,7 +127,7 @@ func TestRunActionFailureOnNeeded(t *testing.T) {
 
 func TestRunActionFailureOnRun(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", ActionNeeded("some-reason"), nil, errors.New("RunFailed"))
+	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), nil, errors.New("RunFailed"))
 
 	err := runAction(ctx, action)
 	require.Error(t, err)
@@ -140,7 +141,7 @@ func TestRunActionFailureOnRun(t *testing.T) {
 
 func TestRunActionStillNeeded(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action := newTestingAction("Action X", ActionNeeded("some-reason"), ActionNeeded("some-reason"), nil)
+	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), taskapi.ActionNeeded("some-reason"), nil)
 
 	err := runAction(ctx, action)
 	require.Error(t, err)
@@ -152,12 +153,12 @@ func TestRunActionStillNeeded(t *testing.T) {
 
 func TestTaskRunner(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action1 := newTestingAction("Action 1", ActionNeeded("some-reason"), ActionNotNeeded(), nil)
-	action2 := newTestingAction("Action 2", ActionNeeded("some-reason"), ActionNotNeeded(), nil)
+	action1 := newTestingAction("Action 1", taskapi.ActionNeeded("some-reason"), taskapi.ActionNotNeeded(), nil)
+	action2 := newTestingAction("Action 2", taskapi.ActionNeeded("some-reason"), taskapi.ActionNotNeeded(), nil)
 
-	task := &Task{
-		TaskDefinition: &TaskDefinition{Name: "testtask"},
-		Actions:        []TaskAction{action1, action2},
+	task := &taskapi.Task{
+		TaskDefinition: &taskapi.TaskDefinition{Name: "testtask"},
+		Actions:        []taskapi.TaskAction{action1, action2},
 	}
 
 	taskRunner := &TaskRunnerImpl{}
@@ -175,12 +176,12 @@ func TestTaskRunner(t *testing.T) {
 
 func TestTaskRunnerWithError(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action1 := newTestingAction("Action 1", ActionFailed("CRASH 1"), nil, nil)
+	action1 := newTestingAction("Action 1", taskapi.ActionFailed("CRASH 1"), nil, nil)
 	action2 := newTestingAction("Action 2", nil, nil, nil)
 
-	task := &Task{
-		TaskDefinition: &TaskDefinition{Name: "testtask"},
-		Actions:        []TaskAction{action1, action2},
+	task := &taskapi.Task{
+		TaskDefinition: &taskapi.TaskDefinition{Name: "testtask"},
+		Actions:        []taskapi.TaskAction{action1, action2},
 	}
 
 	taskRunner := &TaskRunnerImpl{}
@@ -197,7 +198,7 @@ func TestTaskRunnerWithError(t *testing.T) {
 
 func TestRun(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	tasks := []*Task{dummyTask("1"), dummyTask("2")}
+	tasks := []*taskapi.Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{}
 	taskSelector := &taskSelectorMock{true}
@@ -211,8 +212,8 @@ func TestRun(t *testing.T) {
 
 func TestRunRequiredTaskCheck(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	tasks := []*Task{
-		&Task{TaskDefinition: &TaskDefinition{Key: "pip", RequiredTask: "python"}},
+	tasks := []*taskapi.Task{
+		&taskapi.Task{TaskDefinition: &taskapi.TaskDefinition{Key: "pip", RequiredTask: "python"}},
 	}
 
 	success, err := Run(ctx, nil, nil, tasks)
@@ -222,7 +223,7 @@ func TestRunRequiredTaskCheck(t *testing.T) {
 
 func TestRunWithTaskError(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	tasks := []*Task{dummyTask("1"), dummyTask("2")}
+	tasks := []*taskapi.Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
 	taskSelector := &taskSelectorMock{true}
@@ -237,7 +238,7 @@ func TestRunWithTaskError(t *testing.T) {
 
 func TestRunWithTaskWithOsRequirement(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	tasks := []*Task{dummyTask("1"), dummyTask("2")}
+	tasks := []*taskapi.Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
 	taskSelector := &taskSelectorMock{false}

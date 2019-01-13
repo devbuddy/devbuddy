@@ -10,6 +10,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskengine"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
@@ -44,10 +45,10 @@ func upRun(cmd *cobra.Command, args []string) {
 		Features: taskapi.GetFeaturesFromTasks(taskList),
 	}
 
-	runner := &taskapi.TaskRunnerImpl{}
-	selector := taskapi.NewTaskSelector()
+	runner := &taskengine.TaskRunnerImpl{}
+	selector := taskengine.NewTaskSelector()
 
-	success, err := taskapi.Run(ctx, runner, selector, taskList)
+	success, err := taskengine.Run(ctx, runner, selector, taskList)
 	checkError(err)
 	if !success {
 		os.Exit(1)
