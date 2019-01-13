@@ -20,7 +20,7 @@ func parserPip(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return fmt.Errorf("no pip files specified")
 	}
 
-	task.SetInfo(strings.Join(files, ", "))
+	task.Info = strings.Join(files, ", ")
 
 	for _, file := range files {
 		pipInstall := func(ctx *taskapi.Context) error {
