@@ -35,10 +35,7 @@ func NewTaskFromDefinition(definition interface{}) (task *Task, err error) {
 
 	taskDef := taskDefinitions[taskConfig.name]
 	if taskDef == nil {
-		taskDef = &TaskDefinition{
-			Name:   "Unknown",
-			Parser: parseUnknown,
-		}
+		taskDef = newUnknownTaskDefinition()
 	}
 
 	task = &Task{TaskDefinition: taskDef}
@@ -46,13 +43,15 @@ func NewTaskFromDefinition(definition interface{}) (task *Task, err error) {
 	return
 }
 
-func parseUnknown(config *TaskConfig, task *Task) error {
-	builder := actionBuilder("", func(ctx *Context) error {
-		ctx.UI.TaskWarning(fmt.Sprintf("Unknown task: \"%s\"", config.name))
+func newUnknownTaskDefinition() *TaskDefinition {
+	parser := func(config *TaskConfig, task *Task) error {
+		task.AddActionWithBuilder("", func(ctx *Context) error {
+			ctx.UI.TaskWarning(fmt.Sprintf("Unknown task: \"%s\"", config.name))
+			return nil
+		})
 		return nil
-	})
-	task.AddAction(builder.Build())
-	return nil
+	}
+	return &TaskDefinition{Name: "Unknown", Parser: parser}
 }
 
 func GetFeaturesFromTasks(tasks []*Task) features.FeatureSet {

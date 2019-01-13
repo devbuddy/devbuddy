@@ -1,16 +1,7 @@
 package taskapi
 
-type genericTaskActionCondition struct {
-	pre  func(*Context) *ActionResult
-	post func(*Context) *ActionResult
-}
-
 type genericTaskActionBuilder struct {
 	*genericTaskAction
-}
-
-func actionBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
-	return &genericTaskActionBuilder{&genericTaskAction{desc: description, runFunc: runFunc}}
 }
 
 // On registers a new condition
@@ -31,9 +22,4 @@ func (a *genericTaskActionBuilder) OnFunc(condFunc func(*Context) *ActionResult)
 func (a *genericTaskActionBuilder) OnFileChange(path string) *genericTaskActionBuilder {
 	a.monitoredFiles = append(a.monitoredFiles, path)
 	return a
-}
-
-// Build returns a new task action with the behaviour specified by the builder
-func (a *genericTaskActionBuilder) Build() *genericTaskAction {
-	return a.genericTaskAction
 }
