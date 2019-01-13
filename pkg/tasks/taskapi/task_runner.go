@@ -8,14 +8,10 @@ import (
 )
 
 // Run accepts a list of tasks and check for their requirements and runs them if their conditions are met
-func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*Task) (success bool, err error) {
-	for _, task := range taskList {
-		if task.RequiredTask != "" {
-			if _, present := ctx.Features[task.RequiredTask]; !present {
-				ctx.UI.TaskErrorf("You must specify a %s environment to use a %s task", task.RequiredTask, task.Name)
-				return false, nil
-			}
-		}
+func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*Task) (bool, error) {
+	err := checkRequiredTasks(taskList)
+	if err != nil {
+		return false, err
 	}
 
 	for _, task := range taskList {
@@ -38,6 +34,17 @@ func Run(ctx *Context, executor TaskRunner, selector TaskSelector, taskList []*T
 	}
 
 	return true, nil
+}
+
+func checkRequiredTasks(taskList []*Task) error {
+	seen := map[string]bool{}
+	for _, task := range taskList {
+		if task.RequiredTask != "" && !seen[task.RequiredTask] {
+			return fmt.Errorf("You must specify a %s task before a %s task", task.RequiredTask, task.Key)
+		}
+		seen[task.Key] = true
+	}
+	return nil
 }
 
 type TaskRunner interface {
