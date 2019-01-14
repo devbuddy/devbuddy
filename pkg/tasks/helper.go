@@ -40,28 +40,28 @@ func asListOfStrings(value interface{}) ([]string, error) {
 	return listOfStrings, nil
 }
 
-func command(ctx *Context, program string, args ...string) *executor.Executor {
+func command(ctx *Context, program string, args ...string) executor.Executor {
 	ctx.ui.TaskCommand(program, args...)
 	return commandSilent(ctx, program, args...)
 }
 
-func sudoCommand(ctx *Context, program string, args ...string) *executor.Executor {
+func sudoCommand(ctx *Context, program string, args ...string) executor.Executor {
 	args = append([]string{program}, args...)
 	program = "sudo"
 	ctx.ui.TaskCommand(program, args...)
 	return commandSilent(ctx, program, args...)
 }
 
-func commandSilent(ctx *Context, program string, args ...string) *executor.Executor {
+func commandSilent(ctx *Context, program string, args ...string) executor.Executor {
 	return executor.New(program, args...).SetOutputPrefix("  ").SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ())
 }
 
-func shell(ctx *Context, cmdline string) *executor.Executor {
+func shell(ctx *Context, cmdline string) executor.Executor {
 	ctx.ui.TaskShell(cmdline)
 	return shellSilent(ctx, cmdline)
 }
 
-func shellSilent(ctx *Context, cmdline string) *executor.Executor {
+func shellSilent(ctx *Context, cmdline string) executor.Executor {
 	return executor.NewShell(cmdline).SetOutputPrefix("  ").SetCwd(ctx.proj.Path).SetEnv(ctx.env.Environ())
 }
 
