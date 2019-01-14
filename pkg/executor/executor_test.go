@@ -108,9 +108,10 @@ func TestPrefix(t *testing.T) {
 	buf := &bytes.Buffer{}
 
 	executor := NewShell("echo \"line1\nline2\nline3\"")
-	executor.outputWriter = buf
-	executor.SetOutputPrefix("---")
-	result := executor.Run()
+	impl := executor.(*executorImpl)
+	impl.outputWriter = buf
+	impl.SetOutputPrefix("---")
+	result := impl.Run()
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -122,10 +123,11 @@ func TestFilter(t *testing.T) {
 	buf := &bytes.Buffer{}
 
 	executor := NewShell("echo \"line1\nline2\nline3\nline4\"")
-	executor.outputWriter = buf
-	executor.AddOutputFilter("line2")
-	executor.AddOutputFilter("line4")
-	result := executor.Run()
+	impl := executor.(*executorImpl)
+	impl.outputWriter = buf
+	impl.AddOutputFilter("line2")
+	impl.AddOutputFilter("line4")
+	result := impl.Run()
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
