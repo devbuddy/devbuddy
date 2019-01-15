@@ -3,11 +3,10 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/devbuddy/devbuddy/pkg/tasks"
-
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 var inspectCmd = &cobra.Command{
@@ -23,8 +22,10 @@ func inspectRun(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("Found project at %s\n", proj.Path)
 
-	projectTasks, err := tasks.GetTasksFromProject(proj)
+	projectTasks, err := taskapi.GetTasksFromProject(proj)
 	checkError(err)
 
-	fmt.Print(tasks.InspectTasks(projectTasks, proj))
+	for _, task := range projectTasks {
+		fmt.Printf("- %s\n", task.Describe())
+	}
 }

@@ -1,13 +1,14 @@
-package tasks
+package taskengine
 
 import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers/osidentity"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 type TaskSelector interface {
-	ShouldRun(*Context, *Task) (bool, error)
+	ShouldRun(*taskapi.Context, *taskapi.Task) (bool, error)
 }
 
 type TaskSelectorImpl struct {
@@ -18,7 +19,7 @@ func NewTaskSelector() *TaskSelectorImpl {
 	return &TaskSelectorImpl{osIdent: osidentity.Detect()}
 }
 
-func (s *TaskSelectorImpl) ShouldRun(ctx *Context, task *Task) (bool, error) {
+func (s *TaskSelectorImpl) ShouldRun(ctx *taskapi.Context, task *taskapi.Task) (bool, error) {
 	shouldRun, err := s.osRequirementMatch(ctx, task)
 	if err != nil {
 		return false, err
@@ -30,8 +31,8 @@ func (s *TaskSelectorImpl) ShouldRun(ctx *Context, task *Task) (bool, error) {
 	return true, nil
 }
 
-func (s *TaskSelectorImpl) osRequirementMatch(ctx *Context, task *Task) (bool, error) {
-	switch task.osRequirement {
+func (s *TaskSelectorImpl) osRequirementMatch(ctx *taskapi.Context, task *taskapi.Task) (bool, error) {
+	switch task.OSRequirement {
 	case "":
 		break
 	case "debian":
@@ -43,7 +44,7 @@ func (s *TaskSelectorImpl) osRequirementMatch(ctx *Context, task *Task) (bool, e
 			return false, nil
 		}
 	default:
-		return false, fmt.Errorf("invalid value for osRequirement: %s", task.osRequirement)
+		return false, fmt.Errorf("invalid value for osRequirement: %s", task.OSRequirement)
 	}
 
 	return true, nil

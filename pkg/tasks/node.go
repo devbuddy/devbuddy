@@ -1,35 +1,33 @@
 package tasks
 
 import (
-	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func init() {
-	t := registerTaskDefinition("node")
-	t.name = "NodeJS"
-	t.parser = parseNode
+	taskapi.Register("node", "NodeJS", parseNode)
 }
 
-func parseNode(config *taskConfig, task *Task) error {
-	version, err := config.getStringPropertyAllowSingle("version")
+func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
+	version, err := config.GetStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
 	}
 
-	task.header = version
-	task.feature = features.NewFeatureInfo("node", version)
+	task.Info = version
+	task.SetFeature("node", version)
 
-	builder := actionBuilder("install nodejs from https://nodejs.org", func(ctx *Context) error {
-		return helpers.NewNode(ctx.cfg, version).Install()
-	})
-	builder.OnFunc(func(ctx *Context) *actionResult {
-		if !helpers.NewNode(ctx.cfg, version).Exists() {
-			return actionNeeded("node version is not installed")
+	run := func(ctx *taskapi.Context) error {
+		return helpers.NewNode(ctx.Cfg, version).Install()
+	}
+	condition := func(ctx *taskapi.Context) *taskapi.ActionResult {
+		if !helpers.NewNode(ctx.Cfg, version).Exists() {
+			return taskapi.ActionNeeded("node version is not installed")
 		}
-		return actionNotNeeded()
-	})
-	task.addAction(builder.Build())
+		return taskapi.ActionNotNeeded()
+	}
+	task.AddActionWithBuilder("install nodejs from https://nodejs.org", run).OnFunc(condition)
 
 	return nil
 }
