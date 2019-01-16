@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -38,6 +39,10 @@ func (p *golangDepInstall) Run(ctx *taskapi.Context) error {
 	if result.Error != nil {
 		return fmt.Errorf("failed to install Go GolangDep: %s", result.Error)
 	}
+	return nil
+}
+
+func (p *golangDepInstall) Feature() *features.FeatureInfo {
 	return nil
 }
 
@@ -78,5 +83,9 @@ func (p *golangDepEnsure) Run(ctx *taskapi.Context) error {
 	if result.Error != nil {
 		return fmt.Errorf("failed to run dep ensure: %s", result.Error)
 	}
+	return nil
+}
+
+func (p *golangDepEnsure) Feature() *features.FeatureInfo {
 	return nil
 }
