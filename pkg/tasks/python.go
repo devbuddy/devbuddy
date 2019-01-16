@@ -21,9 +21,7 @@ func parserPython(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	if err != nil {
 		return err
 	}
-
 	task.Info = version
-	task.SetFeature("python", version)
 
 	parserPythonInstallPyenv(task, version)
 	parserPythonInstallPythonVersion(task, version)
@@ -127,5 +125,7 @@ func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
 		}
 		return nil
 	}
-	task.AddActionWithBuilder("create virtualenv", run).OnFunc(needed)
+	task.AddActionWithBuilder("create virtualenv", run).
+		OnFunc(needed).
+		SetFeature("python", version)
 }

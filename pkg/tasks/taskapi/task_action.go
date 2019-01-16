@@ -1,11 +1,16 @@
 package taskapi
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/devbuddy/devbuddy/pkg/features"
+)
 
 type TaskAction interface {
 	Description() string
 	Needed(*Context) *ActionResult
 	Run(*Context) error
+	Feature() *features.FeatureInfo
 }
 
 type ActionResult struct {

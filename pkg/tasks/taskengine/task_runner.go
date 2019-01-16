@@ -16,44 +16,15 @@ type TaskRunnerImpl struct{}
 
 func (r *TaskRunnerImpl) Run(ctx *taskapi.Context, task *taskapi.Task) (err error) {
 	for _, action := range task.Actions {
-		err = runAction(ctx, action)
+		err = r.runAction(ctx, action)
 		if err != nil {
 			return err
 		}
 	}
-
-	err = r.activateFeature(ctx, task)
-	return err
+	return nil
 }
 
-func (r *TaskRunnerImpl) activateFeature(ctx *taskapi.Context, task *taskapi.Task) error {
-	if task.Feature.Name == "" {
-		return nil
-	}
-
-	def, err := features.Get(task.Feature)
-	if err != nil {
-		return err
-	}
-
-	devUpNeeded, err := def.Activate(task.Feature.Param, ctx.Cfg, ctx.Project, ctx.Env)
-	if err != nil {
-		return err
-	}
-	if devUpNeeded {
-		ctx.UI.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", task.Feature))
-	}
-
-	// Special case, we want the bud process to get PATH updates from features to call the right processes.
-	// Like the pip process from the newly activated virtualenv.
-	// Explanation: exec.Command calls exec.LookPath to find the executable path, which rely on the PATH of
-	// the process itself.
-	// There is no problem when executing a shell command since the shell process will do the executable lookup
-	// itself with the PATH value from the specified Env.
-	return os.Setenv("PATH", ctx.Env.Get("PATH"))
-}
-
-func runAction(ctx *taskapi.Context, action taskapi.TaskAction) error {
+func (r *TaskRunnerImpl) runAction(ctx *taskapi.Context, action taskapi.TaskAction) error {
 	desc := action.Description()
 
 	result := action.Needed(ctx)
@@ -82,5 +53,32 @@ func runAction(ctx *taskapi.Context, action taskapi.TaskAction) error {
 		}
 	}
 
+	feature := action.Feature()
+	if feature != nil {
+		return r.activateFeature(ctx, *feature)
+	}
 	return nil
+}
+
+func (r *TaskRunnerImpl) activateFeature(ctx *taskapi.Context, feature features.FeatureInfo) error {
+	def, err := features.Get(feature)
+	if err != nil {
+		return err
+	}
+
+	devUpNeeded, err := def.Activate(feature.Param, ctx.Cfg, ctx.Project, ctx.Env)
+	if err != nil {
+		return err
+	}
+	if devUpNeeded {
+		ctx.UI.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", feature))
+	}
+
+	// Special case, we want the bud process to get PATH updates from features to call the right processes.
+	// Like the pip process from the newly activated virtualenv.
+	// Explanation: exec.Command calls exec.LookPath to find the executable path, which rely on the PATH of
+	// the process itself.
+	// There is no problem when executing a shell command since the shell process will do the executable lookup
+	// itself with the PATH value from the specified Env.
+	return os.Setenv("PATH", ctx.Env.Get("PATH"))
 }
