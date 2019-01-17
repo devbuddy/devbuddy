@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	taskapi.Register("golang_dep", "Go Dep", parserGolangDep).SetRequiredTask("golang")
+	taskapi.Register("golang_dep", "Go Dep", parserGolangDep).SetRequiredTask("go")
 }
 
 func parserGolangDep(config *taskapi.TaskConfig, task *taskapi.Task) error {
