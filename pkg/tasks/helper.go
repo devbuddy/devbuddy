@@ -11,28 +11,28 @@ import (
 // RegisterTasks is a hack to force the execution of the task registration (in the init functions)
 func RegisterTasks() {}
 
-func command(ctx *taskapi.Context, program string, args ...string) *executor.Executor {
+func command(ctx *taskapi.Context, program string, args ...string) executor.Executor {
 	ctx.UI.TaskCommand(program, args...)
 	return commandSilent(ctx, program, args...)
 }
 
-func sudoCommand(ctx *taskapi.Context, program string, args ...string) *executor.Executor {
+func sudoCommand(ctx *taskapi.Context, program string, args ...string) executor.Executor {
 	args = append([]string{program}, args...)
 	program = "sudo"
 	ctx.UI.TaskCommand(program, args...)
 	return commandSilent(ctx, program, args...)
 }
 
-func commandSilent(ctx *taskapi.Context, program string, args ...string) *executor.Executor {
+func commandSilent(ctx *taskapi.Context, program string, args ...string) executor.Executor {
 	return executor.New(program, args...).SetOutputPrefix("  ").SetCwd(ctx.Project.Path).SetEnv(ctx.Env.Environ())
 }
 
-func shell(ctx *taskapi.Context, cmdline string) *executor.Executor {
+func shell(ctx *taskapi.Context, cmdline string) executor.Executor {
 	ctx.UI.TaskShell(cmdline)
 	return shellSilent(ctx, cmdline)
 }
 
-func shellSilent(ctx *taskapi.Context, cmdline string) *executor.Executor {
+func shellSilent(ctx *taskapi.Context, cmdline string) executor.Executor {
 	return executor.NewShell(cmdline).SetOutputPrefix("  ").SetCwd(ctx.Project.Path).SetEnv(ctx.Env.Environ())
 }
 
