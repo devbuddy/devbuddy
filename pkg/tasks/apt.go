@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -69,5 +70,9 @@ func (a *aptInstall) Run(ctx *taskapi.Context) error {
 		return fmt.Errorf("failed to run apt-get install: %s", result.Error)
 	}
 
+	return nil
+}
+
+func (a *aptInstall) Feature() *features.FeatureInfo {
 	return nil
 }

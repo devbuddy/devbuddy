@@ -16,7 +16,6 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	}
 
 	task.Info = version
-	task.SetFeature("node", version)
 
 	run := func(ctx *taskapi.Context) error {
 		return helpers.NewNode(ctx.Cfg, version).Install()
@@ -27,7 +26,9 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		}
 		return taskapi.ActionNotNeeded()
 	}
-	task.AddActionWithBuilder("install nodejs from https://nodejs.org", run).OnFunc(condition)
+	task.AddActionWithBuilder("install nodejs from https://nodejs.org", run).
+		OnFunc(condition).
+		SetFeature("node", version)
 
 	return nil
 }

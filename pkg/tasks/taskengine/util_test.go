@@ -20,6 +20,8 @@ type testingAction struct {
 	neededResults   []*taskapi.ActionResult
 	neededCallCount int
 
+	feature *features.FeatureInfo
+
 	runResult    error
 	runCallCount int
 }
@@ -42,11 +44,22 @@ func (a *testingAction) Run(ctx *taskapi.Context) error {
 	return a.runResult
 }
 
+func (a *testingAction) Feature() *features.FeatureInfo {
+	return a.feature
+}
+
 func newTestingAction(desc string, resultBefore, resultAfter *taskapi.ActionResult, runResult error) *testingAction {
 	return &testingAction{
 		desc:          desc,
 		neededResults: []*taskapi.ActionResult{resultBefore, resultAfter},
 		runResult:     runResult,
+	}
+}
+
+func newTaskWithAction(name string, action taskapi.TaskAction) *taskapi.Task {
+	return &taskapi.Task{
+		TaskDefinition: &taskapi.TaskDefinition{Name: name},
+		Actions:        []taskapi.TaskAction{action},
 	}
 }
 

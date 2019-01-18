@@ -43,6 +43,13 @@ func TestTaskActionGenericDescription(t *testing.T) {
 	require.Equal(t, "dummy desc", action.Description())
 }
 
+func TestTaskActionGenericFeature(t *testing.T) {
+	action := newBuilder("dummy desc", nil)
+	action.SetFeature("name", "param")
+	require.Equal(t, "name", action.Feature().Name)
+	require.Equal(t, "param", action.Feature().Param)
+}
+
 func TestTaskActionGenericNoConditions(t *testing.T) {
 	action := newBuilder("", func(ctx *Context) error { return nil }).genericTaskAction
 

@@ -14,9 +14,7 @@ func loadTestTask(t *testing.T, payload string) (*taskapi.Task, error) {
 	if err != nil {
 		t.Fatalf("Failed to load a test fixture: %s", err)
 	}
-
-	task, err := taskapi.NewTaskFromDefinition(data)
-	return task, err
+	return taskapi.NewTaskFromDefinition(data)
 }
 
 func ensureLoadTestTask(t *testing.T, payload string) *taskapi.Task {

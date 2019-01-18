@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
@@ -54,5 +55,9 @@ func (b *brewInstall) Run(ctx *taskapi.Context) error {
 		return fmt.Errorf("failed to run brew install: %s", result.Error)
 	}
 
+	return nil
+}
+
+func (b *brewInstall) Feature() *features.FeatureInfo {
 	return nil
 }

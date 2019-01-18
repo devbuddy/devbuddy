@@ -14,9 +14,7 @@ func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	if err != nil {
 		return err
 	}
-
 	task.Info = version
-	task.SetFeature("golang", version)
 
 	checkPATHVar := func(ctx *taskapi.Context) *taskapi.ActionResult {
 		if ctx.Env.Get("GOPATH") == "" {
@@ -39,7 +37,9 @@ func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	installGo := func(ctx *taskapi.Context) error {
 		return helpers.NewGolang(ctx.Cfg, version).Install()
 	}
-	task.AddActionWithBuilder("install golang distribution", installGo).OnFunc(installNeeded)
+	task.AddActionWithBuilder("install golang distribution", installGo).
+		OnFunc(installNeeded).
+		SetFeature("golang", version)
 
 	return nil
 }

@@ -2,8 +2,6 @@ package taskapi
 
 import (
 	"fmt"
-
-	"github.com/devbuddy/devbuddy/pkg/features"
 )
 
 // Task represents a task created by a taskDefinition.parser and specified by the TaskInfo
@@ -11,11 +9,6 @@ type Task struct {
 	*TaskDefinition
 	Info    string
 	Actions []TaskAction
-	Feature features.FeatureInfo
-}
-
-func (t *Task) SetFeature(name, param string) {
-	t.Feature = features.NewFeatureInfo(name, param)
 }
 
 func (t *Task) AddAction(action TaskAction) {
@@ -38,8 +31,12 @@ func (t *Task) Describe() string {
 		description += fmt.Sprintf(" required_task=%s", t.RequiredTask)
 	}
 
-	if t.Feature.Name != "" {
-		description += fmt.Sprintf(" feature=%s:%s", t.Feature.Name, t.Feature.Param)
+	for _, action := range t.Actions {
+		f := action.Feature()
+		if action.Feature() != nil {
+			feature := *f
+			description += fmt.Sprintf(" feature=%s:%s", feature.Name, feature.Param)
+		}
 	}
 
 	description += fmt.Sprintf(" actions=%d", len(t.Actions))

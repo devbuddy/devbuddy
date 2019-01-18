@@ -1,5 +1,9 @@
 package taskapi
 
+import (
+	"github.com/devbuddy/devbuddy/pkg/features"
+)
+
 type genericTaskActionBuilder struct {
 	*genericTaskAction
 }
@@ -21,5 +25,12 @@ func (a *genericTaskActionBuilder) OnFunc(condFunc func(*Context) *ActionResult)
 // The action will NOT fail if the file is not created.
 func (a *genericTaskActionBuilder) OnFileChange(path string) *genericTaskActionBuilder {
 	a.monitoredFiles = append(a.monitoredFiles, path)
+	return a
+}
+
+// SetFeature defines that the feature specified should be activated.
+func (a *genericTaskActionBuilder) SetFeature(name, param string) *genericTaskActionBuilder {
+	featureInfo := features.NewFeatureInfo(name, param)
+	a.feature = &featureInfo
 	return a
 }
