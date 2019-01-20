@@ -45,7 +45,7 @@ func NewTaskConfig(definition interface{}) (*TaskConfig, error) {
 // GetListOfStrings expects the payload to be a list of string, returns it.
 //
 // YAML Example:
-// - taskname:
+//   - TASKNAME:
 //     - foo
 //     - bar
 func (c *TaskConfig) GetListOfStrings() ([]string, error) {
@@ -56,7 +56,7 @@ func (c *TaskConfig) GetListOfStrings() ([]string, error) {
 // Or returns the default value specified if the payload is nil.
 //
 // YAML Example:
-// - taskname:
+//   - TASKNAME:
 //     - foo
 //     - bar
 func (c *TaskConfig) GetListOfStringsPropertyDefault(name string, defaultValue []string) ([]string, error) {
@@ -72,10 +72,10 @@ func (c *TaskConfig) GetListOfStringsPropertyDefault(name string, defaultValue [
 // 2. the payload is a hash of string, returns the value for the name specified
 //
 // YAML Example:
-// - taskname: foo
+//   - TASKNAME: foo
 // or
-// - taskname:
-//     <name>: foo
+//   - TASKNAME:
+//       PROPERTYNAME: foo
 func (c *TaskConfig) GetStringPropertyAllowSingle(name string) (string, error) {
 	if value, ok := c.payload.(string); ok {
 		return value, nil
@@ -86,8 +86,8 @@ func (c *TaskConfig) GetStringPropertyAllowSingle(name string) (string, error) {
 // GetStringProperty expects the payload to be a hash of string, returns the value for the name specified.
 //
 // YAML Example:
-// - taskname:
-//     <name>: foo
+//   - TASKNAME:
+//       PROPERTYNAME: foo
 func (c *TaskConfig) GetStringProperty(name string) (string, error) {
 	value, err := c.getProperty(name)
 	if err != nil {
@@ -100,8 +100,8 @@ func (c *TaskConfig) GetStringProperty(name string) (string, error) {
 // Or returns the default value specified if the payload is nil.
 //
 // YAML Example:
-// - taskname:
-//     <name>: foo
+//   - TASKNAME:
+//       PROPERTYNAME: foo
 func (c *TaskConfig) GetStringPropertyDefault(name string, defaultValue string) (string, error) {
 	value, err := c.getPropertyDefault(name, defaultValue)
 	if err != nil {
