@@ -13,9 +13,9 @@ custom:
   meet: custom-command
 `)
 
-	require.Equal(t, "custom-command", task.header)
-	require.Equal(t, 1, len(task.actions))
+	require.Equal(t, "Task Custom (custom-command) actions=1", task.Describe())
 }
+
 func TestCustomName(t *testing.T) {
 	task := ensureLoadTestTask(t, `
 custom:
@@ -24,7 +24,7 @@ custom:
   meet: custom-command
 `)
 
-	require.Equal(t, "NAMENAME", task.header)
+	require.Equal(t, "Task Custom (NAMENAME) actions=1", task.Describe())
 }
 
 func TestCustomWithBoolean(t *testing.T) {

@@ -48,7 +48,7 @@ func rootRun(cmd *cobra.Command, args []string) {
 	}
 
 	if GetFlagBool(cmd, "shell-hook") {
-		hook.Hook()
+		hook.Run()
 		os.Exit(0)
 	}
 

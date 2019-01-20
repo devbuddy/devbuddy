@@ -13,8 +13,7 @@ apt:
   - git
 `)
 
-	require.Equal(t, "curl, git", task.header)
-	require.Equal(t, 1, len(task.actions))
+	require.Equal(t, "Task Apt (curl, git) actions=1", task.Describe())
 }
 
 func TestAptEmpty(t *testing.T) {

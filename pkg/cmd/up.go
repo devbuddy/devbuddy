@@ -6,10 +6,17 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskengine"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
+
+func init() {
+	tasks.RegisterTasks()
+}
 
 var upCmd = &cobra.Command{
 	Use:   "up",
@@ -27,14 +34,21 @@ func upRun(cmd *cobra.Command, args []string) {
 	proj, err := project.FindCurrent()
 	checkError(err)
 
-	taskList, err := tasks.GetTasksFromProject(proj)
+	taskList, err := taskapi.GetTasksFromProject(proj)
 	checkError(err)
 
-	ctx := tasks.NewContext(cfg, proj, ui, taskList)
-	runner := &tasks.TaskRunnerImpl{}
-	selector := tasks.NewTaskSelector()
+	ctx := &taskapi.Context{
+		Cfg:      cfg,
+		Project:  proj,
+		UI:       ui,
+		Env:      env.NewFromOS(),
+		Features: taskapi.GetFeaturesFromTasks(taskList),
+	}
 
-	success, err := tasks.Run(ctx, runner, selector, taskList)
+	runner := &taskengine.TaskRunnerImpl{}
+	selector := taskengine.NewTaskSelector()
+
+	success, err := taskengine.Run(ctx, runner, selector, taskList)
 	checkError(err)
 	if !success {
 		os.Exit(1)
