@@ -48,7 +48,8 @@ Go:
 
 Node:
 - Node environment
-- Npm/Yarn **planned**
+- Dependencies with NPM
+- Dependencies with Yarn **planned**
 
 Ruby: **planned**
 
