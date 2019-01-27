@@ -7,6 +7,10 @@ import sys
 from typing import List, Optional, Iterator
 
 
+class Error(Exception):
+    pass
+
+
 class Git:
     def __init__(self) -> None:
         self.__local_tags: Optional[List[str]] = None
@@ -51,7 +55,6 @@ class Git:
 
 class InvalidVersion(ValueError):
     pass
-
 
 
 class Version:
@@ -114,9 +117,6 @@ class Version:
 
 class Releases:
 
-    class Error(Exception):
-        pass
-
     def __init__(self, git: Git) -> None:
         self._git = git
 
@@ -132,7 +132,7 @@ class Releases:
     def latest_release(self) -> Version:
         versions = [v for v in self.versions() if not v.is_pre_release()]
         if not versions:
-            raise self.Error('no releases found from tags')
+            raise Error('no releases found from tags')
         return versions[-1]
 
     def next_release_candidate(self) -> Version:
@@ -140,7 +140,7 @@ class Releases:
 
         versions = self.versions()
         if not versions:
-            raise self.Error('no releases found from tags')
+            raise Error('no releases found from tags')
         latest_release = versions[-1]
 
         if latest_release.is_pre_release():
@@ -155,7 +155,7 @@ class Releases:
         name = f'v{version}'
 
         if name in self._git.remote_tags():
-            raise self.Error(f'the tag {name} exists in remote')
+            raise Error(f'the tag {name} exists in remote')
 
         self._git.create_commit(f"Release {name}")
         self._git.create_annotated_tag(name, f"Release {name}")
@@ -163,10 +163,10 @@ class Releases:
 
 def process(git: Git, releases: Releases, action: str) -> None:
     if git.current_branch() != 'master':
-        sys.exit('not on the master branch')
+        raise Error('not on the master branch')
 
     if not git.is_index_clean():
-        sys.exit('uncommited changes')
+        raise Error('uncommited changes')
 
     print(f'Latest release: {releases.latest_release()}')
 
@@ -181,7 +181,7 @@ def process(git: Git, releases: Releases, action: str) -> None:
     releases.create_release(version)
 
     print(f'Pushing to remote')
-    git.push()
+    # git.push()
 
 
 def main() -> None:
@@ -194,7 +194,7 @@ def main() -> None:
 
     try:
         process(git, releases, args.action)
-    except Releases.Error as err:
+    except (Error, InvalidVersion) as err:
         sys.exit(f'\033[31m{err}\033[0m')
 
 
