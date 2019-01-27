@@ -45,8 +45,12 @@ commands:
     run: script/test && pytest -v tests && script/lint
 
   release:
-    desc: Create a new release (bud release [VERSION])
-    run: script/release
+    desc: Create a new release
+    run: script/release.py release
+
+  rc:
+    desc: Create a new release-candidate or increment the last release-candidate
+    run: script/release.py release-candidate
 
   releaselog:
     desc: Show the commits since the last tag
