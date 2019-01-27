@@ -181,7 +181,7 @@ def process(git: Git, releases: Releases, action: str) -> None:
     releases.create_release(version)
 
     print(f'Pushing to remote')
-    # git.push()
+    git.push()
 
 
 def main() -> None:
