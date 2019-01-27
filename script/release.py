@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 import sys
-from typing import List, Optional, Iterator
+from typing import Any, Iterator, List, Optional, Tuple
 
 
 class Error(Exception):
@@ -18,7 +18,8 @@ class Git:
 
     def _capture(self, args: List[str], check: bool = True) -> str:
         result = subprocess.run(args, check=check, stdout=subprocess.PIPE)
-        return result.stdout.strip().decode()
+        stdout: bytes = result.stdout  # typeshed hints it as Any :-/
+        return stdout.strip().decode()
 
     def current_branch(self) -> str:
         return self._capture(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
@@ -69,10 +70,6 @@ class Version:
         major, minor, patch, _, pre_type, _, pre_version = match.groups()
         return cls(int(major), int(minor), int(patch), pre_type, None if pre_version is None else int(pre_version))
 
-    @staticmethod
-    def sorted(versions: Iterator['Version']) -> List['Version']:
-        return sorted(versions, key=lambda e: e.sort_key())
-
     def __init__(self, major: int, minor: int, patch: int, pre_type: Optional[str], pre_version: Optional[int]) -> None:
         self.major = major
         self.minor = minor
@@ -80,8 +77,13 @@ class Version:
         self.pre_type = pre_type
         self.pre_version = pre_version
 
-    def sort_key(self) -> List:
-        return [self.major, self.minor, self.patch, self.pre_type, self.pre_version]
+    def __key__(self) -> Tuple[int, int, int, Optional[str], Optional[int]]:
+        return (self.major, self.minor, self.patch, self.pre_type, self.pre_version)
+
+    def __lt__(self, other: Any) -> bool:
+        if not isinstance(other, Version):
+            raise TypeError('not an instance of Version')
+        return self.__key__() < other.__key__()
 
     def next_major(self) -> 'Version':
         return Version(self.major + 1, 0, 0, None, None)
@@ -127,7 +129,7 @@ class Releases:
                     yield Version.from_string(tag.lstrip('v'))
                 except InvalidVersion:
                     pass
-        return Version.sorted(gen())
+        return sorted(gen())
 
     def latest_release(self) -> Version:
         versions = [v for v in self.versions() if not v.is_pre_release()]
