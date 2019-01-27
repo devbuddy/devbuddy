@@ -9,7 +9,7 @@ jobs:
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
       - run: dep ensure -v -vendor-only
       - run: script/test
-      - run: pip install mypy; mypy script/release.py
+      - run: pip install mypy; mypy --strict script/release.py
 
   tests-bash:
     docker:
