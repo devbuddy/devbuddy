@@ -163,7 +163,7 @@ class Releases:
         self._git.create_annotated_tag(name, f"Release {name}")
 
 
-def process(git: Git, releases: Releases, action: str) -> None:
+def process(git: Git, releases: Releases, args: argparse.Namespace) -> None:
     if git.current_branch() != 'master':
         raise Error('not on the master branch')
 
@@ -172,10 +172,12 @@ def process(git: Git, releases: Releases, action: str) -> None:
 
     print(f'Latest release: {releases.latest_release()}')
 
-    if action == 'release-candidate':
+    if args.action == 'release-candidate':
         version = releases.next_release_candidate()
-    elif action == 'release':
+    elif args.action == 'release':
         version = releases.next_release()
+    elif args.action == 'custom':
+        version = Version.from_string(args.version)
     else:
         raise AssertionError()
 
@@ -186,16 +188,30 @@ def process(git: Git, releases: Releases, action: str) -> None:
     git.push()
 
 
-def main() -> None:
+def make_arg_parser() -> argparse.PARSER:
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['release-candidate', 'release'])
-    args = parser.parse_args()
+
+    sub = parser.add_subparsers(dest='action')
+    sub.required = True
+
+    sub.add_parser('release')
+
+    sub.add_parser('release-candidate')
+
+    custom = sub.add_parser('custom')
+    custom.add_argument('version', help='version to release (following semver v2)')
+
+    return parser
+
+
+def main() -> None:
+    args = make_arg_parser().parse_args()
 
     git = Git()
     releases = Releases(git)
 
     try:
-        process(git, releases, args.action)
+        process(git, releases, args)
     except (Error, InvalidVersion) as err:
         sys.exit(f'\033[31m{err}\033[0m')
 
