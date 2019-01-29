@@ -188,7 +188,7 @@ def process(git: Git, releases: Releases, args: argparse.Namespace) -> None:
     git.push()
 
 
-def make_arg_parser() -> argparse.PARSER:
+def make_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
 
     sub = parser.add_subparsers(dest='action')
