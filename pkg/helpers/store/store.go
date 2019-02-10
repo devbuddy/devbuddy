@@ -14,10 +14,6 @@ type fileData struct {
 	Entries map[string]string `json:"entries"`
 }
 
-func newFileData() *fileData {
-	return &fileData{Entries: make(map[string]string)}
-}
-
 // Store is the place to record information or keep files about a project
 type Store struct {
 	projectMetadata *projectmetadata.ProjectMetadata
@@ -28,34 +24,48 @@ func New(projectPath string) *Store {
 	return &Store{projectMetadata: projectmetadata.New(projectPath)}
 }
 
-func (s *Store) path() string {
-	return filepath.Join(s.projectMetadata.Path(), "store")
+func (s *Store) path() (string, error) {
+	path, err := s.projectMetadata.Path()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(path, "store"), nil
 }
 
 func (s *Store) read() (*fileData, error) {
-	data := newFileData()
-
-	if !utils.PathExists(s.path()) {
-		return data, nil
-	}
-
-	serialized, err := ioutil.ReadFile(s.path())
+	path, err := s.path()
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(serialized, data)
-	if err != nil {
-		return nil, err
+
+	data := &fileData{Entries: make(map[string]string)}
+
+	if utils.PathExists(path) {
+		serialized, err := ioutil.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(serialized, data)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	return data, nil
 }
 
 func (s *Store) write(data *fileData) error {
+	path, err := s.path()
+	if err != nil {
+		return err
+	}
+
 	serialized, err := json.MarshalIndent(data, "", "    ")
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(s.path(), serialized, 0644)
+
+	return ioutil.WriteFile(path, serialized, 0644)
 }
 
 // SetString stores a string for a key
@@ -64,10 +74,6 @@ func (s *Store) SetString(key string, value string) error {
 		return errors.New("empty string is not a valid key")
 	}
 
-	err := s.projectMetadata.Prepare()
-	if err != nil {
-		return err
-	}
 	data, err := s.read()
 	if err != nil {
 		return err
@@ -82,10 +88,6 @@ func (s *Store) GetString(key string) (string, error) {
 		return "", errors.New("empty string is not a valid key")
 	}
 
-	err := s.projectMetadata.Prepare()
-	if err != nil {
-		return "", err
-	}
 	data, err := s.read()
 	if err != nil {
 		return "", err

@@ -13,36 +13,43 @@ var dirName = ".devbuddy"
 
 // ProjectMetadata is the place to store metadata files about a project
 type ProjectMetadata struct {
-	projectPath string
+	path string
 }
 
 // New returns an instance of ProjectMetadata
 func New(projectPath string) *ProjectMetadata {
-	return &ProjectMetadata{projectPath: projectPath}
-}
-
-func (p *ProjectMetadata) Path() string {
-	return filepath.Join(p.projectPath, dirName)
-}
-
-// Prepare makes sure the metadata directory is ready
-func (p *ProjectMetadata) Prepare() (err error) {
-	if !utils.PathExists(p.projectPath) {
-		return fmt.Errorf("failed to initialize the project metadata dir: path does not exist: %s", p.projectPath)
+	if !utils.PathExists(projectPath) {
+		panic("project path does not exist: " + projectPath)
 	}
 
-	if !utils.PathExists(p.Path()) {
-		err = os.MkdirAll(p.Path(), 0755)
+	return &ProjectMetadata{
+		path: filepath.Join(projectPath, dirName),
+	}
+}
+
+// Path returns the path of the project metadata directory.
+func (p *ProjectMetadata) Path() (string, error) {
+	err := p.prepare()
+	if err != nil {
+		return "", fmt.Errorf("failed to initialize the project metadata dir: %s", err)
+	}
+
+	return p.path, nil
+}
+
+func (p *ProjectMetadata) prepare() error {
+	if !utils.PathExists(p.path) {
+		err := os.MkdirAll(p.path, 0755)
 		if err != nil {
-			return
+			return err
 		}
 	}
 
-	gitignore := filepath.Join(p.Path(), ".gitignore")
+	gitignore := filepath.Join(p.path, ".gitignore")
 	if !utils.PathExists(gitignore) {
-		err = ioutil.WriteFile(gitignore, []byte("*"), 0644)
+		err := ioutil.WriteFile(gitignore, []byte("*"), 0644)
 		if err != nil {
-			return
+			return err
 		}
 	}
 	return nil
