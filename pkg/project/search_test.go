@@ -82,3 +82,16 @@ func TestSearchingWithNoProject(t *testing.T) {
 	require.Error(t, err, "FindBestMatch() should return an error when no project found")
 	require.Equal(t, "no projects found at all! Try cloning one first", err.Error())
 }
+
+func TestFuzzySearch(t *testing.T) {
+  index := []string{"ddg", "github", "heroku"}
+
+  link := FindBestLinkMatch("github", index)
+	require.Equal(t, "github", link)
+
+  link = FindBestLinkMatch("dd", index)
+	require.Equal(t, "ddg", link)
+
+  link = FindBestLinkMatch("heru", index)
+  require.Equal(t, "heroku", link)
+}
