@@ -9,6 +9,14 @@ import (
 	"github.com/Flaque/filet"
 )
 
+func open(path string) *Store {
+	store, err := Open(path, "testTable")
+	if err != nil {
+		panic("failed to open the store")
+	}
+	return store
+}
+
 func TestSetGetString(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
@@ -16,10 +24,10 @@ func TestSetGetString(t *testing.T) {
 	testValues := []string{"DUMMY", "", "   "}
 
 	for _, testVal := range testValues {
-		err := New(tmpdir).SetString("key", testVal)
+		err := open(tmpdir).SetString("key", testVal)
 		require.NoError(t, err)
 
-		val, err := New(tmpdir).GetString("key")
+		val, err := open(tmpdir).GetString("key")
 		require.NoError(t, err)
 		assert.Equal(t, testVal, val)
 	}
@@ -29,10 +37,10 @@ func TestKeyEmpty(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
 
-	_, err := New(tmpdir).GetString("")
+	_, err := open(tmpdir).GetString("")
 	require.EqualError(t, err, "empty string is not a valid key")
 
-	err = New(tmpdir).SetString("", "")
+	err = open(tmpdir).SetString("", "")
 	require.EqualError(t, err, "empty string is not a valid key")
 }
 
@@ -40,7 +48,7 @@ func TestGetStringNotFound(t *testing.T) {
 	defer filet.CleanUp(t)
 	tmpdir := filet.TmpDir(t, "")
 
-	val, err := New(tmpdir).GetString("doesnotexist")
+	val, err := open(tmpdir).GetString("doesnotexist")
 	require.NoError(t, err)
 	require.Equal(t, "", val)
 }
