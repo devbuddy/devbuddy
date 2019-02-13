@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-go test `go list ./... | grep -vF /vendor/`
+go test ./... -cover
