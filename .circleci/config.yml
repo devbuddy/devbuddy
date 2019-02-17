@@ -7,7 +7,6 @@ jobs:
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
-      - run: dep ensure -v -vendor-only
       - run: script/test
       - run: pip install mypy; mypy --strict script/release.py
 
@@ -18,7 +17,6 @@ jobs:
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
-      - run: dep ensure -v -vendor-only
       - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 -v tests
 
@@ -29,7 +27,6 @@ jobs:
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
-      - run: dep ensure -v -vendor-only
       - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 --shell zsh -v tests
 
@@ -39,7 +36,6 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure -v -vendor-only
       - run: script/lint
 
   binaries:
@@ -48,7 +44,6 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure -v -vendor-only
       - run: script/buildall
       - store_artifacts:
           path: dist/
@@ -59,7 +54,6 @@ jobs:
     working_directory: /go/src/github.com/devbuddy/devbuddy
     steps:
       - checkout
-      - run: dep ensure -v -vendor-only
       - run: script/buildall
       - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME `git describe --tags` dist
 
