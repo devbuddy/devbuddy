@@ -37,6 +37,14 @@
   version = "v1.0"
 
 [[projects]]
+  digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
+  name = "github.com/joho/godotenv"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "23d116af351c84513e1946b527c88823e476be13"
+  version = "v1.3.0"
+
+[[projects]]
   branch = "master"
   digest = "1:be40f095cd741773905744f16c1f7a21fd9226ccd0529f019deb7da6d667f71c"
   name = "github.com/logrusorgru/aurora"
@@ -135,6 +143,7 @@
   input-imports = [
     "github.com/Flaque/filet",
     "github.com/dnaeon/go-vcr/recorder",
+    "github.com/joho/godotenv",
     "github.com/logrusorgru/aurora",
     "github.com/mitchellh/go-ps",
     "github.com/sahilm/fuzzy",

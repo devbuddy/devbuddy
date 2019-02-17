@@ -54,6 +54,12 @@ func (e *Env) Get(name string) string {
 	return e.env[name]
 }
 
+// Has indicates whether a variable exists or not
+func (e *Env) Has(name string) bool {
+	_, present := e.env[name]
+	return present
+}
+
 // Environ returns all variable as os.Environ() would
 func (e *Env) Environ() (vars []string) {
 	for name, value := range e.env {

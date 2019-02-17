@@ -28,6 +28,12 @@ func TestEnviron(t *testing.T) {
 	require.ElementsMatch(t, []string{"K1=V1B", "K3=V3"}, env.Environ())
 }
 
+func TestHas(t *testing.T) {
+	env := New([]string{"K1=V1"})
+	require.True(t, env.Has("K1"))
+	require.False(t, env.Has("NOPE"))
+}
+
 func TestIsInPath(t *testing.T) {
 	env := New([]string{"PATH=/usr/bin:/bin"})
 
