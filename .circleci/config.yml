@@ -1,16 +1,9 @@
-version: 2.1
-
-executors:
-  devbuddytesting:
-    docker:
-      - image: devbuddy/testing:latest
-    working_directory: /go/src/github.com/devbuddy/devbuddy
-    environment:
-      GO111MODULE: 'on'
+version: 2
 
 jobs:
   tests:
-    executor: devbuddytesting
+    docker:
+      - image: devbuddy/docker-testing:1.0
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
@@ -18,7 +11,8 @@ jobs:
       - run: pip install mypy; mypy --strict script/release.py
 
   tests-bash:
-    executor: devbuddytesting
+    docker:
+      - image: devbuddy/docker-testing:1.0
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
@@ -26,7 +20,8 @@ jobs:
       - run: pytest --durations=1 -v tests
 
   tests-zsh:
-    executor: devbuddytesting
+    docker:
+      - image: devbuddy/docker-testing:1.0
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
@@ -34,13 +29,15 @@ jobs:
       - run: pytest --durations=1 --shell zsh -v tests
 
   lint:
-    executor: devbuddytesting
+    docker:
+      - image: devbuddy/docker-testing:1.0
     steps:
       - checkout
       - run: script/lint
 
   binaries:
-    executor: devbuddytesting
+    docker:
+      - image: devbuddy/docker-testing:1.0
     steps:
       - checkout
       - run: script/buildall
@@ -48,7 +45,8 @@ jobs:
           path: dist/
 
   deploy-release:
-    executor: devbuddytesting
+    docker:
+      - image: devbuddy/docker-testing:1.0
     steps:
       - checkout
       - run: script/buildall
