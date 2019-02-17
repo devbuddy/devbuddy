@@ -24,6 +24,9 @@ func golangActivate(version string, cfg *config.Config, proj *project.Project, e
 
 	// TODO: decide whether we want to enable GO15VENDOREXPERIMENT
 	// Introduced in 1.5, enabled by default in 1.7
+	if utils.PathExists("go.mod") {
+		env.Set("GO111MODULE", "on")
+	}
 
 	return false, nil
 }
