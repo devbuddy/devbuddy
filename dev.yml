@@ -1,6 +1,5 @@
 up:
   - go: 1.11.5
-  - golang_dep
   - python: 3.6.5
   - pip: [tests/requirements.txt]
   - homebrew:
