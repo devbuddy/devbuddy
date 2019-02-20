@@ -34,7 +34,7 @@ jobs:
     executor: testing
     steps:
       - checkout
-      - run: golangci-lint --version
+      - run: go mod download
       - run: script/lint
 
   binaries:
