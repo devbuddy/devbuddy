@@ -37,6 +37,19 @@ func TestTaskConfigStringOrStringProperty(t *testing.T) {
 	require.Equal(t, val, "value")
 }
 
+func TestTaskConfigGetBooleanPropertyDefault(t *testing.T) {
+	payload := map[interface{}]interface{}{"flag": true}
+	config := &TaskConfig{name: "test", payload: payload}
+
+	val, err := config.GetBooleanPropertyDefault("flag", false)
+	require.NoError(t, err)
+	require.Equal(t, val, true)
+
+	val, err = config.GetBooleanPropertyDefault("nope", false)
+	require.NoError(t, err)
+	require.Equal(t, val, false)
+}
+
 func TestTaskConfigStringProperty(t *testing.T) {
 	value := map[interface{}]interface{}{"key": "val"}
 	config := &TaskConfig{name: "test", payload: value}
