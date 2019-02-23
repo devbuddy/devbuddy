@@ -14,34 +14,36 @@ type FeatureState struct {
 	env *env.Env
 }
 
-func serializeFeatureSet(featureSet FeatureSet) string {
-	var parts []string
-	for _, info := range featureSet {
-		parts = append(parts, fmt.Sprintf("%s=%s", info.Name, info.Param))
-	}
-	return strings.Join(parts, ":")
-}
-
-func deserializeFeatureSet(serialized string) FeatureSet {
-	features := FeatureSet{}
-	for _, feat := range strings.Split(serialized, ":") {
-		if feat != "" {
-			parts := strings.SplitN(feat, "=", 2)
-			if len(parts) == 2 {
-				features = features.With(FeatureInfo{parts[0], parts[1]})
-			}
-		}
-	}
-	return features
-}
-
 // GetActiveFeatures returns a Hash of feature name -> param
 func (s *FeatureState) GetActiveFeatures() FeatureSet {
-	return deserializeFeatureSet(s.env.Get(autoEnvVariableName))
+	_, set := s.get()
+	return set
 }
 
-func (s *FeatureState) setActiveFeatures(featureSet FeatureSet) {
-	val := serializeFeatureSet(featureSet)
+// SetProject change the state to set the project
+func (s *FeatureState) SetProjectSlug(slug string) {
+	_, set := s.get()
+	s.set(slug, set)
+}
+
+// IsProject returns whether the state is for this project
+func (s *FeatureState) GetProjectSlug() string {
+	slug, _ := s.get()
+	return slug
+}
+
+func (s *FeatureState) get() (string, FeatureSet) {
+	data := s.env.Get(autoEnvVariableName)
+
+	if strings.HasPrefix(data, "1:") {
+		parts := strings.SplitN(data, ":", 3)
+		return parts[1], NewFeatureSetFromString(parts[2])
+	}
+	return "", NewFeatureSetFromString(data)
+}
+
+func (s *FeatureState) set(slug string, featureSet FeatureSet) {
+	val := fmt.Sprintf("1:%s:%s", slug, featureSet.Serialize())
 	if len(val) == 0 {
 		s.env.Unset(autoEnvVariableName)
 	} else {
@@ -51,10 +53,12 @@ func (s *FeatureState) setActiveFeatures(featureSet FeatureSet) {
 
 // SetFeature marks a feature as active
 func (s *FeatureState) SetFeature(featureInfo FeatureInfo) {
-	s.setActiveFeatures(s.GetActiveFeatures().With(featureInfo))
+	pKey, set := s.get()
+	s.set(pKey, set.With(featureInfo))
 }
 
 // UnsetFeature marks a feature as inactive
 func (s *FeatureState) UnsetFeature(name string) {
-	s.setActiveFeatures(s.GetActiveFeatures().Without(name))
+	pKey, set := s.get()
+	s.set(pKey, set.Without(name))
 }
