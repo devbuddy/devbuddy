@@ -17,6 +17,13 @@ type runner struct {
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
+	// If we jumped to a different project, all feature should be deactivated
+	if r.state.GetProjectSlug() != r.proj.Slug() {
+		for _, featureInfo := range r.state.GetActiveFeatures() {
+			r.deactivateFeature(featureInfo)
+		}
+	}
+
 	activeFeatures := r.state.GetActiveFeatures()
 
 	for _, name := range r.reg.names() {
@@ -38,6 +45,9 @@ func (r *runner) sync(featureSet FeatureSet) {
 			}
 		}
 	}
+
+	// Record for which project the features were activated
+	r.state.SetProjectSlug(r.proj.Slug())
 }
 
 func (r *runner) activateFeature(featureInfo FeatureInfo) {
