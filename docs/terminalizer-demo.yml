@@ -78,7 +78,7 @@ config:
   fontFamily: "Monaco, Lucida Console, Ubuntu Mono, Monospace"
 
   # The size of the font
-  fontSize: 12
+  fontSize: 14
 
   # The height of lines
   lineHeight: 1
@@ -92,21 +92,21 @@ config:
     foreground: "#afafaf"
     cursor: "#c7c7c7"
     black: "#232628"
-    red: "#fc4384"
-    green: "#b3e33b"
-    yellow: "#ffa727"
-    blue: "#75dff2"
-    magenta: "#ae89fe"
-    cyan: "#708387"
-    white: "#d5d5d0"
-    brightBlack: "#626566"
-    brightRed: "#ff7fac"
-    brightGreen: "#c8ed71"
-    brightYellow: "#ebdf86"
-    brightBlue: "#75dff2"
-    brightMagenta: "#ae89fe"
-    brightCyan: "#b1c6ca"
-    brightWhite: "#f9f9f4"
+    red: "#c91b00"
+    green: "#00c200"
+    yellow: "#c7c400"
+    blue: "#0225c7"
+    magenta: "#c930c7"
+    cyan: "#00c5c7"
+    white: "#c7c7c7"
+    brightBlack: "#676767"
+    brightRed: "#ff6d67"
+    brightGreen: "#5ff967"
+    brightYellow: "#fefb67"
+    brightBlue: "#6871ff"
+    brightMagenta: "#ff76ff"
+    brightCyan: "#5ffdff"
+    brightWhite: "#feffff"
 
 # Records, feel free to edit them
 records:
