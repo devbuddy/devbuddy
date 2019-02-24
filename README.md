@@ -27,6 +27,8 @@ With **DevBuddy**, pushing a change on a project you never touched look like thi
 - `bud test`
 - `git push`
 
+<p align="center"><img src="/docs/demo.gif?raw=true"/></p>
+
 ## Status and progress
 
 **DevBuddy** is mostly useful for Python and Go projects. More languages will be natively
