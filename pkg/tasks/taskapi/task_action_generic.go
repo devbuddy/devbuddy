@@ -3,8 +3,7 @@ package taskapi
 import (
 	"path/filepath"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
-
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/helpers/store"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
@@ -14,7 +13,7 @@ type genericTaskAction struct {
 	conditions     []*genericTaskActionCondition
 	monitoredFiles []string
 	runFunc        func(*Context) error
-	feature        *features.FeatureInfo
+	feature        *autoenv.FeatureInfo
 
 	runCalled bool
 }
@@ -40,7 +39,7 @@ func (a *genericTaskAction) Run(ctx *Context) error {
 	return a.runFunc(ctx)
 }
 
-func (a *genericTaskAction) Feature() *features.FeatureInfo {
+func (a *genericTaskAction) Feature() *autoenv.FeatureInfo {
 	return a.feature
 }
 

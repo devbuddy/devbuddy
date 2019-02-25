@@ -4,24 +4,28 @@ import (
 	"fmt"
 )
 
-type featureRegister struct {
+type Register struct {
 	nameToFeature map[string]*Feature
 }
 
-func newFeatureRegister() *featureRegister {
-	return &featureRegister{nameToFeature: make(map[string]*Feature)}
+func NewRegister() *Register {
+	return &Register{nameToFeature: make(map[string]*Feature)}
 }
 
-var globalRegister *featureRegister
+var globalRegister *Register
+
+func GetRegister() *Register {
+	return globalRegister
+}
 
 func register(name string, activate activateFunc, deactivate deactivateFunc) {
 	if globalRegister == nil {
-		globalRegister = newFeatureRegister()
+		globalRegister = NewRegister()
 	}
-	globalRegister.register(name, activate, deactivate)
+	globalRegister.Register(name, activate, deactivate)
 }
 
-func (e *featureRegister) register(name string, activate activateFunc, deactivate deactivateFunc) {
+func (e *Register) Register(name string, activate activateFunc, deactivate deactivateFunc) {
 	if _, ok := e.nameToFeature[name]; ok {
 		panic(fmt.Sprint("Can't re-register a definition:", name))
 	}
@@ -35,7 +39,7 @@ func (e *featureRegister) register(name string, activate activateFunc, deactivat
 	e.nameToFeature[name] = &Feature{Name: name, Activate: activate, Deactivate: deactivate}
 }
 
-func (e *featureRegister) get(name string) (*Feature, error) {
+func (e *Register) Get(name string) (*Feature, error) {
 	env := e.nameToFeature[name]
 	if env == nil {
 		return nil, fmt.Errorf("unknown feature: %s", name)
@@ -43,7 +47,7 @@ func (e *featureRegister) get(name string) (*Feature, error) {
 	return env, nil
 }
 
-func (e *featureRegister) names() (names []string) {
+func (e *Register) Names() (names []string) {
 	for name := range e.nameToFeature {
 		names = append(names, string(name))
 	}

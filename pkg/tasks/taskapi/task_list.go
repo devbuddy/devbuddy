@@ -3,7 +3,7 @@ package taskapi
 import (
 	"fmt"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
@@ -54,8 +54,8 @@ func newUnknownTaskDefinition() *TaskDefinition {
 	return &TaskDefinition{Name: "Unknown", Parser: parser}
 }
 
-func GetFeaturesFromTasks(tasks []*Task) features.FeatureSet {
-	featureSet := features.FeatureSet{}
+func GetFeaturesFromTasks(tasks []*Task) autoenv.FeatureSet {
+	featureSet := autoenv.FeatureSet{}
 
 	for _, task := range tasks {
 		for _, action := range task.Actions {

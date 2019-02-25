@@ -3,9 +3,9 @@ package taskengine
 import (
 	"bytes"
 
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/termui"
@@ -20,7 +20,7 @@ type testingAction struct {
 	neededResults   []*taskapi.ActionResult
 	neededCallCount int
 
-	feature *features.FeatureInfo
+	feature *autoenv.FeatureInfo
 
 	runResult    error
 	runCallCount int
@@ -44,7 +44,7 @@ func (a *testingAction) Run(ctx *taskapi.Context) error {
 	return a.runResult
 }
 
-func (a *testingAction) Feature() *features.FeatureInfo {
+func (a *testingAction) Feature() *autoenv.FeatureInfo {
 	return a.feature
 }
 
@@ -71,7 +71,7 @@ func setupTaskTesting() (*taskapi.Context, *bytes.Buffer) {
 		UI:       ui,
 		Cfg:      config.NewTestConfig(),
 		Env:      env.New([]string{}),
-		Features: features.NewFeatureSet(),
+		Features: autoenv.NewFeatureSet(),
 	}
 
 	return ctx, buf

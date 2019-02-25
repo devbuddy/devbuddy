@@ -1,9 +1,10 @@
-package features
+package autoenv
 
 import (
 	"strings"
 	"testing"
 
+	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/stretchr/testify/require"
 
@@ -30,8 +31,8 @@ func (r *recorder) getCallsAndReset() []string {
 	return val
 }
 
-func newMockEnv(name string, reg *featureRegister, rec *recorder) {
-	reg.register(
+func newMockEnv(name string, reg *features.Register, rec *recorder) {
+	reg.Register(
 		name,
 		func(param string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
 			rec.record("activate", param)
@@ -43,11 +44,11 @@ func newMockEnv(name string, reg *featureRegister, rec *recorder) {
 	)
 }
 
-func newRunner(env *env.Env, reg *featureRegister) *runner {
+func newRunner(env *env.Env, reg *features.Register) *runner {
 	return newRunnerWithProject(env, reg, "/project")
 }
 
-func newRunnerWithProject(env *env.Env, reg *featureRegister, projectPath string) *runner {
+func newRunnerWithProject(env *env.Env, reg *features.Register, projectPath string) *runner {
 	_, ui := termui.NewTesting(false)
 	return &runner{
 		cfg:   nil,
@@ -62,7 +63,7 @@ func newRunnerWithProject(env *env.Env, reg *featureRegister, projectPath string
 func TestRunner(t *testing.T) {
 	testEnv := env.New([]string{})
 
-	reg := newFeatureRegister()
+	reg := features.NewRegister()
 
 	rustCalls := newRecorder()
 	newMockEnv("rust", reg, rustCalls)
@@ -98,7 +99,7 @@ func TestRunner(t *testing.T) {
 func TestRunnerWithTwoFeatures(t *testing.T) {
 	testEnv := env.New([]string{})
 
-	reg := newFeatureRegister()
+	reg := features.NewRegister()
 
 	rustCalls := newRecorder()
 	newMockEnv("rust", reg, rustCalls)
@@ -135,7 +136,7 @@ func TestRunnerWithTwoFeatures(t *testing.T) {
 func TestRunnerChangeProject(t *testing.T) {
 	testEnv := env.New([]string{})
 
-	reg := newFeatureRegister()
+	reg := features.NewRegister()
 
 	rustCalls := newRecorder()
 	newMockEnv("rust", reg, rustCalls)
