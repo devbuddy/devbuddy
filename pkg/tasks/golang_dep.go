@@ -61,15 +61,15 @@ func (p *golangDepEnsure) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	// Is the vendor dir out dated?
 	vendorMod, err := fileModTime(ctx, "vendor")
 	if err != nil {
-		return taskapi.ActionFailed("failed to get the modification of the vendor directory", err)
+		return taskapi.ActionFailed("failed to get the modification of the vendor directory: %s", err)
 	}
 	tomlMod, err := fileModTime(ctx, "Gopkg.toml")
 	if err != nil {
-		return taskapi.ActionFailed("failed to get the modification of Gopkg.toml", err)
+		return taskapi.ActionFailed("failed to get the modification of Gopkg.toml: %s", err)
 	}
 	lockMod, err := fileModTime(ctx, "Gopkg.lock")
 	if err != nil {
-		return taskapi.ActionFailed("failed to get the modification of Gopkg.lock", err)
+		return taskapi.ActionFailed("failed to get the modification of Gopkg.lock: %s", err)
 	}
 	if tomlMod > vendorMod || lockMod > vendorMod {
 		return taskapi.ActionNeeded("Gopkg.toml or Gopkg.lock has been changed")

@@ -44,8 +44,19 @@ func newMockEnv(name string, reg *featureRegister, rec *recorder) {
 }
 
 func newRunner(env *env.Env, reg *featureRegister) *runner {
+	return newRunnerWithProject(env, reg, "/project")
+}
+
+func newRunnerWithProject(env *env.Env, reg *featureRegister, projectPath string) *runner {
 	_, ui := termui.NewTesting(false)
-	return &runner{cfg: nil, proj: nil, ui: ui, env: env, state: &FeatureState{env}, reg: reg}
+	return &runner{
+		cfg:   nil,
+		proj:  project.NewFromPath(projectPath),
+		ui:    ui,
+		env:   env,
+		state: &FeatureState{env},
+		reg:   reg,
+	}
 }
 
 func TestRunner(t *testing.T) {
@@ -63,14 +74,22 @@ func TestRunner(t *testing.T) {
 	runner.sync(NewFeatureSet())
 	require.Equal(t, []string{}, rustCalls.getCallsAndReset())
 
+	// Add a feature
 	runner = newRunner(testEnv, reg)
 	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
 	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 
+	// Second time with the same feature
+	runner = newRunner(testEnv, reg)
+	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
+	require.Equal(t, []string{}, rustCalls.getCallsAndReset())
+
+	// Change the feature param
 	runner = newRunner(testEnv, reg)
 	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "2.0"}))
 	require.Equal(t, []string{"deactivate 1.0", "activate 2.0"}, rustCalls.getCallsAndReset())
 
+	// With no feature
 	runner = newRunner(testEnv, reg)
 	runner.sync(NewFeatureSet())
 	require.Equal(t, []string{"deactivate 2.0"}, rustCalls.getCallsAndReset())
@@ -111,4 +130,23 @@ func TestRunnerWithTwoFeatures(t *testing.T) {
 	runner.sync(NewFeatureSet())
 	require.Equal(t, []string{"deactivate 1.0"}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{"deactivate 0.5"}, elixirCalls.getCallsAndReset())
+}
+
+func TestRunnerChangeProject(t *testing.T) {
+	testEnv := env.New([]string{})
+
+	reg := newFeatureRegister()
+
+	rustCalls := newRecorder()
+	newMockEnv("rust", reg, rustCalls)
+
+	// Add a feature
+	runner := newRunnerWithProject(testEnv, reg, "/project-a")
+	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
+	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
+
+	// Same feature on a different project
+	runner = newRunnerWithProject(testEnv, reg, "/project-b")
+	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
+	require.Equal(t, []string{"deactivate 1.0", "activate 1.0"}, rustCalls.getCallsAndReset())
 }

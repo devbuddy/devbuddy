@@ -101,7 +101,12 @@ func genericTaskActionPreConditionForFile(ctx *Context, path string) *ActionResu
 		return ActionFailed("failed to get the file checksum: %s", err)
 	}
 
-	storedChecksum, err := store.New(ctx.Project.Path).GetString("checksum" + path)
+	checksumStore, err := store.Open(ctx.Project.Path, "checksum")
+	if err != nil {
+		return ActionFailed("failed to open the internal project state: %s", err)
+	}
+
+	storedChecksum, err := checksumStore.GetString(path)
 	if err != nil {
 		return ActionFailed("failed to read the previous file checksum: %s", err)
 	}
@@ -124,7 +129,12 @@ func genericTaskActionPostConditionForFile(ctx *Context, path string) *ActionRes
 		return ActionFailed("failed to get the file checksum: %s", err)
 	}
 
-	err = store.New(ctx.Project.Path).SetString("checksum"+path, fileChecksum)
+	checksumStore, err := store.Open(ctx.Project.Path, "checksum")
+	if err != nil {
+		return ActionFailed("failed to open the internal project state: %s", err)
+	}
+
+	err = checksumStore.SetString(path, fileChecksum)
 	if err != nil {
 		return ActionFailed("failed to store the current file checksum: %s", err)
 	}

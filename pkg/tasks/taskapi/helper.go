@@ -11,6 +11,15 @@ func asString(value interface{}) (string, error) {
 	return "", fmt.Errorf("not a string: %T (%+v)", value, value)
 }
 
+func asBool(value interface{}) (bool, error) {
+	result, ok := value.(bool)
+	if ok {
+		return result, nil
+	}
+
+	return false, fmt.Errorf("not a boolean: %T (%+v)", value, value)
+}
+
 func asListOfStrings(value interface{}) ([]string, error) {
 	if v, ok := value.([]string); ok {
 		return v, nil
