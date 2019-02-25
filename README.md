@@ -5,6 +5,7 @@
 [![GitHub Release](https://img.shields.io/github/release/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 [![GitHub Release Date](https://img.shields.io/github/release-date/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 [![Gitter](https://img.shields.io/badge/Discussions%20on-Gitter-crimson.svg?logo=gitter&style=flat)](https://gitter.im/devbuddy)
+![GitHub Release](https://img.shields.io/badge/license-MIT-green.svg)
 
 Contents:
 - [Install DevBuddy](#install)
