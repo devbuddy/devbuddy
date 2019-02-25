@@ -27,13 +27,13 @@ With **DevBuddy**, pushing a change on a project you never touched look like thi
 - `bud test`
 - `git push`
 
+<br>
 <p align="center"><img src="/docs/demo.gif?raw=true"/></p>
 
 ## Status and progress
 
-**DevBuddy** is mostly useful for Python and Go projects. More languages will be natively
-supported. Additional automatic tasks will also be implemented, making **DevBuddy** also
-useful for languages without native support.
+**DevBuddy** is more useful for Python, Go and Node projects. More languages will be natively
+supported. DevBuddy is still useful for languages without native support thanks to the **custom** task.
 
 See the project config [documentation](docs/Config.md).
 
