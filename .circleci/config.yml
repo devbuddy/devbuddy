@@ -1,65 +1,54 @@
-version: 2
+version: 2.1
+
+executors:
+  testing:
+    docker:
+      - image: devbuddy/docker-testing:1.1
+
 jobs:
   tests:
-    docker:
-      - image: devbuddy/testing:latest
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+    executor: testing
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
-      - run: dep ensure -v -vendor-only
       - run: script/test
       - run: pip install mypy; mypy --strict script/release.py
 
   tests-bash:
-    docker:
-      - image: devbuddy/testing:latest
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+    executor: testing
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
-      - run: dep ensure -v -vendor-only
       - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 -v tests
 
   tests-zsh:
-    docker:
-      - image: devbuddy/testing:latest
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+    executor: testing
     steps:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
-      - run: dep ensure -v -vendor-only
       - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 --shell zsh -v tests
 
   lint:
-    docker:
-      - image: devbuddy/testing:latest
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+    executor: testing
     steps:
       - checkout
-      - run: dep ensure -v -vendor-only
+      - run: go mod download
       - run: script/lint
 
   binaries:
-    docker:
-      - image: devbuddy/testing:latest
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+    executor: testing
     steps:
       - checkout
-      - run: dep ensure -v -vendor-only
       - run: script/buildall
       - store_artifacts:
           path: dist/
 
   deploy-release:
-    docker:
-      - image: devbuddy/testing:latest
-    working_directory: /go/src/github.com/devbuddy/devbuddy
+    executor: testing
     steps:
       - checkout
-      - run: dep ensure -v -vendor-only
       - run: script/buildall
       - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME `git describe --tags` dist
 

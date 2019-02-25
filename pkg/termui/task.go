@@ -38,7 +38,7 @@ func (u *UI) TaskError(err error) {
 }
 
 func (u *UI) TaskErrorf(message string, a ...interface{}) {
-	u.TaskError(fmt.Errorf(message, a))
+	u.TaskError(fmt.Errorf(message, a...))
 }
 
 func (u *UI) TaskWarning(message string) {
