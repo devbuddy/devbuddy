@@ -1,4 +1,4 @@
-package features
+package register
 
 import (
 	"testing"

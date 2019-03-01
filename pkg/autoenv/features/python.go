@@ -1,6 +1,7 @@
 package features
 
 import (
+	"github.com/devbuddy/devbuddy/pkg/autoenv/register"
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
@@ -8,7 +9,7 @@ import (
 )
 
 func init() {
-	register("python", pythonActivate, pythonDeactivate)
+	register.RegisterFeature("python", pythonActivate, pythonDeactivate)
 }
 
 func pythonActivate(version string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
