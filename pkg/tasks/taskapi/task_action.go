@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 )
 
 type TaskAction interface {
 	Description() string
-	Needed(*Context) *ActionResult
-	Run(*Context) error
+	Needed(*context.Context) *ActionResult
+	Run(*context.Context) error
 	Feature() *autoenv.FeatureInfo
 }
 

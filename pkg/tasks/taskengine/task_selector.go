@@ -3,12 +3,13 @@ package taskengine
 import (
 	"fmt"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers/osidentity"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 type TaskSelector interface {
-	ShouldRun(*taskapi.Context, *taskapi.Task) (bool, error)
+	ShouldRun(*context.Context, *taskapi.Task) (bool, error)
 }
 
 type TaskSelectorImpl struct {
@@ -19,7 +20,7 @@ func NewTaskSelector() *TaskSelectorImpl {
 	return &TaskSelectorImpl{osIdent: osidentity.Detect()}
 }
 
-func (s *TaskSelectorImpl) ShouldRun(ctx *taskapi.Context, task *taskapi.Task) (bool, error) {
+func (s *TaskSelectorImpl) ShouldRun(ctx *context.Context, task *taskapi.Task) (bool, error) {
 	shouldRun, err := s.osRequirementMatch(ctx, task)
 	if err != nil {
 		return false, err
@@ -31,7 +32,7 @@ func (s *TaskSelectorImpl) ShouldRun(ctx *taskapi.Context, task *taskapi.Task) (
 	return true, nil
 }
 
-func (s *TaskSelectorImpl) osRequirementMatch(ctx *taskapi.Context, task *taskapi.Task) (bool, error) {
+func (s *TaskSelectorImpl) osRequirementMatch(ctx *context.Context, task *taskapi.Task) (bool, error) {
 	switch task.OSRequirement {
 	case "":
 		break

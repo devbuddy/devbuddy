@@ -2,6 +2,8 @@ package taskapi
 
 import (
 	"fmt"
+
+	"github.com/devbuddy/devbuddy/pkg/context"
 )
 
 // Task represents a task created by a taskDefinition.parser and specified by the TaskInfo
@@ -15,7 +17,7 @@ func (t *Task) AddAction(action TaskAction) {
 	t.Actions = append(t.Actions, action)
 }
 
-func (t *Task) AddActionWithBuilder(description string, runFunc func(*Context) error) *genericTaskActionBuilder {
+func (t *Task) AddActionWithBuilder(description string, runFunc func(*context.Context) error) *genericTaskActionBuilder {
 	if runFunc == nil {
 		panic("runFunc cannot be nil")
 	}

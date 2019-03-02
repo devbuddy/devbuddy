@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -23,7 +24,7 @@ func parserPythonDevelop(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	}
 	pipArgs := []string{"install", "--require-virtualenv", "-e", pipTarget}
 
-	pipInstall := func(ctx *taskapi.Context) error {
+	pipInstall := func(ctx *context.Context) error {
 		result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
 		if result.Error != nil {
 			return fmt.Errorf("Pip failed: %s", result.Error)

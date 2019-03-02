@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
@@ -45,7 +46,7 @@ func NewTaskFromDefinition(definition interface{}) (task *Task, err error) {
 
 func newUnknownTaskDefinition() *TaskDefinition {
 	parser := func(config *TaskConfig, task *Task) error {
-		task.AddActionWithBuilder("", func(ctx *Context) error {
+		task.AddActionWithBuilder("", func(ctx *context.Context) error {
 			ctx.UI.TaskWarning(fmt.Sprintf("Unknown task: \"%s\"", config.name))
 			return nil
 		})

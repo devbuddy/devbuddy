@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -26,7 +27,7 @@ func (p *golangDepInstall) Description() string {
 	return "Install Go Dep"
 }
 
-func (p *golangDepInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
+func (p *golangDepInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 	_, err := exec.LookPath("dep") // Just check if `dep` is in the PATH for now
 	if err != nil {
 		return taskapi.ActionNeeded("could not find the dep command in the PATH")
@@ -34,7 +35,7 @@ func (p *golangDepInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	return taskapi.ActionNotNeeded()
 }
 
-func (p *golangDepInstall) Run(ctx *taskapi.Context) error {
+func (p *golangDepInstall) Run(ctx *context.Context) error {
 	result := command(ctx, "go", "get", "-u", "github.com/golang/dep/cmd/dep").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to install Go GolangDep: %s", result.Error)
@@ -53,7 +54,7 @@ func (p *golangDepEnsure) Description() string {
 	return "Run dep ensure"
 }
 
-func (p *golangDepEnsure) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
+func (p *golangDepEnsure) Needed(ctx *context.Context) *taskapi.ActionResult {
 	if !fileExists(ctx, "vendor") {
 		return taskapi.ActionNeeded("the vendor directory does not exist")
 	}
@@ -78,7 +79,7 @@ func (p *golangDepEnsure) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	return taskapi.ActionNotNeeded()
 }
 
-func (p *golangDepEnsure) Run(ctx *taskapi.Context) error {
+func (p *golangDepEnsure) Run(ctx *context.Context) error {
 	result := command(ctx, "dep", "ensure").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run dep ensure: %s", result.Error)

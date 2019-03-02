@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 
 	"github.com/stretchr/testify/require"
@@ -14,7 +15,7 @@ type taskRunnerMock struct {
 	tasks     []*taskapi.Task
 }
 
-func (r *taskRunnerMock) Run(ctx *taskapi.Context, task *taskapi.Task) error {
+func (r *taskRunnerMock) Run(ctx *context.Context, task *taskapi.Task) error {
 	r.tasks = append(r.tasks, task)
 	return r.taskError
 }
@@ -23,7 +24,7 @@ type taskSelectorMock struct {
 	should bool
 }
 
-func (s *taskSelectorMock) ShouldRun(ctx *taskapi.Context, task *taskapi.Task) (bool, error) {
+func (s *taskSelectorMock) ShouldRun(ctx *context.Context, task *taskapi.Task) (bool, error) {
 	return s.should, nil
 }
 

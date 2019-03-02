@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -13,16 +14,19 @@ func init() {
 }
 
 func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
-	installPipfile := func(ctx *taskapi.Context) error {
+	installPipfile := func(ctx *context.Context) error {
 		result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
 		if result.Error != nil {
 			return fmt.Errorf("failed to install pipenv: %s", result.Error)
 		}
 		return nil
 	}
-	installPipfileNeeded := func(ctx *taskapi.Context) *taskapi.ActionResult {
-		featureInfo := ctx.Features["python"]
-		name := helpers.VirtualenvName(ctx.Project, featureInfo.Param)
+	installPipfileNeeded := func(ctx *context.Context) *taskapi.ActionResult {
+		version, err := findAutoEnvFeatureParam(ctx, "python")
+		if err != nil {
+			return taskapi.ActionFailed("missing python feature: %s", err)
+		}
+		name := helpers.VirtualenvName(ctx.Project, version)
 		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		pipenvCmd := venv.Which("pipenv")
 		if !utils.PathExists(pipenvCmd) {
@@ -33,7 +37,7 @@ func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	task.AddActionWithBuilder("install pipfile command", installPipfile).
 		OnFunc(installPipfileNeeded)
 
-	runPipfileInstall := func(ctx *taskapi.Context) error {
+	runPipfileInstall := func(ctx *context.Context) error {
 		result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
 		if result.Error != nil {
 			return fmt.Errorf("pipenv failed: %s", result.Error)

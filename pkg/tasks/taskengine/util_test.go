@@ -5,6 +5,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
@@ -30,7 +31,7 @@ func (a *testingAction) Description() string {
 	return a.desc
 }
 
-func (a *testingAction) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
+func (a *testingAction) Needed(ctx *context.Context) *taskapi.ActionResult {
 	result := a.neededResults[a.neededCallCount]
 	if result == nil {
 		panic("the task should not have been called")
@@ -39,7 +40,7 @@ func (a *testingAction) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	return result
 }
 
-func (a *testingAction) Run(ctx *taskapi.Context) error {
+func (a *testingAction) Run(ctx *context.Context) error {
 	a.runCallCount++
 	return a.runResult
 }
@@ -63,15 +64,14 @@ func newTaskWithAction(name string, action taskapi.TaskAction) *taskapi.Task {
 	}
 }
 
-func setupTaskTesting() (*taskapi.Context, *bytes.Buffer) {
+func setupTaskTesting() (*context.Context, *bytes.Buffer) {
 	buf, ui := termui.NewTesting(false)
 
-	ctx := &taskapi.Context{
-		Project:  project.NewFromPath("/src/myproject"),
-		UI:       ui,
-		Cfg:      config.NewTestConfig(),
-		Env:      env.New([]string{}),
-		Features: autoenv.NewFeatureSet(),
+	ctx := &context.Context{
+		Project: project.NewFromPath("/src/myproject"),
+		UI:      ui,
+		Cfg:     config.NewTestConfig(),
+		Env:     env.New([]string{}),
 	}
 
 	return ctx, buf
