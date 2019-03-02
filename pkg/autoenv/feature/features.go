@@ -15,10 +15,3 @@ type Feature struct {
 	Activate   ActivateFunc
 	Deactivate DeactivateFunc
 }
-
-// type Feature interface {
-// 	Activate(string, *config.Config, *project.Project, *env.Env) (bool, error)
-// 	Deactivate(string, *config.Config, *env.Env)
-
-// 	String() string
-// }
