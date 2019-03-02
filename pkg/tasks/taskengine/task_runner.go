@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -60,8 +61,8 @@ func (r *TaskRunnerImpl) runAction(ctx *taskapi.Context, action taskapi.TaskActi
 	return nil
 }
 
-func (r *TaskRunnerImpl) activateFeature(ctx *taskapi.Context, feature features.FeatureInfo) error {
-	def, err := features.Get(feature)
+func (r *TaskRunnerImpl) activateFeature(ctx *taskapi.Context, feature autoenv.FeatureInfo) error {
+	def, err := features.GlobalRegister().Get(feature.Name)
 	if err != nil {
 		return err
 	}

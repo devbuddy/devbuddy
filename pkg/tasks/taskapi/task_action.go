@@ -3,14 +3,14 @@ package taskapi
 import (
 	"fmt"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 )
 
 type TaskAction interface {
 	Description() string
 	Needed(*Context) *ActionResult
 	Run(*Context) error
-	Feature() *features.FeatureInfo
+	Feature() *autoenv.FeatureInfo
 }
 
 type ActionResult struct {

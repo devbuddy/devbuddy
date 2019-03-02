@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -42,7 +42,7 @@ func (p *golangDepInstall) Run(ctx *taskapi.Context) error {
 	return nil
 }
 
-func (p *golangDepInstall) Feature() *features.FeatureInfo {
+func (p *golangDepInstall) Feature() *autoenv.FeatureInfo {
 	return nil
 }
 
@@ -86,6 +86,6 @@ func (p *golangDepEnsure) Run(ctx *taskapi.Context) error {
 	return nil
 }
 
-func (p *golangDepEnsure) Feature() *features.FeatureInfo {
+func (p *golangDepEnsure) Feature() *autoenv.FeatureInfo {
 	return nil
 }

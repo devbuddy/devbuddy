@@ -3,9 +3,9 @@ package hook
 import (
 	"fmt"
 
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/termui"
@@ -44,17 +44,17 @@ func run(cfg *config.Config, ui *termui.UI) error {
 	ui.Debug("features: %+v", allFeatures)
 
 	env := env.NewFromOS()
-	features.Sync(cfg, proj, ui, env, allFeatures)
+	autoenv.Sync(cfg, proj, ui, env, allFeatures)
 	printEnvironmentChangeAsShellCommands(ui, env)
 
 	return nil
 }
 
-func getFeaturesFromProject(proj *project.Project) (features.FeatureSet, error) {
+func getFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
 	if proj == nil {
 		// When no project was found, we must deactivate all potentially active features
 		// So we continue with an empty feature map
-		return features.NewFeatureSet(), nil
+		return autoenv.NewFeatureSet(), nil
 	}
 	allTasks, err := taskapi.GetTasksFromProject(proj)
 	if err != nil {

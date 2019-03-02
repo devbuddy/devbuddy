@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -73,6 +73,6 @@ func (a *aptInstall) Run(ctx *taskapi.Context) error {
 	return nil
 }
 
-func (a *aptInstall) Feature() *features.FeatureInfo {
+func (a *aptInstall) Feature() *autoenv.FeatureInfo {
 	return nil
 }

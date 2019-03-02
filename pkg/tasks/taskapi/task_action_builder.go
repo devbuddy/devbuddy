@@ -1,7 +1,7 @@
 package taskapi
 
 import (
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 )
 
 type genericTaskActionBuilder struct {
@@ -30,7 +30,7 @@ func (a *genericTaskActionBuilder) OnFileChange(path string) *genericTaskActionB
 
 // SetFeature defines that the feature specified should be activated.
 func (a *genericTaskActionBuilder) SetFeature(name, param string) *genericTaskActionBuilder {
-	featureInfo := features.NewFeatureInfo(name, param)
+	featureInfo := autoenv.NewFeatureInfo(name, param)
 	a.feature = &featureInfo
 	return a
 }

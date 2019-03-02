@@ -11,7 +11,7 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	reg := newFeatureRegister()
+	reg := NewRegister()
 
 	activate := func(param string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
 		return false, nil
@@ -19,18 +19,18 @@ func TestRegister(t *testing.T) {
 	deactivate1 := func(param string, cfg *config.Config, env *env.Env) {}
 	deactivate2 := func(param string, cfg *config.Config, env *env.Env) {}
 
-	reg.register("env1", activate, deactivate1)
-	reg.register("env2", activate, deactivate2)
+	reg.Register("env1", activate, deactivate1)
+	reg.Register("env2", activate, deactivate2)
 
-	require.ElementsMatch(t, reg.names(), []string{"env1", "env2"})
+	require.ElementsMatch(t, reg.Names(), []string{"env1", "env2"})
 
-	env, err := reg.get("env1")
+	env, err := reg.Get("env1")
 	require.NoError(t, err)
 	require.Equal(t, env.Name, "env1")
 	require.NotNil(t, env.Activate)
 	require.NotNil(t, env.Deactivate)
 
-	env, err = reg.get("env2")
+	env, err = reg.Get("env2")
 	require.NoError(t, err)
 	require.Equal(t, env.Name, "env2")
 	require.NotNil(t, env.Activate)
@@ -38,8 +38,8 @@ func TestRegister(t *testing.T) {
 }
 
 func TestRegisterNotFound(t *testing.T) {
-	reg := newFeatureRegister()
+	reg := NewRegister()
 
-	_, err := reg.get("nope")
+	_, err := reg.Get("nope")
 	require.Error(t, err)
 }

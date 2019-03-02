@@ -1,11 +1,20 @@
-package features
+package autoenv
 
 import (
+	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
+
+// Sync activates / deactivates the features in the instance of env.Env.
+// When a feature is already active but unknown, it will be ignored completely.
+// When a param changes, the feature is deactivated with the current param then activated with the new param.
+func Sync(cfg *config.Config, proj *project.Project, ui *termui.UI, env *env.Env, set FeatureSet) {
+	runner := &runner{cfg: cfg, proj: proj, ui: ui, env: env, state: &FeatureState{env}, reg: features.GlobalRegister()}
+	runner.sync(set)
+}
 
 type runner struct {
 	cfg   *config.Config
@@ -13,7 +22,7 @@ type runner struct {
 	ui    *termui.UI
 	env   *env.Env
 	state *FeatureState
-	reg   *featureRegister
+	reg   features.Register
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
@@ -26,7 +35,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 
 	activeFeatures := r.state.GetActiveFeatures()
 
-	for _, name := range r.reg.names() {
+	for _, name := range r.reg.Names() {
 		wantFeatureInfo, want := featureSet[name]
 		activeFeatureInfo, active := activeFeatures[name]
 
@@ -55,7 +64,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 func (r *runner) activateFeature(featureInfo FeatureInfo) {
 	r.ui.Debug("activating %s (%s)", featureInfo.Name, featureInfo.Param)
 
-	environment, err := r.reg.get(featureInfo.Name)
+	environment, err := r.reg.Get(featureInfo.Name)
 	if err != nil {
 		r.ui.Warningf("%s (ignoring)", err)
 		return
@@ -77,7 +86,7 @@ func (r *runner) activateFeature(featureInfo FeatureInfo) {
 func (r *runner) deactivateFeature(featureInfo FeatureInfo) {
 	r.ui.Debug("deactivating %s (%s)", featureInfo.Name, featureInfo.Param)
 
-	environment, err := r.reg.get(featureInfo.Name)
+	environment, err := r.reg.Get(featureInfo.Name)
 	if err != nil {
 		r.ui.Warningf("%s (ignoring)", err)
 		return
