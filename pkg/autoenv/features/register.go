@@ -1,4 +1,4 @@
-package register
+package features
 
 import (
 	"fmt"
@@ -6,33 +6,33 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv/feature"
 )
 
-type ImmutableRegister interface {
+type MutableRegister struct {
+	nameToFeature map[string]*feature.Feature
+}
+
+func NewRegister() *MutableRegister {
+	return &MutableRegister{nameToFeature: make(map[string]*feature.Feature)}
+}
+
+type Register interface {
 	Get(string) (*feature.Feature, error)
 	Names() []string
 }
 
-type Register struct {
-	nameToFeature map[string]*feature.Feature
-}
+var globalRegister *MutableRegister
 
-func NewRegister() *Register {
-	return &Register{nameToFeature: make(map[string]*feature.Feature)}
-}
-
-var globalRegister *Register
-
-func Global() ImmutableRegister {
+func GlobalRegister() Register {
 	return globalRegister
 }
 
-func RegisterFeature(name string, activate feature.ActivateFunc, deactivate feature.DeactivateFunc) {
+func register(name string, activate feature.ActivateFunc, deactivate feature.DeactivateFunc) {
 	if globalRegister == nil {
 		globalRegister = NewRegister()
 	}
 	globalRegister.Register(name, activate, deactivate)
 }
 
-func (e *Register) Register(name string, activate feature.ActivateFunc, deactivate feature.DeactivateFunc) {
+func (e *MutableRegister) Register(name string, activate feature.ActivateFunc, deactivate feature.DeactivateFunc) {
 	if _, ok := e.nameToFeature[name]; ok {
 		panic(fmt.Sprint("Can't re-register a definition:", name))
 	}
@@ -46,7 +46,7 @@ func (e *Register) Register(name string, activate feature.ActivateFunc, deactiva
 	e.nameToFeature[name] = &feature.Feature{Name: name, Activate: activate, Deactivate: deactivate}
 }
 
-func (e *Register) Get(name string) (*feature.Feature, error) {
+func (e *MutableRegister) Get(name string) (*feature.Feature, error) {
 	env := e.nameToFeature[name]
 	if env == nil {
 		return nil, fmt.Errorf("unknown feature: %s", name)
@@ -54,7 +54,7 @@ func (e *Register) Get(name string) (*feature.Feature, error) {
 	return env, nil
 }
 
-func (e *Register) Names() (names []string) {
+func (e *MutableRegister) Names() (names []string) {
 	for name := range e.nameToFeature {
 		names = append(names, string(name))
 	}

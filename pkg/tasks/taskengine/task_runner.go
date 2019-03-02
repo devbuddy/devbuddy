@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
-	"github.com/devbuddy/devbuddy/pkg/autoenv/register"
+	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -62,7 +62,7 @@ func (r *TaskRunnerImpl) runAction(ctx *taskapi.Context, action taskapi.TaskActi
 }
 
 func (r *TaskRunnerImpl) activateFeature(ctx *taskapi.Context, feature autoenv.FeatureInfo) error {
-	def, err := register.Global().Get(feature.Name)
+	def, err := features.GlobalRegister().Get(feature.Name)
 	if err != nil {
 		return err
 	}

@@ -55,7 +55,7 @@ func newUnknownTaskDefinition() *TaskDefinition {
 }
 
 func GetFeaturesFromTasks(tasks []*Task) autoenv.FeatureSet {
-	featureSet := autoenv.FeatureSet{}
+	featureSet := autoenv.NewFeatureSet()
 
 	for _, task := range tasks {
 		for _, action := range task.Actions {
