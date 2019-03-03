@@ -5,13 +5,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskengine"
-	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 func init() {
@@ -26,24 +23,11 @@ var upCmd = &cobra.Command{
 }
 
 func upRun(cmd *cobra.Command, args []string) {
-	cfg, err := config.Load()
+	ctx, err := context.Load()
 	checkError(err)
 
-	ui := termui.New(cfg)
-
-	proj, err := project.FindCurrent()
+	taskList, err := taskapi.GetTasksFromProject(ctx.Project)
 	checkError(err)
-
-	taskList, err := taskapi.GetTasksFromProject(proj)
-	checkError(err)
-
-	ctx := &taskapi.Context{
-		Cfg:      cfg,
-		Project:  proj,
-		UI:       ui,
-		Env:      env.NewFromOS(),
-		Features: taskapi.GetFeaturesFromTasks(taskList),
-	}
 
 	runner := &taskengine.TaskRunnerImpl{}
 	selector := taskengine.NewTaskSelector()

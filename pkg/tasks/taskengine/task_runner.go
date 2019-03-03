@@ -6,16 +6,17 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 type TaskRunner interface {
-	Run(*taskapi.Context, *taskapi.Task) error
+	Run(*context.Context, *taskapi.Task) error
 }
 
 type TaskRunnerImpl struct{}
 
-func (r *TaskRunnerImpl) Run(ctx *taskapi.Context, task *taskapi.Task) (err error) {
+func (r *TaskRunnerImpl) Run(ctx *context.Context, task *taskapi.Task) (err error) {
 	for _, action := range task.Actions {
 		err = r.runAction(ctx, action)
 		if err != nil {
@@ -25,7 +26,7 @@ func (r *TaskRunnerImpl) Run(ctx *taskapi.Context, task *taskapi.Task) (err erro
 	return nil
 }
 
-func (r *TaskRunnerImpl) runAction(ctx *taskapi.Context, action taskapi.TaskAction) error {
+func (r *TaskRunnerImpl) runAction(ctx *context.Context, action taskapi.TaskAction) error {
 	desc := action.Description()
 
 	result := action.Needed(ctx)
@@ -61,7 +62,7 @@ func (r *TaskRunnerImpl) runAction(ctx *taskapi.Context, action taskapi.TaskActi
 	return nil
 }
 
-func (r *TaskRunnerImpl) activateFeature(ctx *taskapi.Context, feature autoenv.FeatureInfo) error {
+func (r *TaskRunnerImpl) activateFeature(ctx *context.Context, feature autoenv.FeatureInfo) error {
 	def, err := features.GlobalRegister().Get(feature.Name)
 	if err != nil {
 		return err

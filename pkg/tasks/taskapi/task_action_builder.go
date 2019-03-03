@@ -2,6 +2,7 @@ package taskapi
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 )
 
 type genericTaskActionBuilder struct {
@@ -15,7 +16,7 @@ func (a *genericTaskActionBuilder) On(condition *genericTaskActionCondition) *ge
 }
 
 // OnFunc registers a condition defined as a single function
-func (a *genericTaskActionBuilder) OnFunc(condFunc func(*Context) *ActionResult) *genericTaskActionBuilder {
+func (a *genericTaskActionBuilder) OnFunc(condFunc func(*context.Context) *ActionResult) *genericTaskActionBuilder {
 	a.On(&genericTaskActionCondition{pre: condFunc, post: condFunc})
 	return a
 }
