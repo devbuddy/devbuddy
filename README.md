@@ -5,6 +5,7 @@
 [![GitHub Release](https://img.shields.io/github/release/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 [![GitHub Release Date](https://img.shields.io/github/release-date/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 [![Gitter](https://img.shields.io/badge/Discussions%20on-Gitter-crimson.svg?logo=gitter&style=flat)](https://gitter.im/devbuddy)
+![GitHub Release](https://img.shields.io/badge/license-MIT-green.svg)
 
 Contents:
 - [Install DevBuddy](#install)
@@ -27,11 +28,13 @@ With **DevBuddy**, pushing a change on a project you never touched look like thi
 - `bud test`
 - `git push`
 
+<br>
+<p align="center"><img src="/docs/demo.gif?raw=true"/></p>
+
 ## Status and progress
 
-**DevBuddy** is mostly useful for Python and Go projects. More languages will be natively
-supported. Additional automatic tasks will also be implemented, making **DevBuddy** also
-useful for languages without native support.
+**DevBuddy** is more useful for Python, Go and Node projects. More languages will be natively
+supported. DevBuddy is still useful for languages without native support thanks to the **custom** task.
 
 See the project config [documentation](docs/Config.md).
 
@@ -48,7 +51,8 @@ Go:
 
 Node:
 - Node environment
-- Npm/Yarn **planned**
+- Dependencies with NPM
+- Dependencies with Yarn **planned**
 
 Ruby: **planned**
 

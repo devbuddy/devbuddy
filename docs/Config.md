@@ -139,6 +139,24 @@ up:
   - golang_dep
 ```
 
+### `node`
+
+This task will download the Node distribution from `nodejs.org` and activate it in your shell.
+Optionally, it can also install the NodeJS dependencies.
+
+```yaml
+up:
+  - node: 10.15.0
+```
+
+To install the dependencies with NPM:
+
+```yaml
+up:
+  - node: 10.15.0
+      npm: true
+```
+
 ### `custom`
 
 This task will run a command if a condition is not met.

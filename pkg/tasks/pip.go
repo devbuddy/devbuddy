@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -23,7 +24,7 @@ func parserPip(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	task.Info = strings.Join(files, ", ")
 
 	for _, file := range files {
-		pipInstall := func(ctx *taskapi.Context) error {
+		pipInstall := func(ctx *context.Context) error {
 			pipArgs := []string{"install", "--require-virtualenv", "-r", file}
 			result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
 			if result.Error != nil {

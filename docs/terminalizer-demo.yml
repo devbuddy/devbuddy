@@ -1,0 +1,275 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Specify a command to be executed
+  # like `/bin/bash -l`, `ls`, or any other commands
+  # the default is bash for Linux
+  # or powershell.exe for Windows
+  command: bash -l
+
+  # Specify the current working directory path
+  # the default is the current working directory path
+  cwd: /Users/pior
+
+  # Export additional ENV variables
+  env:
+    recording: true
+
+  # Explicitly set the number of columns
+  # or use `auto` to take the current
+  # number of columns of your shell
+  cols: 108
+
+  # Explicitly set the number of rows
+  # or use `auto` to take the current
+  # number of rows of your shell
+  rows: 20
+
+  # Amount of times to repeat GIF
+  # If value is -1, play once
+  # If value is 0, loop indefinitely
+  # If value is a positive number, loop n times
+  repeat: 0
+
+  # Quality
+  # 1 - 100
+  quality: 100
+
+  # Delay between frames in ms
+  # If the value is `auto` use the actual recording delays
+  frameDelay: auto
+
+  # Maximum delay between frames in ms
+  # Ignored if the `frameDelay` isn't set to `auto`
+  # Set to `auto` to prevent limiting the max idle time
+  maxIdleTime: 2000
+
+  # The surrounding frame box
+  # The `type` can be null, window, floating, or solid`
+  # To hide the title use the value null
+  # Don't forget to add a backgroundColor style with a null as type
+  frameBox:
+    type: solid
+    title: null
+    style:
+      boxShadow: none
+      margin: 0px
+
+  # Add a watermark image to the rendered gif
+  # You need to specify an absolute path for
+  # the image on your machine or a URL, and you can also
+  # add your own CSS styles
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+
+  # Cursor style can be one of
+  # `block`, `underline`, or `bar`
+  cursorStyle: block
+
+  # Font family
+  # You can use any font that is installed on your machine
+  # in CSS-like syntax
+  fontFamily: "Monaco, Lucida Console, Ubuntu Mono, Monospace"
+
+  # The size of the font
+  fontSize: 14
+
+  # The height of lines
+  lineHeight: 1
+
+  # The spacing between letters
+  letterSpacing: 0
+
+  # Theme
+  theme:
+    background: "transparent"
+    foreground: "#afafaf"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#c91b00"
+    green: "#00c200"
+    yellow: "#c7c400"
+    blue: "#0225c7"
+    magenta: "#c930c7"
+    cyan: "#00c5c7"
+    white: "#c7c7c7"
+    brightBlack: "#676767"
+    brightRed: "#ff6d67"
+    brightGreen: "#5ff967"
+    brightYellow: "#fefb67"
+    brightBlue: "#6871ff"
+    brightMagenta: "#ff76ff"
+    brightCyan: "#5ffdff"
+    brightWhite: "#feffff"
+
+# Records, feel free to edit them
+records:
+  - delay: 1000
+    content: "\e(B\e[m"
+
+  - delay: 1000
+    content: "\r\nLet's start by cloning DevBuddy from github:\r\n\r\n"
+  - delay: 50
+    content: "\e[?1034h\e[1m\e[38;5;64m~ \e[97m$ \e(B\e[m"
+
+  - delay: 4000
+    content: "bud clone devbuddy/devbuddy"
+  - delay: 500
+    content: "\r\n"
+  - delay: 44
+    content: "Cloning into '/Users/pior/src/github.com/devbuddy/devbuddy'...\r\n"
+  - delay: 1935
+    content: "\U0001F43C  \e[33mjumping to\e[0m \e[32mgithub.com:devbuddy/devbuddy\e[0m\r\n"
+  - delay: 43
+    content: "\U0001F43C  \e[31mfailed to activate python. Try running 'bud up' first!\e[0m \e[33m(version: 3.6.5)\e[0m\r\n\U0001F43C  \e[36mgolang activated.\e[0m \e[34m(version: 1.10.1)\e[0m\r\n"
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/devbuddy/devbuddy \e[97m$ \e(B\e[m"
+
+  - delay: 4000
+    content: "\r\n\r\nRun the project setup:\r\n\r\n"
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/devbuddy/devbuddy \e[97m$ \e(B\e[m"
+
+  - delay: 4000
+    content: bud up
+  - delay: 500
+    content: "\r\n"
+  - delay: 32
+    content: "\e[33m◼︎\e[0m \e[35mGolang\e[0m (\e[34m1.10.1\e[0m)\r\n\e[33m◼︎\e[0m \e[35mGo Dep\e[0m (\e[34mdep ensure\e[0m)\r\n  \e[33m▪︎\e[0m\e[35mRun dep ensure\e[0m\r\n  Running: \e[1;36mdep\e[0m \e[36mensure\e[0m\r\n"
+  - delay: 1075
+    content: "\e[33m◼︎\e[0m \e[35mPython\e[0m (\e[34m3.6.5\e[0m)\r\n"
+  - delay: 228
+    content: "  \e[33m▪︎\e[0m\e[35mcreate virtualenv\e[0m\r\n"
+  - delay: 76
+    content: "  Running: \e[1;36m/Users/pior/.pyenv/versions/3.6.5/bin/virtualenv\e[0m \e[36m/Users/pior/.local/share/bud/virtualenvs/devbuddy-1911165133-3.6.5\e[0m\r\n"
+  - delay: 405
+    content: "  Using base prefix '/Users/pior/.pyenv/versions/3.6.5'\r\n  New python executable in /Users/pior/.local/share/bud/virtualenvs/devbuddy-1911165133-3.6.5/bin/python3.6\r\n  Also creating executable in /Users/pior/.local/share/bud/virtualenvs/devbuddy-1911165133-3.6.5/bin/python\r\n"
+  - delay: 6544
+    content: "  Installing setuptools, pip, wheel...done.\r\n"
+  - delay: 15
+    content: "\e[33m◼︎\e[0m \e[35mPip\e[0m (\e[34mtests/requirements.txt\e[0m)\r\n  \e[33m▪︎\e[0m\e[35minstall tests/requirements.txt\e[0m\r\n  Running: \e[1;36mpip\e[0m \e[36minstall --require-virtualenv -r tests/requirements.txt\e[0m\r\n"
+  - delay: 354
+    content: "  Collecting pytest==3.6.1 (from -r tests/requirements.txt (line 1))\r\n"
+  - delay: 375
+    content: "    Using cached https://files.pythonhosted.org/packages/d3/75/e79b66c9fe6166a90004bb8fb02bab06213c3348e93f3be41d7eaf625554/pytest-3.6.1-py2.py3-none-any.whl\r\n"
+  - delay: 39
+    content: "  Collecting pexpect==4.6.0 (from -r tests/requirements.txt (line 2))\r\n"
+  - delay: 108
+    content: "    Using cached https://files.pythonhosted.org/packages/89/e6/b5a1de8b0cc4e07ca1b305a4fcc3f9806025c1b651ea302646341222f88b/pexpect-4.6.0-py2.py3-none-any.whl\r\n"
+  - delay: 18
+    content: "  Collecting PyYAML==3.13 (from -r tests/requirements.txt (line 3))\r\n"
+  - delay: 42
+    content: "  Installing collected packages: pytest, pexpect, PyYAML\r\n"
+  - delay: 468
+    content: "  Successfully installed PyYAML-3.13 pexpect-4.6.0 pytest-3.6.1\r\n"
+  - delay: 103
+    content: "\e[33m◼︎\e[0m \e[35mHomebrew\e[0m (\e[34mcurl, shellcheck, golangci/tap/golangci-lint\e[0m)\r\n\e[33m◼︎\e[0m \e[35mApt\e[0m (\e[34mcurl, shellcheck\e[0m) (\e[33mdisabled\e[0m)\r\n\e[33m◼︎\e[0m \e[35mCustom\e[0m (\e[34mInstall golangci-lint\e[0m)\r\n"
+  - delay: 31
+    content: "\U0001F43C  \e[36mpython activated.\e[0m \e[34m(version: 3.6.5)\e[0m\r\n"
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/devbuddy/devbuddy \e[97m$ \e(B\e[m"
+
+  - delay: 4000
+    content: "\r\n\r\nTypical development flow:\r\n\r\n"
+
+  - delay: 2000
+    content: "1. Make some changes\r\n\r\n"
+
+  - delay: 2000
+    content: "2. run the tests:\r\n\r\n"
+
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/devbuddy/devbuddy \e[97m$ \e(B\e[m"
+  - delay: 4000
+    content: "bud test"
+  - delay: 500
+    content: "\r\n"
+  - delay: 26
+    content: "\U0001F43C  \e[34mrunning\e[0m \e[36mscript/test\e[0m\r\n"
+  - delay: 1066
+    content: "?   \tgithub.com/devbuddy/devbuddy\t[no test files]\r\n"
+  - delay: 52
+    content: "?   \tgithub.com/devbuddy/devbuddy/pkg/cmd\t[no test files]\r\n?   \tgithub.com/devbuddy/devbuddy/pkg/config\t[no test files]\r\n"
+  - delay: 40
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/env\t(cached)\tcoverage: 68.6% of statements\r\n"
+  - delay: 904
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/executor\t0.110s\tcoverage: 96.6% of statements\r\nok  \tgithub.com/devbuddy/devbuddy/pkg/features\t(cached)\tcoverage: 60.6% of statements\r\n"
+  - delay: 228
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/helpers\t0.251s\tcoverage: 42.4% of statements\r\nok  \tgithub.com/devbuddy/devbuddy/pkg/helpers/open\t0.189s\tcoverage: 82.9% of statements\r\nok  \tgithub.com/devbuddy/devbuddy/pkg/helpers/osidentity\t(cached)\tcoverage: 100.0% of statements\r\n"
+  - delay: 23
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/helpers/projectmetadata\t0.040s\tcoverage: 76.5% of statements\r\n"
+  - delay: 774
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/helpers/store\t0.031s\tcoverage: 80.6% of statements\r\n?   \tgithub.com/devbuddy/devbuddy/pkg/hook\t[no test files]\r\n?   \tgithub.com/devbuddy/devbuddy/pkg/integration\t[no test files]\r\nok  \tgithub.com/devbuddy/devbuddy/pkg/manifest\t(cached)\tcoverage: 71.4% of statements\r\n"
+  - delay: 75
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/project\t(cached)\tcoverage: 78.7% of statements\r\n"
+  - delay: 162
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/tasks\t0.022s\tcoverage: 26.7% of statements\r\n"
+  - delay: 136
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/tasks/taskapi\t0.018s\tcoverage: 54.4% of statements\r\n"
+  - delay: 221
+    content: "ok  \tgithub.com/devbuddy/devbuddy/pkg/tasks/taskengine\t0.014s\tcoverage: 61.1% of statements\r\n?   \tgithub.com/devbuddy/devbuddy/pkg/termui\t[no test files]\r\n?   \tgithub.com/devbuddy/devbuddy/pkg/test\t[no test files]\r\nok  \tgithub.com/devbuddy/devbuddy/pkg/utils\t(cached)\tcoverage: 40.5% of statements\r\n"
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/devbuddy/devbuddy \e[97m$ \e(B\e[m"
+
+  - delay: 4000
+    content: "\r\n\r\n3. run the linters:\r\n\r\n"
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/devbuddy/devbuddy \e[97m$ \e(B\e[m"
+
+  - delay: 4000
+    content: bud lint
+  - delay: 500
+    content: "\r\n"
+  - delay: 34
+    content: "\U0001F43C  \e[34mrunning\e[0m \e[36mscript/lint\e[0m\r\n"
+  - delay: 4700
+    content: "\e[1m\e[38;5;64m~/src/github.com/devbuddy/devbuddy \e[97m$ \e(B\e[m"
+
+  - delay: 4000
+    content: "\r\n\r\n4. push your changes (git commit, git push...)\r\n\r\n"
+
+  - delay: 8000
+    content: "\e[H\e[2J"
+
+  - delay: 1000
+    content: "\r\nJump to another project  (cloned projects are fuzzy-searched)\r\n\r\n"
+
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/devbuddy/devbuddy \e[97m$ \e(B\e[m"
+  - delay: 4000
+    content: bud cd mweb
+  - delay: 500
+    content: "\r\n"
+  - delay: 37
+    content: "\U0001F43C  \e[33mjumping to\e[0m \e[32mgithub.com:mtlpy/mtlpyweb\e[0m\r\n"
+  - delay: 22
+    content: "\U0001F43C  \e[36mnode activated.\e[0m \e[34m(version: 10.15.0)\e[0m\r\n\U0001F43C  \e[36mpython activated.\e[0m \e[34m(version: 3.6.5)\e[0m\r\n"
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/mtlpy/mtlpyweb \e[97m(\e[38;5;61mmaster\e[38;5;33m [!?S]\e[97m) \e[97m$ \e(B\e[m"
+
+  - delay: 4000
+    content: "\r\n\r\nAfter the initial run, the setup is very fast:\r\n\r\n"
+
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/mtlpy/mtlpyweb \e[97m(\e[38;5;61mmaster\e[38;5;33m [!?S]\e[97m) \e[97m$ \e(B\e[m"
+  - delay: 4000
+    content: bud up
+  - delay: 500
+    content: "\r\n"
+  - delay: 28
+    content: "\e[33m◼︎\e[0m \e[35mPython\e[0m (\e[34m3.6.5\e[0m)\r\n"
+  - delay: 134
+    content: "\e[33m◼︎\e[0m \e[35mPipfile\e[0m\r\n"
+  - delay: 7
+    content: "\e[33m◼︎\e[0m \e[35mNodeJS\e[0m (\e[34m10.15.0\e[0m)\r\n\e[33m◼︎\e[0m \e[35mHomebrew\e[0m (\e[34msassc\e[0m)\r\n\e[33m◼︎\e[0m \e[35mCustom\e[0m (\e[34mCreate the .env file\e[0m)\r\n"
+  - delay: 50
+    content: "\e[1m\e[38;5;64m~/src/github.com/mtlpy/mtlpyweb \e[97m(\e[38;5;61mmaster\e[38;5;33m [!?S]\e[97m) \e[97m$ \e(B\e[m"
+
+  - delay: 10000
+    content: "\r\n"

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -31,14 +32,14 @@ func parserPython(config *taskapi.TaskConfig, task *taskapi.Task) error {
 }
 
 func parserPythonInstallPyenv(task *taskapi.Task, version string) {
-	needed := func(ctx *taskapi.Context) *taskapi.ActionResult {
+	needed := func(ctx *context.Context) *taskapi.ActionResult {
 		_, err := helpers.NewPyEnv()
 		if err != nil {
 			return taskapi.ActionNeeded("Pyenv is not installed: %s", err)
 		}
 		return taskapi.ActionNotNeeded()
 	}
-	run := func(ctx *taskapi.Context) error {
+	run := func(ctx *context.Context) error {
 		result := command(ctx, "brew", "install", "pyenv").Run()
 		if result.Error != nil {
 			return fmt.Errorf("failed to install pyenv: %s", result.Error)
@@ -49,7 +50,7 @@ func parserPythonInstallPyenv(task *taskapi.Task, version string) {
 }
 
 func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
-	needed := func(ctx *taskapi.Context) *taskapi.ActionResult {
+	needed := func(ctx *context.Context) *taskapi.ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
 			return taskapi.ActionFailed("cannot use pyenv: %s", err)
@@ -63,7 +64,7 @@ func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
 		}
 		return taskapi.ActionNotNeeded()
 	}
-	run := func(ctx *taskapi.Context) error {
+	run := func(ctx *context.Context) error {
 		result := command(ctx, "pyenv", "install", version).Run()
 		if result.Error != nil {
 			return fmt.Errorf("failed to install the required python version: %s", result.Error)
@@ -74,7 +75,7 @@ func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
 }
 
 func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
-	needed := func(ctx *taskapi.Context) *taskapi.ActionResult {
+	needed := func(ctx *context.Context) *taskapi.ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
 			return taskapi.ActionFailed("cannot use pyenv: %s", err)
@@ -85,7 +86,7 @@ func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
 		}
 		return taskapi.ActionNotNeeded()
 	}
-	run := func(ctx *taskapi.Context) error {
+	run := func(ctx *context.Context) error {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
 			return err
@@ -100,7 +101,7 @@ func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
 }
 
 func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
-	needed := func(ctx *taskapi.Context) *taskapi.ActionResult {
+	needed := func(ctx *context.Context) *taskapi.ActionResult {
 		name := helpers.VirtualenvName(ctx.Project, version)
 		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		if !venv.Exists() {
@@ -108,7 +109,7 @@ func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
 		}
 		return taskapi.ActionNotNeeded()
 	}
-	run := func(ctx *taskapi.Context) error {
+	run := func(ctx *context.Context) error {
 		name := helpers.VirtualenvName(ctx.Project, version)
 		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		err := os.MkdirAll(filepath.Dir(venv.Path()), 0750)

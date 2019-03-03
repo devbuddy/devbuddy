@@ -14,7 +14,7 @@ type taskRunnerMock struct {
 	tasks     []*taskapi.Task
 }
 
-func (r *taskRunnerMock) Run(ctx *taskapi.Context, task *taskapi.Task) error {
+func (r *taskRunnerMock) Run(task *taskapi.Task) error {
 	r.tasks = append(r.tasks, task)
 	return r.taskError
 }
@@ -23,7 +23,7 @@ type taskSelectorMock struct {
 	should bool
 }
 
-func (s *taskSelectorMock) ShouldRun(ctx *taskapi.Context, task *taskapi.Task) (bool, error) {
+func (s *taskSelectorMock) ShouldRun(task *taskapi.Task) (bool, error) {
 	return s.should, nil
 }
 

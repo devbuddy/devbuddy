@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -38,7 +39,7 @@ func (a *aptInstall) Description() string {
 	return ""
 }
 
-func (a *aptInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
+func (a *aptInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 	a.missingPackageNames = []string{}
 
 	for _, name := range a.packageNames {
@@ -58,7 +59,7 @@ func (a *aptInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	return taskapi.ActionNotNeeded()
 }
 
-func (a *aptInstall) Run(ctx *taskapi.Context) error {
+func (a *aptInstall) Run(ctx *context.Context) error {
 	result := sudoCommand(ctx, "apt-get", "update").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get update: %s", result.Error)
@@ -73,6 +74,6 @@ func (a *aptInstall) Run(ctx *taskapi.Context) error {
 	return nil
 }
 
-func (a *aptInstall) Feature() *features.FeatureInfo {
+func (a *aptInstall) Feature() *autoenv.FeatureInfo {
 	return nil
 }

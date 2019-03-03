@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -26,7 +27,7 @@ func (p *golangDepInstall) Description() string {
 	return "Install Go Dep"
 }
 
-func (p *golangDepInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
+func (p *golangDepInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 	_, err := exec.LookPath("dep") // Just check if `dep` is in the PATH for now
 	if err != nil {
 		return taskapi.ActionNeeded("could not find the dep command in the PATH")
@@ -34,7 +35,7 @@ func (p *golangDepInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	return taskapi.ActionNotNeeded()
 }
 
-func (p *golangDepInstall) Run(ctx *taskapi.Context) error {
+func (p *golangDepInstall) Run(ctx *context.Context) error {
 	result := command(ctx, "go", "get", "-u", "github.com/golang/dep/cmd/dep").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to install Go GolangDep: %s", result.Error)
@@ -42,7 +43,7 @@ func (p *golangDepInstall) Run(ctx *taskapi.Context) error {
 	return nil
 }
 
-func (p *golangDepInstall) Feature() *features.FeatureInfo {
+func (p *golangDepInstall) Feature() *autoenv.FeatureInfo {
 	return nil
 }
 
@@ -53,7 +54,7 @@ func (p *golangDepEnsure) Description() string {
 	return "Run dep ensure"
 }
 
-func (p *golangDepEnsure) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
+func (p *golangDepEnsure) Needed(ctx *context.Context) *taskapi.ActionResult {
 	if !fileExists(ctx, "vendor") {
 		return taskapi.ActionNeeded("the vendor directory does not exist")
 	}
@@ -61,15 +62,15 @@ func (p *golangDepEnsure) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	// Is the vendor dir out dated?
 	vendorMod, err := fileModTime(ctx, "vendor")
 	if err != nil {
-		return taskapi.ActionFailed("failed to get the modification of the vendor directory", err)
+		return taskapi.ActionFailed("failed to get the modification of the vendor directory: %s", err)
 	}
 	tomlMod, err := fileModTime(ctx, "Gopkg.toml")
 	if err != nil {
-		return taskapi.ActionFailed("failed to get the modification of Gopkg.toml", err)
+		return taskapi.ActionFailed("failed to get the modification of Gopkg.toml: %s", err)
 	}
 	lockMod, err := fileModTime(ctx, "Gopkg.lock")
 	if err != nil {
-		return taskapi.ActionFailed("failed to get the modification of Gopkg.lock", err)
+		return taskapi.ActionFailed("failed to get the modification of Gopkg.lock: %s", err)
 	}
 	if tomlMod > vendorMod || lockMod > vendorMod {
 		return taskapi.ActionNeeded("Gopkg.toml or Gopkg.lock has been changed")
@@ -78,7 +79,7 @@ func (p *golangDepEnsure) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	return taskapi.ActionNotNeeded()
 }
 
-func (p *golangDepEnsure) Run(ctx *taskapi.Context) error {
+func (p *golangDepEnsure) Run(ctx *context.Context) error {
 	result := command(ctx, "dep", "ensure").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run dep ensure: %s", result.Error)
@@ -86,6 +87,6 @@ func (p *golangDepEnsure) Run(ctx *taskapi.Context) error {
 	return nil
 }
 
-func (p *golangDepEnsure) Feature() *features.FeatureInfo {
+func (p *golangDepEnsure) Feature() *autoenv.FeatureInfo {
 	return nil
 }
