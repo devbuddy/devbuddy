@@ -29,7 +29,7 @@ func upRun(cmd *cobra.Command, args []string) {
 	taskList, err := taskapi.GetTasksFromProject(ctx.Project)
 	checkError(err)
 
-	runner := &taskengine.TaskRunnerImpl{}
+	runner := taskengine.NewTaskRunner(ctx)
 	selector := taskengine.NewTaskSelector()
 
 	success, err := taskengine.Run(ctx, runner, selector, taskList)

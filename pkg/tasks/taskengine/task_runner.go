@@ -11,14 +11,20 @@ import (
 )
 
 type TaskRunner interface {
-	Run(*context.Context, *taskapi.Task) error
+	Run(*taskapi.Task) error
 }
 
-type TaskRunnerImpl struct{}
+type TaskRunnerImpl struct {
+	ctx *context.Context
+}
 
-func (r *TaskRunnerImpl) Run(ctx *context.Context, task *taskapi.Task) (err error) {
+func NewTaskRunner(ctx *context.Context) TaskRunner {
+	return &TaskRunnerImpl{ctx: ctx}
+}
+
+func (r *TaskRunnerImpl) Run(task *taskapi.Task) (err error) {
 	for _, action := range task.Actions {
-		err = r.runAction(ctx, action)
+		err = r.runAction(action)
 		if err != nil {
 			return err
 		}
@@ -26,26 +32,26 @@ func (r *TaskRunnerImpl) Run(ctx *context.Context, task *taskapi.Task) (err erro
 	return nil
 }
 
-func (r *TaskRunnerImpl) runAction(ctx *context.Context, action taskapi.TaskAction) error {
+func (r *TaskRunnerImpl) runAction(action taskapi.TaskAction) error {
 	desc := action.Description()
 
-	result := action.Needed(ctx)
+	result := action.Needed(r.ctx)
 	if result.Error != nil {
 		return fmt.Errorf("The task action (%s) failed to detect whether it need to run: %s", desc, result.Error)
 	}
 
 	if result.Needed {
 		if desc != "" {
-			ctx.UI.TaskActionHeader(desc)
+			r.ctx.UI.TaskActionHeader(desc)
 		}
-		ctx.UI.Debug("Reason: \"%s\"", result.Reason)
+		r.ctx.UI.Debug("Reason: \"%s\"", result.Reason)
 
-		err := action.Run(ctx)
+		err := action.Run(r.ctx)
 		if err != nil {
 			return fmt.Errorf("The task action failed to run: %s", err)
 		}
 
-		result = action.Needed(ctx)
+		result = action.Needed(r.ctx)
 		if result.Error != nil {
 			return fmt.Errorf("The task action failed to detect if it is resolved: %s", result.Error)
 		}
@@ -57,23 +63,23 @@ func (r *TaskRunnerImpl) runAction(ctx *context.Context, action taskapi.TaskActi
 
 	feature := action.Feature()
 	if feature != nil {
-		return r.activateFeature(ctx, *feature)
+		return r.activateFeature(*feature)
 	}
 	return nil
 }
 
-func (r *TaskRunnerImpl) activateFeature(ctx *context.Context, feature autoenv.FeatureInfo) error {
+func (r *TaskRunnerImpl) activateFeature(feature autoenv.FeatureInfo) error {
 	def, err := features.GlobalRegister().Get(feature.Name)
 	if err != nil {
 		return err
 	}
 
-	devUpNeeded, err := def.Activate(ctx, feature.Param)
+	devUpNeeded, err := def.Activate(r.ctx, feature.Param)
 	if err != nil {
 		return err
 	}
 	if devUpNeeded {
-		ctx.UI.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", feature))
+		r.ctx.UI.TaskWarning(fmt.Sprintf("Something is wrong, the feature %s could not be activated", feature))
 	}
 
 	// Special case, we want the bud process to get PATH updates from features to call the right processes.
@@ -82,5 +88,5 @@ func (r *TaskRunnerImpl) activateFeature(ctx *context.Context, feature autoenv.F
 	// the process itself.
 	// There is no problem when executing a shell command since the shell process will do the executable lookup
 	// itself with the PATH value from the specified Env.
-	return os.Setenv("PATH", ctx.Env.Get("PATH"))
+	return os.Setenv("PATH", r.ctx.Env.Get("PATH"))
 }
