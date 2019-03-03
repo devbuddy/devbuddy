@@ -26,7 +26,7 @@ func Run(ctx *context.Context, executor TaskRunner, selector TaskSelector, taskL
 		}
 
 		ctx.UI.TaskHeader(task.Name, task.Info, "")
-		err = executor.Run(ctx, task)
+		err = executor.Run(task)
 		if err != nil {
 			ctx.UI.TaskError(err)
 			return false, nil
