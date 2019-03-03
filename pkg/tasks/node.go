@@ -32,7 +32,7 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		OnFunc(condition).
 		SetFeature("node", version)
 
-	npmInstall := func(ctx *taskapi.Context) error {
+	npmInstall := func(ctx *context.Context) error {
 		if !utils.PathExists("package.json") {
 			ctx.UI.TaskWarning("No package.json found.")
 			return nil
