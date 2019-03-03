@@ -25,7 +25,7 @@ func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	}
 	featureVersion := version
 	if modulesEnabled {
-		featureVersion += "+modules"
+		featureVersion += "+mod"
 	}
 
 	task.Info = version

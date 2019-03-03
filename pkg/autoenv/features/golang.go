@@ -38,7 +38,7 @@ func golangDeactivate(ctx *context.Context, version string) {
 	ctx.Env.Unset("GOROOT")
 }
 
-const golangModulesSuffix = "+modules"
+const golangModulesSuffix = "+mod"
 
 func golangExtractVersion(version string) string {
 	return strings.TrimSuffix(version, golangModulesSuffix)
