@@ -15,6 +15,19 @@ func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	if err != nil {
 		return err
 	}
+
+	modulesEnabled := false
+	if config.IsHash() {
+		modulesEnabled, err = config.GetBooleanPropertyDefault("modules", false)
+		if err != nil {
+			return err
+		}
+	}
+	featureVersion := version
+	if modulesEnabled {
+		featureVersion += "+modules"
+	}
+
 	task.Info = version
 
 	checkPATHVar := func(ctx *context.Context) *taskapi.ActionResult {
@@ -40,7 +53,7 @@ func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	}
 	task.AddActionWithBuilder("install golang distribution", installGo).
 		OnFunc(installNeeded).
-		SetFeature("golang", version)
+		SetFeature("golang", featureVersion)
 
 	return nil
 }

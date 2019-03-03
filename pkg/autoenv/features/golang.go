@@ -1,6 +1,8 @@
 package features
 
 import (
+	"strings"
+
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 )
@@ -10,7 +12,7 @@ func init() {
 }
 
 func golangActivate(ctx *context.Context, version string) (bool, error) {
-	golang := helpers.NewGolang(ctx.Cfg, version)
+	golang := helpers.NewGolang(ctx.Cfg, golangExtractVersion(version))
 
 	if !golang.Exists() {
 		return true, nil
@@ -20,8 +22,9 @@ func golangActivate(ctx *context.Context, version string) (bool, error) {
 
 	ctx.Env.Set("GOROOT", golang.Path())
 
-	// TODO: decide whether we want to enable GO15VENDOREXPERIMENT
-	// Introduced in 1.5, enabled by default in 1.7
+	if golangVersionWithModules(version) {
+		ctx.Env.Set("GO111MODULES", "on")
+	}
 
 	return false, nil
 }
@@ -31,5 +34,16 @@ func golangDeactivate(ctx *context.Context, version string) {
 	golang := helpers.NewGolang(ctx.Cfg, "")
 	ctx.Env.RemoveFromPath(golang.Path())
 
+	ctx.Env.Unset("GO111MODULES")
 	ctx.Env.Unset("GOROOT")
+}
+
+const golangModulesSuffix = "+modules"
+
+func golangExtractVersion(version string) string {
+	return strings.TrimSuffix(version, golangModulesSuffix)
+}
+
+func golangVersionWithModules(version string) bool {
+	return strings.HasSuffix(version, golangModulesSuffix)
 }
