@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/stretchr/testify/require"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
@@ -34,11 +34,11 @@ func (r *recorder) getCallsAndReset() []string {
 func newMockEnv(name string, reg *features.MutableRegister, rec *recorder) {
 	reg.Register(
 		name,
-		func(param string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
+		func(ctx *context.Context, param string) (bool, error) {
 			rec.record("activate", param)
 			return false, nil
 		},
-		func(param string, cfg *config.Config, env *env.Env) {
+		func(ctx *context.Context, param string) {
 			rec.record("deactivate", param)
 		},
 	)
@@ -51,10 +51,12 @@ func newRunner(env *env.Env, reg *features.MutableRegister) *runner {
 func newRunnerWithProject(env *env.Env, reg *features.MutableRegister, projectPath string) *runner {
 	_, ui := termui.NewTesting(false)
 	return &runner{
-		cfg:   nil,
-		proj:  project.NewFromPath(projectPath),
-		ui:    ui,
-		env:   env,
+		ctx: &context.Context{
+			Cfg:     nil,
+			Project: project.NewFromPath(projectPath),
+			UI:      ui,
+			Env:     env,
+		},
 		state: &FeatureState{env},
 		reg:   reg,
 	}

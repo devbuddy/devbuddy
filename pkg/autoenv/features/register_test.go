@@ -3,9 +3,7 @@ package features
 import (
 	"testing"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/context"
 
 	"github.com/stretchr/testify/require"
 )
@@ -13,11 +11,11 @@ import (
 func TestRegister(t *testing.T) {
 	reg := NewRegister()
 
-	activate := func(param string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
+	activate := func(ctx *context.Context, param string) (bool, error) {
 		return false, nil
 	}
-	deactivate1 := func(param string, cfg *config.Config, env *env.Env) {}
-	deactivate2 := func(param string, cfg *config.Config, env *env.Env) {}
+	deactivate1 := func(ctx *context.Context, param string) {}
+	deactivate2 := func(ctx *context.Context, param string) {}
 
 	reg.Register("env1", activate, deactivate1)
 	reg.Register("env2", activate, deactivate2)

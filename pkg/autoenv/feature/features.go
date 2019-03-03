@@ -1,13 +1,11 @@
 package feature
 
 import (
-	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/context"
 )
 
-type ActivateFunc func(string, *config.Config, *project.Project, *env.Env) (bool, error)
-type DeactivateFunc func(string, *config.Config, *env.Env)
+type ActivateFunc func(*context.Context, string) (bool, error)
+type DeactivateFunc func(*context.Context, string)
 
 // Feature is the implementation of an environment feature.
 type Feature struct {

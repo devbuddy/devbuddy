@@ -2,32 +2,30 @@ package autoenv
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
-	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/context"
 )
 
 // Sync activates / deactivates the features in the instance of env.Env.
 // When a feature is already active but unknown, it will be ignored completely.
 // When a param changes, the feature is deactivated with the current param then activated with the new param.
-func Sync(cfg *config.Config, proj *project.Project, ui *termui.UI, env *env.Env, set FeatureSet) {
-	runner := &runner{cfg: cfg, proj: proj, ui: ui, env: env, state: &FeatureState{env}, reg: features.GlobalRegister()}
+func Sync(ctx *context.Context, set FeatureSet) {
+	runner := &runner{
+		ctx:   ctx,
+		state: &FeatureState{ctx.Env},
+		reg:   features.GlobalRegister(),
+	}
 	runner.sync(set)
 }
 
 type runner struct {
-	cfg   *config.Config
-	proj  *project.Project
-	ui    *termui.UI
-	env   *env.Env
+	ctx   *context.Context
 	state *FeatureState
 	reg   features.Register
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
 	// If we jumped to a different project, all feature should be deactivated
-	if r.proj != nil && r.state.GetProjectSlug() != r.proj.Slug() {
+	if r.ctx.Project != nil && r.state.GetProjectSlug() != r.ctx.Project.Slug() {
 		for _, featureInfo := range r.state.GetActiveFeatures() {
 			r.deactivateFeature(featureInfo)
 		}
@@ -56,42 +54,42 @@ func (r *runner) sync(featureSet FeatureSet) {
 	}
 
 	// Record for which project the features were activated
-	if r.proj != nil {
-		r.state.SetProjectSlug(r.proj.Slug())
+	if r.ctx.Project != nil {
+		r.state.SetProjectSlug(r.ctx.Project.Slug())
 	}
 }
 
 func (r *runner) activateFeature(featureInfo FeatureInfo) {
-	r.ui.Debug("activating %s (%s)", featureInfo.Name, featureInfo.Param)
+	r.ctx.UI.Debug("activating %s (%s)", featureInfo.Name, featureInfo.Param)
 
 	environment, err := r.reg.Get(featureInfo.Name)
 	if err != nil {
-		r.ui.Warningf("%s (ignoring)", err)
+		r.ctx.UI.Warningf("%s (ignoring)", err)
 		return
 	}
 
-	devUpNeeded, err := environment.Activate(featureInfo.Param, r.cfg, r.proj, r.env)
+	devUpNeeded, err := environment.Activate(r.ctx, featureInfo.Param)
 	if err != nil {
-		r.ui.Debug("failed: %s", err)
+		r.ctx.UI.Debug("failed: %s", err)
 		return
 	}
 	if devUpNeeded {
-		r.ui.HookFeatureFailure(featureInfo.Name, featureInfo.Param)
+		r.ctx.UI.HookFeatureFailure(featureInfo.Name, featureInfo.Param)
 		return
 	}
-	r.ui.HookFeatureActivated(featureInfo.Name, featureInfo.Param)
+	r.ctx.UI.HookFeatureActivated(featureInfo.Name, featureInfo.Param)
 	r.state.SetFeature(featureInfo)
 }
 
 func (r *runner) deactivateFeature(featureInfo FeatureInfo) {
-	r.ui.Debug("deactivating %s (%s)", featureInfo.Name, featureInfo.Param)
+	r.ctx.UI.Debug("deactivating %s (%s)", featureInfo.Name, featureInfo.Param)
 
 	environment, err := r.reg.Get(featureInfo.Name)
 	if err != nil {
-		r.ui.Warningf("%s (ignoring)", err)
+		r.ctx.UI.Warningf("%s (ignoring)", err)
 		return
 	}
 
-	environment.Deactivate(featureInfo.Param, r.cfg, r.env)
+	environment.Deactivate(r.ctx, featureInfo.Param)
 	r.state.UnsetFeature(featureInfo.Name)
 }
