@@ -23,7 +23,7 @@ var upCmd = &cobra.Command{
 }
 
 func upRun(cmd *cobra.Command, args []string) {
-	ctx, err := context.Load()
+	ctx, err := context.LoadWithProject()
 	checkError(err)
 
 	taskList, err := taskapi.GetTasksFromProject(ctx.Project)

@@ -68,7 +68,7 @@ func (r *TaskRunnerImpl) activateFeature(ctx *context.Context, feature autoenv.F
 		return err
 	}
 
-	devUpNeeded, err := def.Activate(feature.Param, ctx.Cfg, ctx.Project, ctx.Env)
+	devUpNeeded, err := def.Activate(ctx, feature.Param)
 	if err != nil {
 		return err
 	}
