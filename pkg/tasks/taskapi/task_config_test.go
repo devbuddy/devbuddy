@@ -6,6 +6,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestTaskConfigIsHash(t *testing.T) {
+	config := &TaskConfig{
+		payload: map[interface{}]interface{}{},
+	}
+
+	require.True(t, config.IsHash())
+
+	config = &TaskConfig{
+		payload: "",
+	}
+
+	require.False(t, config.IsHash())
+}
+
 func TestTaskConfigProperty(t *testing.T) {
 	config := &TaskConfig{
 		name:    "test",
