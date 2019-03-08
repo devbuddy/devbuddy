@@ -143,6 +143,9 @@ class ProjectTestHelper:
         with open(os.path.join(self.path, local_path), 'w') as fp:
             fp.write(data)
 
+    def write_file_dedent(self, local_path, data):
+        self.write_file(local_path, textwrap.dedent(data).lstrip())
+
     def assert_file(self, local_path, expect_content=None, present=True):
         path = os.path.join(self.path, local_path)
 

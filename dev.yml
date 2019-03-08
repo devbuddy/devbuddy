@@ -1,5 +1,7 @@
 up:
-  - go: '1.12'
+  - go:
+      version: '1.12'
+      modules: true
   - python: 3.6.5
   - pip: [tests/requirements.txt]
   - homebrew:
