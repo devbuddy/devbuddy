@@ -21,7 +21,3 @@ func (u *UI) HookFeatureFailure(name string, version string) {
 func HookShellDetectionError(err error) {
 	Fprintf(os.Stderr, "%s %s\n", color.Brown("Could not detect your shell:"), err.Error())
 }
-
-func HookIntegrationError(message string) {
-	Fprintf(os.Stderr, "%s: %s", color.Red("Shell integration error:"), message)
-}
