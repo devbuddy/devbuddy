@@ -23,7 +23,7 @@ func golangActivate(ctx *context.Context, version string) (bool, error) {
 	ctx.Env.Set("GOROOT", golang.Path())
 
 	if golangVersionWithModules(version) {
-		ctx.Env.Set("GO111MODULES", "on")
+		ctx.Env.Set("GO111MODULE", "on")
 	}
 
 	return false, nil
@@ -34,7 +34,7 @@ func golangDeactivate(ctx *context.Context, version string) {
 	golang := helpers.NewGolang(ctx.Cfg, "")
 	ctx.Env.RemoveFromPath(golang.Path())
 
-	ctx.Env.Unset("GO111MODULES")
+	ctx.Env.Unset("GO111MODULE")
 	ctx.Env.Unset("GOROOT")
 }
 
