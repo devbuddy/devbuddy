@@ -32,11 +32,11 @@ def test_warn_gopath_missing(cmd, project, gopath):
     assert "The GOPATH environment variable should be set" in output
 
 
-def test_with_modules(cmd, project, gopath):
+def test_with_modules(cmd, project, srcdir):
     # We want to support pre-modules and modules projects in the same environment
     # so we set a GOPATH as it would be for pre-modules setup
     # Devbuddy will set GO111MODULES=on to force-enable Go modules even if we are in the GOPATH
-    cmd.run(f"export GOPATH={gopath}")
+    cmd.run(f"export GOPATH={srcdir}")
 
     project.write_devyml("""
         up:

@@ -131,7 +131,7 @@ def cmd(binary_path, workdir, request):
 
 
 class ProjectTestHelper:
-    def __init__(self, org, name):
+    def __init__(self, org, name, path):
         self.org = org
         self.name = name
         self.path = os.path.expanduser('~/src/github.com/%s/%s' % (org, name))
@@ -163,9 +163,15 @@ class ProjectTestHelper:
 
 
 @pytest.fixture
-def project_factory(request):
+def srcdir():
+    return os.path.expanduser('~')
+
+
+@pytest.fixture
+def project_factory(request, srcdir):
     def func(org, name):
-        project = ProjectTestHelper(org, name)
+        path = srcdir.join('src').join('github.com').join(org).join(name)
+        project = ProjectTestHelper(org, name, path)
 
         if os.path.exists(project.path):
             shutil.rmtree(project.path)
