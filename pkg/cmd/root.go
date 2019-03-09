@@ -25,7 +25,7 @@ func build(version string) {
 	rootCmd.Flags().Bool("shell-init", false, "Shell initialization")
 	rootCmd.Flags().Bool("with-completion", false, "Enable completion during initialization")
 
-	rootCmd.Flags().Bool("show-debug-info", false, "Show debug information to create an issue")
+	rootCmd.Flags().Bool("debug-info", false, "Show debug information to create an issue")
 	rootCmd.Flags().Bool("report-issue", false, "Create an issue about DevBuddy on Github")
 
 	rootCmd.Flags().Bool("shell-hook", false, "Shell prompt hook")
@@ -59,7 +59,7 @@ func rootRun(cmd *cobra.Command, args []string) {
 		os.Exit(0)
 	}
 
-	if GetFlagBool(cmd, "show-debug-info") {
+	if GetFlagBool(cmd, "debug-info") {
 		fmt.Println(debug.FormatDebugInfo(rootCmd.Version, os.Environ(), debug.SafeFindCurrentProject()))
 		os.Exit(0)
 	}
