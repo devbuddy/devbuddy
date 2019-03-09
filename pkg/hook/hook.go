@@ -17,11 +17,10 @@ func Run() {
 
 	// Also, we can't annoy the user here, so we always just quit silently
 
-	ctx, err := context.Load()
+	ctx, err := context.Load(true)
 	if err != nil {
 		return
 	}
-	ctx.UI.SetOutputToStderr()
 
 	err = run(ctx)
 	if err != nil {
