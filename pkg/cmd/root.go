@@ -1,7 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+
+	"github.com/devbuddy/devbuddy/pkg/helpers/debug"
+	"github.com/devbuddy/devbuddy/pkg/helpers/open"
 
 	"github.com/spf13/cobra"
 
@@ -20,6 +24,9 @@ func build(version string) {
 
 	rootCmd.Flags().Bool("shell-init", false, "Shell initialization")
 	rootCmd.Flags().Bool("with-completion", false, "Enable completion during initialization")
+
+	rootCmd.Flags().Bool("show-debug-info", false, "Show debug information to create an issue")
+	rootCmd.Flags().Bool("report-issue", false, "Create an issue about DevBuddy on Github")
 
 	rootCmd.Flags().Bool("shell-hook", false, "Shell prompt hook")
 	err := rootCmd.Flags().MarkHidden("shell-hook")
@@ -49,6 +56,17 @@ func rootRun(cmd *cobra.Command, args []string) {
 
 	if GetFlagBool(cmd, "shell-hook") {
 		hook.Run()
+		os.Exit(0)
+	}
+
+	if GetFlagBool(cmd, "show-debug-info") {
+		fmt.Println(debug.FormatDebugInfo(rootCmd.Version, os.Environ(), debug.SafeFindCurrentProject()))
+		os.Exit(0)
+	}
+
+	if GetFlagBool(cmd, "report-issue") {
+		url := debug.NewGithubIssueURL(rootCmd.Version, os.Environ(), debug.SafeFindCurrentProject())
+		open.Open(url)
 		os.Exit(0)
 	}
 
