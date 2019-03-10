@@ -31,6 +31,6 @@ func TestFormatDebugInfo(t *testing.T) {
 
 func TestNewGithubIssueURL(t *testing.T) {
 	url := NewGithubIssueURL("", []string{}, "")
-	require.Contains(t, url, "https://github.com/devbuddy/devbuddy/issues/new?body=")
+	require.Contains(t, url, "https://github.com/devbuddy/devbuddy/issues/new?")
 	require.Contains(t, url, "Project+not+found")
 }
