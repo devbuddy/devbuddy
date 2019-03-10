@@ -67,7 +67,7 @@ workflows:
             tags:
               only: /.*/
       - deploy-release:
-          requires: [tests, tests-bash, tests-zsh, lint]
+          requires: [tests, tests-bash, tests-zsh]
           filters:
             branches:
               ignore: /.*/
