@@ -45,17 +45,18 @@ commands:
     desc: Run all tests as CI would do
     run: script/test && pytest -v tests && script/lint
 
-  release:
-    desc: Create a new release
-    run: script/release.py release
-
-  rc:
-    desc: Create a new release-candidate or increment the last release-candidate
-    run: script/release.py release-candidate
-
   releaselog:
     desc: Show the commits since the last tag
     run: git log `git describe --tags --abbrev=0`..HEAD --pretty=format:'%s'
+  release:
+    desc: Create a new release
+    run: script/release.py release
+  patch:
+    desc: Create a new patch release
+    run: script/release.py patch
+  rc:
+    desc: Create a new release-candidate or increment the last release-candidate
+    run: script/release.py release-candidate
 
   godoc:
     desc: Starting GoDoc server on http://0.0.0.0:6060
