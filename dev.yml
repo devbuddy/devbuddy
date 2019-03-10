@@ -45,9 +45,6 @@ commands:
     desc: Run all tests as CI would do
     run: script/test && pytest -v tests && script/lint
 
-  releaselog:
-    desc: Show the commits since the last tag
-    run: git log `git describe --tags --abbrev=0`..HEAD --pretty=format:'%s'
   release:
     desc: Create a new release
     run: script/release.py release
@@ -57,6 +54,9 @@ commands:
   rc:
     desc: Create a new release-candidate or increment the last release-candidate
     run: script/release.py release-candidate
+  releaselog:
+    desc: Show the commits since the last tag
+    run: git log `git describe --tags --abbrev=0`..HEAD --pretty=format:'%s'
 
   godoc:
     desc: Starting GoDoc server on http://0.0.0.0:6060
