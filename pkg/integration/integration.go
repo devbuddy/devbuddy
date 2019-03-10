@@ -47,14 +47,26 @@ func AddFinalizerCd(path string) error {
 	return addFinalizer("cd", path)
 }
 
+func formatError(message string) error {
+	return fmt.Errorf(`there is something wrong this the shell integration:
+
+    %s
+
+This usually means that DevBuddy is not setup properly.
+Please follow the setup steps: https://github.com/devbuddy/devbuddy/tree/v0.9.0#setup
+
+If DevBuddy is already setup, then please open an issue on https://github.com/devbuddy/devbuddy/issues/new?labels=bug
+You can use "bud --report-issue" to do that.
+`, message)
+}
+
 func addFinalizer(action, arg string) (err error) {
 	content := fmt.Sprintf("%s:%s\n", action, arg)
 
 	finalizerPath := os.Getenv("BUD_FINALIZER_FILE")
 
 	if finalizerPath == "" {
-		termui.HookIntegrationError("can't run a finalizer action: " + content)
-		return nil
+		return formatError("the BUD_FINALIZER_FILE environment variable is missing or empty")
 	}
 
 	return writeFile(finalizerPath, content)
