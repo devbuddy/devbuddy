@@ -16,3 +16,17 @@ def test_cmd_init(cmd):
     init = cmd.run('bud --shell-init')
     assert 'bud() {' in init
     assert '__bud_prompt_command' in init
+
+
+def test_debug_info(cmd, project):
+    pwd = cmd.run('echo -n $PWD')
+    assert pwd
+
+    debug_info = cmd.run('bud --debug-info')
+    assert '**DevBuddy version**' in debug_info
+    assert f'PWD="{pwd}"' in debug_info
+    assert 'Project not found' in debug_info
+
+    project.write_devyml("")
+    debug_info = cmd.run('bud --debug-info')
+    assert 'Project path: ' in debug_info
