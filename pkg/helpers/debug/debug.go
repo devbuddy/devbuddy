@@ -46,7 +46,7 @@ What happened? What did you expect?
 `
 	body += FormatDebugInfo(version, environ, projectPath)
 	bodyParam := url.QueryEscape(body)
-	return fmt.Sprintf("https://github.com/devbuddy/devbuddy/issues/new?body=%s", bodyParam)
+	return fmt.Sprintf("https://github.com/devbuddy/devbuddy/issues/new?labels=user-bug&body=%s", bodyParam)
 }
 
 // SafeFindCurrentProject returns the path of the project if found, and an empty string otherwise
