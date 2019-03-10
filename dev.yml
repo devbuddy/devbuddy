@@ -48,11 +48,12 @@ commands:
   release:
     desc: Create a new release
     run: script/release.py release
-
+  patch:
+    desc: Create a new patch release
+    run: script/release.py patch
   rc:
     desc: Create a new release-candidate or increment the last release-candidate
     run: script/release.py release-candidate
-
   releaselog:
     desc: Show the commits since the last tag
     run: git log `git describe --tags --abbrev=0`..HEAD --pretty=format:'%s'
