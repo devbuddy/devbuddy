@@ -1,1 +1,36 @@
 package debug
+
+import (
+	"testing"
+
+	"github.com/Flaque/filet"
+	"github.com/stretchr/testify/require"
+
+	"github.com/devbuddy/devbuddy/pkg/test"
+)
+
+func TestFormatDebugInfo(t *testing.T) {
+	defer filet.CleanUp(t)
+
+	text := FormatDebugInfo("versionONE", []string{"SHELL=/bin/bash"}, "")
+	require.Contains(t, text, "`versionONE`")
+	require.Contains(t, text, "SHELL=\"/bin/bash\"\n")
+	require.Contains(t, text, "Project not found")
+
+	tmpdir := filet.TmpDir(t, "")
+
+	text = FormatDebugInfo("", []string{}, tmpdir)
+	require.Contains(t, text, "Failed to read manifest: no manifest at")
+
+	writer := test.Project(tmpdir)
+	writer.Manifest().WriteString(t, "up: [{go: 1.2.3}]")
+
+	text = FormatDebugInfo("", []string{}, tmpdir)
+	require.Contains(t, text, "0. `map[go:1.2.3]`")
+}
+
+func TestNewGithubIssueURL(t *testing.T) {
+	url := NewGithubIssueURL("", []string{}, "")
+	require.Contains(t, url, "https://github.com/devbuddy/devbuddy/issues/new?body=")
+	require.Contains(t, url, "Project+not+found")
+}
