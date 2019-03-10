@@ -53,7 +53,7 @@ func formatError(message string) error {
     %s
 
 This usually means that DevBuddy is not setup properly.
-Please follow the setup steps: https://github.com/devbuddy/devbuddy/tree/v0.9.0#setup
+Please follow the setup steps: https://github.com/devbuddy/devbuddy/tree/master#setup
 
 If DevBuddy is already setup, then please open an issue on https://github.com/devbuddy/devbuddy/issues/new?labels=bug
 You can use "bud --report-issue" to do that.
