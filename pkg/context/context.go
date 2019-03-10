@@ -16,13 +16,16 @@ type Context struct {
 }
 
 // Load returns a Context, even if the project was not found
-func Load() (*Context, error) {
+func Load(hookMode bool) (*Context, error) {
 	cfg, err := config.Load()
 	if err != nil {
 		return nil, err
 	}
 
 	ui := termui.New(cfg)
+	if hookMode {
+		ui.SetOutputToStderr()
+	}
 
 	proj, err := project.FindCurrent()
 	if err != nil {
@@ -46,7 +49,7 @@ func Load() (*Context, error) {
 
 // LoadWithProject returns a Context, fails if the project is not found
 func LoadWithProject() (*Context, error) {
-	ctx, err := Load()
+	ctx, err := Load(false)
 	if err != nil {
 		return nil, err
 	}
