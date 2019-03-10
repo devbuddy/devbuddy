@@ -65,7 +65,8 @@ func rootRun(cmd *cobra.Command, args []string) {
 
 	if GetFlagBool(cmd, "report-issue") {
 		url := debug.NewGithubIssueURL(rootCmd.Version, os.Environ(), debug.SafeFindCurrentProject())
-		open.Open(url)
+		err := open.Open(url)
+		checkError(err)
 		os.Exit(0)
 	}
 
