@@ -12,6 +12,7 @@ jobs:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
       - run: script/test
+      - run: script/lint
       - run: pip install mypy; mypy --strict script/release.py
 
   tests-bash:
@@ -29,13 +30,6 @@ jobs:
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
       - run: pip install -r tests/requirements.txt
       - run: pytest --durations=1 --shell zsh -v tests
-
-  lint:
-    executor: testing
-    steps:
-      - checkout
-      - run: go mod download
-      - run: script/lint
 
   binaries:
     executor: testing
