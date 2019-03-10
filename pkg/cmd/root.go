@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/devbuddy/devbuddy/pkg/helpers/debug"
-	"github.com/devbuddy/devbuddy/pkg/helpers/open"
-
 	"github.com/spf13/cobra"
 
+	"github.com/devbuddy/devbuddy/pkg/helpers/debug"
+	"github.com/devbuddy/devbuddy/pkg/helpers/open"
 	"github.com/devbuddy/devbuddy/pkg/hook"
 	"github.com/devbuddy/devbuddy/pkg/integration"
 )
