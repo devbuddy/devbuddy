@@ -60,22 +60,22 @@ func SafeFindCurrentProject() string {
 
 func fmtEnvVar(environ []string) string {
 	names := [][]string{
-		[]string{
+		{
 			"SHELL",
 			"SHLVL",
 			"TERM",
 		},
-		[]string{
+		{
 			"PATH",
 			"USER",
 			"PWD",
 		},
-		[]string{
+		{
 			"BUD_DEBUG",
 			"BUD_FINALIZER_FILE",
 			"BUD_AUTO_ENV_FEATURES",
 		},
-		[]string{
+		{
 			"GOROOT",
 			"GOPATH",
 			"GO111MODULE",
