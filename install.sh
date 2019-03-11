@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 
-VERSION="v0.9.1"
+VERSION="v0.9.2"
 DEST="/usr/local/bin"
 SHELL_LINE='eval "$(bud --shell-init --with-completion)"'
 
