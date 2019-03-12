@@ -5,10 +5,8 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
-	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 func Run() {
@@ -36,7 +34,8 @@ func run(ctx *context.Context) error {
 	ctx.UI.Debug("features: %+v", allFeatures)
 
 	autoenv.Sync(ctx, allFeatures)
-	printEnvironmentChangeAsShellCommands(ctx.UI, ctx.Env)
+	emitEnvironmentChangeAsShellCommands(ctx)
+	emitShellHashResetCommand(ctx)
 
 	return nil
 }
@@ -54,14 +53,23 @@ func getFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
 	return taskapi.GetFeaturesFromTasks(allTasks), nil
 }
 
-func printEnvironmentChangeAsShellCommands(ui *termui.UI, env *env.Env) {
-	for _, change := range env.Changed() {
-		ui.Debug("Env change: %+v", change)
+func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {
+	for _, change := range ctx.Env.Changed() {
+		ctx.UI.Debug("Env change: %+v", change)
 
 		if change.Deleted {
 			fmt.Printf("unset %s\n", change.Name)
 		} else {
 			fmt.Printf("export %s=\"%s\"\n", change.Name, change.Value)
+		}
+	}
+}
+
+func emitShellHashResetCommand(ctx *context.Context) {
+	for _, change := range ctx.Env.Changed() {
+		if change.Name == "PATH" {
+			fmt.Printf("hash -r")
+			return
 		}
 	}
 }
