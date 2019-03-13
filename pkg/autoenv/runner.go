@@ -11,7 +11,7 @@ import (
 func Sync(ctx *context.Context, set FeatureSet) {
 	runner := &runner{
 		ctx:   ctx,
-		state: &FeatureState{ctx.Env},
+		state: &FeatureState{ctx.Env, ctx.UI},
 		reg:   features.GlobalRegister(),
 	}
 	runner.sync(set)
@@ -24,6 +24,15 @@ type runner struct {
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
+	if r.state.GetProjectSlug() != "" {
+		if r.ctx.Project == nil || r.ctx.Project != nil && r.state.GetProjectSlug() != r.ctx.Project.Slug() {
+			r.state.Restore()
+		}
+	}
+	if r.ctx.Project == nil {
+		r.state.Forget()
+	}
+
 	// If we jumped to a different project, all feature should be deactivated
 	if r.ctx.Project != nil && r.state.GetProjectSlug() != r.ctx.Project.Slug() {
 		for _, featureInfo := range r.state.GetActiveFeatures() {
@@ -56,6 +65,12 @@ func (r *runner) sync(featureSet FeatureSet) {
 	// Record for which project the features were activated
 	if r.ctx.Project != nil {
 		r.state.SetProjectSlug(r.ctx.Project.Slug())
+		err := r.state.Save()
+		if err != nil {
+			r.ctx.UI.Debug("state.RecordPrevious() failed with: %s", err)
+		}
+	} else {
+		r.state.SetProjectSlug("")
 	}
 }
 

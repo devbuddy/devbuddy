@@ -17,7 +17,7 @@ func pythonActivate(ctx *context.Context, version string) (bool, error) {
 		return true, nil
 	}
 
-	pythonCleanPath(ctx)
+	// pythonCleanPath(ctx)
 	ctx.Env.PrependToPath(venv.BinPath())
 
 	ctx.Env.Set("VIRTUAL_ENV", venv.Path())
@@ -26,9 +26,9 @@ func pythonActivate(ctx *context.Context, version string) (bool, error) {
 }
 
 func pythonDeactivate(ctx *context.Context, version string) {
-	ctx.Env.Unset("VIRTUAL_ENV")
+	// ctx.Env.Unset("VIRTUAL_ENV")
 
-	pythonCleanPath(ctx)
+	// pythonCleanPath(ctx)
 }
 
 // pythonCleanPath removes all virtualenv path, even if multiple of them exists

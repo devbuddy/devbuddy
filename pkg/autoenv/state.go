@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/devbuddy/devbuddy/pkg/termui"
+
 	"github.com/devbuddy/devbuddy/pkg/env"
 )
 
@@ -12,6 +14,7 @@ const autoEnvVariableName = "BUD_AUTO_ENV_FEATURES"
 // FeatureState remember the current state of the features (whether they are active)
 type FeatureState struct {
 	env *env.Env
+	UI  *termui.UI
 }
 
 // GetActiveFeatures returns a Hash of feature name -> param
@@ -61,4 +64,92 @@ func (s *FeatureState) SetFeature(featureInfo FeatureInfo) {
 func (s *FeatureState) UnsetFeature(name string) {
 	pKey, set := s.get()
 	s.set(pKey, set.Without(name))
+}
+
+const autoEnvStateVariableName = "__BUD_AUTOENV_STATE"
+
+type previousState map[string]*string
+
+func (p previousState) String() string {
+	elements := []string{}
+
+	for name, value := range p {
+		if value == nil {
+			elements = append(elements, name+"=nil")
+		} else {
+			elements = append(elements, fmt.Sprintf("%s=\"%s\"", name, *value))
+		}
+	}
+	return strings.Join(elements, " ")
+}
+
+type AutoEnvState struct {
+	Previous map[string]*string `json:previous`
+}
+
+func (s *FeatureState) loadState() (previousState, error) {
+	state := make(previousState)
+
+	if s.env.Has(autoEnvStateVariableName) {
+		err := Unmarshal(s.env.Get(autoEnvStateVariableName), &state)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return state, nil
+}
+
+func (s *FeatureState) Forget() {
+	s.env.Unset(autoEnvStateVariableName)
+}
+
+func (s *FeatureState) Save() error {
+	state, err := s.loadState()
+	if err != nil {
+		return err
+	}
+	s.UI.Debug("Loaded state: %s", state)
+
+	for _, mutation := range s.env.Mutations() {
+		if mutation.Name == autoEnvStateVariableName || mutation.Name == autoEnvVariableName {
+			continue
+		}
+		if _, present := state[mutation.Name]; present {
+			continue // only the first mutation should be recorded to keep the original state
+		}
+		if mutation.Previous == nil {
+			state[mutation.Name] = nil
+		} else {
+			copiedValue := fmt.Sprint(mutation.Previous.Value)
+			state[mutation.Name] = &copiedValue
+		}
+	}
+
+	serialized, err := Marshal(state)
+	if err != nil {
+		return err
+	}
+
+	s.env.Set(autoEnvStateVariableName, string(serialized))
+
+	return nil
+}
+
+func (s *FeatureState) Restore() error {
+	state, err := s.loadState()
+	if err != nil {
+		return err
+	}
+
+	for name, value := range state {
+		if value == nil {
+			s.env.Unset(name)
+			s.UI.Debug("restoring %s to deleted", name)
+		} else {
+			s.env.Set(name, *value)
+			s.UI.Debug("restoring %s to %s", name, *value)
+		}
+	}
+	return nil
 }

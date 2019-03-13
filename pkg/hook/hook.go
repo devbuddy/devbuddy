@@ -54,20 +54,20 @@ func getFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
 }
 
 func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {
-	for _, change := range ctx.Env.Changed() {
-		ctx.UI.Debug("Env change: %+v", change)
+	for _, mutation := range ctx.Env.Mutations() {
+		ctx.UI.Debug("Env change: %+v -> %+v", mutation.Previous, mutation.Current)
 
-		if change.Deleted {
-			fmt.Printf("unset %s\n", change.Name)
+		if mutation.Current == nil {
+			fmt.Printf("unset %s\n", mutation.Name)
 		} else {
-			fmt.Printf("export %s=\"%s\"\n", change.Name, change.Value)
+			fmt.Printf("export %s=\"%s\"\n", mutation.Name, mutation.Current.Value)
 		}
 	}
 }
 
 func emitShellHashResetCommand(ctx *context.Context) {
-	for _, change := range ctx.Env.Changed() {
-		if change.Name == "PATH" {
+	for _, mutation := range ctx.Env.Mutations() {
+		if mutation.Name == "PATH" {
 			fmt.Printf("hash -r")
 			return
 		}

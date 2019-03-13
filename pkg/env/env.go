@@ -7,24 +7,16 @@ import (
 
 // An Env provides a simple interface to manipulate environment variables
 type Env struct {
-	env         map[string]string
-	verbatimEnv map[string]string
+	env         Variables
+	verbatimEnv Variables
 }
 
 // New returns a new Env from an arbitrary list of variables
-func New(env []string) (e *Env) {
-	e = &Env{
-		env:         make(map[string]string),
-		verbatimEnv: make(map[string]string),
+func New(env []string) *Env {
+	return &Env{
+		env:         NewVariables(env),
+		verbatimEnv: NewVariables(env),
 	}
-
-	for _, pair := range env {
-		parts := strings.SplitN(pair, "=", 2)
-		e.env[parts[0]] = parts[1]
-		e.verbatimEnv[parts[0]] = parts[1]
-	}
-
-	return
 }
 
 // NewFromOS returns a new Env with variables from os.Environ()
@@ -32,16 +24,9 @@ func NewFromOS() (e *Env) {
 	return New(os.Environ())
 }
 
-// A VariableChange represents the change made on a variable
-type VariableChange struct {
-	Name    string
-	Value   string
-	Deleted bool
-}
-
 // Set adds or changes a variable
 func (e *Env) Set(name string, value string) {
-	e.env[name] = value
+	e.env[name] = &Variable{name, value}
 }
 
 // Unset removes a variable if it exists
@@ -51,15 +36,21 @@ func (e *Env) Unset(name string) {
 
 // Get returns the value of a variable (defaults to empty string)
 func (e *Env) Get(name string) string {
-	return e.env[name]
+	variable := e.env[name]
+	if variable != nil {
+		return variable.Value
+	}
+	return ""
+}
+
+// Has returns whether the variable exists
+func (e *Env) Has(name string) bool {
+	return e.env[name] != nil
 }
 
 // Environ returns all variable as os.Environ() would
-func (e *Env) Environ() (vars []string) {
-	for name, value := range e.env {
-		vars = append(vars, name+"="+value)
-	}
-	return vars
+func (e *Env) Environ() []string {
+	return e.env.AsEnviron()
 }
 
 // PrependToPath inserts a new path at the beginning of the PATH variable
@@ -90,27 +81,26 @@ func (e *Env) IsInPath(path string) bool {
 	return false
 }
 
-// Changed returns all changes made on the variables
-func (e *Env) Changed() []VariableChange {
-	c := []VariableChange{}
-
-	for k, v := range e.env {
-		if v != e.verbatimEnv[k] {
-			c = append(c, VariableChange{Name: k, Value: v})
+// Mutations returns a list of variable mutations (previous and current value)
+func (e *Env) Mutations() (m []VariableMutation) {
+	for _, current := range e.env {
+		previous := e.verbatimEnv[current.Name]
+		if !current.Eq(previous) {
+			m = append(m, VariableMutation{Name: current.Name, Previous: previous, Current: current})
 		}
 	}
-	for k := range e.verbatimEnv {
-		if _, ok := e.env[k]; !ok {
-			c = append(c, VariableChange{Name: k, Deleted: true})
+	for _, previous := range e.verbatimEnv {
+		if _, present := e.env[previous.Name]; !present {
+			m = append(m, VariableMutation{Name: previous.Name, Previous: previous, Current: nil})
 		}
 	}
-	return c
+	return m
 }
 
 func (e *Env) getPathParts() []string {
-	return strings.Split(e.env["PATH"], ":")
+	return strings.Split(e.Get("PATH"), ":")
 }
 
 func (e *Env) setPathParts(elems ...string) {
-	e.env["PATH"] = strings.Join(elems, ":")
+	e.Set("PATH", strings.Join(elems, ":"))
 }

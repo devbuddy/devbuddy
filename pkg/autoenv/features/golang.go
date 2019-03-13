@@ -31,11 +31,11 @@ func golangActivate(ctx *context.Context, version string) (bool, error) {
 
 func golangDeactivate(ctx *context.Context, version string) {
 	// Golang install without version to get the base path
-	golang := helpers.NewGolang(ctx.Cfg, "")
-	ctx.Env.RemoveFromPath(golang.Path())
+	// golang := helpers.NewGolang(ctx.Cfg, "")
+	// ctx.Env.RemoveFromPath(golang.Path())
 
-	ctx.Env.Unset("GO111MODULE")
-	ctx.Env.Unset("GOROOT")
+	// ctx.Env.Unset("GO111MODULE")
+	// ctx.Env.Unset("GOROOT")
 }
 
 const golangModulesSuffix = "+mod"

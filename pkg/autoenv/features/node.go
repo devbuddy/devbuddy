@@ -19,6 +19,6 @@ func nodeActivate(ctx *context.Context, version string) (bool, error) {
 }
 
 func nodeDeactivate(ctx *context.Context, version string) {
-	node := helpers.NewNode(ctx.Cfg, version)
-	ctx.Env.RemoveFromPath(node.Path())
+	// node := helpers.NewNode(ctx.Cfg, version)
+	// ctx.Env.RemoveFromPath(node.Path())
 }
