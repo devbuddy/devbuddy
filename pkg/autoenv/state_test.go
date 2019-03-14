@@ -41,14 +41,14 @@ func TestStateDeserialization(t *testing.T) {
 
 	for idx := range envs {
 		env := env.New(envs[idx])
-		state := FeatureState{env}
+		state := FeatureState{env: env}
 		require.Equal(t, features[idx], state.GetActiveFeatures())
 		require.Equal(t, slugs[idx], state.GetProjectSlug())
 	}
 }
 func TestStateSerialization(t *testing.T) {
 	env := env.New([]string{})
-	state := FeatureState{env}
+	state := FeatureState{env: env}
 
 	state.SetProjectSlug("p-1")
 	require.Equal(t, "1:p-1:", env.Get("BUD_AUTO_ENV_FEATURES"))
@@ -66,42 +66,46 @@ func TestStateSerialization(t *testing.T) {
 func TestStateSetUnsetFeatures(t *testing.T) {
 	env := env.New([]string{})
 
-	state := FeatureState{env}
+	newFeatureState := func() *FeatureState {
+		return &FeatureState{env: env}
+	}
+
+	state := newFeatureState()
 	state.SetFeature(FeatureInfo{"rust", "v1"})
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	require.Equal(t,
 		NewFeatureSet().With(FeatureInfo{"rust", "v1"}),
 		state.GetActiveFeatures())
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	state.SetFeature(FeatureInfo{"elixir", "v1"})
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	require.Equal(t,
 		NewFeatureSet().With(FeatureInfo{"rust", "v1"}).With(FeatureInfo{"elixir", "v1"}),
 		state.GetActiveFeatures())
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	state.SetFeature(FeatureInfo{"rust", "v2"})
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	require.Equal(t,
 		NewFeatureSet().With(FeatureInfo{"rust", "v2"}).With(FeatureInfo{"elixir", "v1"}),
 		state.GetActiveFeatures())
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	state.UnsetFeature("elixir")
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	require.Equal(t,
 		NewFeatureSet().With(FeatureInfo{"rust", "v2"}),
 		state.GetActiveFeatures())
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	state.UnsetFeature("rust")
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	require.Equal(t,
 		NewFeatureSet(),
 		state.GetActiveFeatures())
@@ -110,15 +114,19 @@ func TestStateSetUnsetFeatures(t *testing.T) {
 func TestStateSetGetProjectSlug(t *testing.T) {
 	env := env.New([]string{})
 
-	state := FeatureState{env}
+	newFeatureState := func() *FeatureState {
+		return &FeatureState{env: env}
+	}
+
+	state := newFeatureState()
 	state.SetProjectSlug("p-1")
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	require.Equal(t, "p-1", state.GetProjectSlug())
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	state.SetProjectSlug("p-123")
 
-	state = FeatureState{env}
+	state = newFeatureState()
 	require.Equal(t, "p-123", state.GetProjectSlug())
 }

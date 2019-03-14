@@ -58,9 +58,9 @@ func findAutoEnvFeatureParam(ctx *context.Context, name string) (string, error) 
 	if err != nil {
 		return "", err
 	}
-	featureParam := taskapi.GetFeaturesFromTasks(taskList)[name].Param
-	if featureParam == "" {
+	feature := taskapi.GetFeaturesFromTasks(taskList).Get(name)
+	if feature == nil {
 		return "", fmt.Errorf("no autoenv feature with name %s", name)
 	}
-	return featureParam, nil
+	return feature.Param, nil
 }

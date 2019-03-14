@@ -31,7 +31,7 @@ func run(ctx *context.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx.UI.Debug("features: %+v", allFeatures)
+	ctx.UI.Debug("Desired features: %+v", allFeatures)
 
 	autoenv.Sync(ctx, allFeatures)
 	emitEnvironmentChangeAsShellCommands(ctx)
@@ -55,7 +55,7 @@ func getFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
 
 func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {
 	for _, mutation := range ctx.Env.Mutations() {
-		ctx.UI.Debug("Env change: %+v -> %+v", mutation.Previous, mutation.Current)
+		ctx.UI.Debug("Apply change: %s\n%s", mutation.Name, mutation.DiffString())
 
 		if mutation.Current == nil {
 			fmt.Printf("unset %s\n", mutation.Name)

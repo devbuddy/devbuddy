@@ -1,6 +1,9 @@
 package env
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // Variable represents an environment variable
 type Variable struct {
@@ -52,10 +55,13 @@ type VariableMutation struct {
 	Current  *Variable
 }
 
-// func (m VariableMutation) String() string {
-// 	if m.Previous == nil && m.Current != nil {
-// 		return fmt.Sprintf("set %s=%s", m.Current.Name, m.Current.Value)
-// 	}
-// 	if m.Previous
-// 	return fmt.
-// }
+func (m VariableMutation) DiffString() string {
+	text := ""
+	if m.Previous != nil {
+		text += fmt.Sprintf("  - %s\n", m.Previous.Value)
+	}
+	if m.Current != nil {
+		text += fmt.Sprintf("  + %s\n", m.Current.Value)
+	}
+	return text
+}

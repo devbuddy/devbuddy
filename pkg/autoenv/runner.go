@@ -25,29 +25,35 @@ type runner struct {
 
 func (r *runner) sync(featureSet FeatureSet) {
 	if r.state.GetProjectSlug() != "" {
-		if r.ctx.Project == nil || r.ctx.Project != nil && r.state.GetProjectSlug() != r.ctx.Project.Slug() {
-			r.state.Restore()
-		}
-	}
-	if r.ctx.Project == nil {
-		r.state.Forget()
-	}
+		// A project was active until now
 
-	// If we jumped to a different project, all feature should be deactivated
-	if r.ctx.Project != nil && r.state.GetProjectSlug() != r.ctx.Project.Slug() {
-		for _, featureInfo := range r.state.GetActiveFeatures() {
-			r.deactivateFeature(featureInfo)
+		if r.ctx.Project == nil {
+			// We jumped out of the project
+
+			r.state.RestoreEnv()
+			r.state.ForgetEnv() // we won't need to restore it in the future
+		}
+
+		if r.ctx.Project != nil && r.state.GetProjectSlug() != r.ctx.Project.Slug() {
+			// We jumped to a different project
+
+			r.state.RestoreEnv()
+			// When we jump to another project, we will need to restore the initial environment eventually
+
+			for _, featureInfo := range r.state.GetActiveFeatures() {
+				r.deactivateFeature(featureInfo)
+			}
 		}
 	}
 
 	activeFeatures := r.state.GetActiveFeatures()
 
 	for _, name := range r.reg.Names() {
-		wantFeatureInfo, want := featureSet[name]
-		activeFeatureInfo, active := activeFeatures[name]
+		wantFeatureInfo := featureSet.Get(name)
+		activeFeatureInfo := activeFeatures.Get(name)
 
-		if want {
-			if active {
+		if wantFeatureInfo != nil {
+			if activeFeatureInfo != nil {
 				if wantFeatureInfo.Param != activeFeatureInfo.Param {
 					r.deactivateFeature(activeFeatureInfo)
 					r.activateFeature(wantFeatureInfo)
@@ -56,7 +62,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 				r.activateFeature(wantFeatureInfo)
 			}
 		} else {
-			if active {
+			if activeFeatureInfo != nil {
 				r.deactivateFeature(activeFeatureInfo)
 			}
 		}
@@ -65,7 +71,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 	// Record for which project the features were activated
 	if r.ctx.Project != nil {
 		r.state.SetProjectSlug(r.ctx.Project.Slug())
-		err := r.state.Save()
+		err := r.state.SaveEnv()
 		if err != nil {
 			r.ctx.UI.Debug("state.RecordPrevious() failed with: %s", err)
 		}
@@ -74,7 +80,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 	}
 }
 
-func (r *runner) activateFeature(featureInfo FeatureInfo) {
+func (r *runner) activateFeature(featureInfo *FeatureInfo) {
 	r.ctx.UI.Debug("activating %s (%s)", featureInfo.Name, featureInfo.Param)
 
 	environment, err := r.reg.Get(featureInfo.Name)
@@ -96,7 +102,7 @@ func (r *runner) activateFeature(featureInfo FeatureInfo) {
 	r.state.SetFeature(featureInfo)
 }
 
-func (r *runner) deactivateFeature(featureInfo FeatureInfo) {
+func (r *runner) deactivateFeature(featureInfo *FeatureInfo) {
 	r.ctx.UI.Debug("deactivating %s (%s)", featureInfo.Name, featureInfo.Param)
 
 	environment, err := r.reg.Get(featureInfo.Name)

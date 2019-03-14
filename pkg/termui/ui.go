@@ -47,6 +47,7 @@ func (u *UI) SetOutputToStderr() {
 func (u *UI) Debug(format string, params ...interface{}) {
 	if u.debugEnabled {
 		msg := fmt.Sprintf(format, params...)
+		msg = strings.TrimSuffix(msg, "\n")
 		Fprintf(u.out, "BUD_DEBUG: %s\n", color.Gray(msg))
 	}
 }

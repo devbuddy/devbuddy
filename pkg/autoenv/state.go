@@ -4,12 +4,23 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/devbuddy/devbuddy/pkg/termui"
-
 	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
-const autoEnvVariableName = "BUD_AUTO_ENV_FEATURES"
+const autoEnvStateVariableName = "__BUD_AUTOENV_STATE"
+
+type savedEnv map[string]*string
+
+type AutoEnvState struct {
+	ProjectHash string     `json:"project_hash"`
+	Features    FeatureSet `json:"features"`
+	SavedEnv    savedEnv   `json:"saved_state"`
+}
+
+func (a *AutoEnvState) resetEnv() {
+	a.SavedEnv = savedEnv{}
+}
 
 // FeatureState remember the current state of the features (whether they are active)
 type FeatureState struct {
@@ -17,60 +28,61 @@ type FeatureState struct {
 	UI  *termui.UI
 }
 
+func (s *FeatureState) read() *AutoEnvState {
+	state := &AutoEnvState{}
+	state.resetEnv()
+
+	if s.env.Has(autoEnvStateVariableName) {
+		err := Unmarshal(s.env.Get(autoEnvStateVariableName), &state)
+		if err != nil {
+			panic(fmt.Sprintf("failed to read the state: %s", err))
+		}
+	}
+	return state
+}
+
+func (s *FeatureState) write(state *AutoEnvState) {
+	serialized, err := Marshal(state)
+	if err != nil {
+		panic(fmt.Sprintf("failed to write the state: %s", err))
+	}
+	s.env.Set(autoEnvStateVariableName, serialized)
+}
+
 // GetActiveFeatures returns a Hash of feature name -> param
 func (s *FeatureState) GetActiveFeatures() FeatureSet {
-	_, set := s.get()
-	return set
+	state := s.read()
+	return state.Features
 }
 
 // SetProject change the state to set the project
 func (s *FeatureState) SetProjectSlug(slug string) {
-	_, set := s.get()
-	s.set(slug, set)
+	state := s.read()
+	state.ProjectHash = slug
+	s.write(state)
 }
 
-// IsProject returns whether the state is for this project
+// GetProjectSlug returns the slug of the project in which DevBuddy was when the state was written
 func (s *FeatureState) GetProjectSlug() string {
-	slug, _ := s.get()
-	return slug
-}
-
-func (s *FeatureState) get() (string, FeatureSet) {
-	data := s.env.Get(autoEnvVariableName)
-
-	if strings.HasPrefix(data, "1:") {
-		parts := strings.SplitN(data, ":", 3)
-		return parts[1], NewFeatureSetFromString(parts[2])
-	}
-	return "", NewFeatureSetFromString(data)
-}
-
-func (s *FeatureState) set(slug string, featureSet FeatureSet) {
-	val := fmt.Sprintf("1:%s:%s", slug, featureSet.Serialize())
-	if len(val) == 0 {
-		s.env.Unset(autoEnvVariableName)
-	} else {
-		s.env.Set(autoEnvVariableName, val)
-	}
+	state := s.read()
+	return state.ProjectHash
 }
 
 // SetFeature marks a feature as active
-func (s *FeatureState) SetFeature(featureInfo FeatureInfo) {
-	pKey, set := s.get()
-	s.set(pKey, set.With(featureInfo))
+func (s *FeatureState) SetFeature(featureInfo *FeatureInfo) {
+	state := s.read()
+	state.Features = state.Features.With(featureInfo)
+	s.write(state)
 }
 
 // UnsetFeature marks a feature as inactive
 func (s *FeatureState) UnsetFeature(name string) {
-	pKey, set := s.get()
-	s.set(pKey, set.Without(name))
+	state := s.read()
+	state.Features = state.Features.Without(name)
+	s.write(state)
 }
 
-const autoEnvStateVariableName = "__BUD_AUTOENV_STATE"
-
-type previousState map[string]*string
-
-func (p previousState) String() string {
+func (p savedEnv) String() string {
 	elements := []string{}
 
 	for name, value := range p {
@@ -83,66 +95,40 @@ func (p previousState) String() string {
 	return strings.Join(elements, " ")
 }
 
-type AutoEnvState struct {
-	Previous map[string]*string `json:previous`
+func (s *FeatureState) ForgetEnv() {
+	state := s.read()
+	state.resetEnv()
+	s.write(state)
 }
 
-func (s *FeatureState) loadState() (previousState, error) {
-	state := make(previousState)
-
-	if s.env.Has(autoEnvStateVariableName) {
-		err := Unmarshal(s.env.Get(autoEnvStateVariableName), &state)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return state, nil
-}
-
-func (s *FeatureState) Forget() {
-	s.env.Unset(autoEnvStateVariableName)
-}
-
-func (s *FeatureState) Save() error {
-	state, err := s.loadState()
-	if err != nil {
-		return err
-	}
-	s.UI.Debug("Loaded state: %s", state)
+func (s *FeatureState) SaveEnv() error {
+	state := s.read()
 
 	for _, mutation := range s.env.Mutations() {
-		if mutation.Name == autoEnvStateVariableName || mutation.Name == autoEnvVariableName {
-			continue
+		if mutation.Name == autoEnvStateVariableName {
+			continue // skip our own variable
 		}
-		if _, present := state[mutation.Name]; present {
-			continue // only the first mutation should be recorded to keep the original state
+
+		if _, present := state.SavedEnv[mutation.Name]; present {
+			continue // skip if we already recorded the initial value for this variable
 		}
+
 		if mutation.Previous == nil {
-			state[mutation.Name] = nil
+			state.SavedEnv[mutation.Name] = nil
 		} else {
-			copiedValue := fmt.Sprint(mutation.Previous.Value)
-			state[mutation.Name] = &copiedValue
+			copiedValue := fmt.Sprint(mutation.Previous.Value) // trick to make a copy of the string
+			state.SavedEnv[mutation.Name] = &copiedValue
 		}
 	}
 
-	serialized, err := Marshal(state)
-	if err != nil {
-		return err
-	}
-
-	s.env.Set(autoEnvStateVariableName, string(serialized))
-
+	s.write(state)
 	return nil
 }
 
-func (s *FeatureState) Restore() error {
-	state, err := s.loadState()
-	if err != nil {
-		return err
-	}
+func (s *FeatureState) RestoreEnv() error {
+	state := s.read()
 
-	for name, value := range state {
+	for name, value := range state.SavedEnv {
 		if value == nil {
 			s.env.Unset(name)
 			s.UI.Debug("restoring %s to deleted", name)
