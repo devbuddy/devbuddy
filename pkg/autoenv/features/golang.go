@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	register("golang", golangActivate, golangDeactivate)
+	register("golang", golangActivate, nil)
 }
 
 func golangActivate(ctx *context.Context, version string) (bool, error) {
@@ -27,15 +27,6 @@ func golangActivate(ctx *context.Context, version string) (bool, error) {
 	}
 
 	return false, nil
-}
-
-func golangDeactivate(ctx *context.Context, version string) {
-	// Golang install without version to get the base path
-	// golang := helpers.NewGolang(ctx.Cfg, "")
-	// ctx.Env.RemoveFromPath(golang.Path())
-
-	// ctx.Env.Unset("GO111MODULE")
-	// ctx.Env.Unset("GOROOT")
 }
 
 const golangModulesSuffix = "+mod"
