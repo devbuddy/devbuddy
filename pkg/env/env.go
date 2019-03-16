@@ -20,33 +20,33 @@ func New(env []string) *Env {
 }
 
 // NewFromOS returns a new Env with variables from os.Environ()
-func NewFromOS() (e *Env) {
+func NewFromOS() *Env) {
 	return New(os.Environ())
 }
 
 // Set adds or changes a variable
 func (e *Env) Set(name string, value string) {
-	e.env.Set(name, value)
+	e.env.set(name, value)
 }
 
 // Unset removes a variable if it exists
 func (e *Env) Unset(name string) {
-	e.env.Unset(name)
+	e.env.unset(name)
 }
 
 // Get returns the value of a variable (defaults to empty string)
 func (e *Env) Get(name string) string {
-	return e.env.GetDefault(name, "")
+	return e.env.getDefault(name, "")
 }
 
 // Has returns whether the variable exists
 func (e *Env) Has(name string) bool {
-	return e.env[name] != nil
+	return e.env.has(name)
 }
 
 // Environ returns all variable as os.Environ() would
 func (e *Env) Environ() []string {
-	return e.env.AsEnviron()
+	return e.env.asEnviron()
 }
 
 // PrependToPath inserts a new path at the beginning of the PATH variable
@@ -65,17 +65,6 @@ func (e *Env) setPathParts(elems ...string) {
 }
 
 // Mutations returns a list of variable mutations (previous and current value)
-func (e *Env) Mutations() (m []VariableMutation) {
-	for _, current := range e.env {
-		previous := e.verbatimEnv[current.Name]
-		if !current.Eq(previous) {
-			m = append(m, VariableMutation{Name: current.Name, Previous: previous, Current: current})
-		}
-	}
-	for _, previous := range e.verbatimEnv {
-		if _, present := e.env[previous.Name]; !present {
-			m = append(m, VariableMutation{Name: previous.Name, Previous: previous, Current: nil})
-		}
-	}
-	return m
+func (e *Env) Mutations() []VariableMutation {
+	return buildMutations(e.env, e.verbatimEnv)
 }

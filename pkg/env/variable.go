@@ -1,17 +1,16 @@
 package env
 
 import (
-	"fmt"
 	"strings"
 )
 
 // Variable represents an environment variable
-type Variable struct {
+type variable struct {
 	Name  string
 	Value string
 }
 
-func (v *Variable) Eq(other *Variable) bool {
+func (v *variable) eq(other *variable) bool {
 	if v != nil && other != nil && v.Value != other.Value {
 		return false
 	}
@@ -21,20 +20,20 @@ func (v *Variable) Eq(other *Variable) bool {
 	return true
 }
 
-type Variables map[string]*Variable
+type Variables map[string]*variable
 
 func NewVariables(environ []string) Variables {
-	variables := map[string]*Variable{}
+	variables := map[string]*variable{}
 
 	for _, pair := range environ {
 		parts := strings.SplitN(pair, "=", 2)
-		variables[parts[0]] = &Variable{parts[0], parts[1]}
+		variables[parts[0]] = &variable{parts[0], parts[1]}
 	}
 
 	return variables
 }
 
-func (vs Variables) GetDefault(name string, defaultValue string) string {
+func (vs Variables) getDefault(name string, defaultValue string) string {
 	variable := vs[name]
 	if variable != nil {
 		return variable.Value
@@ -42,35 +41,21 @@ func (vs Variables) GetDefault(name string, defaultValue string) string {
 	return defaultValue
 }
 
-func (vs Variables) Set(name, value string) {
-	vs[name] = &Variable{name, value}
+func (vs Variables) set(name, value string) {
+	vs[name] = &variable{name, value}
 }
 
-func (vs Variables) Unset(name string) {
+func (vs Variables) has(name string) bool {
+	return vs[name] != nil
+}
+
+func (vs Variables) unset(name string) {
 	delete(vs, name)
 }
 
-func (vs Variables) AsEnviron() (vars []string) {
+func (vs Variables) asEnviron() (vars []string) {
 	for _, variable := range vs {
 		vars = append(vars, variable.Name+"="+variable.Value)
 	}
 	return vars
-}
-
-// VariableMutation represents the change made on a variable
-type VariableMutation struct {
-	Name     string
-	Previous *Variable
-	Current  *Variable
-}
-
-func (m VariableMutation) DiffString() string {
-	text := ""
-	if m.Previous != nil {
-		text += fmt.Sprintf("  - %s\n", m.Previous.Value)
-	}
-	if m.Current != nil {
-		text += fmt.Sprintf("  + %s\n", m.Current.Value)
-	}
-	return text
 }
