@@ -11,10 +11,6 @@ type FeatureInfo struct {
 	Param string `json:"param"`
 }
 
-// func (i FeatureInfo) String() string {
-// 	return fmt.Sprintf("%s (%s)", i.Name, i.Param)
-// }
-
 // NewFeatureInfo returns a FeatureInfo
 func NewFeatureInfo(name string, param string) FeatureInfo {
 	return FeatureInfo{name, param}
@@ -27,20 +23,6 @@ type FeatureSet []*FeatureInfo
 func NewFeatureSet() FeatureSet {
 	return FeatureSet{}
 }
-
-// NewFeatureSetFromString returns a new FeatureSet from a serialized string
-// func NewFeatureSetFromString(data string) FeatureSet {
-// 	set := FeatureSet{}
-// 	for _, feat := range strings.Split(data, ":") {
-// 		if feat != "" {
-// 			parts := strings.SplitN(feat, "=", 2)
-// 			if len(parts) == 2 {
-// 				set = set.With(FeatureInfo{parts[0], parts[1]})
-// 			}
-// 		}
-// 	}
-// 	return set
-// }
 
 // With returns a new FeatureSet augmented with the featureInfo provided
 func (s FeatureSet) With(featureInfo *FeatureInfo) FeatureSet {
@@ -76,12 +58,3 @@ func (s FeatureSet) String() string {
 	}
 	return strings.Join(elements, " ")
 }
-
-// Serialize returns the FeatureSet serialized as a string
-// func (s FeatureSet) Serialize() string {
-// 	var parts []string
-// 	for _, info := range s {
-// 		parts = append(parts, fmt.Sprintf("%s=%s", info.Name, info.Param))
-// 	}
-// 	return strings.Join(parts, ":")
-// }
