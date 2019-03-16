@@ -31,17 +31,17 @@ func (r *runner) sync(featureSet FeatureSet) {
 			// We jumped out of the project
 
 			r.state.RestoreEnv()
-			r.state.ForgetEnv() // we won't need to restore it in the future
-		}
+			r.state.ForgetEnv()
+		} else {
+			if r.state.GetProjectSlug() != r.ctx.Project.Slug() {
+				// We jumped to a different project
 
-		if r.ctx.Project != nil && r.state.GetProjectSlug() != r.ctx.Project.Slug() {
-			// We jumped to a different project
+				r.state.RestoreEnv()
+				// Keep the SavedEnv until we jump out of a project
 
-			r.state.RestoreEnv()
-			// When we jump to another project, we will need to restore the initial environment eventually
-
-			for _, featureInfo := range r.state.GetActiveFeatures() {
-				r.deactivateFeature(featureInfo)
+				for _, featureInfo := range r.state.GetActiveFeatures() {
+					r.deactivateFeature(featureInfo)
+				}
 			}
 		}
 	}

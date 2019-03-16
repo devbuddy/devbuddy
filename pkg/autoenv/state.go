@@ -126,7 +126,7 @@ func (s *FeatureState) SaveEnv() error {
 	return nil
 }
 
-func (s *FeatureState) RestoreEnv() error {
+func (s *FeatureState) RestoreEnv() {
 	state := s.read()
 
 	for name, value := range state.SavedEnv {
@@ -138,5 +138,4 @@ func (s *FeatureState) RestoreEnv() error {
 			s.UI.Debug("restoring %s to %s", name, *value)
 		}
 	}
-	return nil
 }
