@@ -10,23 +10,23 @@ import (
 func TestStateDeserialization(t *testing.T) {
 	envs := [][]string{
 		{},
-		{"BUD_AUTO_ENV_FEATURES="},
-		{"BUD_AUTO_ENV_FEATURES=f1=v1"},
-		{"BUD_AUTO_ENV_FEATURES=f1=v1:f2=v2"},
+		{"__BUD_AUTOENV_STATE="},
+		{"__BUD_AUTOENV_STATE=f1=v1"},
+		{"__BUD_AUTOENV_STATE=f1=v1:f2=v2"},
 
-		{"BUD_AUTO_ENV_FEATURES=1:project-1234:"},
-		{"BUD_AUTO_ENV_FEATURES=1:project-1234:f1=v1"},
-		{"BUD_AUTO_ENV_FEATURES=1:project-1234:f1=v1:f2=v2"},
+		{"__BUD_AUTOENV_STATE=1:project-1234:"},
+		{"__BUD_AUTOENV_STATE=1:project-1234:f1=v1"},
+		{"__BUD_AUTOENV_STATE=1:project-1234:f1=v1:f2=v2"},
 	}
 	features := []FeatureSet{
 		NewFeatureSet(),
 		NewFeatureSet(),
-		NewFeatureSet().With(FeatureInfo{"f1", "v1"}),
-		NewFeatureSet().With(FeatureInfo{"f1", "v1"}).With(FeatureInfo{"f2", "v2"}),
+		NewFeatureSet().With(&FeatureInfo{"f1", "v1"}),
+		NewFeatureSet().With(&FeatureInfo{"f1", "v1"}).With(&FeatureInfo{"f2", "v2"}),
 
 		NewFeatureSet(),
-		NewFeatureSet().With(FeatureInfo{"f1", "v1"}),
-		NewFeatureSet().With(FeatureInfo{"f1", "v1"}).With(FeatureInfo{"f2", "v2"}),
+		NewFeatureSet().With(&FeatureInfo{"f1", "v1"}),
+		NewFeatureSet().With(&FeatureInfo{"f1", "v1"}).With(&FeatureInfo{"f2", "v2"}),
 	}
 	slugs := []string{
 		"",
@@ -51,16 +51,16 @@ func TestStateSerialization(t *testing.T) {
 	state := FeatureState{env: env}
 
 	state.SetProjectSlug("p-1")
-	require.Equal(t, "1:p-1:", env.Get("BUD_AUTO_ENV_FEATURES"))
+	require.Equal(t, "1:p-1:", env.Get("__BUD_AUTOENV_STATE"))
 
-	state.SetFeature(FeatureInfo{"f1", "v1"})
-	require.Equal(t, "1:p-1:f1=v1", env.Get("BUD_AUTO_ENV_FEATURES"))
+	state.SetFeature(&FeatureInfo{"f1", "v1"})
+	require.Equal(t, "1:p-1:f1=v1", env.Get("__BUD_AUTOENV_STATE"))
 
 	state.SetProjectSlug("p-2")
-	require.Equal(t, "1:p-2:f1=v1", env.Get("BUD_AUTO_ENV_FEATURES"))
+	require.Equal(t, "1:p-2:f1=v1", env.Get("__BUD_AUTOENV_STATE"))
 
 	state.UnsetFeature("f1")
-	require.Equal(t, "1:p-2:", env.Get("BUD_AUTO_ENV_FEATURES"))
+	require.Equal(t, "1:p-2:", env.Get("__BUD_AUTOENV_STATE"))
 }
 
 func TestStateSetUnsetFeatures(t *testing.T) {
@@ -71,27 +71,27 @@ func TestStateSetUnsetFeatures(t *testing.T) {
 	}
 
 	state := newFeatureState()
-	state.SetFeature(FeatureInfo{"rust", "v1"})
+	state.SetFeature(&FeatureInfo{"rust", "v1"})
 
 	state = newFeatureState()
 	require.Equal(t,
-		NewFeatureSet().With(FeatureInfo{"rust", "v1"}),
+		NewFeatureSet().With(&FeatureInfo{"rust", "v1"}),
 		state.GetActiveFeatures())
 
 	state = newFeatureState()
-	state.SetFeature(FeatureInfo{"elixir", "v1"})
+	state.SetFeature(&FeatureInfo{"elixir", "v1"})
 
 	state = newFeatureState()
 	require.Equal(t,
-		NewFeatureSet().With(FeatureInfo{"rust", "v1"}).With(FeatureInfo{"elixir", "v1"}),
+		NewFeatureSet().With(&FeatureInfo{"rust", "v1"}).With(&FeatureInfo{"elixir", "v1"}),
 		state.GetActiveFeatures())
 
 	state = newFeatureState()
-	state.SetFeature(FeatureInfo{"rust", "v2"})
+	state.SetFeature(&FeatureInfo{"rust", "v2"})
 
 	state = newFeatureState()
 	require.Equal(t,
-		NewFeatureSet().With(FeatureInfo{"rust", "v2"}).With(FeatureInfo{"elixir", "v1"}),
+		NewFeatureSet().With(&FeatureInfo{"rust", "v2"}).With(&FeatureInfo{"elixir", "v1"}),
 		state.GetActiveFeatures())
 
 	state = newFeatureState()
@@ -99,7 +99,7 @@ func TestStateSetUnsetFeatures(t *testing.T) {
 
 	state = newFeatureState()
 	require.Equal(t,
-		NewFeatureSet().With(FeatureInfo{"rust", "v2"}),
+		NewFeatureSet().With(&FeatureInfo{"rust", "v2"}),
 		state.GetActiveFeatures())
 
 	state = newFeatureState()

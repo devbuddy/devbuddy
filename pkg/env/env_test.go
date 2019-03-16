@@ -27,13 +27,3 @@ func TestEnviron(t *testing.T) {
 	env.Unset("K2")
 	require.ElementsMatch(t, []string{"K1=V1B", "K3=V3"}, env.Environ())
 }
-
-func TestIsInPath(t *testing.T) {
-	env := New([]string{"PATH=/usr/bin:/bin"})
-
-	require.True(t, env.IsInPath("/usr/bin"))
-	require.True(t, env.IsInPath("/bin"))
-
-	require.False(t, env.IsInPath("/usr/local/bin"))
-	require.False(t, env.IsInPath("/usr"))
-}

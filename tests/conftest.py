@@ -40,7 +40,19 @@ def binary(binary_path):
 
 
 def build_pexpect_bash(workdir):
-    child = pexpect.spawn('bash', ['--norc', '--noprofile'], echo=False, encoding='utf-8', cwd=str(workdir))
+    env = {
+        'PATH': os.getenv('PATH'),
+        'LANG': 'C.UTF-8',
+        'LC_ALL': 'C.UTF-8',
+    }
+
+    child = pexpect.spawn(
+        'bash', ['--norc', '--noprofile'],
+        echo=False,
+        encoding='utf-8',
+        env=env,
+        cwd=str(workdir),
+    )
     child.timeout = 180
 
     # If the user runs 'env', the value of PS1 will be in the output. To avoid
@@ -114,6 +126,7 @@ def cmd(binary_path, workdir, request):
     build_pexpect_shell = PEXPECT_SHELLS[shell_name]
     pexpect_wrapper = build_pexpect_shell(workdir)
 
+    import pdb; pdb.set_trace()
     pexpect_wrapper.run_command('export PATH={}:$PATH'.format(binary_path))
 
     output = pexpect_wrapper.run_command('which bud')

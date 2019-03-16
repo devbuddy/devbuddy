@@ -26,21 +26,17 @@ func NewFromOS() (e *Env) {
 
 // Set adds or changes a variable
 func (e *Env) Set(name string, value string) {
-	e.env[name] = &Variable{name, value}
+	e.env.Set(name, value)
 }
 
 // Unset removes a variable if it exists
 func (e *Env) Unset(name string) {
-	delete(e.env, name)
+	e.env.Unset(name)
 }
 
 // Get returns the value of a variable (defaults to empty string)
 func (e *Env) Get(name string) string {
-	variable := e.env[name]
-	if variable != nil {
-		return variable.Value
-	}
-	return ""
+	return e.env.GetDefault(name, "")
 }
 
 // Has returns whether the variable exists
@@ -60,25 +56,12 @@ func (e *Env) PrependToPath(path string) {
 	e.setPathParts(elems...)
 }
 
-// RemoveFromPath removes all path entries matching a substring
-func (e *Env) RemoveFromPath(substring string) {
-	newElems := []string{}
-	for _, elem := range e.getPathParts() {
-		if !strings.Contains(elem, substring) {
-			newElems = append(newElems, elem)
-		}
-	}
-	e.setPathParts(newElems...)
+func (e *Env) getPathParts() []string {
+	return strings.Split(e.Get("PATH"), ":")
 }
 
-// IsInPath returns true if one path of $PATH is exactly equal to the path provided
-func (e *Env) IsInPath(path string) bool {
-	for _, elem := range e.getPathParts() {
-		if elem == path {
-			return true
-		}
-	}
-	return false
+func (e *Env) setPathParts(elems ...string) {
+	e.Set("PATH", strings.Join(elems, ":"))
 }
 
 // Mutations returns a list of variable mutations (previous and current value)
@@ -95,12 +78,4 @@ func (e *Env) Mutations() (m []VariableMutation) {
 		}
 	}
 	return m
-}
-
-func (e *Env) getPathParts() []string {
-	return strings.Split(e.Get("PATH"), ":")
-}
-
-func (e *Env) setPathParts(elems ...string) {
-	e.Set("PATH", strings.Join(elems, ":"))
 }

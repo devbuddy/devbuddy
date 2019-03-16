@@ -24,7 +24,7 @@ func (v *Variable) Eq(other *Variable) bool {
 type Variables map[string]*Variable
 
 func NewVariables(environ []string) Variables {
-	variables := make(map[string]*Variable)
+	variables := map[string]*Variable{}
 
 	for _, pair := range environ {
 		parts := strings.SplitN(pair, "=", 2)
@@ -34,18 +34,27 @@ func NewVariables(environ []string) Variables {
 	return variables
 }
 
-func (v Variables) AsEnviron() (vars []string) {
-	for _, variable := range v {
+func (vs Variables) GetDefault(name string, defaultValue string) string {
+	variable := vs[name]
+	if variable != nil {
+		return variable.Value
+	}
+	return defaultValue
+}
+
+func (vs Variables) Set(name, value string) {
+	vs[name] = &Variable{name, value}
+}
+
+func (vs Variables) Unset(name string) {
+	delete(vs, name)
+}
+
+func (vs Variables) AsEnviron() (vars []string) {
+	for _, variable := range vs {
 		vars = append(vars, variable.Name+"="+variable.Value)
 	}
 	return vars
-}
-
-// A VariableChange represents the change made on a variable
-type VariableChange struct {
-	Name    string
-	Value   string
-	Deleted bool
 }
 
 // VariableMutation represents the change made on a variable
