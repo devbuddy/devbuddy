@@ -36,12 +36,12 @@ func (r *runner) sync(featureSet FeatureSet) {
 			if r.state.GetProjectSlug() != r.ctx.Project.Slug() {
 				// We jumped to a different project
 
-				r.state.RestoreEnv()
-				// Keep the SavedEnv until we jump out of a project
-
 				for _, featureInfo := range r.state.GetActiveFeatures() {
 					r.deactivateFeature(featureInfo)
 				}
+
+				r.state.RestoreEnv()
+				// Keep the SavedEnv until we jump out of a project
 			}
 		}
 	}
