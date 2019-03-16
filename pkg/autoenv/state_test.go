@@ -7,60 +7,25 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestStateDeserialization(t *testing.T) {
-	envs := [][]string{
-		{},
-		{"__BUD_AUTOENV_STATE="},
-		{"__BUD_AUTOENV_STATE=f1=v1"},
-		{"__BUD_AUTOENV_STATE=f1=v1:f2=v2"},
-
-		{"__BUD_AUTOENV_STATE=1:project-1234:"},
-		{"__BUD_AUTOENV_STATE=1:project-1234:f1=v1"},
-		{"__BUD_AUTOENV_STATE=1:project-1234:f1=v1:f2=v2"},
-	}
-	features := []FeatureSet{
-		NewFeatureSet(),
-		NewFeatureSet(),
-		NewFeatureSet().With(&FeatureInfo{"f1", "v1"}),
-		NewFeatureSet().With(&FeatureInfo{"f1", "v1"}).With(&FeatureInfo{"f2", "v2"}),
-
-		NewFeatureSet(),
-		NewFeatureSet().With(&FeatureInfo{"f1", "v1"}),
-		NewFeatureSet().With(&FeatureInfo{"f1", "v1"}).With(&FeatureInfo{"f2", "v2"}),
-	}
-	slugs := []string{
-		"",
-		"",
-		"",
-		"",
-
-		"project-1234",
-		"project-1234",
-		"project-1234",
-	}
-
-	for idx := range envs {
-		env := env.New(envs[idx])
-		state := FeatureState{env: env}
-		require.Equal(t, features[idx], state.GetActiveFeatures())
-		require.Equal(t, slugs[idx], state.GetProjectSlug())
-	}
-}
 func TestStateSerialization(t *testing.T) {
 	env := env.New([]string{})
-	state := FeatureState{env: env}
+	state := &FeatureState{env: env}
 
 	state.SetProjectSlug("p-1")
-	require.Equal(t, "1:p-1:", env.Get("__BUD_AUTOENV_STATE"))
+	require.Equal(t, `{"project":"p-1","features":null,"saved_state":{}}`,
+		env.Get("__BUD_AUTOENV"))
 
 	state.SetFeature(&FeatureInfo{"f1", "v1"})
-	require.Equal(t, "1:p-1:f1=v1", env.Get("__BUD_AUTOENV_STATE"))
+	require.Equal(t, `{"project":"p-1","features":[{"name":"f1","param":"v1"}],"saved_state":{}}`,
+		env.Get("__BUD_AUTOENV"))
 
 	state.SetProjectSlug("p-2")
-	require.Equal(t, "1:p-2:f1=v1", env.Get("__BUD_AUTOENV_STATE"))
+	require.Equal(t, `{"project":"p-2","features":[{"name":"f1","param":"v1"}],"saved_state":{}}`,
+		env.Get("__BUD_AUTOENV"))
 
 	state.UnsetFeature("f1")
-	require.Equal(t, "1:p-2:", env.Get("__BUD_AUTOENV_STATE"))
+	require.Equal(t, `{"project":"p-2","features":[],"saved_state":{}}`,
+		env.Get("__BUD_AUTOENV"))
 }
 
 func TestStateSetUnsetFeatures(t *testing.T) {
@@ -70,45 +35,20 @@ func TestStateSetUnsetFeatures(t *testing.T) {
 		return &FeatureState{env: env}
 	}
 
-	state := newFeatureState()
-	state.SetFeature(&FeatureInfo{"rust", "v1"})
+	newFeatureState().SetFeature(NewFeatureInfo("rust", "v1"))
+	require.Equal(t, "rust:v1", newFeatureState().GetActiveFeatures().String())
 
-	state = newFeatureState()
-	require.Equal(t,
-		NewFeatureSet().With(&FeatureInfo{"rust", "v1"}),
-		state.GetActiveFeatures())
+	newFeatureState().SetFeature(NewFeatureInfo("elixir", "v1"))
+	require.Equal(t, "rust:v1 elixir:v1", newFeatureState().GetActiveFeatures().String())
 
-	state = newFeatureState()
-	state.SetFeature(&FeatureInfo{"elixir", "v1"})
+	newFeatureState().SetFeature(NewFeatureInfo("rust", "v2"))
+	require.Equal(t, "rust:v1 elixir:v1 rust:v2", newFeatureState().GetActiveFeatures().String())
 
-	state = newFeatureState()
-	require.Equal(t,
-		NewFeatureSet().With(&FeatureInfo{"rust", "v1"}).With(&FeatureInfo{"elixir", "v1"}),
-		state.GetActiveFeatures())
+	newFeatureState().UnsetFeature("elixir")
+	require.Equal(t, "rust:v1 rust:v2", newFeatureState().GetActiveFeatures().String())
 
-	state = newFeatureState()
-	state.SetFeature(&FeatureInfo{"rust", "v2"})
-
-	state = newFeatureState()
-	require.Equal(t,
-		NewFeatureSet().With(&FeatureInfo{"rust", "v2"}).With(&FeatureInfo{"elixir", "v1"}),
-		state.GetActiveFeatures())
-
-	state = newFeatureState()
-	state.UnsetFeature("elixir")
-
-	state = newFeatureState()
-	require.Equal(t,
-		NewFeatureSet().With(&FeatureInfo{"rust", "v2"}),
-		state.GetActiveFeatures())
-
-	state = newFeatureState()
-	state.UnsetFeature("rust")
-
-	state = newFeatureState()
-	require.Equal(t,
-		NewFeatureSet(),
-		state.GetActiveFeatures())
+	newFeatureState().UnsetFeature("rust")
+	require.Equal(t, "", newFeatureState().GetActiveFeatures().String())
 }
 
 func TestStateSetGetProjectSlug(t *testing.T) {

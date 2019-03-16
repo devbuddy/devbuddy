@@ -9,7 +9,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
-const autoEnvStateVariableName = "__BUD_AUTOENV_STATE"
+const autoEnvStateVariableName = "__BUD_AUTOENV"
 
 type savedEnv map[string]*string
 

@@ -12,8 +12,8 @@ type FeatureInfo struct {
 }
 
 // NewFeatureInfo returns a FeatureInfo
-func NewFeatureInfo(name string, param string) FeatureInfo {
-	return FeatureInfo{name, param}
+func NewFeatureInfo(name string, param string) *FeatureInfo {
+	return &FeatureInfo{name, param}
 }
 
 // FeatureSet represents a set of parameterized features
