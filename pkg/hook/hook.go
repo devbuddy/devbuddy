@@ -2,6 +2,7 @@ package hook
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
@@ -60,8 +61,10 @@ func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {
 		if mutation.Current == nil {
 			fmt.Printf("unset %s\n", mutation.Name)
 		} else {
-			fmt.Printf("export %s=\"%s\"\n", mutation.Name, mutation.Current.Value)
+			escaped := strings.Replace(mutation.Current.Value, "\"", "\\\"", -1)
+			fmt.Printf("export %s=\"%s\"\n", mutation.Name, escaped)
 		}
+
 	}
 }
 

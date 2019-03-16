@@ -73,7 +73,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 		r.state.SetProjectSlug(r.ctx.Project.Slug())
 		err := r.state.SaveEnv()
 		if err != nil {
-			r.ctx.UI.Debug("state.RecordPrevious() failed with: %s", err)
+			r.ctx.UI.Debug("state.SaveEnv() failed with: %s", err)
 		}
 	} else {
 		r.state.SetProjectSlug("")

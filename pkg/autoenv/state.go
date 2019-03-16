@@ -1,6 +1,7 @@
 package autoenv
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -13,7 +14,7 @@ const autoEnvStateVariableName = "__BUD_AUTOENV_STATE"
 type savedEnv map[string]*string
 
 type AutoEnvState struct {
-	ProjectHash string     `json:"project_hash"`
+	ProjectHash string     `json:"project"`
 	Features    FeatureSet `json:"features"`
 	SavedEnv    savedEnv   `json:"saved_state"`
 }
@@ -33,7 +34,7 @@ func (s *FeatureState) read() *AutoEnvState {
 	state.resetEnv()
 
 	if s.env.Has(autoEnvStateVariableName) {
-		err := Unmarshal(s.env.Get(autoEnvStateVariableName), &state)
+		err := json.Unmarshal([]byte(s.env.Get(autoEnvStateVariableName)), &state)
 		if err != nil {
 			panic(fmt.Sprintf("failed to read the state: %s", err))
 		}
@@ -42,11 +43,11 @@ func (s *FeatureState) read() *AutoEnvState {
 }
 
 func (s *FeatureState) write(state *AutoEnvState) {
-	serialized, err := Marshal(state)
+	serialized, err := json.Marshal(state)
 	if err != nil {
 		panic(fmt.Sprintf("failed to write the state: %s", err))
 	}
-	s.env.Set(autoEnvStateVariableName, serialized)
+	s.env.Set(autoEnvStateVariableName, string(serialized))
 }
 
 // GetActiveFeatures returns a Hash of feature name -> param
