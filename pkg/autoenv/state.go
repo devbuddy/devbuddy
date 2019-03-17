@@ -13,71 +13,6 @@ const autoEnvStateVariableName = "__BUD_AUTOENV"
 
 type savedEnv map[string]*string
 
-type StateData struct {
-	ProjectSlug string     `json:"project"`
-	Features    FeatureSet `json:"features"`
-	SavedEnv    savedEnv   `json:"saved_state"`
-}
-
-// State remember the current state of the features (whether they are active)
-type State struct {
-	env *env.Env
-	UI  *termui.UI
-}
-
-func (s *State) read() *StateData {
-	state := &StateData{SavedEnv: savedEnv{}}
-
-	if s.env.Has(autoEnvStateVariableName) {
-		err := json.Unmarshal([]byte(s.env.Get(autoEnvStateVariableName)), &state)
-		if err != nil {
-			panic(fmt.Sprintf("failed to read the state: %s", err))
-		}
-	}
-	return state
-}
-
-func (s *State) write(state *StateData) {
-	serialized, err := json.Marshal(state)
-	if err != nil {
-		panic(fmt.Sprintf("failed to write the state: %s", err))
-	}
-	s.env.Set(autoEnvStateVariableName, string(serialized))
-}
-
-// GetActiveFeatures returns the FeatureSet recorded in the state
-func (s *State) GetActiveFeatures() FeatureSet {
-	state := s.read()
-	return state.Features
-}
-
-// SetProjectSlug records the project slug in the state
-func (s *State) SetProjectSlug(slug string) {
-	state := s.read()
-	state.ProjectSlug = slug
-	s.write(state)
-}
-
-// GetProjectSlug returns the slug of the project in which DevBuddy was when the state was written
-func (s *State) GetProjectSlug() string {
-	state := s.read()
-	return state.ProjectSlug
-}
-
-// SetFeature marks a feature as active
-func (s *State) SetFeature(featureInfo *FeatureInfo) {
-	state := s.read()
-	state.Features = state.Features.With(featureInfo)
-	s.write(state)
-}
-
-// UnsetFeature marks a feature as inactive
-func (s *State) UnsetFeature(name string) {
-	state := s.read()
-	state.Features = state.Features.Without(name)
-	s.write(state)
-}
-
 func (p savedEnv) String() string {
 	elements := []string{}
 
@@ -91,8 +26,73 @@ func (p savedEnv) String() string {
 	return strings.Join(elements, " ")
 }
 
+type StateData struct {
+	ProjectSlug string     `json:"project"`
+	Features    FeatureSet `json:"features"`
+	SavedEnv    savedEnv   `json:"saved_state"`
+}
+
+// StateManager remember the current state of the features (whether they are active)
+type StateManager struct {
+	env *env.Env
+	UI  *termui.UI
+}
+
+func (s *StateManager) read() *StateData {
+	state := &StateData{SavedEnv: savedEnv{}}
+
+	if s.env.Has(autoEnvStateVariableName) {
+		err := json.Unmarshal([]byte(s.env.Get(autoEnvStateVariableName)), &state)
+		if err != nil {
+			panic(fmt.Sprintf("failed to read the state: %s", err))
+		}
+	}
+	return state
+}
+
+func (s *StateManager) write(state *StateData) {
+	serialized, err := json.Marshal(state)
+	if err != nil {
+		panic(fmt.Sprintf("failed to write the state: %s", err))
+	}
+	s.env.Set(autoEnvStateVariableName, string(serialized))
+}
+
+// GetActiveFeatures returns the FeatureSet recorded in the state
+func (s *StateManager) GetActiveFeatures() FeatureSet {
+	state := s.read()
+	return state.Features
+}
+
+// SetProjectSlug records the project slug in the state
+func (s *StateManager) SetProjectSlug(slug string) {
+	state := s.read()
+	state.ProjectSlug = slug
+	s.write(state)
+}
+
+// GetProjectSlug returns the slug of the project in which DevBuddy was when the state was written
+func (s *StateManager) GetProjectSlug() string {
+	state := s.read()
+	return state.ProjectSlug
+}
+
+// SetFeature marks a feature as active
+func (s *StateManager) SetFeature(featureInfo *FeatureInfo) {
+	state := s.read()
+	state.Features = state.Features.With(featureInfo)
+	s.write(state)
+}
+
+// UnsetFeature marks a feature as inactive
+func (s *StateManager) UnsetFeature(name string) {
+	state := s.read()
+	state.Features = state.Features.Without(name)
+	s.write(state)
+}
+
 // SaveEnv records the environment mutations in the state
-func (s *State) SaveEnv() {
+func (s *StateManager) SaveEnv() {
 	state := s.read()
 
 	for _, mutation := range s.env.Mutations() {
@@ -116,7 +116,7 @@ func (s *State) SaveEnv() {
 }
 
 // RestoreEnv reverts the environment as recorded in the state
-func (s *State) RestoreEnv() {
+func (s *StateManager) RestoreEnv() {
 	state := s.read()
 
 	for name, value := range state.SavedEnv {
@@ -131,7 +131,7 @@ func (s *State) RestoreEnv() {
 }
 
 // ForgetEnv clears the environment mutations previously recorded in the state
-func (s *State) ForgetEnv() {
+func (s *StateManager) ForgetEnv() {
 	state := s.read()
 	state.SavedEnv = savedEnv{}
 	s.write(state)

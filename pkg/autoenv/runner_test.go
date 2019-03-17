@@ -57,7 +57,7 @@ func newRunnerWithProject(env *env.Env, reg *features.MutableRegister, projectPa
 			UI:      ui,
 			Env:     env,
 		},
-		state: &State{env, ui},
+		state: &StateManager{env, ui},
 		reg:   reg,
 	}
 }

@@ -9,7 +9,7 @@ import (
 
 func TestStateSerialization(t *testing.T) {
 	env := env.New([]string{})
-	state := &State{env: env}
+	state := &StateManager{env: env}
 
 	state.SetProjectSlug("p-1")
 	require.Equal(t, `{"project":"p-1","features":null,"saved_state":{}}`,
@@ -31,36 +31,36 @@ func TestStateSerialization(t *testing.T) {
 func TestStateSetUnsetFeatures(t *testing.T) {
 	env := env.New([]string{})
 
-	newFeatureState := func() *State {
-		return &State{env: env}
+	newStateManager := func() *StateManager {
+		return &StateManager{env: env}
 	}
 
-	newFeatureState().SetFeature(NewFeatureInfo("rust", "v1"))
-	require.Equal(t, "rust:v1", newFeatureState().GetActiveFeatures().String())
+	newStateManager().SetFeature(NewFeatureInfo("rust", "v1"))
+	require.Equal(t, "rust:v1", newStateManager().GetActiveFeatures().String())
 
-	newFeatureState().SetFeature(NewFeatureInfo("elixir", "v1"))
-	require.Equal(t, "rust:v1 elixir:v1", newFeatureState().GetActiveFeatures().String())
+	newStateManager().SetFeature(NewFeatureInfo("elixir", "v1"))
+	require.Equal(t, "rust:v1 elixir:v1", newStateManager().GetActiveFeatures().String())
 
-	newFeatureState().SetFeature(NewFeatureInfo("rust", "v2"))
-	require.Equal(t, "elixir:v1 rust:v2", newFeatureState().GetActiveFeatures().String())
+	newStateManager().SetFeature(NewFeatureInfo("rust", "v2"))
+	require.Equal(t, "elixir:v1 rust:v2", newStateManager().GetActiveFeatures().String())
 
-	newFeatureState().UnsetFeature("elixir")
-	require.Equal(t, "rust:v2", newFeatureState().GetActiveFeatures().String())
+	newStateManager().UnsetFeature("elixir")
+	require.Equal(t, "rust:v2", newStateManager().GetActiveFeatures().String())
 
-	newFeatureState().UnsetFeature("rust")
-	require.Equal(t, "", newFeatureState().GetActiveFeatures().String())
+	newStateManager().UnsetFeature("rust")
+	require.Equal(t, "", newStateManager().GetActiveFeatures().String())
 }
 
 func TestStateSetGetProjectSlug(t *testing.T) {
 	env := env.New([]string{})
 
-	newFeatureState := func() *State {
-		return &State{env: env}
+	newStateManager := func() *StateManager {
+		return &StateManager{env: env}
 	}
 
-	newFeatureState().SetProjectSlug("p-1")
-	require.Equal(t, "p-1", newFeatureState().GetProjectSlug())
+	newStateManager().SetProjectSlug("p-1")
+	require.Equal(t, "p-1", newStateManager().GetProjectSlug())
 
-	newFeatureState().SetProjectSlug("p-123")
-	require.Equal(t, "p-123", newFeatureState().GetProjectSlug())
+	newStateManager().SetProjectSlug("p-123")
+	require.Equal(t, "p-123", newStateManager().GetProjectSlug())
 }
