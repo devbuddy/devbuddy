@@ -14,7 +14,7 @@ const autoEnvStateVariableName = "__BUD_AUTOENV"
 type savedEnv map[string]*string
 
 type AutoEnvState struct {
-	ProjectHash string     `json:"project"`
+	ProjectSlug string     `json:"project"`
 	Features    FeatureSet `json:"features"`
 	SavedEnv    savedEnv   `json:"saved_state"`
 }
@@ -59,14 +59,14 @@ func (s *FeatureState) GetActiveFeatures() FeatureSet {
 // SetProject change the state to set the project
 func (s *FeatureState) SetProjectSlug(slug string) {
 	state := s.read()
-	state.ProjectHash = slug
+	state.ProjectSlug = slug
 	s.write(state)
 }
 
 // GetProjectSlug returns the slug of the project in which DevBuddy was when the state was written
 func (s *FeatureState) GetProjectSlug() string {
 	state := s.read()
-	return state.ProjectHash
+	return state.ProjectSlug
 }
 
 // SetFeature marks a feature as active
