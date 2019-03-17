@@ -9,7 +9,7 @@ import (
 
 func TestStateSerialization(t *testing.T) {
 	env := env.New([]string{})
-	state := &FeatureState{env: env}
+	state := &State{env: env}
 
 	state.SetProjectSlug("p-1")
 	require.Equal(t, `{"project":"p-1","features":null,"saved_state":{}}`,
@@ -31,8 +31,8 @@ func TestStateSerialization(t *testing.T) {
 func TestStateSetUnsetFeatures(t *testing.T) {
 	env := env.New([]string{})
 
-	newFeatureState := func() *FeatureState {
-		return &FeatureState{env: env}
+	newFeatureState := func() *State {
+		return &State{env: env}
 	}
 
 	newFeatureState().SetFeature(NewFeatureInfo("rust", "v1"))
@@ -54,8 +54,8 @@ func TestStateSetUnsetFeatures(t *testing.T) {
 func TestStateSetGetProjectSlug(t *testing.T) {
 	env := env.New([]string{})
 
-	newFeatureState := func() *FeatureState {
-		return &FeatureState{env: env}
+	newFeatureState := func() *State {
+		return &State{env: env}
 	}
 
 	state := newFeatureState()

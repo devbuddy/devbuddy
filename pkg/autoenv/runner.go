@@ -11,7 +11,7 @@ import (
 func Sync(ctx *context.Context, set FeatureSet) {
 	runner := &runner{
 		ctx:   ctx,
-		state: &FeatureState{ctx.Env, ctx.UI},
+		state: &State{ctx.Env, ctx.UI},
 		reg:   features.GlobalRegister(),
 	}
 	runner.sync(set)
@@ -19,7 +19,7 @@ func Sync(ctx *context.Context, set FeatureSet) {
 
 type runner struct {
 	ctx   *context.Context
-	state *FeatureState
+	state *State
 	reg   features.Register
 }
 
@@ -43,7 +43,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 				}
 
 				r.state.RestoreEnv()
-				// Do not ForgetEnv(), we keep the SavedEnv until we jump out of a project
+				// No ForgetEnv(), we keep the SavedEnv until we jump out of a project
 			}
 		}
 	}
