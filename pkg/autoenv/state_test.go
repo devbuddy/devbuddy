@@ -42,10 +42,10 @@ func TestStateSetUnsetFeatures(t *testing.T) {
 	require.Equal(t, "rust:v1 elixir:v1", newFeatureState().GetActiveFeatures().String())
 
 	newFeatureState().SetFeature(NewFeatureInfo("rust", "v2"))
-	require.Equal(t, "rust:v1 elixir:v1 rust:v2", newFeatureState().GetActiveFeatures().String())
+	require.Equal(t, "elixir:v1 rust:v2", newFeatureState().GetActiveFeatures().String())
 
 	newFeatureState().UnsetFeature("elixir")
-	require.Equal(t, "rust:v1 rust:v2", newFeatureState().GetActiveFeatures().String())
+	require.Equal(t, "rust:v2", newFeatureState().GetActiveFeatures().String())
 
 	newFeatureState().UnsetFeature("rust")
 	require.Equal(t, "", newFeatureState().GetActiveFeatures().String())

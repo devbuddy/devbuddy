@@ -26,9 +26,7 @@ func NewFeatureSet() FeatureSet {
 
 // With returns a new FeatureSet augmented with the featureInfo provided
 func (s FeatureSet) With(featureInfo *FeatureInfo) FeatureSet {
-	// TODO: check for existing element
-	s = append(s, featureInfo)
-	return s
+	return append(s.Without(featureInfo.Name), featureInfo)
 }
 
 // Without returns a new FeatureSet augmented with the featureInfo provided
@@ -42,6 +40,7 @@ func (s FeatureSet) Without(name string) FeatureSet {
 	return newSet
 }
 
+// Get returns a new FeatureSet augmented with the featureInfo provided
 func (s FeatureSet) Get(name string) *FeatureInfo {
 	for _, element := range s {
 		if element.Name == name {
