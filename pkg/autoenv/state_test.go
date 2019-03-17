@@ -12,19 +12,19 @@ func TestStateSerialization(t *testing.T) {
 	state := &StateManager{env: env}
 
 	state.SetProjectSlug("p-1")
-	require.Equal(t, `{"project":"p-1","features":null,"saved_state":{}}`,
+	require.Equal(t, `{"project":"p-1","features":null,"saved_env":{}}`,
 		env.Get("__BUD_AUTOENV"))
 
 	state.SetFeature(&FeatureInfo{"f1", "v1"})
-	require.Equal(t, `{"project":"p-1","features":[{"name":"f1","param":"v1"}],"saved_state":{}}`,
+	require.Equal(t, `{"project":"p-1","features":[{"name":"f1","param":"v1"}],"saved_env":{}}`,
 		env.Get("__BUD_AUTOENV"))
 
 	state.SetProjectSlug("p-2")
-	require.Equal(t, `{"project":"p-2","features":[{"name":"f1","param":"v1"}],"saved_state":{}}`,
+	require.Equal(t, `{"project":"p-2","features":[{"name":"f1","param":"v1"}],"saved_env":{}}`,
 		env.Get("__BUD_AUTOENV"))
 
 	state.UnsetFeature("f1")
-	require.Equal(t, `{"project":"p-2","features":[],"saved_state":{}}`,
+	require.Equal(t, `{"project":"p-2","features":[],"saved_env":{}}`,
 		env.Get("__BUD_AUTOENV"))
 }
 

@@ -29,7 +29,7 @@ func (p savedEnv) String() string {
 type StateData struct {
 	ProjectSlug string     `json:"project"`
 	Features    FeatureSet `json:"features"`
-	SavedEnv    savedEnv   `json:"saved_state"`
+	SavedEnv    savedEnv   `json:"saved_env"`
 }
 
 // StateManager remember the current state of the features (whether they are active)
