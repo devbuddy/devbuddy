@@ -40,19 +40,7 @@ def binary(binary_path):
 
 
 def build_pexpect_bash(workdir):
-    env = {
-        'PATH': os.getenv('PATH'),
-        'LANG': 'C.UTF-8',
-        'LC_ALL': 'C.UTF-8',
-    }
-
-    child = pexpect.spawn(
-        'bash', ['--norc', '--noprofile'],
-        echo=False,
-        encoding='utf-8',
-        env=env,
-        cwd=str(workdir),
-    )
+    child = pexpect.spawn('bash', ['--norc', '--noprofile'], echo=False, encoding='utf-8', cwd=str(workdir))
     child.timeout = 180
 
     # If the user runs 'env', the value of PS1 will be in the output. To avoid

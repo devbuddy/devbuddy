@@ -58,15 +58,9 @@ func TestStateSetGetProjectSlug(t *testing.T) {
 		return &State{env: env}
 	}
 
-	state := newFeatureState()
-	state.SetProjectSlug("p-1")
+	newFeatureState().SetProjectSlug("p-1")
+	require.Equal(t, "p-1", newFeatureState().GetProjectSlug())
 
-	state = newFeatureState()
-	require.Equal(t, "p-1", state.GetProjectSlug())
-
-	state = newFeatureState()
-	state.SetProjectSlug("p-123")
-
-	state = newFeatureState()
-	require.Equal(t, "p-123", state.GetProjectSlug())
+	newFeatureState().SetProjectSlug("p-123")
+	require.Equal(t, "p-123", newFeatureState().GetProjectSlug())
 }
