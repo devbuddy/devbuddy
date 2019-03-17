@@ -20,7 +20,7 @@ func New(env []string) *Env {
 }
 
 // NewFromOS returns a new Env with variables from os.Environ()
-func NewFromOS() *Env) {
+func NewFromOS() *Env {
 	return New(os.Environ())
 }
 

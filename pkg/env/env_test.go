@@ -44,11 +44,59 @@ func TestHas(t *testing.T) {
 }
 
 func TestPATH(t *testing.T) {
-	env := New([]string{})
-
-	env.PrependToPath("/bin")
-	require.Equal(t, "/bin", env.Get("PATH"))
+	env := New([]string{"PATH=/bin"})
 
 	env.PrependToPath("/sbin")
 	require.Equal(t, "/sbin:/bin", env.Get("PATH"))
+
+	env.PrependToPath("/usr/bin")
+	require.Equal(t, "/usr/bin:/sbin:/bin", env.Get("PATH"))
+}
+
+func TestMutations(t *testing.T) {
+	env := New([]string{"PATH=/bin", "K1=V1"})
+
+	require.Equal(t, []VariableMutation{}, env.Mutations())
+
+	env.Set("K2", "V1")
+	require.Equal(t, []VariableMutation{
+		VariableMutation{"K2", nil, &variable{"K2", "V1"}},
+	}, env.Mutations())
+
+	env.Set("K2", "V2")
+	require.Equal(t, []VariableMutation{
+		VariableMutation{"K2", nil, &variable{"K2", "V2"}},
+	}, env.Mutations())
+
+	env.Unset("K2")
+	require.Equal(t, []VariableMutation{}, env.Mutations())
+
+	env.Set("K1", "V2")
+	require.Equal(t, []VariableMutation{
+		VariableMutation{"K1", &variable{"K1", "V1"}, &variable{"K1", "V2"}},
+	}, env.Mutations())
+
+	env.Unset("K1")
+	require.Equal(t, []VariableMutation{
+		VariableMutation{"K1", &variable{"K1", "V1"}, nil},
+	}, env.Mutations())
+
+	env.Set("K1", "V1")
+	require.Equal(t, []VariableMutation{}, env.Mutations())
+
+	env.PrependToPath("/foo")
+	require.Equal(t, []VariableMutation{
+		VariableMutation{"PATH", &variable{"PATH", "/bin"}, &variable{"PATH", "/foo:/bin"}},
+	}, env.Mutations())
+}
+
+func TestMutationsDiffString(t *testing.T) {
+	m := VariableMutation{"NAME", &variable{"NAME", "V1"}, &variable{"NAME", "V2"}}
+	require.Equal(t, "  - V1\n  + V2\n", m.DiffString())
+
+	m = VariableMutation{"NAME", nil, &variable{"NAME", "V2"}}
+	require.Equal(t, "  + V2\n", m.DiffString())
+
+	m = VariableMutation{"NAME", &variable{"NAME", "V1"}, nil}
+	require.Equal(t, "  - V1\n", m.DiffString())
 }
