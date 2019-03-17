@@ -68,14 +68,12 @@ func (r *runner) sync(featureSet FeatureSet) {
 		}
 	}
 
-	// Record for which project the features were activated
 	if r.ctx.Project != nil {
+		// Record the project and the environment mutations made by this project
 		r.state.SetProjectSlug(r.ctx.Project.Slug())
-		err := r.state.SaveEnv()
-		if err != nil {
-			r.ctx.UI.Debug("state.SaveEnv() failed with: %s", err)
-		}
+		r.state.SaveEnv()
 	} else {
+		// Record that we are NOT in a project
 		r.state.SetProjectSlug("")
 	}
 }

@@ -102,7 +102,7 @@ func (s *FeatureState) ForgetEnv() {
 	s.write(state)
 }
 
-func (s *FeatureState) SaveEnv() error {
+func (s *FeatureState) SaveEnv() {
 	state := s.read()
 
 	for _, mutation := range s.env.Mutations() {
@@ -123,7 +123,6 @@ func (s *FeatureState) SaveEnv() error {
 	}
 
 	s.write(state)
-	return nil
 }
 
 func (s *FeatureState) RestoreEnv() {
