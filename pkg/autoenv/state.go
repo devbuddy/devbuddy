@@ -45,13 +45,13 @@ func (s *State) write(state *StateData) {
 	s.env.Set(autoEnvStateVariableName, string(serialized))
 }
 
-// GetActiveFeatures returns a Hash of feature name -> param
+// GetActiveFeatures returns the FeatureSet recorded in the state
 func (s *State) GetActiveFeatures() FeatureSet {
 	state := s.read()
 	return state.Features
 }
 
-// SetProject change the state to set the project
+// SetProjectSlug records the project slug in the state
 func (s *State) SetProjectSlug(slug string) {
 	state := s.read()
 	state.ProjectSlug = slug
@@ -91,7 +91,7 @@ func (p savedEnv) String() string {
 	return strings.Join(elements, " ")
 }
 
-// SaveEnv records the
+// SaveEnv records the environment mutations in the state
 func (s *State) SaveEnv() {
 	state := s.read()
 
@@ -115,6 +115,7 @@ func (s *State) SaveEnv() {
 	s.write(state)
 }
 
+// RestoreEnv reverts the environment as recorded in the state
 func (s *State) RestoreEnv() {
 	state := s.read()
 
@@ -129,6 +130,7 @@ func (s *State) RestoreEnv() {
 	}
 }
 
+// ForgetEnv clears the environment mutations previously recorded in the state
 func (s *State) ForgetEnv() {
 	state := s.read()
 	state.SavedEnv = savedEnv{}

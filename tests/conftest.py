@@ -126,7 +126,6 @@ def cmd(binary_path, workdir, request):
     build_pexpect_shell = PEXPECT_SHELLS[shell_name]
     pexpect_wrapper = build_pexpect_shell(workdir)
 
-    import pdb; pdb.set_trace()
     pexpect_wrapper.run_command('export PATH={}:$PATH'.format(binary_path))
 
     output = pexpect_wrapper.run_command('which bud')
