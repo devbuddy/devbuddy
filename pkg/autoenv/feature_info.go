@@ -16,6 +16,10 @@ func NewFeatureInfo(name string, param string) *FeatureInfo {
 	return &FeatureInfo{name, param}
 }
 
+func (f FeatureInfo) String() string {
+	return fmt.Sprintf("%s:%s", f.Name, f.Param)
+}
+
 // FeatureSet represents a set of parameterized features
 type FeatureSet []*FeatureInfo
 
@@ -53,7 +57,7 @@ func (s FeatureSet) Get(name string) *FeatureInfo {
 func (s FeatureSet) String() string {
 	elements := []string{}
 	for _, element := range s {
-		elements = append(elements, fmt.Sprintf("%s:%s", element.Name, element.Param))
+		elements = append(elements, element.String())
 	}
 	return strings.Join(elements, " ")
 }
