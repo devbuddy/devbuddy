@@ -52,7 +52,7 @@ func (s *FeatureState) set(slug string, featureSet FeatureSet) {
 }
 
 // SetFeature marks a feature as active
-func (s *FeatureState) SetFeature(featureInfo FeatureInfo) {
+func (s *FeatureState) SetFeature(featureInfo *FeatureInfo) {
 	pKey, set := s.get()
 	s.set(pKey, set.With(featureInfo))
 }

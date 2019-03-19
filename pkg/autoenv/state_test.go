@@ -21,12 +21,12 @@ func TestStateDeserialization(t *testing.T) {
 	features := []FeatureSet{
 		NewFeatureSet(),
 		NewFeatureSet(),
-		NewFeatureSet().With(FeatureInfo{"f1", "v1"}),
-		NewFeatureSet().With(FeatureInfo{"f1", "v1"}).With(FeatureInfo{"f2", "v2"}),
+		NewFeatureSet().With(NewFeatureInfo("f1", "v1")),
+		NewFeatureSet().With(NewFeatureInfo("f1", "v1")).With(NewFeatureInfo("f2", "v2")),
 
 		NewFeatureSet(),
-		NewFeatureSet().With(FeatureInfo{"f1", "v1"}),
-		NewFeatureSet().With(FeatureInfo{"f1", "v1"}).With(FeatureInfo{"f2", "v2"}),
+		NewFeatureSet().With(NewFeatureInfo("f1", "v1")),
+		NewFeatureSet().With(NewFeatureInfo("f1", "v1")).With(NewFeatureInfo("f2", "v2")),
 	}
 	slugs := []string{
 		"",
@@ -53,7 +53,7 @@ func TestStateSerialization(t *testing.T) {
 	state.SetProjectSlug("p-1")
 	require.Equal(t, "1:p-1:", env.Get("BUD_AUTO_ENV_FEATURES"))
 
-	state.SetFeature(FeatureInfo{"f1", "v1"})
+	state.SetFeature(NewFeatureInfo("f1", "v1"))
 	require.Equal(t, "1:p-1:f1=v1", env.Get("BUD_AUTO_ENV_FEATURES"))
 
 	state.SetProjectSlug("p-2")
@@ -67,44 +67,34 @@ func TestStateSetUnsetFeatures(t *testing.T) {
 	env := env.New([]string{})
 
 	state := FeatureState{env}
-	state.SetFeature(FeatureInfo{"rust", "v1"})
+	state.SetFeature(NewFeatureInfo("rust", "v1"))
 
 	state = FeatureState{env}
-	require.Equal(t,
-		NewFeatureSet().With(FeatureInfo{"rust", "v1"}),
-		state.GetActiveFeatures())
+	require.Equal(t, "rust:v1", state.GetActiveFeatures().String())
 
 	state = FeatureState{env}
-	state.SetFeature(FeatureInfo{"elixir", "v1"})
+	state.SetFeature(NewFeatureInfo("elixir", "v1"))
 
 	state = FeatureState{env}
-	require.Equal(t,
-		NewFeatureSet().With(FeatureInfo{"rust", "v1"}).With(FeatureInfo{"elixir", "v1"}),
-		state.GetActiveFeatures())
+	require.Equal(t, "rust:v1 elixir:v1", state.GetActiveFeatures().String())
 
 	state = FeatureState{env}
-	state.SetFeature(FeatureInfo{"rust", "v2"})
+	state.SetFeature(NewFeatureInfo("rust", "v2"))
 
 	state = FeatureState{env}
-	require.Equal(t,
-		NewFeatureSet().With(FeatureInfo{"rust", "v2"}).With(FeatureInfo{"elixir", "v1"}),
-		state.GetActiveFeatures())
+	require.Equal(t, "elixir:v1 rust:v2", state.GetActiveFeatures().String())
 
 	state = FeatureState{env}
 	state.UnsetFeature("elixir")
 
 	state = FeatureState{env}
-	require.Equal(t,
-		NewFeatureSet().With(FeatureInfo{"rust", "v2"}),
-		state.GetActiveFeatures())
+	require.Equal(t, "rust:v2", state.GetActiveFeatures().String())
 
 	state = FeatureState{env}
 	state.UnsetFeature("rust")
 
 	state = FeatureState{env}
-	require.Equal(t,
-		NewFeatureSet(),
-		state.GetActiveFeatures())
+	require.Equal(t, "", state.GetActiveFeatures().String())
 }
 
 func TestStateSetGetProjectSlug(t *testing.T) {

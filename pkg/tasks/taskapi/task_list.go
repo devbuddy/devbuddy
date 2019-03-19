@@ -61,7 +61,7 @@ func GetFeaturesFromTasks(tasks []*Task) autoenv.FeatureSet {
 	for _, task := range tasks {
 		for _, action := range task.Actions {
 			if action.Feature() != nil {
-				featureSet = featureSet.With(*action.Feature())
+				featureSet = featureSet.With(action.Feature())
 			}
 		}
 	}
