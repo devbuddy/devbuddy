@@ -2,6 +2,7 @@ package hook
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
@@ -54,20 +55,22 @@ func getFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
 }
 
 func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {
-	for _, change := range ctx.Env.Changed() {
-		ctx.UI.Debug("Env change: %+v", change)
+	for _, mutation := range ctx.Env.Mutations() {
+		ctx.UI.Debug("Apply change: %s\n%s", mutation.Name, mutation.DiffString())
 
-		if change.Deleted {
-			fmt.Printf("unset %s\n", change.Name)
+		if mutation.Current == nil {
+			fmt.Printf("unset %s\n", mutation.Name)
 		} else {
-			fmt.Printf("export %s=\"%s\"\n", change.Name, change.Value)
+			escaped := strings.Replace(mutation.Current.Value, "\"", "\\\"", -1)
+			fmt.Printf("export %s=\"%s\"\n", mutation.Name, escaped)
 		}
+
 	}
 }
 
 func emitShellHashResetCommand(ctx *context.Context) {
-	for _, change := range ctx.Env.Changed() {
-		if change.Name == "PATH" {
+	for _, mutation := range ctx.Env.Mutations() {
+		if mutation.Name == "PATH" {
 			fmt.Printf("hash -r")
 			return
 		}
