@@ -7,59 +7,46 @@ import (
 
 // An Env provides a simple interface to manipulate environment variables
 type Env struct {
-	env         map[string]string
-	verbatimEnv map[string]string
+	env         Variables
+	verbatimEnv Variables
 }
 
 // New returns a new Env from an arbitrary list of variables
-func New(env []string) (e *Env) {
-	e = &Env{
-		env:         make(map[string]string),
-		verbatimEnv: make(map[string]string),
+func New(env []string) *Env {
+	return &Env{
+		env:         NewVariables(env),
+		verbatimEnv: NewVariables(env),
 	}
-
-	for _, pair := range env {
-		parts := strings.SplitN(pair, "=", 2)
-		e.env[parts[0]] = parts[1]
-		e.verbatimEnv[parts[0]] = parts[1]
-	}
-
-	return
 }
 
 // NewFromOS returns a new Env with variables from os.Environ()
-func NewFromOS() (e *Env) {
+func NewFromOS() *Env {
 	return New(os.Environ())
-}
-
-// A VariableChange represents the change made on a variable
-type VariableChange struct {
-	Name    string
-	Value   string
-	Deleted bool
 }
 
 // Set adds or changes a variable
 func (e *Env) Set(name string, value string) {
-	e.env[name] = value
+	e.env.set(name, value)
 }
 
 // Unset removes a variable if it exists
 func (e *Env) Unset(name string) {
-	delete(e.env, name)
+	e.env.unset(name)
 }
 
 // Get returns the value of a variable (defaults to empty string)
 func (e *Env) Get(name string) string {
-	return e.env[name]
+	return e.env.getDefault(name, "")
+}
+
+// Has returns whether the variable exists
+func (e *Env) Has(name string) bool {
+	return e.env.has(name)
 }
 
 // Environ returns all variable as os.Environ() would
-func (e *Env) Environ() (vars []string) {
-	for name, value := range e.env {
-		vars = append(vars, name+"="+value)
-	}
-	return vars
+func (e *Env) Environ() []string {
+	return e.env.asEnviron()
 }
 
 // PrependToPath inserts a new path at the beginning of the PATH variable
@@ -80,37 +67,15 @@ func (e *Env) RemoveFromPath(substring string) {
 	e.setPathParts(newElems...)
 }
 
-// IsInPath returns true if one path of $PATH is exactly equal to the path provided
-func (e *Env) IsInPath(path string) bool {
-	for _, elem := range e.getPathParts() {
-		if elem == path {
-			return true
-		}
-	}
-	return false
-}
-
-// Changed returns all changes made on the variables
-func (e *Env) Changed() []VariableChange {
-	c := []VariableChange{}
-
-	for k, v := range e.env {
-		if v != e.verbatimEnv[k] {
-			c = append(c, VariableChange{Name: k, Value: v})
-		}
-	}
-	for k := range e.verbatimEnv {
-		if _, ok := e.env[k]; !ok {
-			c = append(c, VariableChange{Name: k, Deleted: true})
-		}
-	}
-	return c
-}
-
 func (e *Env) getPathParts() []string {
-	return strings.Split(e.env["PATH"], ":")
+	return strings.Split(e.Get("PATH"), ":")
 }
 
 func (e *Env) setPathParts(elems ...string) {
-	e.env["PATH"] = strings.Join(elems, ":")
+	e.Set("PATH", strings.Join(elems, ":"))
+}
+
+// Mutations returns a list of variable mutations (previous and current value)
+func (e *Env) Mutations() []VariableMutation {
+	return buildMutations(e.env, e.verbatimEnv)
 }
