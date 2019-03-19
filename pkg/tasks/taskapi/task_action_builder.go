@@ -31,7 +31,6 @@ func (a *genericTaskActionBuilder) OnFileChange(path string) *genericTaskActionB
 
 // SetFeature defines that the feature specified should be activated.
 func (a *genericTaskActionBuilder) SetFeature(name, param string) *genericTaskActionBuilder {
-	featureInfo := autoenv.NewFeatureInfo(name, param)
-	a.feature = &featureInfo
+	a.feature = autoenv.NewFeatureInfo(name, param)
 	return a
 }

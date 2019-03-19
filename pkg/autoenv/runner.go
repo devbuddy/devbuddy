@@ -34,11 +34,11 @@ func (r *runner) sync(featureSet FeatureSet) {
 	activeFeatures := r.state.GetActiveFeatures()
 
 	for _, name := range r.reg.Names() {
-		wantFeatureInfo, want := featureSet[name]
-		activeFeatureInfo, active := activeFeatures[name]
+		wantFeatureInfo := featureSet.Get(name)
+		activeFeatureInfo := activeFeatures.Get(name)
 
-		if want {
-			if active {
+		if wantFeatureInfo != nil {
+			if activeFeatureInfo != nil {
 				if wantFeatureInfo.Param != activeFeatureInfo.Param {
 					r.deactivateFeature(activeFeatureInfo)
 					r.activateFeature(wantFeatureInfo)
@@ -47,7 +47,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 				r.activateFeature(wantFeatureInfo)
 			}
 		} else {
-			if active {
+			if activeFeatureInfo != nil {
 				r.deactivateFeature(activeFeatureInfo)
 			}
 		}
@@ -59,7 +59,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 	}
 }
 
-func (r *runner) activateFeature(featureInfo FeatureInfo) {
+func (r *runner) activateFeature(featureInfo *FeatureInfo) {
 	r.ctx.UI.Debug("activating %s (%s)", featureInfo.Name, featureInfo.Param)
 
 	environment, err := r.reg.Get(featureInfo.Name)
@@ -81,7 +81,7 @@ func (r *runner) activateFeature(featureInfo FeatureInfo) {
 	r.state.SetFeature(featureInfo)
 }
 
-func (r *runner) deactivateFeature(featureInfo FeatureInfo) {
+func (r *runner) deactivateFeature(featureInfo *FeatureInfo) {
 	r.ctx.UI.Debug("deactivating %s (%s)", featureInfo.Name, featureInfo.Param)
 
 	environment, err := r.reg.Get(featureInfo.Name)

@@ -11,17 +11,17 @@ type FeatureInfo struct {
 	Param string
 }
 
-// func (i FeatureInfo) String() string {
-// 	return fmt.Sprintf("%s (%s)", i.Name, i.Param)
-// }
-
 // NewFeatureInfo returns a FeatureInfo
-func NewFeatureInfo(name string, param string) FeatureInfo {
-	return FeatureInfo{name, param}
+func NewFeatureInfo(name string, param string) *FeatureInfo {
+	return &FeatureInfo{name, param}
+}
+
+func (f FeatureInfo) String() string {
+	return fmt.Sprintf("%s:%s", f.Name, f.Param)
 }
 
 // FeatureSet represents a set of parameterized features
-type FeatureSet map[string]FeatureInfo
+type FeatureSet []*FeatureInfo
 
 // NewFeatureSet returns a FeatureSet
 func NewFeatureSet() FeatureSet {
@@ -35,7 +35,7 @@ func NewFeatureSetFromString(data string) FeatureSet {
 		if feat != "" {
 			parts := strings.SplitN(feat, "=", 2)
 			if len(parts) == 2 {
-				set = set.With(FeatureInfo{parts[0], parts[1]})
+				set = set.With(NewFeatureInfo(parts[0], parts[1]))
 			}
 		}
 	}
@@ -43,15 +43,37 @@ func NewFeatureSetFromString(data string) FeatureSet {
 }
 
 // With returns a new FeatureSet augmented with the featureInfo provided
-func (s FeatureSet) With(featureInfo FeatureInfo) FeatureSet {
-	s[featureInfo.Name] = featureInfo
-	return s
+func (s FeatureSet) With(featureInfo *FeatureInfo) FeatureSet {
+	return append(s.Without(featureInfo.Name), featureInfo)
 }
 
 // Without returns a new FeatureSet augmented with the featureInfo provided
 func (s FeatureSet) Without(name string) FeatureSet {
-	delete(s, name)
-	return s
+	newSet := FeatureSet{}
+	for _, element := range s {
+		if element.Name != name {
+			newSet = append(newSet, element)
+		}
+	}
+	return newSet
+}
+
+// Get returns a new FeatureSet augmented with the featureInfo provided
+func (s FeatureSet) Get(name string) *FeatureInfo {
+	for _, element := range s {
+		if element.Name == name {
+			return element
+		}
+	}
+	return nil
+}
+
+func (s FeatureSet) String() string {
+	elements := []string{}
+	for _, element := range s {
+		elements = append(elements, element.String())
+	}
+	return strings.Join(elements, " ")
 }
 
 // Serialize returns the FeatureSet serialized as a string
