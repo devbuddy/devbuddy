@@ -32,7 +32,7 @@ func run(ctx *context.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx.UI.Debug("features: %+v", allFeatures)
+	ctx.UI.Debug("Desired features: %+v", allFeatures)
 
 	autoenv.Sync(ctx, allFeatures)
 	emitEnvironmentChangeAsShellCommands(ctx)
