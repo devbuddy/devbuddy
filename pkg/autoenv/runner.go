@@ -11,7 +11,7 @@ import (
 func Sync(ctx *context.Context, set FeatureSet) {
 	runner := &runner{
 		ctx:   ctx,
-		state: &StateManager{ctx.Env},
+		state: &StateManager{ctx.Env, ctx.UI},
 		reg:   features.GlobalRegister(),
 	}
 	runner.sync(set)
