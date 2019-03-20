@@ -24,10 +24,27 @@ type runner struct {
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
-	// If we jumped to a different project, all feature should be deactivated
-	if r.ctx.Project != nil && r.state.GetProjectSlug() != r.ctx.Project.Slug() {
-		for _, featureInfo := range r.state.GetActiveFeatures() {
-			r.deactivateFeature(featureInfo)
+	if r.state.GetProjectSlug() != "" {
+		// A project was active until now
+
+		if r.ctx.Project == nil {
+			// We jumped out of the project
+
+			r.state.RestoreEnv()
+			r.state.ForgetEnv()
+		} else {
+			if r.state.GetProjectSlug() != r.ctx.Project.Slug() {
+				// We jumped to a different project
+
+				// Since it's a different project, we just deactivate all features
+				// For example, "python:3.7" is activating a virtualenv built for a specific project
+				for _, featureInfo := range r.state.GetActiveFeatures() {
+					r.deactivateFeature(featureInfo)
+				}
+
+				r.state.RestoreEnv()
+				// No ForgetEnv(), we keep the SavedEnv until we jump out of a project
+			}
 		}
 	}
 
@@ -53,9 +70,13 @@ func (r *runner) sync(featureSet FeatureSet) {
 		}
 	}
 
-	// Record for which project the features were activated
 	if r.ctx.Project != nil {
+		// Record the project and the environment mutations made by this project
 		r.state.SetProjectSlug(r.ctx.Project.Slug())
+		r.state.SaveEnv()
+	} else {
+		// Record that we are NOT in a project
+		r.state.SetProjectSlug("")
 	}
 }
 

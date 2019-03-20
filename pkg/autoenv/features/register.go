@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv/feature"
+	"github.com/devbuddy/devbuddy/pkg/context"
 )
 
 type MutableRegister struct {
@@ -40,7 +41,7 @@ func (e *MutableRegister) Register(name string, activate feature.ActivateFunc, d
 		panic("activate can't be nil")
 	}
 	if deactivate == nil {
-		panic("deactivate can't be nil")
+		deactivate = func(ctx *context.Context, version string) {}
 	}
 
 	e.nameToFeature[name] = &feature.Feature{Name: name, Activate: activate, Deactivate: deactivate}
