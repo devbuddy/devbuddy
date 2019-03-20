@@ -99,3 +99,18 @@ func TestStateSavedEnvMultipleChanges(t *testing.T) {
 	require.False(t, env3.Has("GOROOT"))
 	require.Equal(t, "off", env3.Get("GO111MODULES"))
 }
+
+func TestStateSavedEnvForget(t *testing.T) {
+	env1 := env.New([]string{})
+
+	env1.Set("GOROOT", "/go/1")
+	newStateManager(env1).SaveEnv()
+
+	env2 := env.New(env1.Environ())
+
+	stateManager := newStateManager(env2)
+	stateManager.ForgetEnv()
+	stateManager.RestoreEnv() // the restore would have unset GOROOT
+
+	require.True(t, env2.Has("GOROOT"))
+}
