@@ -6,11 +6,11 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/termui"
-	"github.com/stretchr/testify/require"
-
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/termui"
+
+	"github.com/stretchr/testify/require"
 )
 
 type recorder struct {
@@ -57,7 +57,7 @@ func newRunnerWithProject(env *env.Env, reg *features.MutableRegister, projectPa
 			UI:      ui,
 			Env:     env,
 		},
-		state: &StateManager{env},
+		state: &StateManager{env, ui},
 		reg:   reg,
 	}
 }
