@@ -50,7 +50,7 @@ __bud_prompt_command() {
 
 __bud_log_debug() {
     [ -n "${BUD_DEBUG:-}" ] || return
-    echo -e "BUD_HOOK_DEBUG: $@"
+    echo -e "\033[33mBUD_HOOK_DEBUG\033[0m: $@"
 }
 
 bud-enable-debug() {
