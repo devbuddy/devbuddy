@@ -21,7 +21,6 @@ type StateManager struct {
 
 func (s *StateManager) read() *StateData {
 	state := &StateData{}
-
 	if s.env.Has(autoEnvVariableName) {
 		err := json.Unmarshal([]byte(s.env.Get(autoEnvVariableName)), &state)
 		if err != nil {
@@ -54,8 +53,7 @@ func (s *StateManager) SetProjectSlug(slug string) {
 
 // GetProjectSlug returns the slug of the project in which DevBuddy was when the state was written
 func (s *StateManager) GetProjectSlug() string {
-	state := s.read()
-	return state.ProjectSlug
+	return s.read().ProjectSlug
 }
 
 // SetFeature marks a feature as active
