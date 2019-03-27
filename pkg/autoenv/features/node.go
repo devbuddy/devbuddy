@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	register("node", nodeActivate, nodeDeactivate)
+	register("node", nodeActivate, nil)
 }
 
 func nodeActivate(ctx *context.Context, version string) (bool, error) {
@@ -16,9 +16,4 @@ func nodeActivate(ctx *context.Context, version string) (bool, error) {
 	}
 	ctx.Env.PrependToPath(node.BinPath())
 	return false, nil
-}
-
-func nodeDeactivate(ctx *context.Context, version string) {
-	node := helpers.NewNode(ctx.Cfg, version)
-	ctx.Env.RemoveFromPath(node.Path())
 }
