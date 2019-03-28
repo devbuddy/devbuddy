@@ -42,6 +42,11 @@ func NewTaskConfig(definition interface{}) (*TaskConfig, error) {
 	return nil, fmt.Errorf("invalid task: \"%+v\"", definition)
 }
 
+// IsHash returns a boolean indicating whether the payload is a hash
+func (c *TaskConfig) IsHash() bool {
+	return reflect.ValueOf(c.payload).Kind() == reflect.Map
+}
+
 // GetListOfStrings expects the payload to be a list of string, returns it.
 //
 // YAML Example:

@@ -1,15 +1,16 @@
-package features
+package autoenv
 
 import (
 	"strings"
 	"testing"
 
-	"github.com/devbuddy/devbuddy/pkg/termui"
-	"github.com/stretchr/testify/require"
-
-	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/termui"
+
+	"github.com/stretchr/testify/require"
 )
 
 type recorder struct {
@@ -30,31 +31,33 @@ func (r *recorder) getCallsAndReset() []string {
 	return val
 }
 
-func newMockEnv(name string, reg *featureRegister, rec *recorder) {
-	reg.register(
+func newMockEnv(name string, reg *features.MutableRegister, rec *recorder) {
+	reg.Register(
 		name,
-		func(param string, cfg *config.Config, proj *project.Project, env *env.Env) (bool, error) {
+		func(ctx *context.Context, param string) (bool, error) {
 			rec.record("activate", param)
 			return false, nil
 		},
-		func(param string, cfg *config.Config, env *env.Env) {
+		func(ctx *context.Context, param string) {
 			rec.record("deactivate", param)
 		},
 	)
 }
 
-func newRunner(env *env.Env, reg *featureRegister) *runner {
+func newRunner(env *env.Env, reg *features.MutableRegister) *runner {
 	return newRunnerWithProject(env, reg, "/project")
 }
 
-func newRunnerWithProject(env *env.Env, reg *featureRegister, projectPath string) *runner {
+func newRunnerWithProject(env *env.Env, reg *features.MutableRegister, projectPath string) *runner {
 	_, ui := termui.NewTesting(false)
 	return &runner{
-		cfg:   nil,
-		proj:  project.NewFromPath(projectPath),
-		ui:    ui,
-		env:   env,
-		state: &FeatureState{env},
+		ctx: &context.Context{
+			Cfg:     nil,
+			Project: project.NewFromPath(projectPath),
+			UI:      ui,
+			Env:     env,
+		},
+		state: &StateManager{env, ui},
 		reg:   reg,
 	}
 }
@@ -62,7 +65,7 @@ func newRunnerWithProject(env *env.Env, reg *featureRegister, projectPath string
 func TestRunner(t *testing.T) {
 	testEnv := env.New([]string{})
 
-	reg := newFeatureRegister()
+	reg := features.NewRegister()
 
 	rustCalls := newRecorder()
 	newMockEnv("rust", reg, rustCalls)
@@ -76,17 +79,17 @@ func TestRunner(t *testing.T) {
 
 	// Add a feature
 	runner = newRunner(testEnv, reg)
-	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")))
 	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 
 	// Second time with the same feature
 	runner = newRunner(testEnv, reg)
-	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")))
 	require.Equal(t, []string{}, rustCalls.getCallsAndReset())
 
 	// Change the feature param
 	runner = newRunner(testEnv, reg)
-	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "2.0"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "2.0")))
 	require.Equal(t, []string{"deactivate 1.0", "activate 2.0"}, rustCalls.getCallsAndReset())
 
 	// With no feature
@@ -98,7 +101,7 @@ func TestRunner(t *testing.T) {
 func TestRunnerWithTwoFeatures(t *testing.T) {
 	testEnv := env.New([]string{})
 
-	reg := newFeatureRegister()
+	reg := features.NewRegister()
 
 	rustCalls := newRecorder()
 	newMockEnv("rust", reg, rustCalls)
@@ -107,22 +110,22 @@ func TestRunnerWithTwoFeatures(t *testing.T) {
 	newMockEnv("elixir", reg, elixirCalls)
 
 	runner := newRunner(testEnv, reg)
-	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}).With(FeatureInfo{"elixir", "0.4"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")).With(NewFeatureInfo("elixir", "0.4")))
 	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{"activate 0.4"}, elixirCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(NewFeatureSet().With(FeatureInfo{"elixir", "0.4"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("elixir", "0.4")))
 	require.Equal(t, []string{"deactivate 1.0"}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{}, elixirCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}).With(FeatureInfo{"elixir", "0.4"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")).With(NewFeatureInfo("elixir", "0.4")))
 	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{}, elixirCalls.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
-	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}).With(FeatureInfo{"elixir", "0.5"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")).With(NewFeatureInfo("elixir", "0.5")))
 	require.Equal(t, []string{}, rustCalls.getCallsAndReset())
 	require.Equal(t, []string{"deactivate 0.4", "activate 0.5"}, elixirCalls.getCallsAndReset())
 
@@ -135,18 +138,18 @@ func TestRunnerWithTwoFeatures(t *testing.T) {
 func TestRunnerChangeProject(t *testing.T) {
 	testEnv := env.New([]string{})
 
-	reg := newFeatureRegister()
+	reg := features.NewRegister()
 
 	rustCalls := newRecorder()
 	newMockEnv("rust", reg, rustCalls)
 
 	// Add a feature
 	runner := newRunnerWithProject(testEnv, reg, "/project-a")
-	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")))
 	require.Equal(t, []string{"activate 1.0"}, rustCalls.getCallsAndReset())
 
 	// Same feature on a different project
 	runner = newRunnerWithProject(testEnv, reg, "/project-b")
-	runner.sync(NewFeatureSet().With(FeatureInfo{"rust", "1.0"}))
+	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")))
 	require.Equal(t, []string{"deactivate 1.0", "activate 1.0"}, rustCalls.getCallsAndReset())
 }

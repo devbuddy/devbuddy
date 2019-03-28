@@ -1,9 +1,9 @@
 package taskapi
 
 import (
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/features"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
@@ -14,5 +14,5 @@ type Context struct {
 	UI       *termui.UI
 	Cfg      *config.Config
 	Env      *env.Env
-	Features features.FeatureSet
+	Features autoenv.FeatureSet
 }

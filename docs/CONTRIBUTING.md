@@ -7,6 +7,7 @@ Install DevBuddy by following the steps in the [README](README.md#install).
 ### Clone the project
 
 This will clone a repository from Github: `github.com/devbuddy/devbuddy`.
+
 The repo will be cloned at `~/src/github.com/devbuddy/devbuddy`.
 
 ```shell
@@ -54,6 +55,18 @@ Typical commands are `test`, `lint`, `clean`, `release`
 ~/src/github.com/devbuddy/devbuddy $ bud install-dev
 ```
 
+### Reinstall a release 
+
+```shell
+~/src/github.com/devbuddy/devbuddy $ bud install-release
+```
+
+Or simply:
+
+```shell
+~ $ bud upgrade
+```
+
 ### Debugging
 
 You can enable the debug messages with:
@@ -72,7 +85,7 @@ export BUD_DEBUG=1
 
 Create a release locally with the command:
 ```bash
-$ bud release 1.0.0
+$ bud release
 ```
 
 This command will create a tag and push it to the origin.

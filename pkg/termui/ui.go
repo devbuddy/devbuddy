@@ -32,13 +32,6 @@ func New(cfg *config.Config) *UI {
 	}
 }
 
-func NewHook(cfg *config.Config) *UI {
-	return &UI{
-		out:          os.Stderr,
-		debugEnabled: cfg.DebugEnabled,
-	}
-}
-
 func NewTesting(debugEnabled bool) (*bytes.Buffer, *UI) {
 	buffer := bytes.NewBufferString("")
 	return buffer, &UI{
@@ -47,10 +40,15 @@ func NewTesting(debugEnabled bool) (*bytes.Buffer, *UI) {
 	}
 }
 
+func (u *UI) SetOutputToStderr() {
+	u.out = os.Stderr
+}
+
 func (u *UI) Debug(format string, params ...interface{}) {
 	if u.debugEnabled {
 		msg := fmt.Sprintf(format, params...)
-		Fprintf(u.out, "BUD_DEBUG: %s\n", color.Gray(msg))
+		msg = strings.TrimSuffix(msg, "\n")
+		Fprintf(u.out, "%s: %s\n", color.Brown("BUD_DEBUG"), color.Gray(msg))
 	}
 }
 

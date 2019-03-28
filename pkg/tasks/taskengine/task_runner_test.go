@@ -14,8 +14,8 @@ func TestRunActionNeeded(t *testing.T) {
 	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), taskapi.ActionNotNeeded(), nil)
 	task := newTaskWithAction("testtask", action)
 
-	taskRunner := &TaskRunnerImpl{}
-	err := taskRunner.Run(ctx, task)
+	taskRunner := &TaskRunnerImpl{ctx: ctx}
+	err := taskRunner.Run(task)
 	require.NoError(t, err)
 
 	require.Equal(t, 2, action.neededCallCount)
@@ -29,8 +29,8 @@ func TestRunActionNotNeeded(t *testing.T) {
 	action := newTestingAction("Action X", taskapi.ActionNotNeeded(), nil, nil)
 	task := newTaskWithAction("testtask", action)
 
-	taskRunner := &TaskRunnerImpl{}
-	err := taskRunner.Run(ctx, task)
+	taskRunner := &TaskRunnerImpl{ctx: ctx}
+	err := taskRunner.Run(task)
 	require.NoError(t, err)
 
 	require.Equal(t, 1, action.neededCallCount)
@@ -44,8 +44,8 @@ func TestRunActionFailureOnNeeded(t *testing.T) {
 	action := newTestingAction("Action X", taskapi.ActionFailed("ERROR_X"), nil, nil)
 	task := newTaskWithAction("testtask", action)
 
-	taskRunner := &TaskRunnerImpl{}
-	err := taskRunner.Run(ctx, task)
+	taskRunner := &TaskRunnerImpl{ctx: ctx}
+	err := taskRunner.Run(task)
 	require.Error(t, err, "failed to detect whether it need to run: ERROR_X")
 
 	require.Equal(t, 1, action.neededCallCount)
@@ -57,8 +57,8 @@ func TestRunActionFailureOnRun(t *testing.T) {
 	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), nil, errors.New("RunFailed"))
 	task := newTaskWithAction("testtask", action)
 
-	taskRunner := &TaskRunnerImpl{}
-	err := taskRunner.Run(ctx, task)
+	taskRunner := &TaskRunnerImpl{ctx: ctx}
+	err := taskRunner.Run(task)
 	require.EqualError(t, err, "The task action failed to run: RunFailed")
 
 	require.Equal(t, 1, action.neededCallCount)
@@ -72,8 +72,8 @@ func TestRunActionStillNeeded(t *testing.T) {
 	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), taskapi.ActionNeeded("some-reason"), nil)
 	task := newTaskWithAction("testtask", action)
 
-	taskRunner := &TaskRunnerImpl{}
-	err := taskRunner.Run(ctx, task)
+	taskRunner := &TaskRunnerImpl{ctx: ctx}
+	err := taskRunner.Run(task)
 	require.EqualError(t, err, "The task action did not produce the expected result: some-reason")
 
 	require.Equal(t, 2, action.neededCallCount)
@@ -90,8 +90,8 @@ func TestTaskRunner(t *testing.T) {
 		Actions:        []taskapi.TaskAction{action1, action2},
 	}
 
-	taskRunner := &TaskRunnerImpl{}
-	err := taskRunner.Run(ctx, task)
+	taskRunner := &TaskRunnerImpl{ctx: ctx}
+	err := taskRunner.Run(task)
 	require.NoError(t, err)
 
 	require.Equal(t, 2, action1.neededCallCount)
@@ -113,8 +113,8 @@ func TestTaskRunnerWithError(t *testing.T) {
 		Actions:        []taskapi.TaskAction{action1, action2},
 	}
 
-	taskRunner := &TaskRunnerImpl{}
-	err := taskRunner.Run(ctx, task)
+	taskRunner := &TaskRunnerImpl{ctx: ctx}
+	err := taskRunner.Run(task)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "The task action (Action 1) failed to detect whether it need to run: CRASH 1")
 

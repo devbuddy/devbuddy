@@ -2,13 +2,12 @@ package hook
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
-	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 func Run() {
@@ -17,44 +16,36 @@ func Run() {
 
 	// Also, we can't annoy the user here, so we always just quit silently
 
-	cfg, err := config.Load()
+	ctx, err := context.Load(true)
 	if err != nil {
 		return
 	}
 
-	ui := termui.NewHook(cfg)
-
-	err = run(cfg, ui)
+	err = run(ctx)
 	if err != nil {
-		ui.Debug("%s", err)
+		ctx.UI.Debug("%s", err)
 	}
 }
 
-func run(cfg *config.Config, ui *termui.UI) error {
-	proj, err := project.FindCurrent()
-	if err != nil && err != project.ErrProjectNotFound {
-		return err
-	}
-	ui.Debug("project: %+v", proj)
-
-	allFeatures, err := getFeaturesFromProject(proj)
+func run(ctx *context.Context) error {
+	allFeatures, err := getFeaturesFromProject(ctx.Project)
 	if err != nil {
 		return err
 	}
-	ui.Debug("features: %+v", allFeatures)
+	ctx.UI.Debug("Desired features: %+v", allFeatures)
 
-	env := env.NewFromOS()
-	features.Sync(cfg, proj, ui, env, allFeatures)
-	printEnvironmentChangeAsShellCommands(ui, env)
+	autoenv.Sync(ctx, allFeatures)
+	emitEnvironmentChangeAsShellCommands(ctx)
+	emitShellHashResetCommand(ctx)
 
 	return nil
 }
 
-func getFeaturesFromProject(proj *project.Project) (features.FeatureSet, error) {
+func getFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
 	if proj == nil {
 		// When no project was found, we must deactivate all potentially active features
 		// So we continue with an empty feature map
-		return features.NewFeatureSet(), nil
+		return autoenv.NewFeatureSet(), nil
 	}
 	allTasks, err := taskapi.GetTasksFromProject(proj)
 	if err != nil {
@@ -63,14 +54,25 @@ func getFeaturesFromProject(proj *project.Project) (features.FeatureSet, error) 
 	return taskapi.GetFeaturesFromTasks(allTasks), nil
 }
 
-func printEnvironmentChangeAsShellCommands(ui *termui.UI, env *env.Env) {
-	for _, change := range env.Changed() {
-		ui.Debug("Env change: %+v", change)
+func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {
+	for _, mutation := range ctx.Env.Mutations() {
+		ctx.UI.Debug("Apply change: %s\n%s", mutation.Name, mutation.DiffString())
 
-		if change.Deleted {
-			fmt.Printf("unset %s\n", change.Name)
+		if mutation.Current == nil {
+			fmt.Printf("unset %s\n", mutation.Name)
 		} else {
-			fmt.Printf("export %s=\"%s\"\n", change.Name, change.Value)
+			escaped := strings.Replace(mutation.Current.Value, "\"", "\\\"", -1)
+			fmt.Printf("export %s=\"%s\"\n", mutation.Name, escaped)
+		}
+
+	}
+}
+
+func emitShellHashResetCommand(ctx *context.Context) {
+	for _, mutation := range ctx.Env.Mutations() {
+		if mutation.Name == "PATH" {
+			fmt.Printf("hash -r")
+			return
 		}
 	}
 }

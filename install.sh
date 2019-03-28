@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 
-VERSION="v0.7.0"
+VERSION="v0.9.2"
 DEST="/usr/local/bin"
 SHELL_LINE='eval "$(bud --shell-init --with-completion)"'
 
@@ -57,8 +57,10 @@ main() {
     TMPDIR=$(mktemp -d)
     cd "${TMPDIR}"
 
-    header "Downloading binary from Github"
-    BINARY="bud-$(make_variant)"
+    VARIANT=$(make_variant)
+
+    header "Downloading DevBuddy version ${VERSION} for ${VARIANT} from Github"
+    BINARY="bud-${VARIANT}"
     URL="https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/${BINARY}"
     curl -L -# --fail "${URL}" -o "${BINARY}"
     curl -L -# --fail "${URL}.sha256" -o "${BINARY}.sha256"

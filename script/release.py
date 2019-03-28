@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import os
 import re
 import subprocess
 import sys
@@ -59,6 +58,7 @@ class InvalidVersion(ValueError):
 
 
 class Version:
+    """Partially implement SemVer v2. https://semver.org"""
 
     _RE = re.compile(r'^(\d+).(\d+).(\d+)(-(rc)){0,1}(.(\d+)){0,1}$')
 
@@ -131,6 +131,15 @@ class Releases:
                     pass
         return sorted(gen())
 
+    def create_release(self, version: Version) -> None:
+        name = f'v{version}'
+
+        if name in self._git.remote_tags():
+            raise Error(f'the tag {name} exists in remote')
+
+        self._git.create_commit(f"Release {name}")
+        self._git.create_annotated_tag(name, f"Release {name}")
+
     def latest_release(self) -> Version:
         versions = [v for v in self.versions() if not v.is_pre_release()]
         if not versions:
@@ -153,14 +162,8 @@ class Releases:
     def next_release(self) -> Version:
         return self.latest_release().next_minor()
 
-    def create_release(self, version: Version) -> None:
-        name = f'v{version}'
-
-        if name in self._git.remote_tags():
-            raise Error(f'the tag {name} exists in remote')
-
-        self._git.create_commit(f"Release {name}")
-        self._git.create_annotated_tag(name, f"Release {name}")
+    def next_patch_release(self) -> Version:
+        return self.latest_release().next_patch()
 
 
 def process(git: Git, releases: Releases, args: argparse.Namespace) -> None:
@@ -174,6 +177,8 @@ def process(git: Git, releases: Releases, args: argparse.Namespace) -> None:
 
     if args.action == 'release-candidate':
         version = releases.next_release_candidate()
+    elif args.action == 'patch':
+        version = releases.next_patch_release()
     elif args.action == 'release':
         version = releases.next_release()
     elif args.action == 'custom':
@@ -181,21 +186,30 @@ def process(git: Git, releases: Releases, args: argparse.Namespace) -> None:
     else:
         raise AssertionError()
 
-    print(f'Creating commit and tag for new version: {version}')
-    releases.create_release(version)
+    print(f'Next version will be {version}')
+    input('Continue?')
+
+    print(f'Creating commit and tag')
+    if args.dryrun:
+        print('Skipped: dry-run')
+    else:
+        releases.create_release(version)
 
     print(f'Pushing to remote')
-    git.push()
+    if args.dryrun:
+        print('Skipped: dry-run')
+    else:
+        git.push()
 
 
 def make_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
+    parser.add_argument('--dryrun', action='store_true')
 
     sub = parser.add_subparsers(dest='action')
     sub.required = True
-
     sub.add_parser('release')
-
+    sub.add_parser('patch')
     sub.add_parser('release-candidate')
 
     custom = sub.add_parser('custom')

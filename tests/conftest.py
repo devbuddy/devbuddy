@@ -131,7 +131,7 @@ def cmd(binary_path, workdir, request):
 
 
 class ProjectTestHelper:
-    def __init__(self, org, name):
+    def __init__(self, org, name, path):
         self.org = org
         self.name = name
         self.path = os.path.expanduser('~/src/github.com/%s/%s' % (org, name))
@@ -142,6 +142,9 @@ class ProjectTestHelper:
     def write_file(self, local_path, data):
         with open(os.path.join(self.path, local_path), 'w') as fp:
             fp.write(data)
+
+    def write_file_dedent(self, local_path, data):
+        self.write_file(local_path, textwrap.dedent(data).lstrip())
 
     def assert_file(self, local_path, expect_content=None, present=True):
         path = os.path.join(self.path, local_path)
@@ -160,9 +163,15 @@ class ProjectTestHelper:
 
 
 @pytest.fixture
-def project_factory(request):
+def srcdir():
+    return os.path.expanduser('~')
+
+
+@pytest.fixture
+def project_factory(request, srcdir):
     def func(org, name):
-        project = ProjectTestHelper(org, name)
+        path = srcdir.join('src').join('github.com').join(org).join(name)
+        project = ProjectTestHelper(org, name, path)
 
         if os.path.exists(project.path):
             shutil.rmtree(project.path)

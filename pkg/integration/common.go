@@ -17,7 +17,7 @@ bud() {
     # Perform finalizers
     local fin
     while read -r fin; do
-        [ -n "${BUD_DEBUG:-}" ] && echo "BUD_DEBUG: finalizer: ${fin}"
+        __bud_log_debug "finalizer: ${fin}"
 
         case "${fin}" in
             cd:*)
@@ -44,18 +44,23 @@ __bud_prompt_command() {
 
     local hook_eval
     hook_eval="$(command bud --shell-hook)"
-    [ -n "${BUD_DEBUG:-}" ] && echo -e "BUD_DEBUG: Hook eval:\n${hook_eval}\n---"
+    __bud_log_debug "Hook eval:\n--------\n${hook_eval}\n--------"
     eval "${hook_eval}"
+}
+
+__bud_log_debug() {
+    [ -n "${BUD_DEBUG:-}" ] || return
+    echo -e "\033[33mBUD_HOOK_DEBUG\033[0m: $@"
 }
 
 bud-enable-debug() {
     export BUD_DEBUG=1
-    echo "BUD_DEBUG: enabled"
+    __bud_log_debug "debug log enabled"
 }
 
 bud-disable-debug() {
+    __bud_log_debug "debug log disable"
     unset BUD_DEBUG
-    echo "BUD_DEBUG: disable"
 }
 
 if [[ -n "${BUD_DEBUG:-}" ]]; then

@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/devbuddy/devbuddy/pkg/features"
+	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
@@ -40,7 +41,7 @@ func (b *brewInstall) Description() string {
 	return fmt.Sprintf("installing %s", b.formula)
 }
 
-func (b *brewInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
+func (b *brewInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 	brew := helpers.NewHomebrew()
 
 	if brew.IsInstalled(b.formula) {
@@ -49,7 +50,7 @@ func (b *brewInstall) Needed(ctx *taskapi.Context) *taskapi.ActionResult {
 	return taskapi.ActionNeeded("package %s is not installed", b.formula)
 }
 
-func (b *brewInstall) Run(ctx *taskapi.Context) error {
+func (b *brewInstall) Run(ctx *context.Context) error {
 	result := command(ctx, "brew", "install", b.formula).Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run brew install: %s", result.Error)
@@ -58,6 +59,6 @@ func (b *brewInstall) Run(ctx *taskapi.Context) error {
 	return nil
 }
 
-func (b *brewInstall) Feature() *features.FeatureInfo {
+func (b *brewInstall) Feature() *autoenv.FeatureInfo {
 	return nil
 }
