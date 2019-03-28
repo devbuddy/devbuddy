@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
@@ -9,12 +10,12 @@ func init() {
 }
 
 func parseEnvfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
-	warning := func(ctx *taskapi.Context) error {
-		ctx.UI.TaskWarning("the .env file does NOT override existing variables")
-		ctx.UI.TaskWarning("the .env file is NOT unloaded when leaving the project")
+	envfilePath := ".env"
+
+	check := func(ctx *context.Context) error {
 		return nil
 	}
-	task.AddActionWithBuilder("", warning).SetFeature("envfile", "")
+	task.AddActionWithBuilder("", check).SetFeature("envfile", envfilePath)
 
 	return nil
 }
