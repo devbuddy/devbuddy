@@ -2,8 +2,7 @@ package features
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/context"
-
-	"github.com/joho/godotenv"
+	"github.com/devbuddy/devbuddy/pkg/helpers"
 )
 
 func init() {
@@ -13,13 +12,9 @@ func init() {
 func envfileActivate(ctx *context.Context, param string) (bool, error) {
 	envfilePath := param
 
-	loadedEnv, err := godotenv.Read(envfilePath)
+	err := helpers.LoadEnvfile(ctx.Env, envfilePath)
 	if err != nil {
 		return true, err
-	}
-
-	for name, value := range loadedEnv {
-		ctx.Env.Set(name, value)
 	}
 
 	return false, nil
