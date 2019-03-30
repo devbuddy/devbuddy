@@ -7,7 +7,7 @@ def test_load_envfile_in_process(cmd, project):
         - envfile
         - custom:
             name: succeed if TESTVAR is set
-            met?: test "${TESTVAR}" == "1"
+            met?: test -n "${TESTVAR}"
             meet: echo "TESTVAR is not set"; false
     """)
 
