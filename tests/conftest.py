@@ -39,8 +39,28 @@ def binary(binary_path):
         )
 
 
+def test_environ():
+    """Hack: remove the PATH elements added by DevBuddy for its own project."""
+
+    path = os.environ['PATH']
+    path_parts = [part for part in path.split(":") if '.local/share/bud' not in part]
+    path = ':'.join(path_parts)
+
+    return {
+        'PATH': path,
+        'HOME': os.environ['HOME'],
+        'LANG': 'en_US.UTF-8',
+    }
+
+
 def build_pexpect_bash(workdir):
-    child = pexpect.spawn('bash', ['--norc', '--noprofile'], echo=False, encoding='utf-8', cwd=str(workdir))
+    child = pexpect.spawn(
+        'bash', ['--norc', '--noprofile'],
+        echo=False,
+        encoding='utf-8',
+        env=test_environ(),
+        cwd=str(workdir),
+    )
     child.timeout = 180
 
     # If the user runs 'env', the value of PS1 will be in the output. To avoid
@@ -55,12 +75,8 @@ def build_pexpect_bash(workdir):
 
 
 def build_pexpect_zsh(workdir):
-    env = {
-        'PROMPT': 'ps1',
-        'PATH': os.getenv('PATH'),
-        'LANG': 'C.UTF-8',
-        'LC_ALL': 'C.UTF-8',
-    }
+    env = test_environ()
+    env['PROMPT'] = 'ps1'
 
     child = pexpect.spawn(
         'zsh', ['--no-globalrcs', '--no-rcs', '--no-zle', '--no-promptcr'],
@@ -114,7 +130,10 @@ def cmd(binary_path, workdir, request):
     build_pexpect_shell = PEXPECT_SHELLS[shell_name]
     pexpect_wrapper = build_pexpect_shell(workdir)
 
+    # import pdb; pdb.set_trace()
+
     pexpect_wrapper.run_command('export PATH={}:$PATH'.format(binary_path))
+    pexpect_wrapper.run_command('hash -r')
 
     output = pexpect_wrapper.run_command('which bud')
     assert str(binary_path) in output
