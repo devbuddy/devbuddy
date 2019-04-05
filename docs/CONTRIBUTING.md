@@ -2,7 +2,7 @@
 
 ## Quickstart
 
-Install DevBuddy by following the steps in the [README](README.md#install).
+Install DevBuddy by following the steps in the [README](../README.md#install).
 
 ### Clone the project
 
@@ -23,13 +23,13 @@ start developing on the project.
 ~/src/github.com/devbuddy/devbuddy $ bud up
 ```
 
-The command will sequentially evaluate the *up* tasks defined in [dev.yml](dev.yml).
+The command will sequentially evaluate the *up* tasks defined in [dev.yml](../dev.yml).
 Some will setup the working environment (`go`, `python`), some will install dependencies (`golang_dep`, `pip`),
 some will conditionally execute an arbitrary command for specific situations.
 
 ### Run the tests
 
-Project specific commands can be defined in the `commands` section of the [dev.yml](dev.yml).
+Project specific commands can be defined in the `commands` section of the [dev.yml](../dev.yml).
 
 Typical commands are `test`, `lint`, `clean`, `release`
 
@@ -55,7 +55,7 @@ Typical commands are `test`, `lint`, `clean`, `release`
 ~/src/github.com/devbuddy/devbuddy $ bud install-dev
 ```
 
-### Reinstall a release 
+### Reinstall a release
 
 ```shell
 ~/src/github.com/devbuddy/devbuddy $ bud install-release
