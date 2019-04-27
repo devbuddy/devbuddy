@@ -6,36 +6,48 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
-const defaultManifestContent = `# Created by "bud init"
+const defaultManifestContent = `# DevBuddy config file
+# See https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md
 
 up:
-  - go: 1.10.1
-  - golang_dep
-  - python: 3.6.5
-  - pip: [tests/requirements.txt]
-  - homebrew:
-    - curl
+  # MacOS:
+  # - homebrew:
+  #   - curl
+  #   - golangci/tap/golangci-lint
+
+  # Linux:
+  # - apt:
+  #   - python3-dev
+
+  # Go:
+  # - go:
+  #     version: 1.12.4
+  #     modules: true
+  # - golang_dep
+
+  # Python:
+  # - python: 3.7.0
+  # - pipfile
+  # - pip:
+  #   - requirements.txt
+  #   - tests/requirements.txt
+  # - python_develop
+
+  # Custom task:
+  # - custom:
+  #     name: Create the local config file
+  #     met?: test -f config/local.yml
+  #     meet: cp config/local.yml.tmpl config/local.yml
+
   - custom:
-      name: Install gometalinter
-      met?: which gometalinter.v2 > /dev/null
-      meet: go get gopkg.in/alecthomas/gometalinter.v2
+      name: Edit dev.yml then remove me
+      met?: 'false'
+      meet: $EDITOR dev.yml
 
 commands:
   test:
-    desc: Run the unittests
-    run: script/test
-
-  lint:
-    desc: Lint the project
-    run: script/lint
-
-  release:
-    desc: Create a new release (bud release [VERSION])
-    run: script/release
-
-  godoc:
-    desc: Starting GoDoc server on http://0.0.0.0:6060
-    run: (sleep 1; open http://0.0.0.0:6060)& godoc -http=:6060
+    desc: Run all tests
+    run: go test ./... -cover
 
 open:
   devbuddy: https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md#config-devyml
