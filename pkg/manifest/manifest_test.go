@@ -9,6 +9,9 @@ import (
 )
 
 var manifestContent = `
+env:
+  TESTENV: TESTVALUE
+
 up:
   - task1
   - task2
@@ -32,6 +35,7 @@ func TestLoad(t *testing.T) {
 	require.NoError(t, err, "Load() failed")
 	require.NotEqual(t, nil, man)
 
+	require.Equal(t, map[string]string{"TESTENV": "TESTVALUE"}, man.Env)
 	require.Equal(t, []interface{}{"task1", "task2"}, man.Up)
 	require.Equal(t, map[string]*Command{"cmd1": {Run: "command1", Description: "description1"}}, man.Commands)
 	require.Equal(t, map[string]string{"app": "http://localhost:5000"}, man.Open)

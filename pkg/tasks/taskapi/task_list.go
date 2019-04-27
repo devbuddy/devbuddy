@@ -17,6 +17,14 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 		return nil, err
 	}
 
+	if len(manifest.Env) != 0 {
+		task, err = NewTaskFromDefinition("env")
+		if err != nil {
+			return nil, err
+		}
+		taskList = append(taskList, task)
+	}
+
 	for _, taskdef := range manifest.Up {
 		task, err = NewTaskFromDefinition(taskdef)
 		if err != nil {

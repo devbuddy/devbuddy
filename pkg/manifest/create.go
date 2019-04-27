@@ -8,6 +8,9 @@ import (
 
 const defaultManifestContent = `# Created by "bud init"
 
+env:
+  ENV: development
+
 up:
   - go: 1.10.1
   - golang_dep
