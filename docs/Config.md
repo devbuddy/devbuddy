@@ -41,6 +41,20 @@ open:
   doc: https://godoc.org/github.com/org/myapp
 ```
 
+## Environment variables
+
+Environment variables can be set by using the `env` key:
+
+```yaml
+env:
+  ENV: development
+  DATABASE_URL: mysql://localhost:3306/dev
+  MEMCACHE_URL: localhost:11211
+```
+
+The environment variables will be set as soon as you enter the project, they can be used in `custom` tasks, in
+the `commands` section and in your shell.
+
 ## Tasks
 
 ### `apt`
