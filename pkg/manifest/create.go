@@ -9,6 +9,9 @@ import (
 const defaultManifestContent = `# DevBuddy config file
 # See https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md
 
+env:
+  ENV: development
+
 up:
   # MacOS:
   # - homebrew:

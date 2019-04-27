@@ -14,6 +14,7 @@ var manifestFilename = "dev.yml"
 
 // Manifest is a representation of the project manifest
 type Manifest struct {
+	Env      map[string]string   `yaml:"env"`
 	Up       []interface{}       `yaml:"up"`
 	Commands map[string]*Command `yaml:"commands"`
 	Open     map[string]string   `yaml:"open"`
