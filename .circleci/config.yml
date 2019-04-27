@@ -3,7 +3,7 @@ version: 2.1
 executors:
   testing:
     docker:
-      - image: devbuddy/docker-testing:1.12-0
+      - image: devbuddy/docker-testing:1.12.4-0
 
 jobs:
   tests:
