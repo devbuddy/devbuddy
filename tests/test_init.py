@@ -6,7 +6,6 @@ def test_create(cmd, tmpdir):
 
     output = cmd.run("bud init", check_activation_failure=False)
     assert "Open dev.yml to adjust for your needs." in output
-    assert "Done" in output
 
     manifest = tmpdir.join("dev.yml")
     assert manifest.check(file=1)
