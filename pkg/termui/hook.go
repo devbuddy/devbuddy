@@ -1,21 +1,32 @@
 package termui
 
 import (
+	"fmt"
 	"os"
 
 	color "github.com/logrusorgru/aurora"
 )
 
-func (u *UI) HookFeatureActivated(name string, version string) {
-	msg := color.Sprintf("%s activated.", name)
-	ver := color.Sprintf("(version: %s)", version)
-	Fprintf(u.out, "🐼  %s %s\n", color.Cyan(msg), color.Blue(ver))
+func (u *UI) HookFeatureActivated(name string, param string) {
+	msg := fmt.Sprintf("%s activated.", name)
+
+	paramStr := ""
+	if param != "" {
+		paramStr = fmt.Sprintf(" (%s)", param)
+	}
+
+	Fprintf(u.out, "🐼  %s%s\n", color.Cyan(msg), color.Blue(paramStr))
 }
 
-func (u *UI) HookFeatureFailure(name string, version string) {
-	msg := color.Sprintf("failed to activate %s. Try running 'bud up' first!", name)
-	ver := color.Sprintf("(version: %s)", version)
-	Fprintf(u.out, "🐼  %s %s\n", color.Red(msg), color.Brown(ver))
+func (u *UI) HookFeatureFailure(name string, param string) {
+	msg := fmt.Sprintf("failed to activate %s. Try running 'bud up' first!", name)
+
+	paramStr := ""
+	if param != "" {
+		paramStr = fmt.Sprintf(" (%s)", param)
+	}
+
+	Fprintf(u.out, "🐼  %s%s\n", color.Red(msg), color.Brown(paramStr))
 }
 
 func HookShellDetectionError(err error) {
