@@ -5,11 +5,14 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/kr/pty"
 )
 
 type executorImpl struct {
@@ -88,26 +91,36 @@ func (e *executorImpl) runWithOutputFilter() error {
 		e.outputWriter = os.Stdout
 	}
 
-	e.cmd.Stdin = nil
-	stdout, err := e.cmd.StdoutPipe()
+	ptmx, err := pty.Start(e.cmd)
 	if err != nil {
 		return err
 	}
-	stderr, err := e.cmd.StderrPipe()
-	if err != nil {
-		return err
-	}
+	defer func() {
+		_ = ptmx.Close()
+	}()
 
-	err = e.cmd.Start()
-	if err != nil {
-		return err
-	}
+	// Handle pty size
+	chResize := make(chan os.Signal, 1)
+	signal.Notify(chResize, syscall.SIGWINCH)
+	go func() {
+		for range chResize {
+			_ = pty.InheritSize(os.Stdin, ptmx)
+		}
+	}()
+	chResize <- syscall.SIGWINCH // Initial resize.
+	defer func() {
+		signal.Stop(chResize)
+		close(chResize)
+	}()
 
-	outputWait := new(sync.WaitGroup)
-	outputWait.Add(2)
-	go e.printPipe(outputWait, stdout)
-	go e.printPipe(outputWait, stderr)
-	outputWait.Wait()
+	go func() {
+		_, _ = io.Copy(ptmx, os.Stdin)
+	}()
+
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+	go e.printPipe(wg, ptmx)
+	wg.Wait()
 
 	return e.cmd.Wait()
 }
