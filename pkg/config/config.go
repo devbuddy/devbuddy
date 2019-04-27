@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"os/user"
 	"path/filepath"
 )
 
@@ -22,7 +21,7 @@ func NewTestConfig() *Config {
 
 // Load returns a Config populated from the user environment
 func Load() (*Config, error) {
-	homedir, err := getHomeDir()
+	homedir, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
 	}
@@ -40,18 +39,6 @@ func Load() (*Config, error) {
 
 func debugEnabled() bool {
 	return os.Getenv("BUD_DEBUG") != ""
-}
-
-func getHomeDir() (string, error) {
-	home := os.Getenv("HOME")
-	if home != "" {
-		return home, nil
-	}
-	u, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	return u.HomeDir, nil
 }
 
 func getXdgUserDataDir(homedir string) string {
