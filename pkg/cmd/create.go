@@ -30,6 +30,9 @@ func createRun(cmd *cobra.Command, args []string) {
 	} else {
 		err = proj.Create()
 		checkError(err)
+
+		err = createManifest(ui, proj.Path)
+		checkError(err)
 	}
 
 	ui.JumpProject(proj.FullName())

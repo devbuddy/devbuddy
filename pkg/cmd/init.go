@@ -23,14 +23,21 @@ func initRun(cmd *cobra.Command, args []string) {
 
 	ui := termui.New(cfg)
 
-	ui.ActionHeader("Creating a default dev.yml file.")
-
 	projectPath, err := os.Getwd()
 	checkError(err)
 
-	err = manifest.Create(projectPath)
+	err = createManifest(ui, projectPath)
 	checkError(err)
+}
+
+func createManifest(ui *termui.UI, projectPath string) error {
+	ui.ActionHeader("Creating a default dev.yml file.")
+
+	err := manifest.Create(projectPath)
+	if err != nil {
+		return err
+	}
 
 	ui.ActionNotice("Open dev.yml to adjust for your needs.")
-	ui.ActionDone()
+	return nil
 }
