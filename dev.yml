@@ -30,11 +30,11 @@ commands:
 
   integration:
     desc: Run the integration tests with Bash
-    run: pytest -v tests
+    run: pytest -v -n3 tests
 
   integration-zsh:
     desc: Run the integration tests with Zsh
-    run: pytest --shell zsh -v tests
+    run: pytest --shell zsh -v -n3 tests
 
   lint:
     desc: Lint the project
@@ -46,7 +46,7 @@ commands:
 
   ci:
     desc: Run all tests as CI would do
-    run: script/test && pytest -v tests && script/lint
+    run: script/test && pytest -v -n3 tests && script/lint
 
   release:
     desc: Create a new release

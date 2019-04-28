@@ -21,7 +21,7 @@ jobs:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
       - run: pip install -r tests/requirements.txt
-      - run: pytest --durations=1 -v tests
+      - run: pytest --durations=1 -v -n3 tests
 
   tests-zsh:
     executor: testing
@@ -29,7 +29,7 @@ jobs:
       - checkout
       - run: echo 'export PATH="~/.pyenv/bin:~/.pyenv/shims:$PATH"' >> $BASH_ENV
       - run: pip install -r tests/requirements.txt
-      - run: pytest --durations=1 --shell zsh -v tests
+      - run: pytest --durations=1 --shell zsh -v -n3 tests
 
   binaries:
     executor: testing
