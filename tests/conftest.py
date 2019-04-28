@@ -27,7 +27,7 @@ def binary(binary_path):
     project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
     proc = subprocess.run(
-        'go build -o {}/bud'.format(binary_path),
+        'go build -o {}/bud ./cmd/bud'.format(binary_path),
         shell=True,
         cwd=project_path,
         stdout=subprocess.PIPE,
