@@ -6,6 +6,7 @@ type Executor interface {
 	SetEnv(env []string) Executor
 	SetEnvVar(name, value string) Executor
 	SetOutputPrefix(prefix string) Executor
+	SetPTY(enabled bool) Executor
 	AddOutputFilter(substring string) Executor
 	Run() *Result
 	Capture() *Result

@@ -5,14 +5,11 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"os/signal"
 	"strings"
 	"sync"
-	"syscall"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
-	"github.com/kr/pty"
 )
 
 type executorImpl struct {
@@ -20,6 +17,7 @@ type executorImpl struct {
 	outputPrefix     string
 	filterSubstrings []string
 	outputWriter     io.Writer
+	enablePTY        bool
 }
 
 // New returns an Executor that will run the program with arguments
@@ -58,6 +56,12 @@ func (e *executorImpl) SetOutputPrefix(prefix string) Executor {
 	return e
 }
 
+// SetPTY enables or disable the pseudo-terminal allocation
+func (e *executorImpl) SetPTY(enabled bool) Executor {
+	e.enablePTY = enabled
+	return e
+}
+
 // AddOutputFilter adds a substring to the list used to suppress lines printed by the command
 func (e *executorImpl) AddOutputFilter(substring string) Executor {
 	e.filterSubstrings = append(e.filterSubstrings, substring)
@@ -87,47 +91,46 @@ func (e *executorImpl) shouldSuppressLine(line string) bool {
 }
 
 func (e *executorImpl) runWithOutputFilter() error {
-	if e.outputWriter == nil {
-		e.outputWriter = os.Stdout
-	}
+	e.cmd.Stdin = nil // default to /dev/null
 
-	ptmx, err := pty.Start(e.cmd)
+	stdout, err := e.cmd.StdoutPipe()
 	if err != nil {
 		return err
 	}
-	defer func() {
-		_ = ptmx.Close()
-	}()
 
-	// Handle pty size
-	chResize := make(chan os.Signal, 1)
-	signal.Notify(chResize, syscall.SIGWINCH)
-	go func() {
-		for range chResize {
-			_ = pty.InheritSize(os.Stdin, ptmx)
-		}
-	}()
-	chResize <- syscall.SIGWINCH // Initial resize.
-	defer func() {
-		signal.Stop(chResize)
-		close(chResize)
-	}()
+	stderr, err := e.cmd.StderrPipe()
+	if err != nil {
+		return err
+	}
 
-	go func() {
-		_, _ = io.Copy(ptmx, os.Stdin)
-	}()
+	err = e.cmd.Start()
+	if err != nil {
+		return err
+	}
 
-	wg := new(sync.WaitGroup)
-	wg.Add(1)
-	go e.printPipe(wg, ptmx)
-	wg.Wait()
+	outputWait := new(sync.WaitGroup)
+	outputWait.Add(2)
+	go e.printPipe(outputWait, stdout)
+	go e.printPipe(outputWait, stderr)
+	outputWait.Wait()
 
 	return e.cmd.Wait()
 }
 
 // Run executes the command and returns a Result
 func (e *executorImpl) Run() *Result {
-	err := e.runWithOutputFilter()
+	if e.outputWriter == nil {
+		e.outputWriter = os.Stdout
+	}
+	var err error
+	if e.enablePTY {
+		if len(e.filterSubstrings) != 0 || len(e.outputPrefix) != 0 {
+			panic("command output filter not implemented with allocated pseudo-terminal")
+		}
+		err = runWithPTY(e.cmd, e.outputWriter)
+	} else {
+		err = e.runWithOutputFilter()
+	}
 	return buildResult("", err)
 }
 
