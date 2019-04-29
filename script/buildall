@@ -11,7 +11,7 @@ for GOOS in linux darwin; do
 	NAME=bud-${GOOS}-amd64
 
 	echo "Building $NAME"
-	GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "$LDFLAGS" -o dist/${NAME}
+	GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "$LDFLAGS" -o dist/${NAME} ./cmd/bud
 
 	cd dist
 	shasum -a 256 ${NAME} > ${NAME}.sha256
