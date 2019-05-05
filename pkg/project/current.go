@@ -9,8 +9,10 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 )
 
+// ErrProjectNotFound is returned when the project was not found
 var ErrProjectNotFound = errors.New("project not found")
 
+// FindCurrent returns the project that contains the current directory
 func FindCurrent() (*Project, error) {
 	path, err := os.Getwd()
 	if err != nil {
