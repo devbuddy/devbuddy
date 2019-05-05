@@ -6,7 +6,7 @@ DATE=$(date -u)
 VERSION="${TAG} [${DATE}]"
 LDFLAGS="-s -w -X \"main.Version=${VERSION}\""
 
-for GOOS in linux darwin; do
+for GOOS in ${DEVBUDDY_PLATFORMS:-linux darwin}; do
 	export GOOS
 	NAME=bud-${GOOS}-amd64
 
