@@ -11,8 +11,15 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
-func FindBestMatch(expr string, conf *config.Config) (found *Project, err error) {
-	projects, err := getAllProjects(conf.SourceDir)
+func FindBestMatch(expr string, cfg *config.Config) (found *Project, err error) {
+	// 1. check if the expression is an ID
+	p, err := NewFromID(expr, cfg)
+	if err == nil && p.Exists() {
+		return p, nil
+	}
+
+	// 2. fuzzy search on all projects
+	projects, err := getAllProjects(cfg.SourceDir)
 	if err != nil {
 		return
 	}

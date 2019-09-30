@@ -34,6 +34,13 @@ func TestNewFromIDError(t *testing.T) {
 	require.Nil(t, proj)
 }
 
+func TestNewFromID_DefaultOrg(t *testing.T) {
+	cfg = &config.Config{SourceDir: "/src", DefaultOrg: "golang"}
+	proj, err := NewFromID("go", cfg)
+	require.NoError(t, err)
+	require.Equal(t, "github.com:golang/go", proj.FullName())
+}
+
 func TestNewFromIDGithubFullURL(t *testing.T) {
 	proj, err := NewFromID("git@github.com:golang/go.git", cfg)
 	require.NoError(t, err, "NewFromID() failed")

@@ -5,6 +5,7 @@ import (
 	"hash/adler32"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/executor"
@@ -16,8 +17,14 @@ type Project struct {
 	Path    string // Local path of this project on disk
 }
 
-// NewFromID creates an instance of Project from a short id like "org/name"
+// NewFromID creates an instance of Project from a short id like "org/name" or "name"
 func NewFromID(id string, conf *config.Config) (p *Project, err error) {
+	if !strings.Contains(id, "/") {
+		if conf.DefaultOrg != "" {
+			id = conf.DefaultOrg + "/" + id
+		}
+	}
+
 	hosting, err := newHostingInfoByURL(id)
 	if err != nil {
 		return nil, err

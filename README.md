@@ -127,6 +127,23 @@ A safer version:
 type bud > /dev/null 2> /dev/null && eval "$(bud --shell-init --with-completion)"
 ```
 
+### Configuration
+
+If you usual work with repos from the same organization (like your personal one), you can set it as a default:
+
+```
+export BUD_DEFAULT_ORG="google"
+```
+
+Then you can use it directly to create, clone and jump to those repos:
+```bash
+$ bud clone pytruth
+```
+Rather than:
+```bash
+$ bud clone google/pytruth
+```
+
 ## Usage
 
 ★ Add a `dev.yml` file in your project:

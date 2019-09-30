@@ -19,8 +19,8 @@ func populateProjects(t *testing.T, sourceDir, org string, names []string) {
 	}
 }
 
-func runFind(t *testing.T, dir string, input string) string {
-	cfg := &config.Config{SourceDir: dir}
+func runFind(t *testing.T, dir, input, defaultOrg string) string {
+	cfg := &config.Config{SourceDir: dir, DefaultOrg: defaultOrg}
 	proj, err := FindBestMatch(input, cfg)
 	require.NoError(t, err, "FindBestMatch() crashed")
 	return proj.FullName()
@@ -29,35 +29,49 @@ func runFind(t *testing.T, dir string, input string) string {
 func TestMatches(t *testing.T) {
 	defer filet.CleanUp(t)
 	dir := filet.TmpDir(t, "")
-	populateProjects(t, dir, "pior", []string{"dad", "george", "caravan", "pyramid_bugsnag"})
-	populateProjects(t, dir, "george", []string{"carpe", "dorade", "gardon", "marlin"})
+	populateProjects(t, dir, "pior", []string{"george", "caravan", "pyramid_bugsnag"})
+	populateProjects(t, dir, "george", []string{"carpe", "dorade", "gardon", "marlin", "caravan"})
 
-	tests := map[string]string{
-		"marlin": "github.com:george/marlin",
-		"mar":    "github.com:george/marlin",
-		"rli":    "github.com:george/marlin",
-		"mln":    "github.com:george/marlin",
-		"gm":     "github.com:george/marlin",
+	tests := map[string]map[string]string{
+		// No default organisation
+		"": {
+			"marlin": "github.com:george/marlin",
+			"mar":    "github.com:george/marlin",
+			"rli":    "github.com:george/marlin",
+			"mln":    "github.com:george/marlin",
+			"gm":     "github.com:george/marlin",
 
-		"car": "github.com:george/carpe", // multiple projects matches
+			"car": "github.com:george/carpe", // multiple projects matches
 
-		"george/carpe": "github.com:george/carpe", // with org name
-		"george/car":   "github.com:george/carpe",
-		"p/c":          "github.com:pior/caravan",
-		"p/n":          "github.com:pior/caravan",
+			"george/carpe": "github.com:george/carpe", // with org name
+			"george/car":   "github.com:george/carpe",
+			"p/c":          "github.com:pior/caravan",
+			"p/n":          "github.com:pior/caravan",
 
-		"pyramid_bugsnag": "github.com:pior/pyramid_bugsnag", // with separator
-		"pyramid":         "github.com:pior/pyramid_bugsnag",
-		"_bug":            "github.com:pior/pyramid_bugsnag",
-		"pb":              "github.com:pior/pyramid_bugsnag",
-		"ppb":             "github.com:pior/pyramid_bugsnag",
+			"pyramid_bugsnag": "github.com:pior/pyramid_bugsnag", // with separator
+			"pyramid":         "github.com:pior/pyramid_bugsnag",
+			"_bug":            "github.com:pior/pyramid_bugsnag",
+			"pb":              "github.com:pior/pyramid_bugsnag",
+			"ppb":             "github.com:pior/pyramid_bugsnag",
 
-		"george": "github.com:pior/george", // collision org<->project, project should win
-		"gg":     "github.com:pior/george",
+			"george": "github.com:pior/george", // collision org<->project, project should win
+			"gg":     "github.com:pior/george",
+		},
+
+		// With a default organization
+		"george": {
+			"carpe":   "github.com:george/carpe",
+			"dorade":  "github.com:george/dorade",
+			"gardon":  "github.com:george/gardon",
+			"marlin":  "github.com:george/marlin",
+			"caravan": "github.com:george/caravan",
+		},
 	}
 
-	for input, expected := range tests {
-		assert.Equal(t, expected, runFind(t, dir, input), "for input: %s", input)
+	for defaultOrg, tt := range tests {
+		for input, expected := range tt {
+			assert.Equal(t, expected, runFind(t, dir, input, defaultOrg), "for input: %s", input)
+		}
 	}
 }
 
@@ -65,7 +79,7 @@ func TestNoMatch(t *testing.T) {
 	defer filet.CleanUp(t)
 	dir := filet.TmpDir(t, "")
 
-	populateProjects(t, dir, "pior", []string{"dad"})
+	populateProjects(t, dir, "pior", []string{"whatever"})
 
 	cfg := &config.Config{SourceDir: dir}
 	_, err := FindBestMatch("nope", cfg)
@@ -84,14 +98,14 @@ func TestSearchingWithNoProject(t *testing.T) {
 }
 
 func TestFuzzySearch(t *testing.T) {
-  index := []string{"ddg", "github", "heroku"}
+	index := []string{"ddg", "github", "heroku"}
 
-  link := FindBestLinkMatch("github", index)
+	link := FindBestLinkMatch("github", index)
 	require.Equal(t, "github", link)
 
-  link = FindBestLinkMatch("dd", index)
+	link = FindBestLinkMatch("dd", index)
 	require.Equal(t, "ddg", link)
 
-  link = FindBestLinkMatch("heru", index)
-  require.Equal(t, "heroku", link)
+	link = FindBestLinkMatch("heru", index)
+	require.Equal(t, "heroku", link)
 }

@@ -11,6 +11,7 @@ type Config struct {
 	DebugEnabled bool   // whether debug logging is activated
 	SourceDir    string // projects base directory
 	dataDir      string // directory managed by DevBuddy (languages distribs, virtualenvs...)
+	DefaultOrg   string // [optional] default repo organisation
 }
 
 func NewTestConfig() *Config {
@@ -33,6 +34,7 @@ func Load() (*Config, error) {
 		DebugEnabled: debugEnabled(),
 		SourceDir:    filepath.Join(homedir, "src"),
 		dataDir:      filepath.Join(userDataDir, "bud"),
+		DefaultOrg:   os.Getenv("BUD_DEFAULT_ORG"),
 	}
 	return &c, nil
 }
