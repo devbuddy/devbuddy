@@ -61,9 +61,7 @@ commands:
     desc: Show the commits since the last tag
     run: git log `git describe --tags --abbrev=0`..HEAD --pretty=format:'%s'
 
-  godoc:
-    desc: Starting GoDoc server on http://0.0.0.0:6060
-    run: (sleep 1; open http://0.0.0.0:6060/pkg/github.com/devbuddy/devbuddy/pkg/)& godoc -http=:6060
+  godoc: (sleep 1; open http://0.0.0.0:6060/pkg/github.com/devbuddy/devbuddy/pkg/)& godoc -http=:6060
 
   install-dev:
     desc: Install bud in the GOROOT

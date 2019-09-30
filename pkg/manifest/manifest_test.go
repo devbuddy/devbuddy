@@ -20,6 +20,9 @@ commands:
   cmd1:
     desc: description1
     run: command1
+  cmd2:
+    run: command2
+  cmd3: command3
 
 open:
   app: http://localhost:5000
@@ -37,7 +40,14 @@ func TestLoad(t *testing.T) {
 
 	require.Equal(t, map[string]string{"TESTENV": "TESTVALUE"}, man.Env)
 	require.Equal(t, []interface{}{"task1", "task2"}, man.Up)
-	require.Equal(t, map[string]*Command{"cmd1": {Run: "command1", Description: "description1"}}, man.Commands)
+
+	commands := map[string]*Command{
+		"cmd1": {Run: "command1", Description: "description1"},
+		"cmd2": {Run: "command2"},
+		"cmd3": {Run: "command3"},
+	}
+	require.Equal(t, commands, man.GetCommands())
+
 	require.Equal(t, map[string]string{"app": "http://localhost:5000"}, man.Open)
 }
 

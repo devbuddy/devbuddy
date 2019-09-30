@@ -9,6 +9,15 @@ def test_command(cmd, project):
     project.assert_file('somefile')
 
 
+def test_command_short_syntax(cmd, project):
+    project.write_devyml("""
+        commands:
+          mycmd: touch somefile
+    """)
+    cmd.run("bud mycmd")
+    project.assert_file('somefile')
+
+
 def test_run_in_project_dir(cmd, project):
     project.write_devyml("""
         commands:
