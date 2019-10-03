@@ -3,7 +3,7 @@ env:
 
 up:
   - go:
-      version: 1.12.4
+      version: 1.13.1
       modules: true
   - python: 3.6.5
   - pip: [tests/requirements.txt]
@@ -17,7 +17,7 @@ up:
   - custom:
       name: Install golangci-lint
       met?: which golangci-lint
-      meet: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $GOPATH/bin v1.10.2
+      meet: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $GOPATH/bin v1.19.1
 
 commands:
   testup:
