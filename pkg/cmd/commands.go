@@ -44,7 +44,7 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 	return executor.NewShell(cmdline).SetPTY(true).SetCwd(proj.Path).Run().Error
 }
 
-func buildCustomCommands() {
+func buildCustomCommands(rootCmd *cobra.Command) {
 	proj, err := project.FindCurrent()
 	if err != nil {
 		return

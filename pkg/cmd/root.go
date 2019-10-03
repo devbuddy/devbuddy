@@ -12,10 +12,8 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/integration"
 )
 
-var rootCmd *cobra.Command
-
-func build(version string) {
-	rootCmd = &cobra.Command{
+func build(version string) *cobra.Command {
+	rootCmd := &cobra.Command{
 		Use:     "bud",
 		Run:     rootRun,
 		Version: version,
@@ -39,6 +37,8 @@ func build(version string) {
 	rootCmd.AddCommand(openCmd)
 	rootCmd.AddCommand(upCmd)
 	rootCmd.AddCommand(upgradeCmd)
+
+	return rootCmd
 }
 
 func rootRun(cmd *cobra.Command, args []string) {
@@ -46,7 +46,7 @@ func rootRun(cmd *cobra.Command, args []string) {
 
 	if GetFlagBool(cmd, "shell-init") {
 		if GetFlagBool(cmd, "with-completion") {
-			err = rootCmd.GenBashCompletion(os.Stdout)
+			err = cmd.GenBashCompletion(os.Stdout)
 			checkError(err)
 		}
 		integration.Print()
@@ -59,12 +59,12 @@ func rootRun(cmd *cobra.Command, args []string) {
 	}
 
 	if GetFlagBool(cmd, "debug-info") {
-		fmt.Println(debug.FormatDebugInfo(rootCmd.Version, os.Environ(), debug.SafeFindCurrentProject()))
+		fmt.Println(debug.FormatDebugInfo(cmd.Version, os.Environ(), debug.SafeFindCurrentProject()))
 		os.Exit(0)
 	}
 
 	if GetFlagBool(cmd, "report-issue") {
-		url := debug.NewGithubIssueURL(rootCmd.Version, os.Environ(), debug.SafeFindCurrentProject())
+		url := debug.NewGithubIssueURL(cmd.Version, os.Environ(), debug.SafeFindCurrentProject())
 		err := open.Open(url)
 		checkError(err)
 		os.Exit(0)
@@ -75,8 +75,8 @@ func rootRun(cmd *cobra.Command, args []string) {
 }
 
 func Execute(version string) {
-	build(version)
-	buildCustomCommands()
+	rootCmd := build(version)
+	buildCustomCommands(rootCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
