@@ -13,6 +13,12 @@ Contents:
 - [Tasks](docs/Config.md)
 - [Contributing to DevBuddy](docs/CONTRIBUTING.md)
 
+#### Note: contributors are welcome to join the project! 👩‍💻👨‍💻🤖
+
+The project is evolving slowly, mostly because DevBuddy covers my current needs.
+
+I would love to help people implement their languages/environments/tools/dev-flow.
+
 ## What is this?
 
 **DevBuddy** is an open-source implementation of an amazing internal tool developed at
