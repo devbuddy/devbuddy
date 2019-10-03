@@ -52,7 +52,7 @@ func (g *Golang) Install() (err error) {
 		}
 
 		url := "https://dl.google.com/go/" + archiveName
-		err = utils.DownloadFile(tarPath, url)
+		err = NewDownloader(url).DownloadToFile(tarPath)
 		if err != nil {
 			return fmt.Errorf("failed to download Go %s from %s: %s", g.version, url, err)
 		}

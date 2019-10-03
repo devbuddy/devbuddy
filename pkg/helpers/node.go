@@ -56,7 +56,7 @@ func (n *Node) Install() error {
 		}
 
 		url := fmt.Sprintf("https://nodejs.org/dist/v%s/%s", n.version, archiveName)
-		err = utils.DownloadFile(tarPath, url)
+		err = NewDownloader(url).DownloadToFile(tarPath)
 		if err != nil {
 			return fmt.Errorf("failed to download NodeJS %s from %s: %s", n.version, url, err)
 		}

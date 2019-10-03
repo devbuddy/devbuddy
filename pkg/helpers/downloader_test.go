@@ -1,4 +1,4 @@
-package utils
+package helpers
 
 import (
 	"io/ioutil"
@@ -36,7 +36,7 @@ func TestData(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	testfile := path.Join(tmpdir, "testfile")
 
-	err := DownloadFile(testfile, server.URL+"/download")
+	err := NewDownloader(server.URL + "/download").DownloadToFile(testfile)
 	require.NoError(t, err)
 
 	buffer, err := ioutil.ReadFile(testfile)
@@ -54,7 +54,7 @@ func TestStatus(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	testfile := path.Join(tmpdir, "testfile")
 
-	err := DownloadFile(testfile, server.URL+"/notfound")
+	err := NewDownloader(server.URL + "/notfound").DownloadToFile(testfile)
 	require.Error(t, err)
 }
 
@@ -67,7 +67,7 @@ func TestRedirect(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	testfile := path.Join(tmpdir, "testfile")
 
-	err := DownloadFile(testfile, server.URL+"/redirect")
+	err := NewDownloader(server.URL + "/redirect").DownloadToFile(testfile)
 	require.NoError(t, err)
 
 	fileInfo, err := os.Stat(testfile)
@@ -85,6 +85,6 @@ func TestRedirectLimit(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	testfile := path.Join(tmpdir, "testfile")
 
-	err := DownloadFile(testfile, server.URL+"/loop")
+	err := NewDownloader(server.URL + "/loop").DownloadToFile(testfile)
 	require.EqualErrorf(t, err, "Get /loop: stopped after 10 redirects", "")
 }
