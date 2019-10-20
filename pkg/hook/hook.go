@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/devbuddy/devbuddy/pkg/helpers"
+
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/project"
@@ -25,6 +27,8 @@ func Run() {
 	if err != nil {
 		ctx.UI.Debug("%s", err)
 	}
+
+	helpers.NewDebugLogWriter().Write(ctx.UI.FlushDebugBuffer())
 }
 
 func run(ctx *context.Context) error {

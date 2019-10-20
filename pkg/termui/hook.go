@@ -15,7 +15,7 @@ func (u *UI) HookFeatureActivated(name string, param string) {
 		paramStr = fmt.Sprintf(" (%s)", param)
 	}
 
-	Fprintf(u.out, "🐼  %s%s\n", color.Cyan(msg), color.Blue(paramStr))
+	u.printf("🐼  %s%s\n", color.Cyan(msg), color.Blue(paramStr))
 }
 
 func (u *UI) HookFeatureFailure(name string, param string) {
@@ -26,7 +26,7 @@ func (u *UI) HookFeatureFailure(name string, param string) {
 		paramStr = fmt.Sprintf(" (%s)", param)
 	}
 
-	Fprintf(u.out, "🐼  %s%s\n", color.Red(msg), color.Brown(paramStr))
+	u.printf("🐼  %s%s\n", color.Red(msg), color.Brown(paramStr))
 }
 
 func HookShellDetectionError(err error) {
