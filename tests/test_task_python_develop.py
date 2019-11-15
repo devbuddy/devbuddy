@@ -5,7 +5,7 @@ import textwrap
 def make_setuppy(version=1):
     return textwrap.dedent("""
         from setuptools import setup, find_packages
-        setup(name='devbuddy-test-pkg', version='%s', extras_require={'test': ['test==2.3.4.5']})
+        setup(name='devbuddy-test-pkg', version='%s', extras_require={'test': ['pyreleaser==0.5.2']})
 
         open("sentinel", "w").write("")
     """) % version
@@ -66,7 +66,7 @@ def test_without_extra(cmd, project):
     cmd.run("bud up")
 
     output = cmd.run("pip freeze")
-    assert 'test==2.3.4.5' not in output.splitlines(False)
+    assert 'pyreleaser==0.5.2' not in output.splitlines(False)
 
 
 def test_with_extra(cmd, project):
@@ -81,7 +81,7 @@ def test_with_extra(cmd, project):
     cmd.run("bud up")
 
     output = cmd.run("pip freeze")
-    assert 'test==2.3.4.5' in output.splitlines(False)
+    assert 'pyreleaser==0.5.2' in output.splitlines(False)
 
 
 def test_with_unknown_extra(cmd, project):
