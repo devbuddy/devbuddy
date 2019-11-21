@@ -23,6 +23,7 @@ func Fprintf(w io.Writer, format string, a ...interface{}) {
 type UI struct {
 	out          io.Writer
 	debugEnabled bool
+	debugBuffer  bytes.Buffer
 }
 
 func New(cfg *config.Config) *UI {
@@ -48,13 +49,29 @@ func (u *UI) Debug(format string, params ...interface{}) {
 	if u.debugEnabled {
 		msg := fmt.Sprintf(format, params...)
 		msg = strings.TrimSuffix(msg, "\n")
-		Fprintf(u.out, "%s: %s\n", color.Brown("BUD_DEBUG"), color.Gray(msg))
+		u.printf("%s: %s\n", color.Brown("BUD_DEBUG"), color.Gray(msg))
+	}
+}
+
+func (u *UI) FlushDebugBuffer() []byte {
+	b := u.debugBuffer.Bytes()
+	u.debugBuffer.Reset()
+	return b
+}
+
+func (u *UI) printf(format string, params ...interface{}) {
+	s := fmt.Sprintf(format, params...)
+	u.debugBuffer.WriteString(s)
+
+	_, err := u.out.Write([]byte(s))
+	if err != nil {
+		log.Fatalf("failed to write to console: %s", err)
 	}
 }
 
 func (u *UI) Warningf(format string, params ...interface{}) {
 	msg := fmt.Sprintf(format, params...)
-	Fprintf(u.out, "%s: %s\n", color.Bold(color.Brown("WARNING")), msg)
+	u.printf("%s: %s\n", color.Bold(color.Brown("WARNING")), msg)
 }
 
 func (u *UI) CommandHeader(cmdline string) {
@@ -62,17 +79,17 @@ func (u *UI) CommandHeader(cmdline string) {
 }
 
 func (u *UI) CommandRun(cmdline string, args ...string) {
-	Fprintf(u.out, "%s %s\n", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
+	u.printf("%s %s\n", color.Bold(color.Cyan(cmdline)), color.Cyan(strings.Join(args, " ")))
 }
 
 func (u *UI) CommandActed() {
-	Fprintf(u.out, "  %s\n", color.Green("Done!"))
+	u.printf("  %s\n", color.Green("Done!"))
 }
 
 func (u *UI) ProjectExists() {
-	Fprintf(u.out, "🐼  %s\n", color.Brown("project already exists locally"))
+	u.printf("🐼  %s\n", color.Brown("project already exists locally"))
 }
 
 func (u *UI) JumpProject(name string) {
-	Fprintf(u.out, "🐼  %s %s\n", color.Brown("jumping to"), color.Green(name))
+	u.printf("🐼  %s %s\n", color.Brown("jumping to"), color.Green(name))
 }
