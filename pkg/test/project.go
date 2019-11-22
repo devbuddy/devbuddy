@@ -1,6 +1,8 @@
 package test
 
 import (
+	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
@@ -20,23 +22,24 @@ func Project(path string) *projectWriter {
 
 // GitInit initializes a simple Git repo
 func (p *projectWriter) CreateGitRepo(t *testing.T) {
-	cmd := exec.Command("git", "init")
-	cmd.Dir = p.path
-	require.NoError(t, cmd.Run())
+	p.runGit(t, "init")
+	p.runGit(t, "commit", "-m", "Commit1", "--allow-empty")
+	p.runGit(t, "remote", "add", "origin", "git@github.com:org1/repo1.git")
+}
 
-	cmd = exec.Command("git", "commit", "-m", "Commit1", "--allow-empty")
+func (p *projectWriter) runGit(t *testing.T, args ...string) {
+	cmd := exec.Command("git", args...)
 	cmd.Dir = p.path
 	cmd.Env = []string{
+		"PATH=" + os.Getenv("PATH"),
 		"GIT_COMMITTER_NAME=John",
 		"GIT_AUTHOR_NAME=John",
 		"GIT_COMMITTER_EMAIL=john@doo.com",
 		"GIT_AUTHOR_EMAIL=john@doo.com",
 	}
-	require.NoError(t, cmd.Run())
-
-	cmd = exec.Command("git", "remote", "add", "origin", "git@github.com:org1/repo1.git")
-	cmd.Dir = p.path
-	require.NoError(t, cmd.Run())
+	output, err := cmd.CombinedOutput()
+	fmt.Printf("git output: %s\n", output)
+	require.NoError(t, err)
 }
 
 type manifestWriter struct {
