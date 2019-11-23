@@ -39,10 +39,25 @@ func FileChecksum(path string) (string, error) {
 	return checksum, nil
 }
 
+// WriteNewFile writes data to a new file. Fails if the file exists.
 func WriteNewFile(filename string, data []byte, perm os.FileMode) error {
-	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_EXCL, perm)
+	return write(filename, data, os.O_CREATE|os.O_WRONLY|os.O_EXCL, perm)
+}
+
+// WriteFile writes data to a new file, or rewrites an existing file.
+func WriteFile(filename string, data []byte, perm os.FileMode) error {
+	return write(filename, data, os.O_CREATE|os.O_WRONLY, perm)
+}
+
+// AppendOnlyFile appends to an existing file. Fails if the file does not exist.
+func AppendOnlyFile(filename string, data []byte) error {
+	return write(filename, data, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+}
+
+func write(filename string, data []byte, flag int, perm os.FileMode) error {
+	file, err := os.OpenFile(filename, flag, perm)
 	if err != nil {
-		return fmt.Errorf("creation failed: %s", err)
+		return err
 	}
 
 	defer func() {

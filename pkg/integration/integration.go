@@ -8,6 +8,7 @@ import (
 	ps "github.com/mitchellh/go-ps"
 
 	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 // Print prints the integration code for the user's shell
@@ -69,25 +70,5 @@ func addFinalizer(action, arg string) (err error) {
 		return formatError("the BUD_FINALIZER_FILE environment variable is missing or empty")
 	}
 
-	return writeFile(finalizerPath, content)
-}
-
-func writeFile(path string, content string) (err error) {
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-	if err != nil {
-		return
-	}
-	defer func() {
-		cerr := f.Close()
-		if err == nil {
-			err = cerr
-		}
-	}()
-
-	_, err = f.WriteString(content)
-	if err != nil {
-		return
-	}
-
-	return
+	return utils.AppendOnlyFile(finalizerPath, []byte(content))
 }
