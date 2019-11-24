@@ -18,8 +18,7 @@ def test_create_existing(cmd, tmpdir):
     cmd.run("touch dev.yml")
 
     output = cmd.run("bud init", expect_exit_code=1)
-    assert "creation failed" in output
-    assert "file exists" in output
+    assert "the manifest already exists" in output
 
 
 def validate_manifest(as_string: str) -> None:

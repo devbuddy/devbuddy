@@ -1,6 +1,8 @@
 package manifest
 
 import (
+	"errors"
+	"os"
 	"path"
 
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -59,5 +61,9 @@ open:
 // Create writes a default project manifest in the specified path
 func Create(projectPath string) error {
 	manifestPath := path.Join(projectPath, manifestFilename)
-	return utils.WriteNewFile(manifestPath, []byte(defaultManifestContent), 0666)
+	err := utils.WriteNewFile(manifestPath, []byte(defaultManifestContent), 0666)
+	if os.IsExist(err) {
+		return errors.New("the manifest already exists")
+	}
+	return err
 }
