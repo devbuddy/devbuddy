@@ -48,13 +48,13 @@ func (u *UI) Debug(format string, params ...interface{}) {
 	if u.debugEnabled {
 		msg := fmt.Sprintf(format, params...)
 		msg = strings.TrimSuffix(msg, "\n")
-		Fprintf(u.out, "%s: %s\n", color.Brown("BUD_DEBUG"), color.Gray(msg))
+		Fprintf(u.out, "%s: %s\n", color.Yellow("BUD_DEBUG"), color.Gray(12, msg))
 	}
 }
 
 func (u *UI) Warningf(format string, params ...interface{}) {
 	msg := fmt.Sprintf(format, params...)
-	Fprintf(u.out, "%s: %s\n", color.Bold(color.Brown("WARNING")), msg)
+	Fprintf(u.out, "%s: %s\n", color.Bold(color.Yellow("WARNING")), msg)
 }
 
 func (u *UI) CommandHeader(cmdline string) {
@@ -70,9 +70,9 @@ func (u *UI) CommandActed() {
 }
 
 func (u *UI) ProjectExists() {
-	Fprintf(u.out, "🐼  %s\n", color.Brown("project already exists locally"))
+	Fprintf(u.out, "🐼  %s\n", color.Yellow("project already exists locally"))
 }
 
 func (u *UI) JumpProject(name string) {
-	Fprintf(u.out, "🐼  %s %s\n", color.Brown("jumping to"), color.Green(name))
+	Fprintf(u.out, "🐼  %s %s\n", color.Yellow("jumping to"), color.Green(name))
 }
