@@ -26,9 +26,9 @@ func (u *UI) HookFeatureFailure(name string, param string) {
 		paramStr = fmt.Sprintf(" (%s)", param)
 	}
 
-	Fprintf(u.out, "🐼  %s%s\n", color.Red(msg), color.Brown(paramStr))
+	Fprintf(u.out, "🐼  %s%s\n", color.Red(msg), color.Yellow(paramStr))
 }
 
 func HookShellDetectionError(err error) {
-	Fprintf(os.Stderr, "%s %s\n", color.Brown("Could not detect your shell:"), err.Error())
+	Fprintf(os.Stderr, "%s %s\n", color.Yellow("Could not detect your shell:"), err.Error())
 }

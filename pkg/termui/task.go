@@ -12,9 +12,9 @@ func (u *UI) TaskHeader(name, param, reason string) {
 		param = fmt.Sprintf(" (%s)", color.Blue(param))
 	}
 	if reason != "" {
-		reason = fmt.Sprintf(" (%s)", color.Brown(reason))
+		reason = fmt.Sprintf(" (%s)", color.Yellow(reason))
 	}
-	Fprintf(u.out, "%s %s%s%s\n", color.Brown("◼︎"), color.Magenta(name), param, reason)
+	Fprintf(u.out, "%s %s%s%s\n", color.Yellow("◼︎"), color.Magenta(name), param, reason)
 }
 
 func (u *UI) TaskCommand(cmdline string, args ...string) {
@@ -42,11 +42,11 @@ func (u *UI) TaskErrorf(message string, a ...interface{}) {
 }
 
 func (u *UI) TaskWarning(message string) {
-	Fprintf(u.out, "  Warning: %s\n", color.Brown(message))
+	Fprintf(u.out, "  Warning: %s\n", color.Yellow(message))
 }
 
 func (u *UI) TaskActionHeader(desc string) {
-	Fprintf(u.out, "  %s%s\n", color.Brown("▪︎"), color.Magenta(desc))
+	Fprintf(u.out, "  %s%s\n", color.Yellow("▪︎"), color.Magenta(desc))
 }
 
 func (u *UI) ActionHeader(description string) {
@@ -54,7 +54,7 @@ func (u *UI) ActionHeader(description string) {
 }
 
 func (u *UI) ActionNotice(text string) {
-	Fprintf(u.out, "⚠️   %s\n", color.Brown(text))
+	Fprintf(u.out, "⚠️   %s\n", color.Yellow(text))
 }
 
 func (u *UI) ActionDone() {
