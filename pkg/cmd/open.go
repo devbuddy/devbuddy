@@ -18,6 +18,7 @@ var openCmd = &cobra.Command{
 
 func init() {
 	openCmd.Flags().Bool("list", false, "List available project's URLs")
+	_ = openCmd.MarkZshCompPositionalArgumentWords(1, "github", "gh", "pullrequest", "pr")
 }
 
 func openRun(cmd *cobra.Command, args []string) {
