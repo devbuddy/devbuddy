@@ -1,46 +1,50 @@
 package integration
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
-	"strings"
-
-	ps "github.com/mitchellh/go-ps"
 
 	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
-// Print prints the integration code for the user's shell
-func Print() {
-	shell, err := detectShell()
-	if err != nil {
-		termui.HookShellDetectionError(err)
-	}
-
-	switch shell {
-	case "bash":
-		fmt.Println(shellSource, bashSource)
-	case "zsh":
-		fmt.Println(shellSource, zshSource)
-	}
+type CompletionScriptProvider interface {
+	GenBashCompletion(w io.Writer) error
+	GenZshCompletion(w io.Writer) error
 }
 
-func detectShell() (string, error) {
-	proc, err := ps.FindProcess(os.Getppid())
+// Print prints the integration code for the user's shell
+func Print(withCompletion bool, completionScriptProvider CompletionScriptProvider) {
+	shell, err := DetectShell()
 	if err != nil {
-		return "", fmt.Errorf("failed to get parent process info: %s", err)
-	}
-	parentProcessPath := proc.Executable()
-
-	switch {
-	case strings.HasSuffix(parentProcessPath, "bash"):
-		return "bash", nil
-	case strings.HasSuffix(parentProcessPath, "zsh"):
-		return "zsh", nil
+		termui.HookShellDetectionError(err)
+		return
 	}
 
-	return "", fmt.Errorf("parent process is not a supported shell: %s", parentProcessPath)
+	script := buildCompletionScript(shell, withCompletion, completionScriptProvider)
+	fmt.Println(script)
+}
+
+func buildCompletionScript(shell ShellIdentity, withCompletion bool, completionScriptProvider CompletionScriptProvider) string {
+	buffer := bytes.NewBufferString(shellSource)
+
+	switch shell {
+	case BASH:
+		buffer.WriteString(bashSource)
+		if withCompletion {
+			_ = completionScriptProvider.GenBashCompletion(buffer)
+		}
+	case ZSH:
+		buffer.WriteString(zshSource)
+		if withCompletion {
+			_ = completionScriptProvider.GenZshCompletion(buffer)
+			buffer.WriteString("compdef _bud bud") // interactively define the completion function
+		}
+	}
+
+	return buffer.String()
 }
 
 // AddFinalizerCd declares a "cd" finalizer (change directory)
@@ -49,7 +53,7 @@ func AddFinalizerCd(path string) error {
 }
 
 func formatError(message string) error {
-	return fmt.Errorf(`there is something wrong this the shell integration:
+	return fmt.Errorf(`there is something wrong with the shell integration:
 
     %s
 

@@ -45,11 +45,8 @@ func rootRun(cmd *cobra.Command, args []string) {
 	var err error
 
 	if GetFlagBool(cmd, "shell-init") {
-		if GetFlagBool(cmd, "with-completion") {
-			err = cmd.GenBashCompletion(os.Stdout)
-			checkError(err)
-		}
-		integration.Print()
+		withCompletion := GetFlagBool(cmd, "with-completion")
+		integration.Print(withCompletion, cmd)
 		os.Exit(0)
 	}
 
