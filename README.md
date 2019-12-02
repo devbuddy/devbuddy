@@ -107,6 +107,11 @@ Uninstall it:
 $ sudo rm /usr/local/bin/bud
 ```
 
+To choose another destination:
+```bash
+$ SUDO= DEST=~/bin bash -c "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
+```
+
 ### Manual
 
 Older releases are available on [Github releases](https://github.com/devbuddy/devbuddy/releases).

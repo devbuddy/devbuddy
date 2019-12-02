@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -eu
 
-DEST="/usr/local/bin"
+DEST=${DEST:-"/usr/local/bin"}
+SUDO=${SUDO-sudo} # keep the empty string
 SHELL_LINE='eval "$(bud --shell-init --with-completion)"'
 
 YELLOW="\033[1;33m"
@@ -75,7 +76,7 @@ main() {
     shasum -c "${BINARY}.sha256"
 
     header "Installing to ${DEST}..."
-    sudo install "${BINARY}" "${DEST}/bud"
+    ${SUDO} install "${BINARY}" "${DEST}/bud"
 
     instructions
 }
