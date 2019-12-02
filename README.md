@@ -113,12 +113,12 @@ Older releases are available on [Github releases](https://github.com/devbuddy/de
 
 #### Linux
 
-- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.9.2/bud-linux-amd64 > /tmp/bud```
+- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.11.0/bud-linux-amd64 > /tmp/bud```
 - ```sudo install /tmp/bud /usr/local/bin/bud```
 
 #### MacOs
 
-- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.9.2/bud-darwin-amd64 > /tmp/bud```
+- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.11.0/bud-darwin-amd64 > /tmp/bud```
 - ```sudo install /tmp/bud /usr/local/bin/bud```
 
 ## Setup

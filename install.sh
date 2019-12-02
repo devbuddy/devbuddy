@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -eu
 
-VERSION="v0.9.2"
 DEST="/usr/local/bin"
 SHELL_LINE='eval "$(bud --shell-init --with-completion)"'
 
@@ -11,6 +10,10 @@ WHITE="\033[1;37m"
 CODE="\033[44m\033[1;37m"
 LINK="\033[4m\033[1;34m"
 RESET="\033[0m"
+
+find_latest_version() {
+    curl -Ls -o /dev/null -w %{url_effective} "https://github.com/devbuddy/devbuddy/releases/latest" | grep -oE "[^/]+$"
+}
 
 make_variant() {
     ARCH=$(uname -m)
@@ -59,16 +62,19 @@ main() {
 
     VARIANT=$(make_variant)
 
-    header "Downloading DevBuddy version ${VERSION} for ${VARIANT} from Github"
+    header "Fetching the version of the latest release..."
+    VERSION=$(find_latest_version)
+
+    header "Downloading DevBuddy version ${VERSION} for ${VARIANT} from Github..."
     BINARY="bud-${VARIANT}"
     URL="https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/${BINARY}"
     curl -L -# --fail "${URL}" -o "${BINARY}"
     curl -L -# --fail "${URL}.sha256" -o "${BINARY}.sha256"
 
-    header "Verify SHA256 checksum"
+    header "Verify SHA256 checksum..."
     shasum -c "${BINARY}.sha256"
 
-    header "Installing to ${DEST}"
+    header "Installing to ${DEST}..."
     sudo install "${BINARY}" "${DEST}/bud"
 
     instructions
