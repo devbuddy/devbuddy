@@ -14,5 +14,5 @@ require (
 	github.com/spf13/cobra v0.0.7
 	github.com/stretchr/testify v1.6.0
 	golang.org/x/crypto v0.0.0-20191122220453-ac88ee75c92c
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.3.0
 )
