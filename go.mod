@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/Flaque/filet v0.0.0-20190209224823-fc4d33cfcf93
-	github.com/dnaeon/go-vcr v1.0.1
+	github.com/dnaeon/go-vcr v1.1.0
 	github.com/joho/godotenv v1.3.0
 	github.com/kr/pty v1.1.8
 	github.com/kylelemons/godebug v1.1.0 // indirect
