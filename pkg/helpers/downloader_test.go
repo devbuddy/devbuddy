@@ -86,5 +86,5 @@ func TestRedirectLimit(t *testing.T) {
 	testfile := path.Join(tmpdir, "testfile")
 
 	err := NewDownloader(server.URL + "/loop").DownloadToFile(testfile)
-	require.EqualErrorf(t, err, "Get /loop: stopped after 10 redirects", "")
+	require.EqualErrorf(t, err, "Get \"/loop\": stopped after 10 redirects", "")
 }
