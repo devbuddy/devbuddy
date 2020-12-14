@@ -1,18 +1,19 @@
 module github.com/devbuddy/devbuddy
 
-go 1.13
+go 1.15
 
 require (
-	github.com/Flaque/filet v0.0.0-20190209224823-fc4d33cfcf93
+	github.com/Flaque/filet v0.0.0-20201012163910-45f684403088
 	github.com/creack/pty v1.1.11
 	github.com/dnaeon/go-vcr v1.1.0
 	github.com/joho/godotenv v1.3.0
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/logrusorgru/aurora v0.0.0-20191116043053-66b7ad493a23
-	github.com/mitchellh/go-ps v0.0.0-20190716172923-621e5597135b
+	github.com/logrusorgru/aurora v2.0.3+incompatible
+	github.com/mitchellh/go-ps v1.0.0
 	github.com/sahilm/fuzzy v0.1.0
-	github.com/spf13/cobra v0.0.7
+	github.com/spf13/afero v1.5.1 // indirect
+	github.com/spf13/cobra v1.1.1
 	github.com/stretchr/testify v1.6.1
-	golang.org/x/crypto v0.0.0-20191122220453-ac88ee75c92c
+	golang.org/x/term v0.0.0-20201117132131-f5c789dd3221
 	gopkg.in/yaml.v2 v2.4.0
 )
