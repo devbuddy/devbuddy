@@ -11,9 +11,10 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/sahilm/fuzzy v0.1.0
-	github.com/spf13/cobra v0.0.7
+	github.com/spf13/afero v1.5.1 // indirect
+	github.com/spf13/cobra v1.1.1
 	github.com/stretchr/testify v1.6.1
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
