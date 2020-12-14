@@ -8,7 +8,7 @@ import (
 	"syscall"
 
 	"github.com/creack/pty"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func runWithPTY(cmd *exec.Cmd, outputWriter io.Writer) error {
@@ -35,12 +35,12 @@ func runWithPTY(cmd *exec.Cmd, outputWriter io.Writer) error {
 	}()
 
 	// Set Stdin in raw mode
-	oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
+	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
 		return err
 	}
 	defer func() {
-		_ = terminal.Restore(int(os.Stdin.Fd()), oldState)
+		_ = term.Restore(int(os.Stdin.Fd()), oldState)
 	}()
 
 	go func() {
