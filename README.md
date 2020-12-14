@@ -1,7 +1,7 @@
 # DevBuddy
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/devbuddy/devbuddy)](https://goreportcard.com/report/github.com/devbuddy/devbuddy)
-[![CircleCI](https://circleci.com/gh/devbuddy/devbuddy.svg?style=svg)](https://circleci.com/gh/devbuddy/devbuddy)
+[![tests](https://github.com/devbuddy/devbuddy/workflows/tests/badge.svg)](https://github.com/devbuddy/devbuddy/actions?query=workflow%3Atests)
 [![GitHub Release](https://img.shields.io/github/release/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 [![GitHub Release Date](https://img.shields.io/github/release-date/devbuddy/devbuddy.svg)](https://github.com/devbuddy/devbuddy/releases/latest)
 [![Gitter](https://img.shields.io/badge/Discussions%20on-Gitter-crimson.svg?logo=gitter&style=flat)](https://gitter.im/devbuddy)
