@@ -61,7 +61,7 @@ def build_pexpect_bash(workdir):
         env=test_environ(),
         cwd=str(workdir),
     )
-    child.timeout = 480
+    child.timeout = 600
 
     # If the user runs 'env', the value of PS1 will be in the output. To avoid
     # replwrap seeing that as the next prompt, we'll embed the marker characters
@@ -85,7 +85,7 @@ def build_pexpect_zsh(workdir):
         env=env,
         cwd=str(workdir),
     )
-    child.timeout = 480
+    child.timeout = 600
 
     return pexpect.replwrap.REPLWrapper(
         child,
