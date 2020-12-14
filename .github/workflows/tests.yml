@@ -41,12 +41,7 @@ jobs:
         with:
           go-version: "1.15.x"
       - run: python -m pip install -r tests/requirements.txt
-      - run: curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
-      - run: go version
-      - run: |
-          echo ~/.pyenv/bin >> $GITHUB_PATH
-          echo ~/.pyenv/shims >> $GITHUB_PATH
-          pytest --durations=1 -v tests
+      - run: pytest --durations=1 -v tests
 
   tests-zsh:
     name: tests-zsh
