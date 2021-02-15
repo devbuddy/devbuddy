@@ -1,3 +1,7 @@
-FROM alpine:3.13
+FROM ubuntu:focal
 
-RUN apk add --no-cache bash zsh
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends ca-certificates zsh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

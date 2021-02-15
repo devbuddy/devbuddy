@@ -120,7 +120,7 @@ func (ep *ExpectProcess) reader() {
 
 func (ep *ExpectProcess) debugLine(line string) {
 	if ep.Debug {
-		fmt.Printf("%s[%d]: %q\n", ep.cmd.Path, ep.cmd.Process.Pid, line)
+		fmt.Printf("%s[%d]: %v\n", ep.cmd.Path, ep.cmd.Process.Pid, line)
 	}
 }
 
