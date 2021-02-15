@@ -27,36 +27,35 @@ jobs:
       - uses: actions/setup-go@v1
         with:
           go-version: "1.15.x"
-      - run: go test -cover ./...
+      - run: go test -timeout 10s -cover ./pkg/...
+      - run: docker build -t docker-shells integration/context/expect/docker-shells
+      - run: go test -timeout 10s -cover -v ./integration/context/expect
 
   tests-bash:
-    name: tests-bash
+    name: integration bash
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.6.12
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v1
         with:
           go-version: "1.15.x"
-      - run: python -m pip install -r tests/requirements.txt
-      - run: pytest --durations=1 -v tests
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+      - run: cd integration/docker-images; ./build.sh
+      - run: TEST_SHELL=bash go test -cover -v ./integration
 
   tests-zsh:
-    name: tests-zsh
+    name: integration zsh
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.6.12
-      - run: sudo apt install zsh
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v1
         with:
           go-version: "1.15.x"
-      - run: python -m pip install -r tests/requirements.txt
-      - run: pytest --durations=1 --shell zsh -v tests
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+      - run: cd integration/docker-images; ./build.sh
+      - run: TEST_SHELL=zsh go test -cover -v ./integration
 
   release:
     name: release

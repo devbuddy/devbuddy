@@ -1,3 +1,0 @@
-pytest==3.6.1
-pexpect==4.6.0
-PyYAML==3.13
