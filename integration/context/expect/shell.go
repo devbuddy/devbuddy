@@ -49,10 +49,6 @@ func (c *ShellExpect) Run(command string) ([]string, error) {
 		return nil, fmt.Errorf("waiting prompt after command %q: %w", command, err)
 	}
 
-	// if len(output) < 1 {
-	// 	return nil, fmt.Errorf("expecting echo line, got none")
-	// }
-
 	return output, nil
 }
 

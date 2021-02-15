@@ -6,6 +6,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const DockerImage = "docker-shells"
+
 func Test_ShellExpect_Bash(t *testing.T) {
 	env := []string{
 		"PS1=##\n",
@@ -49,8 +51,6 @@ func Test_ShellExpect_Zsh(t *testing.T) {
 	require.Equal(t, []string{"foobar"}, output)
 }
 
-const DockerImage = "devbuddy-test-env-linux"
-
 func Test_ShellExpect_Docker_Bash(t *testing.T) {
 	args := []string{
 		"docker", "run", "-ti", "--rm",
@@ -64,7 +64,6 @@ func Test_ShellExpect_Docker_Bash(t *testing.T) {
 	ep := NewExpect(args[0], args[1:]...)
 	err := ep.Start()
 	require.NoError(t, err)
-	// ep.Debug = true
 
 	shell := NewShellExpect(ep, "##\n")
 
