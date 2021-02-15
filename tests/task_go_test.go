@@ -4,8 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devbuddy/devbuddy/integration/context"
 	"github.com/stretchr/testify/require"
+
+	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 func Test_Task_Go_Module(t *testing.T) {

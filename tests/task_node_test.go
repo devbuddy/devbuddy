@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devbuddy/devbuddy/integration/context"
+	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 func Test_Task_Node(t *testing.T) {

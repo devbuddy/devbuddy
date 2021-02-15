@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/devbuddy/devbuddy/integration/context"
+	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 var config context.Config // Initialized by TestMain()

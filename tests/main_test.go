@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devbuddy/devbuddy/integration/context"
+	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 func TestMain(m *testing.M) {
