@@ -28,15 +28,15 @@ commands:
 
   integration-init:
     desc: Build the docker image used by the integration tests
-    run: cd integration/docker-images; ./build.sh
+    run: cd tests/docker-images; ./build.sh
 
   integration:
     desc: Run the integration tests with Bash
-    run: TEST_SHELL=bash go test -v ./integration
+    run: TEST_SHELL=bash go test -v ./tests
 
   integration-zsh:
     desc: Run the integration tests with Zsh
-    run: TEST_SHELL=zsh go test -v ./integration
+    run: TEST_SHELL=zsh go test -v ./tests
 
   lint:
     desc: Lint the project
@@ -48,7 +48,7 @@ commands:
 
   ci:
     desc: Run all tests as CI would do
-    run: script/test && pytest -v tests && script/lint
+    run: script/test && script/lint && TEST_SHELL=zsh go test -v ./tests
 
   release:
     desc: Create a new release

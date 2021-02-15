@@ -3,8 +3,9 @@ package integration
 import (
 	"testing"
 
-	"github.com/devbuddy/devbuddy/integration/context"
 	"github.com/stretchr/testify/require"
+
+	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 var customTaskDevYml = `

@@ -3,7 +3,7 @@ package integration
 import (
 	"testing"
 
-	"github.com/devbuddy/devbuddy/integration/context"
+	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 func Test_Cmd_Inspect(t *testing.T) {

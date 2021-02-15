@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devbuddy/devbuddy/integration/context/expect"
+	"github.com/devbuddy/devbuddy/tests/context/expect"
 	"github.com/stretchr/testify/require"
 )
 
