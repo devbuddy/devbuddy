@@ -17,7 +17,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.33
+          version: v1.37
 
   tests:
     name: go test
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v1
         with:
-          go-version: "1.15.x"
+          go-version: "1.16.x"
       - run: go test -timeout 10s -cover ./pkg/...
       - run: docker build -t docker-shells tests/context/expect/docker-shells
       - run: go test -timeout 10s -cover -v ./tests/context/expect
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v1
         with:
-          go-version: "1.15.x"
+          go-version: "1.16.x"
       - uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
       - run: cd tests/docker-images; ./build.sh
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v1
         with:
-          go-version: "1.15.x"
+          go-version: "1.16.x"
       - uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
       - run: cd tests/docker-images; ./build.sh
@@ -66,7 +66,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v1
         with:
-          go-version: "1.15.x"
+          go-version: "1.16.x"
       - run: script/buildall
       - run: ls -l dist
       - run: grep . dist/*.sha256
