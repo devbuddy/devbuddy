@@ -36,7 +36,7 @@ func OutputContains(t *testing.T, lines []string, subStrings ...string) {
 	text := strings.Join(lines, "\n")
 
 	for _, subString := range subStrings {
-		if strings.Index(text, subString) == -1 {
+		if !strings.Contains(text, subString) {
 			t.Fatalf("Substring %q was not found in:\n%s", subString, text)
 		}
 	}
@@ -46,7 +46,7 @@ func OutputNotContain(t *testing.T, lines []string, subStrings ...string) {
 	text := strings.Join(lines, "\n")
 
 	for _, subString := range subStrings {
-		if strings.Index(text, subString) != -1 {
+		if strings.Contains(text, subString) {
 			t.Fatalf("Substring %q was found in:\n%s", subString, text)
 		}
 	}

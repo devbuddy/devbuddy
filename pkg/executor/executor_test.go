@@ -63,12 +63,12 @@ func TestShellCaptureAndTrim(t *testing.T) {
 }
 
 func TestShellCapturePWD(t *testing.T) {
-	result := NewShell("echo $PWD").SetCwd("/bin").Capture()
+	result := NewShell("echo $PWD").SetCwd("/opt").Capture()
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
 	require.Equal(t, 0, result.Code)
-	require.Equal(t, "/bin\n", result.Output)
+	require.Equal(t, "/opt\n", result.Output)
 }
 
 func TestCommandNotFound(t *testing.T) {
