@@ -18,10 +18,6 @@ up:
       meet: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $GOPATH/bin v1.19.1
 
 commands:
-  testup:
-    desc: Build, install and run the development version
-    run: go install && bud up
-
   test:
     desc: Run the unittests
     run: script/test
@@ -65,11 +61,9 @@ commands:
 
   godoc: (sleep 1; open http://0.0.0.0:6060/pkg/github.com/devbuddy/devbuddy/pkg/)& godoc -http=:6060
 
-  install-dev:
-    desc: Install bud in the GOROOT
-    run: |
-      go build -ldflags "-X main.Version=$(git describe --tags --dirty --always)" -o $GOPATH/bin/bud ./cmd/bud
-      [ -e "/usr/local/bin/bud" ] && sudo rm /usr/local/bin/bud || true
+  install:
+    desc: Build and install DevBuddy in ${GOPATH}/bin
+    run: script/install-dev.sh
 
   install-release:
     desc: Remove all bud binaries and install a released version
