@@ -28,8 +28,6 @@ jobs:
         with:
           go-version: "1.16.x"
       - run: go test -timeout 10s -cover ./pkg/...
-      - run: docker build -t docker-shells tests/context/expect/docker-shells
-      - run: go test -timeout 10s -cover -v ./tests/context/expect
 
   tests-bash:
     name: bash tests
