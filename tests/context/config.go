@@ -15,7 +15,7 @@ func LoadConfig() Config {
 	return Config{
 		ShellName:   env("TEST_SHELL", "bash"),
 		BinaryPath:  path.Join(cwd(), "bud"),
-		DockerImage: env("TEST_DOCKER_IMAGE_NAME", "devbuddy-test-env-linux"),
+		DockerImage: mustEnv("TEST_DOCKER_IMAGE"),
 	}
 }
 
@@ -32,4 +32,12 @@ func env(name string, defaultValue string) string {
 		return v
 	}
 	return defaultValue
+}
+
+func mustEnv(name string) string {
+	v, ok := os.LookupEnv(name)
+	if !ok {
+		panic("missing env var " + name)
+	}
+	return v
 }

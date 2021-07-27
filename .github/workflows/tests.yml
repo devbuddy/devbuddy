@@ -8,6 +8,9 @@ on:
       - master
   pull_request:
 
+env:
+  TEST_DOCKER_IMAGE: ghcr.io/devbuddy/docker-testing:sha-f11e362
+
 jobs:
   linters:
     name: golangci-lint
@@ -37,9 +40,7 @@ jobs:
       - uses: actions/setup-go@v1
         with:
           go-version: "1.16.x"
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
-      - run: cd tests/docker-images; ./build.sh
+      - run: docker pull $TEST_DOCKER_IMAGE
       - run: TEST_SHELL=bash go test -cover -v ./tests
 
   tests-zsh:
@@ -50,9 +51,7 @@ jobs:
       - uses: actions/setup-go@v1
         with:
           go-version: "1.16.x"
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
-      - run: cd tests/docker-images; ./build.sh
+      - run: docker pull $TEST_DOCKER_IMAGE
       - run: TEST_SHELL=zsh go test -cover -v ./tests
 
   release:
