@@ -22,17 +22,13 @@ commands:
     desc: Run the unittests
     run: script/test
 
-  integration-init:
-    desc: Build the docker image used by the integration tests
-    run: cd tests/docker-images; ./build.sh
-
   integration:
     desc: Run the integration tests with Bash
-    run: TEST_SHELL=bash go test -v ./tests
+    run: TEST_SHELL=bash TEST_DOCKER_IMAGE=devbuddy-test-env go test -v ./tests
 
   integration-zsh:
     desc: Run the integration tests with Zsh
-    run: TEST_SHELL=zsh go test -v ./tests
+    run: TEST_SHELL=zsh TEST_DOCKER_IMAGE=devbuddy-test-env go test -v ./tests
 
   lint:
     desc: Lint the project
