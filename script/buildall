@@ -8,12 +8,15 @@ LDFLAGS="-s -w -X \"main.Version=${VERSION}\""
 
 for GOOS in ${DEVBUDDY_PLATFORMS:-linux darwin}; do
 	export GOOS
-	NAME=bud-${GOOS}-amd64
+	for ARCH in ${DEVBUDDY_ARCH:-amd64 arm64}; do
+		export ARCH
+		NAME=bud-${GOOS}-${ARCH}
 
-	echo "Building $NAME"
-	GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "$LDFLAGS" -o dist/${NAME} ./cmd/bud
+		echo "Building $NAME"
+		GOARCH=${ARCH} CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "$LDFLAGS" -o dist/${NAME} ./cmd/bud
 
-	cd dist
-	shasum -a 256 ${NAME} > ${NAME}.sha256
-	cd ..
+		cd dist
+		shasum -a 256 ${NAME} > ${NAME}.sha256
+		cd ..
+	done
 done

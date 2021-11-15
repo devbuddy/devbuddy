@@ -18,17 +18,25 @@ find_latest_version() {
 
 make_variant() {
     ARCH=$(uname -m)
-    if [[ "${ARCH}" != "x86_64" ]]; then
+
+    case "$ARCH" in
+    amd64*)
+        echo "amd64"
+        ;;
+    arm64*)
+        echo "arm64"
+    *)
         echo >&2 "unsupported architecture: ${ARCH}"
         return 1
-    fi
+        ;;
+    esac
 
     case "$OSTYPE" in
     darwin*)
-        echo "darwin-amd64"
+        echo "darwin"
         ;;
     linux*)
-        echo "linux-amd64"
+        echo "linux"
         ;;
     *)
         echo >&2 "unsupported OS: $OSTYPE"
