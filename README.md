@@ -126,6 +126,11 @@ Older releases are available on [Github releases](https://github.com/devbuddy/de
 - ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.11.0/bud-darwin-amd64 > /tmp/bud```
 - ```sudo install /tmp/bud /usr/local/bin/bud```
 
+#### MacOS Arm64
+
+- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.11.0/bud-darwin-arm64 > /tmp/bud```
+- ```sudo install /tmp/bud /usr/local/bin/bud```
+
 ## Setup
 
 ★ Install the shell integration (in `~/.bash_profile`):
