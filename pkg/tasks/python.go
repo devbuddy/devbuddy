@@ -42,7 +42,7 @@ func parserPythonInstallPyenv(task *taskapi.Task, version string) {
 	run := func(ctx *context.Context) error {
 		result := command(ctx, "brew", "install", "pyenv").Run()
 		if result.Error != nil {
-			return fmt.Errorf("failed to install pyenv: %s", result.Error)
+			return fmt.Errorf("failed to install pyenv: %w", result.Error)
 		}
 		return nil
 	}
@@ -67,7 +67,7 @@ func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
 	run := func(ctx *context.Context) error {
 		result := command(ctx, "pyenv", "install", version).Run()
 		if result.Error != nil {
-			return fmt.Errorf("failed to install the required python version: %s", result.Error)
+			return fmt.Errorf("failed to install the required python version: %w", result.Error)
 		}
 		return nil
 	}
@@ -93,7 +93,7 @@ func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
 		}
 		result := command(ctx, pyEnv.Which(version, "python"), "-m", "pip", "install", "virtualenv").Run()
 		if result.Error != nil {
-			return fmt.Errorf("failed to install virtualenv: %s", result.Error)
+			return fmt.Errorf("failed to install virtualenv: %w", result.Error)
 		}
 		return nil
 	}
@@ -122,7 +122,7 @@ func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
 		}
 		result := command(ctx, pyEnv.Which(version, "virtualenv"), venv.Path()).Run()
 		if result.Error != nil {
-			return fmt.Errorf("failed to create the virtualenv: %s", result.Error)
+			return fmt.Errorf("failed to create the virtualenv: %w", result.Error)
 		}
 		return nil
 	}

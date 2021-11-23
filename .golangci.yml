@@ -3,4 +3,21 @@ run:
 
 linters:
   enable:
+    - asciicheck
+    - errname
+    # - errorlint
+    - exhaustive
+    - gci
+    - gocritic
     - gofmt
+    - makezero
+    - misspell
+    - tenv
+    # - thelper
+    - unconvert
+    - wastedassign
+
+
+linters-settings:
+  gci:
+    local-prefixes: github.com/devbuddy/devbuddy

@@ -16,7 +16,7 @@ var ErrProjectNotFound = errors.New("project not found")
 func FindCurrent() (*Project, error) {
 	path, err := os.Getwd()
 	if err != nil {
-		return nil, fmt.Errorf("error while searching for project: %s", err)
+		return nil, fmt.Errorf("error while searching for project: %w", err)
 	}
 	return findByPath(path)
 }

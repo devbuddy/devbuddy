@@ -62,13 +62,13 @@ func (a *aptInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 func (a *aptInstall) Run(ctx *context.Context) error {
 	result := sudoCommand(ctx, "apt-get", "update").Run()
 	if result.Error != nil {
-		return fmt.Errorf("failed to run apt-get update: %s", result.Error)
+		return fmt.Errorf("failed to run apt-get update: %w", result.Error)
 	}
 
 	args := append([]string{"install", "--no-install-recommends", "-y"}, a.missingPackageNames...)
 	result = sudoCommand(ctx, "apt-get", args...).Run()
 	if result.Error != nil {
-		return fmt.Errorf("failed to run apt-get install: %s", result.Error)
+		return fmt.Errorf("failed to run apt-get install: %w", result.Error)
 	}
 
 	return nil

@@ -28,7 +28,7 @@ func parserPip(config *taskapi.TaskConfig, task *taskapi.Task) error {
 			pipArgs := []string{"install", "--require-virtualenv", "-r", file}
 			result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
 			if result.Error != nil {
-				return fmt.Errorf("Pip failed: %s", result.Error)
+				return fmt.Errorf("Pip failed: %w", result.Error)
 			}
 			return nil
 		}

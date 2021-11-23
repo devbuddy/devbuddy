@@ -58,7 +58,7 @@ func (n *Node) Install() error {
 		url := fmt.Sprintf("https://nodejs.org/dist/v%s/%s", n.version, archiveName)
 		err = NewDownloader(url).DownloadToFile(tarPath)
 		if err != nil {
-			return fmt.Errorf("failed to download NodeJS %s from %s: %s", n.version, url, err)
+			return fmt.Errorf("failed to download NodeJS %s from %s: %w", n.version, url, err)
 		}
 	}
 
@@ -69,7 +69,7 @@ func (n *Node) Install() error {
 
 	result := executor.New("tar", "--strip", "1", "-xzC", n.path, "-f", tarPath).Run()
 	if result.Error != nil {
-		return fmt.Errorf("failed to extract %s to %s: %s", tarPath, n.path, result.Error)
+		return fmt.Errorf("failed to extract %s to %s: %w", tarPath, n.path, result.Error)
 	}
 
 	return nil

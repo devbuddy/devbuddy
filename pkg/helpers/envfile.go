@@ -1,8 +1,9 @@
 package helpers
 
 import (
-	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/joho/godotenv"
+
+	"github.com/devbuddy/devbuddy/pkg/env"
 )
 
 // LoadEnvfile sets all the environment variables defined in an envfile

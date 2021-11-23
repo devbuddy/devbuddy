@@ -38,7 +38,7 @@ func (p *golangDepInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 func (p *golangDepInstall) Run(ctx *context.Context) error {
 	result := command(ctx, "go", "get", "-u", "github.com/golang/dep/cmd/dep").Run()
 	if result.Error != nil {
-		return fmt.Errorf("failed to install Go GolangDep: %s", result.Error)
+		return fmt.Errorf("failed to install Go GolangDep: %w", result.Error)
 	}
 	return nil
 }
@@ -82,7 +82,7 @@ func (p *golangDepEnsure) Needed(ctx *context.Context) *taskapi.ActionResult {
 func (p *golangDepEnsure) Run(ctx *context.Context) error {
 	result := command(ctx, "dep", "ensure").Run()
 	if result.Error != nil {
-		return fmt.Errorf("failed to run dep ensure: %s", result.Error)
+		return fmt.Errorf("failed to run dep ensure: %w", result.Error)
 	}
 	return nil
 }

@@ -18,7 +18,7 @@ var (
 func DetectShell() (ShellIdentity, error) {
 	proc, err := ps.FindProcess(os.Getppid())
 	if err != nil {
-		return "", fmt.Errorf("failed to get parent process info: %s", err)
+		return "", fmt.Errorf("failed to get parent process info: %w", err)
 	}
 	parentProcessPath := proc.Executable()
 

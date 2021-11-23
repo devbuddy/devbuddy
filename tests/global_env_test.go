@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/devbuddy/devbuddy/tests/context"
-
 	"github.com/stretchr/testify/require"
 )
 

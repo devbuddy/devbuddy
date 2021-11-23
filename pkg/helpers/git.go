@@ -21,7 +21,7 @@ func NewGitRepo(path string) *GitRepo {
 func (r *GitRepo) GetRemoteURL() (string, error) {
 	result := executor.New("git", "config", "--get", "remote.origin.url").SetCwd(r.path).CaptureAndTrim()
 	if result.Error != nil {
-		return "", fmt.Errorf("failed to get the origin remote url: %s", result.Error)
+		return "", fmt.Errorf("failed to get the origin remote url: %w", result.Error)
 	}
 	return result.Output, nil
 }
@@ -30,7 +30,7 @@ func (r *GitRepo) GetRemoteURL() (string, error) {
 func (r *GitRepo) GetCurrentBranch() (string, error) {
 	result := executor.New("git", "rev-parse", "--abbrev-ref", "HEAD").SetCwd(r.path).CaptureAndTrim()
 	if result.Error != nil {
-		return "", fmt.Errorf("failed to get the current branch: %s", result.Error)
+		return "", fmt.Errorf("failed to get the current branch: %w", result.Error)
 	}
 	return result.Output, nil
 }

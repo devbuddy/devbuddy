@@ -54,7 +54,7 @@ func (g *Golang) Install() (err error) {
 		url := "https://dl.google.com/go/" + archiveName
 		err = NewDownloader(url).DownloadToFile(tarPath)
 		if err != nil {
-			return fmt.Errorf("failed to download Go %s from %s: %s", g.version, url, err)
+			return fmt.Errorf("failed to download Go %s from %s: %w", g.version, url, err)
 		}
 	}
 
@@ -65,7 +65,7 @@ func (g *Golang) Install() (err error) {
 
 	result := executor.New("tar", "--strip", "1", "-xzC", g.path, "-f", tarPath).Run()
 	if result.Error != nil {
-		return fmt.Errorf("failed to extract %s to %s: %s", tarPath, g.path, result.Error)
+		return fmt.Errorf("failed to extract %s to %s: %w", tarPath, g.path, result.Error)
 	}
 
 	return nil

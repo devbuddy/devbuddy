@@ -27,7 +27,7 @@ func parserPythonDevelop(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	pipInstall := func(ctx *context.Context) error {
 		result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
 		if result.Error != nil {
-			return fmt.Errorf("Pip failed: %s", result.Error)
+			return fmt.Errorf("Pip failed: %w", result.Error)
 		}
 
 		return nil

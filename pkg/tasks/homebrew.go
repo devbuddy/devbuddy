@@ -53,7 +53,7 @@ func (b *brewInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 func (b *brewInstall) Run(ctx *context.Context) error {
 	result := command(ctx, "brew", "install", b.formula).Run()
 	if result.Error != nil {
-		return fmt.Errorf("failed to run brew install: %s", result.Error)
+		return fmt.Errorf("failed to run brew install: %w", result.Error)
 	}
 
 	return nil

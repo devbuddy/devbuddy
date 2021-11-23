@@ -1,15 +1,15 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
-	"fmt"
+	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/termui"
-	"github.com/spf13/cobra"
 )
 
 var upgradeCmd = &cobra.Command{
