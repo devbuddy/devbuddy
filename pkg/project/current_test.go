@@ -5,14 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Flaque/filet"
 	"github.com/devbuddy/devbuddy/pkg/test"
 	"github.com/stretchr/testify/require"
 )
 
 func TestFindByPath(t *testing.T) {
-	tmpdir := filet.TmpDir(t, "")
-	defer filet.CleanUp(t)
+	tmpdir := t.TempDir()
+
 	writer := test.Project(tmpdir)
 	writer.Manifest().Empty(t)
 
@@ -23,8 +22,8 @@ func TestFindByPath(t *testing.T) {
 }
 
 func TestFindByPathNested(t *testing.T) {
-	tmpdir := filet.TmpDir(t, "")
-	defer filet.CleanUp(t)
+	tmpdir := t.TempDir()
+
 	writer := test.Project(tmpdir)
 	writer.Manifest().Empty(t)
 

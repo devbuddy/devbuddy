@@ -8,7 +8,6 @@ import (
 	"path"
 	"testing"
 
-	filet "github.com/Flaque/filet"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,12 +27,10 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestData(t *testing.T) {
-	defer filet.CleanUp(t)
-
 	server := httptest.NewServer(&TestHandler{})
 	defer server.Close()
 
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 	testfile := path.Join(tmpdir, "testfile")
 
 	err := NewDownloader(server.URL + "/download").DownloadToFile(testfile)
@@ -46,12 +43,10 @@ func TestData(t *testing.T) {
 }
 
 func TestStatus(t *testing.T) {
-	defer filet.CleanUp(t)
-
 	server := httptest.NewServer(&TestHandler{})
 	defer server.Close()
 
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 	testfile := path.Join(tmpdir, "testfile")
 
 	err := NewDownloader(server.URL + "/notfound").DownloadToFile(testfile)
@@ -59,12 +54,10 @@ func TestStatus(t *testing.T) {
 }
 
 func TestRedirect(t *testing.T) {
-	defer filet.CleanUp(t)
-
 	server := httptest.NewServer(&TestHandler{})
 	defer server.Close()
 
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 	testfile := path.Join(tmpdir, "testfile")
 
 	err := NewDownloader(server.URL + "/redirect").DownloadToFile(testfile)
@@ -77,12 +70,10 @@ func TestRedirect(t *testing.T) {
 }
 
 func TestRedirectLimit(t *testing.T) {
-	defer filet.CleanUp(t)
-
 	server := httptest.NewServer(&TestHandler{})
 	defer server.Close()
 
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 	testfile := path.Join(tmpdir, "testfile")
 
 	err := NewDownloader(server.URL + "/loop").DownloadToFile(testfile)

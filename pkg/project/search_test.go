@@ -7,7 +7,6 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 
-	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -27,8 +26,7 @@ func runFind(t *testing.T, dir, input, defaultOrg string) string {
 }
 
 func TestMatches(t *testing.T) {
-	defer filet.CleanUp(t)
-	dir := filet.TmpDir(t, "")
+	dir := t.TempDir()
 	populateProjects(t, dir, "pior", []string{"george", "caravan", "pyramid_bugsnag"})
 	populateProjects(t, dir, "george", []string{"carpe", "dorade", "gardon", "marlin", "caravan"})
 
@@ -76,8 +74,7 @@ func TestMatches(t *testing.T) {
 }
 
 func TestNoMatch(t *testing.T) {
-	defer filet.CleanUp(t)
-	dir := filet.TmpDir(t, "")
+	dir := t.TempDir()
 
 	populateProjects(t, dir, "pior", []string{"whatever"})
 
@@ -88,8 +85,7 @@ func TestNoMatch(t *testing.T) {
 }
 
 func TestSearchingWithNoProject(t *testing.T) {
-	defer filet.CleanUp(t)
-	dir := filet.TmpDir(t, "")
+	dir := t.TempDir()
 
 	cfg := &config.Config{SourceDir: dir}
 	_, err := FindBestMatch("nope", cfg)

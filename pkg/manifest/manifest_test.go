@@ -3,7 +3,6 @@ package manifest
 import (
 	"testing"
 
-	"github.com/Flaque/filet"
 	"github.com/devbuddy/devbuddy/pkg/test"
 	"github.com/stretchr/testify/require"
 )
@@ -29,8 +28,8 @@ open:
 `
 
 func TestLoad(t *testing.T) {
-	tmpdir := filet.TmpDir(t, "")
-	defer filet.CleanUp(t)
+	tmpdir := t.TempDir()
+
 	writer := test.Project(tmpdir)
 	writer.Manifest().WriteString(t, manifestContent)
 

@@ -6,8 +6,8 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/test"
 
-	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/require"
 )
 
@@ -135,8 +135,7 @@ func TestTaskActionGenericOnFunc(t *testing.T) {
 }
 
 func TestTaskActionGenericFileChange(t *testing.T) {
-	defer filet.CleanUp(t)
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir, tmpfile := test.File(t, "testfile")
 
 	ctx := &context.Context{
 		Project: project.NewFromPath(tmpdir),
@@ -160,7 +159,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	// With a new file
 
-	filet.File(t, tmpdir+"/testfile", "content-A")
+	test.WriteFile(tmpfile, []byte("content-A"))
 
 	action = newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
 
@@ -185,7 +184,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	// The file changed
 
-	filet.File(t, tmpdir+"/testfile", "content-B")
+	test.WriteFile(tmpfile, []byte("content-B"))
 
 	action = newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
 
@@ -193,5 +192,4 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 	require.NoError(t, result.Error)
 	require.True(t, result.Needed)
 	require.Equal(t, "file testfile has changed", result.Reason)
-
 }

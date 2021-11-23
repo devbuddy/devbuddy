@@ -3,7 +3,6 @@ module github.com/devbuddy/devbuddy
 go 1.15
 
 require (
-	github.com/Flaque/filet v0.0.0-20201012163910-45f684403088
 	github.com/creack/pty v1.1.17
 	github.com/devbuddy/expect v0.0.0-20210723163049-dbaeb92456c7
 	github.com/dnaeon/go-vcr v1.2.0

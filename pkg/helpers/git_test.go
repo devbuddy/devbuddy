@@ -3,15 +3,13 @@ package helpers
 import (
 	"testing"
 
-	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/require"
 
 	"github.com/devbuddy/devbuddy/pkg/test"
 )
 
 func TestGitGithubProjectURL(t *testing.T) {
-	defer filet.CleanUp(t)
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
 	writer.CreateGitRepo(t)
 
@@ -22,8 +20,7 @@ func TestGitGithubProjectURL(t *testing.T) {
 }
 
 func TestGitGithubPullrequestURL(t *testing.T) {
-	defer filet.CleanUp(t)
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
 	writer.CreateGitRepo(t)
 
