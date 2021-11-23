@@ -3,21 +3,18 @@ package debug
 import (
 	"testing"
 
-	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/require"
 
 	"github.com/devbuddy/devbuddy/pkg/test"
 )
 
 func TestFormatDebugInfo(t *testing.T) {
-	defer filet.CleanUp(t)
-
 	text := FormatDebugInfo("versionONE", []string{"SHELL=/bin/bash"}, "")
 	require.Contains(t, text, "`versionONE`")
 	require.Contains(t, text, "SHELL=\"/bin/bash\"\n")
 	require.Contains(t, text, "Project not found")
 
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 
 	text = FormatDebugInfo("", []string{}, tmpdir)
 	require.Contains(t, text, "Failed to read manifest: no manifest at")

@@ -5,8 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/Flaque/filet"
 )
 
 func open(path string) *Store {
@@ -18,8 +16,7 @@ func open(path string) *Store {
 }
 
 func TestSetGetString(t *testing.T) {
-	defer filet.CleanUp(t)
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 
 	testValues := []string{"DUMMY", "", "   "}
 
@@ -34,8 +31,7 @@ func TestSetGetString(t *testing.T) {
 }
 
 func TestKeyEmpty(t *testing.T) {
-	defer filet.CleanUp(t)
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 
 	_, err := open(tmpdir).GetString("")
 	require.EqualError(t, err, "empty string is not a valid key")
@@ -45,8 +41,7 @@ func TestKeyEmpty(t *testing.T) {
 }
 
 func TestGetStringNotFound(t *testing.T) {
-	defer filet.CleanUp(t)
-	tmpdir := filet.TmpDir(t, "")
+	tmpdir := t.TempDir()
 
 	val, err := open(tmpdir).GetString("doesnotexist")
 	require.NoError(t, err)

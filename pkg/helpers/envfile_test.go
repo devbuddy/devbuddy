@@ -5,33 +5,30 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Flaque/filet"
-
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/test"
 )
 
 func TestLoadEnvfile(t *testing.T) {
-	defer filet.CleanUp(t)
-	envfilePath := filet.File(t, ".env", "\nPOIPOI=fromEnvFile")
+	_, tmpfile := test.CreateFile(t, ".env", []byte("\nPOIPOI=fromEnvFile"))
 
 	env := env.New([]string{})
 	env.Set("EXISTING", "XXX")
 	env.Set("POIPOI", "XXX")
 
-	err := helpers.LoadEnvfile(env, envfilePath.Name())
+	err := helpers.LoadEnvfile(env, tmpfile)
 	require.Nil(t, err)
 	require.Equal(t, "fromEnvFile", env.Get("POIPOI"))
 	require.Equal(t, "XXX", env.Get("EXISTING"))
 }
 
 func TestLoadEnvfileNoFile(t *testing.T) {
-	defer filet.CleanUp(t)
-	envfilePath := filet.File(t, "whatever", "")
+	tmpdir := t.TempDir()
 
 	env := env.New([]string{})
 
-	err := helpers.LoadEnvfile(env, envfilePath.Name()+"nope")
+	err := helpers.LoadEnvfile(env, tmpdir+"/nope")
 	require.NotNil(t, err)
 	require.Zero(t, len(env.Environ()))
 }

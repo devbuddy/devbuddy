@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/require"
 )
 
@@ -52,9 +51,9 @@ func (p *projectWriter) Manifest() *manifestWriter {
 }
 
 func (m *manifestWriter) Empty(t *testing.T) {
-	filet.File(t, m.path, "")
+	WriteFile(m.path, []byte(""))
 }
 
 func (m *manifestWriter) WriteString(t *testing.T, value string) {
-	filet.File(t, m.path, value)
+	WriteFile(m.path, []byte(value))
 }

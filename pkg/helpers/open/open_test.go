@@ -3,7 +3,6 @@ package open
 import (
 	"testing"
 
-	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/require"
 
 	"github.com/devbuddy/devbuddy/pkg/project"
@@ -11,8 +10,7 @@ import (
 )
 
 func TestFindLink(t *testing.T) {
-	tmpdir := filet.TmpDir(t, "")
-	defer filet.CleanUp(t)
+	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
 	writer.Manifest().WriteString(t, "open: {doc: http://doc.com, logs: http://logs}")
 
@@ -30,8 +28,7 @@ func TestFindLink(t *testing.T) {
 }
 
 func TestFindLinkDefault(t *testing.T) {
-	tmpdir := filet.TmpDir(t, "")
-	defer filet.CleanUp(t)
+	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
 	writer.Manifest().WriteString(t, "open: {doc: http://doc.com}")
 
@@ -43,8 +40,7 @@ func TestFindLinkDefault(t *testing.T) {
 }
 
 func TestFindLinkGithub(t *testing.T) {
-	tmpdir := filet.TmpDir(t, "")
-	defer filet.CleanUp(t)
+	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
 	writer.CreateGitRepo(t)
 	writer.Manifest().Empty(t)
@@ -65,8 +61,7 @@ func TestFindLinkGithub(t *testing.T) {
 }
 
 func TestPrintLinks(t *testing.T) {
-	tmpdir := filet.TmpDir(t, "")
-	defer filet.CleanUp(t)
+	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
 
 	proj := project.NewFromPath(tmpdir)
