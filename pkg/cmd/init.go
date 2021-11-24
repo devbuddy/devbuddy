@@ -3,11 +3,11 @@ package cmd
 import (
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/termui"
-
-	"github.com/spf13/cobra"
 )
 
 var initCmd = &cobra.Command{

@@ -57,7 +57,7 @@ func (e *MutableRegister) Get(name string) (*feature.Feature, error) {
 
 func (e *MutableRegister) Names() (names []string) {
 	for name := range e.nameToFeature {
-		names = append(names, string(name))
+		names = append(names, name)
 	}
 	return
 }

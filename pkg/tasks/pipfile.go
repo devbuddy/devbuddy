@@ -17,7 +17,7 @@ func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	installPipfile := func(ctx *context.Context) error {
 		result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
 		if result.Error != nil {
-			return fmt.Errorf("failed to install pipenv: %s", result.Error)
+			return fmt.Errorf("failed to install pipenv: %w", result.Error)
 		}
 		return nil
 	}
@@ -40,7 +40,7 @@ func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	runPipfileInstall := func(ctx *context.Context) error {
 		result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
 		if result.Error != nil {
-			return fmt.Errorf("pipenv failed: %s", result.Error)
+			return fmt.Errorf("pipenv failed: %w", result.Error)
 		}
 		return nil
 	}

@@ -5,11 +5,11 @@ import (
 	"os/exec"
 	"runtime"
 
+	color "github.com/logrusorgru/aurora"
+
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
-
-	color "github.com/logrusorgru/aurora"
 )
 
 // Open a file or URL with the default application, return immediately.

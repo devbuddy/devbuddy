@@ -22,7 +22,7 @@ func buildResult(output string, err error) *Result {
 			code = exitError.Sys().(syscall.WaitStatus).ExitStatus()
 			err = nil
 		} else {
-			err = fmt.Errorf("command failed with: %s", err)
+			err = fmt.Errorf("command failed with: %w", err)
 		}
 	}
 

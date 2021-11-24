@@ -61,10 +61,9 @@ func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {
 		if mutation.Current == nil {
 			fmt.Printf("unset %s\n", mutation.Name)
 		} else {
-			escaped := strings.Replace(mutation.Current.Value, "\"", "\\\"", -1)
+			escaped := strings.ReplaceAll(mutation.Current.Value, "\"", "\\\"")
 			fmt.Printf("export %s=\"%s\"\n", mutation.Name, escaped)
 		}
-
 	}
 }
 

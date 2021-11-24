@@ -31,7 +31,7 @@ func New(projectPath string) *ProjectMetadata {
 func (p *ProjectMetadata) Path() (string, error) {
 	err := p.prepare()
 	if err != nil {
-		return "", fmt.Errorf("failed to initialize the project metadata dir: %s", err)
+		return "", fmt.Errorf("failed to initialize the project metadata dir: %w", err)
 	}
 
 	return p.path, nil

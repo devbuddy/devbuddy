@@ -32,19 +32,17 @@ func (r *runner) sync(featureSet FeatureSet) {
 
 			r.state.RestoreEnv()
 			r.state.ForgetEnv()
-		} else {
-			if r.state.GetProjectSlug() != r.ctx.Project.Slug() {
-				// We jumped to a different project
+		} else if r.state.GetProjectSlug() != r.ctx.Project.Slug() {
+			// We jumped to a different project
 
-				// Since it's a different project, we just deactivate all features
-				// For example, "python:3.7" is activating a virtualenv built for a specific project
-				for _, featureInfo := range r.state.GetActiveFeatures() {
-					r.deactivateFeature(featureInfo)
-				}
-
-				r.state.RestoreEnv()
-				// No ForgetEnv(), we keep the SavedEnv until we jump out of a project
+			// Since it's a different project, we just deactivate all features
+			// For example, "python:3.7" is activating a virtualenv built for a specific project
+			for _, featureInfo := range r.state.GetActiveFeatures() {
+				r.deactivateFeature(featureInfo)
 			}
+
+			r.state.RestoreEnv()
+			// No ForgetEnv(), we keep the SavedEnv until we jump out of a project
 		}
 	}
 

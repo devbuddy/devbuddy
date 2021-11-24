@@ -115,7 +115,7 @@ func getAllProjects(sourceDir string) ([]*Project, error) {
 func listChildDir(path string) (paths []string, err error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		err = fmt.Errorf("error listing files in %s: %s", path, err)
+		err = fmt.Errorf("error listing files in %s: %w", path, err)
 		return
 	}
 
