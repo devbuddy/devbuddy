@@ -17,7 +17,7 @@ up:
 - python: 3.9.0
 - python_develop
 `
-	CreateProject(t, c, "project", devYml)
+	CreateProject(c, "project", devYml)
 
 	// Install in develop mode
 
@@ -49,7 +49,7 @@ up:
 - python_develop:
     extras: [test]
 `
-	CreateProject(t, c, "project", devYml)
+	CreateProject(c, "project", devYml)
 
 	c.Write("setup.py", generateTestSetupPy(1))
 
@@ -67,7 +67,7 @@ up:
 - python: 3.9.0
 - python_develop:
 `
-	CreateProject(t, c, "project", devYml)
+	CreateProject(c, "project", devYml)
 
 	c.Write("setup.py", generateTestSetupPy(1))
 

@@ -21,7 +21,9 @@ type TestContext struct {
 	debug bool
 }
 
-func New(config Config, t *testing.T) (*TestContext, error) {
+func New(t *testing.T, config Config) (*TestContext, error) {
+	t.Helper()
+
 	var (
 		shellPath string
 		args      []string

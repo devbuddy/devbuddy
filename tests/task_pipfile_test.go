@@ -10,7 +10,7 @@ import (
 func Test_Task_Pipfile(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project",
+	CreateProject(c, "project",
 		`up:`,
 		`- python: 3.9.0`,
 		`- pipfile`,

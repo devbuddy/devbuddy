@@ -9,7 +9,7 @@ import (
 func Test_Cmd_Inspect(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project",
+	CreateProject(c, "project",
 		`up:`,
 		`- node: '10.15.0'`,
 		`- pip: [requirements.txt]`,

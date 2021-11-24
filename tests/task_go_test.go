@@ -12,7 +12,7 @@ import (
 func Test_Task_Go_Module(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project",
+	CreateProject(c, "project",
 		`up:`,
 		`- go:`,
 		`    version: "1.15"`,
@@ -50,7 +50,7 @@ func main() {
 func Test_Task_Go_Pre_Module(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	_ = CreateProject(t, c, "project",
+	_ = CreateProject(c, "project",
 		`up:`,
 		`- go: "1.15"`,
 	)
@@ -69,7 +69,7 @@ func Test_Task_Go_Pre_Module(t *testing.T) {
 func Test_Task_Go_Check_GOPATH(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project",
+	CreateProject(c, "project",
 		`up:`,
 		`- go: "1.15"`,
 	)
