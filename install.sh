@@ -25,6 +25,7 @@ make_variant() {
         ;;
     arm64*)
         echo "arm64"
+        ;;
     *)
         echo >&2 "unsupported architecture: ${ARCH}"
         return 1
