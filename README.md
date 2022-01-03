@@ -96,6 +96,20 @@ Others:
 $ brew install devbuddy/devbuddy/devbuddy
 ```
 
+### Go install
+
+Note: use this if your your PATH includes the GOBIN path.
+
+Latest release:
+```bash
+$ go install github.com/devbuddy/devbuddy/cmd/bud@latest
+```
+
+Specify a version, like `v0.11.1`:
+```bash
+$ go install github.com/devbuddy/devbuddy/cmd/bud@v0.11.1
+```
+
 ### Automatic
 
 ```bash
