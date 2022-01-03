@@ -34,10 +34,10 @@ make_variant() {
 
     ARCH=$(uname -m)
     case "$ARCH" in
-    amd64*)
+    x86_64)
         echo -n "amd64"
         ;;
-    arm64*)
+    arm64)
         echo -n "arm64"
         ;;
     *)
