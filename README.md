@@ -129,22 +129,46 @@ $ SUDO= DEST=~/bin bash -c "$(curl -sL https://raw.githubusercontent.com/devbudd
 
 ### Manual
 
-Older releases are available on [Github releases](https://github.com/devbuddy/devbuddy/releases).
+#### Select the version to download:
 
-#### Linux
+Latest:
+```bash
+$ VERSION=$(curl -Ls -o /dev/null -w %{url_effective} "https://github.com/devbuddy/devbuddy/releases/latest" | grep -oE "[^/]+$")
+```
 
-- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.11.0/bud-linux-amd64 > /tmp/bud```
-- ```sudo install /tmp/bud /usr/local/bin/bud```
+[Previous releases](https://github.com/devbuddy/devbuddy/releases):
 
-#### MacOs
+```bash
+$ VERSION="v0.12.0"
+```
 
-- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.11.0/bud-darwin-amd64 > /tmp/bud```
-- ```sudo install /tmp/bud /usr/local/bin/bud```
+#### Download the binary
 
-#### MacOS Arm64
+Linux Intel:
+```bash
+$ curl -L https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-linux-amd64 > /tmp/bud
+```
 
-- ```curl -L https://github.com/devbuddy/devbuddy/releases/download/v0.11.0/bud-darwin-arm64 > /tmp/bud```
-- ```sudo install /tmp/bud /usr/local/bin/bud```
+Linux ARM:
+```bash
+$ curl -L https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-linux-arm64 > /tmp/bud
+```
+
+macOS Intel:
+```bash
+$ curl -L https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-darwin-amd64 > /tmp/bud
+```
+
+macOS Apple Silicon:
+```bash
+$ curl -L https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-darwin-arm64 > /tmp/bud
+```
+
+#### Install the binary
+
+```bash
+$ sudo install /tmp/bud /usr/local/bin/bud
+```
 
 ## Setup
 
