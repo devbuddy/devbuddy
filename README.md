@@ -53,6 +53,7 @@ Python:
 
 Go:
 - Go environment (with GOPATH)
+- Go modules
 - Dep (support for [Go Dep](https://github.com/golang/dep))
 
 Node:
