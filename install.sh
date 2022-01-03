@@ -17,30 +17,31 @@ find_latest_version() {
 }
 
 make_variant() {
-    ARCH=$(uname -m)
-
-    case "$ARCH" in
-    amd64*)
-        echo "amd64"
+    case "$OSTYPE" in
+    darwin*)
+        echo -n "darwin"
         ;;
-    arm64*)
-        echo "arm64"
+    linux*)
+        echo -n "linux"
         ;;
     *)
-        echo >&2 "unsupported architecture: ${ARCH}"
+        echo >&2 "unsupported OS: $OSTYPE"
         return 1
         ;;
     esac
 
-    case "$OSTYPE" in
-    darwin*)
-        echo "darwin"
+    echo -n "-"
+
+    ARCH=$(uname -m)
+    case "$ARCH" in
+    amd64*)
+        echo -n "amd64"
         ;;
-    linux*)
-        echo "linux"
+    arm64*)
+        echo -n "arm64"
         ;;
     *)
-        echo >&2 "unsupported OS: $OSTYPE"
+        echo >&2 "unsupported architecture: ${ARCH}"
         return 1
         ;;
     esac
