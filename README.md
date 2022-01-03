@@ -99,7 +99,7 @@ $ brew install devbuddy/devbuddy/devbuddy
 ### Automatic
 
 ```bash
-$ bash -c "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
+$ bash -euc "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
 ```
 
 Uninstall it:
