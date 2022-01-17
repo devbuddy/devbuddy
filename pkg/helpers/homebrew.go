@@ -8,11 +8,11 @@ import (
 )
 
 type caskroom struct {
-	prefix string
+	prefixes []string
 }
 
 type cellar struct {
-	prefix string
+	prefixes []string
 }
 
 // Homebrew represent an homebrew installation
@@ -23,14 +23,14 @@ type Homebrew struct {
 
 // NewHomebrew is returning a new Cellar
 func NewHomebrew() *Homebrew {
-	return NewHomebrewWithPrefix("/usr/local")
+	return NewHomebrewWithPrefix("/usr/local", "/opt/homebrew")
 }
 
 // NewHomebrewWithPrefix is returning a new Cellar at prefix
-func NewHomebrewWithPrefix(prefix string) *Homebrew {
+func NewHomebrewWithPrefix(prefixes ...string) *Homebrew {
 	return &Homebrew{
-		cellar:   &cellar{prefix: prefix},
-		caskroom: &caskroom{prefix: prefix},
+		cellar:   &cellar{prefixes: prefixes},
+		caskroom: &caskroom{prefixes: prefixes},
 	}
 }
 
@@ -56,11 +56,24 @@ func buildFormulaPath(path string) string {
 func (c *caskroom) isInstalled(formula string) bool {
 	legacyPrefix := "/opt/homebrew-cask"
 
-	return utils.PathExists(filepath.Join(legacyPrefix, "Caskroom", formula)) ||
-		utils.PathExists(filepath.Join(c.prefix, "Caskroom", formula))
+	if utils.PathExists(filepath.Join(legacyPrefix, "Caskroom", formula)) {
+		return true
+	}
+
+	for _, prefix := range c.prefixes {
+		if utils.PathExists(filepath.Join(prefix, "Caskroom", formula)) {
+			return true
+		}
+	}
+	return false
 }
 
 // isInstalled returns true if formulua was installed in cellar
 func (c *cellar) isInstalled(formula string) bool {
-	return utils.PathExists(filepath.Join(c.prefix, "Cellar", formula))
+	for _, prefix := range c.prefixes {
+		if utils.PathExists(filepath.Join(prefix, "Cellar", formula)) {
+			return true
+		}
+	}
+	return false
 }
