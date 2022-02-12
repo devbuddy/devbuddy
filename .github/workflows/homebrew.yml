@@ -1,0 +1,27 @@
+name: Publish version to homebrew
+
+on: 
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get sha
+        run: echo "::set-output name=sha::$(git show-ref -s ${{ github.event.release.tag_name }})"
+        id: getsha
+
+      - name: Emit repository_dispatch
+        uses: mvasigh/dispatch-action@main
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+          repo: homebrew-devbuddy
+          owner: devbuddy
+          event_type: upgrade
+          message: |
+            {
+              "version": "${{ github.event.release.tag_name }}", 
+              "revision": "${{ steps.getsha.outputs.sha }}"
+            }
