@@ -183,7 +183,7 @@ $ sudo install /tmp/bud /usr/local/bin/bud
 
 ## Setup
 
-★ Install the shell integration (in `~/.bash_profile`):
+★ Install the shell integration (in `~/.bash_profile`, or `~/.zshrc`):
 ```bash
 eval "$(bud --shell-init --with-completion)"
 ```
