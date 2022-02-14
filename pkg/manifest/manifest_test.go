@@ -31,7 +31,7 @@ func TestLoad(t *testing.T) {
 	tmpdir := t.TempDir()
 
 	writer := test.Project(tmpdir)
-	writer.Manifest().WriteString(t, manifestContent)
+	writer.Manifest().WriteString(manifestContent)
 
 	man, err := Load(tmpdir)
 	require.NoError(t, err, "Load() failed")

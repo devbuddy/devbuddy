@@ -12,7 +12,7 @@ import (
 func TestFindLink(t *testing.T) {
 	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
-	writer.Manifest().WriteString(t, "open: {doc: http://doc.com, logs: http://logs}")
+	writer.Manifest().WriteString("open: {doc: http://doc.com, logs: http://logs}")
 
 	proj := project.NewFromPath(tmpdir)
 
@@ -30,7 +30,7 @@ func TestFindLink(t *testing.T) {
 func TestFindLinkDefault(t *testing.T) {
 	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
-	writer.Manifest().WriteString(t, "open: {doc: http://doc.com}")
+	writer.Manifest().WriteString("open: {doc: http://doc.com}")
 
 	proj := project.NewFromPath(tmpdir)
 
@@ -43,7 +43,7 @@ func TestFindLinkGithub(t *testing.T) {
 	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
 	writer.CreateGitRepo(t)
-	writer.Manifest().Empty(t)
+	writer.Manifest().Empty()
 
 	proj := project.NewFromPath(tmpdir)
 
@@ -66,12 +66,12 @@ func TestPrintLinks(t *testing.T) {
 
 	proj := project.NewFromPath(tmpdir)
 
-	writer.Manifest().WriteString(t, "")
+	writer.Manifest().WriteString("")
 
 	err := PrintLinks(proj)
 	require.Error(t, err)
 
-	writer.Manifest().WriteString(t, "open: {doc: http://doc.com}")
+	writer.Manifest().WriteString("open: {doc: http://doc.com}")
 	err = PrintLinks(proj)
 	require.NoError(t, err)
 }

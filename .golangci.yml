@@ -13,7 +13,7 @@ linters:
     - makezero
     - misspell
     - tenv
-    # - thelper
+    - thelper
     - unconvert
     - wastedassign
 

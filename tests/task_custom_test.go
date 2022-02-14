@@ -19,7 +19,7 @@ up:
 func Test_Task_Custom(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project", customTaskDevYml)
+	CreateProject(c, "project", customTaskDevYml)
 
 	// file does not exist -> task must run
 	c.Run("bud up")
@@ -35,7 +35,7 @@ func Test_Task_Custom(t *testing.T) {
 func Test_Task_Custom_Subdir(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project", customTaskDevYml)
+	CreateProject(c, "project", customTaskDevYml)
 
 	// The command must work in a sub-dir, but run in the project root
 	c.Run("mkdir subdir")
@@ -50,7 +50,7 @@ func Test_Task_Custom_Subdir(t *testing.T) {
 func Test_Task_Custom_Fails(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project", `
+	CreateProject(c, "project", `
 up:
 - custom:
     name: TestCustom
@@ -67,7 +67,7 @@ func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
 
 	c.Run("export MYVAR=poipoi")
 
-	CreateProject(t, c, "project",
+	CreateProject(c, "project",
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,
@@ -86,7 +86,7 @@ func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
 	t.Skip("Fixme: env vars not set before tasks?")
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project",
+	CreateProject(c, "project",
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,
@@ -107,13 +107,13 @@ func Test_Task_Custom_With_Env_Previously_Set_By_DevBuddy(t *testing.T) {
 
 	c.Run("export MYVAR=poipoi")
 
-	p := CreateProject(t, c, "project",
+	p := CreateProject(c, "project",
 		`env:`,
 		`  MYVAR: poipoi`,
 	)
 	c.Run("bud up")
 
-	p.UpdateDevYml(t, c,
+	p.UpdateDevYml(c,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,

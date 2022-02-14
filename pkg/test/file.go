@@ -7,15 +7,19 @@ import (
 )
 
 // File creates a temporary directory and returns the full path of the file. Panic on error.
-func File(t testing.TB, filename string) (tmpdir, tmpfile string) {
-	tmpdir = t.TempDir()
+func File(tb testing.TB, filename string) (tmpdir, tmpfile string) {
+	tb.Helper()
+
+	tmpdir = tb.TempDir()
 	tmpfile = path.Join(tmpdir, filename)
 	return
 }
 
 // CreateFile creates a temporary directory, writes a file and returns the full path of the file. Panic on error.
-func CreateFile(t testing.TB, filename string, content []byte) (tmpdir, tmpfile string) {
-	tmpdir, tmpfile = File(t, filename)
+func CreateFile(tb testing.TB, filename string, content []byte) (tmpdir, tmpfile string) {
+	tb.Helper()
+
+	tmpdir, tmpfile = File(tb, filename)
 
 	err := os.WriteFile(tmpfile, content, 0600)
 	if err != nil {

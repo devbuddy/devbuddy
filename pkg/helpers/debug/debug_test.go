@@ -20,7 +20,7 @@ func TestFormatDebugInfo(t *testing.T) {
 	require.Contains(t, text, "Failed to read manifest: no manifest at")
 
 	writer := test.Project(tmpdir)
-	writer.Manifest().WriteString(t, "up: [{go: 1.2.3}]")
+	writer.Manifest().WriteString("up: [{go: 1.2.3}]")
 
 	text = FormatDebugInfo("", []string{}, tmpdir)
 	require.Contains(t, text, "0. `map[go:1.2.3]`")

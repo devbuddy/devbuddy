@@ -21,12 +21,16 @@ func Project(path string) *projectWriter {
 
 // GitInit initializes a simple Git repo
 func (p *projectWriter) CreateGitRepo(t *testing.T) {
+	t.Helper()
+
 	p.runGit(t, "init")
 	p.runGit(t, "commit", "-m", "Commit1", "--allow-empty")
 	p.runGit(t, "remote", "add", "origin", "git@github.com:org1/repo1.git")
 }
 
 func (p *projectWriter) runGit(t *testing.T, args ...string) {
+	t.Helper()
+
 	cmd := exec.Command("git", args...)
 	cmd.Dir = p.path
 	cmd.Env = []string{
@@ -50,10 +54,10 @@ func (p *projectWriter) Manifest() *manifestWriter {
 	return &manifestWriter{path: filepath.Join(p.path, "dev.yml")}
 }
 
-func (m *manifestWriter) Empty(t *testing.T) {
+func (m *manifestWriter) Empty() {
 	WriteFile(m.path, []byte(""))
 }
 
-func (m *manifestWriter) WriteString(t *testing.T, value string) {
+func (m *manifestWriter) WriteString(value string) {
 	WriteFile(m.path, []byte(value))
 }
