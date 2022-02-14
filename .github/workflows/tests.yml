@@ -65,15 +65,15 @@ jobs:
         with:
           go-version: "1.17.x"
       - run: script/buildall
-      
+
       - run: ls -l dist
       - run: grep . dist/*.sha256
 
-      - name: upload assets
-        uses: fnkr/github-action-ghr@v1
-        env:
-          GHR_PATH: dist/
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          files: dist/*
+          prerelease: false
 
       - name: Trigger action in homebrew-devbuddy
         uses: mvasigh/dispatch-action@main
