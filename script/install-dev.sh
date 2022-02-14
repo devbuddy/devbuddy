@@ -3,7 +3,7 @@ set -euo pipefail
 
 BUDPATH=${GOPATH}/bin/bud
 
-go build -ldflags "-X main.Version=$(git describe --tags --dirty --always)" -o $BUDPATH ./cmd/bud
+go build -ldflags "-X main.Version=dev-$(git describe --tags --dirty --always)" -o $BUDPATH ./cmd/bud
 
 echo "Installed in ${BUDPATH}"
 
