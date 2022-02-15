@@ -122,22 +122,6 @@ Specify a version, like `v0.11.1`:
 $ go install github.com/devbuddy/devbuddy/cmd/bud@v0.11.1
 ```
 
-### Automatic
-
-```bash
-$ bash -euc "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
-```
-
-Uninstall it:
-```bash
-$ sudo rm /usr/local/bin/bud
-```
-
-To choose another destination:
-```bash
-$ SUDO= DEST=~/bin bash -c "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
-```
-
 ### Manual
 
 #### Select the version to download:
