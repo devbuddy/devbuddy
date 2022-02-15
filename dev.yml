@@ -67,13 +67,6 @@ commands:
     desc: Build and install DevBuddy in ${GOPATH}/bin
     run: script/install-dev.sh
 
-  install-release:
-    desc: Remove all bud binaries and install a released version
-    run: |
-      [ -e "/usr/local/bin/bud" ] && sudo rm -v /usr/local/bin/bud
-      [ -e "$GOPATH/bin/bud" ] && sudo rm -v $GOPATH/bin/bud
-      bash -c "$(curl -sL https://raw.githubusercontent.com/devbuddy/devbuddy/master/install.sh)"
-
   build:
     desc: Build all bud binaries
     run: script/buildall
