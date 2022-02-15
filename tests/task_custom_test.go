@@ -59,7 +59,7 @@ up:
 `)
 
 	lines := c.Run("bud up", context.ExitCode(1))
-	OutputContains(t, lines, "Running: exit 1", "The task action failed to run: command failed with exit code 1")
+	OutputContains(t, lines, "Running: exit 1", `action "": failed to run: command failed with exit code 1`)
 }
 
 func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {

@@ -26,7 +26,7 @@ func (r *TaskRunnerImpl) Run(task *taskapi.Task) (err error) {
 	for _, action := range task.Actions {
 		err = r.runAction(action)
 		if err != nil {
-			return err
+			return fmt.Errorf(`action "%s": %w`, action.Description(), err)
 		}
 	}
 	return nil
@@ -37,7 +37,7 @@ func (r *TaskRunnerImpl) runAction(action taskapi.TaskAction) error {
 
 	result := action.Needed(r.ctx)
 	if result.Error != nil {
-		return fmt.Errorf("The task action (%s) failed to detect whether it need to run: %w", desc, result.Error)
+		return fmt.Errorf("detecting whether it needs to run: %w", result.Error)
 	}
 
 	if result.Needed {
@@ -48,16 +48,16 @@ func (r *TaskRunnerImpl) runAction(action taskapi.TaskAction) error {
 
 		err := action.Run(r.ctx)
 		if err != nil {
-			return fmt.Errorf("The task action failed to run: %w", err)
+			return fmt.Errorf("failed to run: %w", err)
 		}
 
 		result = action.Needed(r.ctx)
 		if result.Error != nil {
-			return fmt.Errorf("The task action failed to detect if it is resolved: %w", result.Error)
+			return fmt.Errorf("detecting whether it still needs to run: %w", result.Error)
 		}
 
 		if result.Needed {
-			return fmt.Errorf("The task action did not produce the expected result: %s", result.Reason)
+			return fmt.Errorf("ran successfully but still need to run: %s", result.Reason)
 		}
 	}
 

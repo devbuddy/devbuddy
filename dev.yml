@@ -24,11 +24,17 @@ commands:
 
   integration:
     desc: Run the integration tests with Bash
-    run: TEST_SHELL=bash TEST_DOCKER_IMAGE=devbuddy-test-env go test -v ./tests
+    run: |
+      export TEST_DOCKER_IMAGE=ghcr.io/devbuddy/docker-testing:sha-f11e362 
+      docker pull $TEST_DOCKER_IMAGE
+      TEST_SHELL=bash go test -v ./tests
 
   integration-zsh:
     desc: Run the integration tests with Zsh
-    run: TEST_SHELL=zsh TEST_DOCKER_IMAGE=devbuddy-test-env go test -v ./tests
+    run: |
+      export TEST_DOCKER_IMAGE=ghcr.io/devbuddy/docker-testing:sha-f11e362 
+      docker pull $TEST_DOCKER_IMAGE
+      TEST_SHELL=zsh go test -v ./tests
 
   lint:
     desc: Lint the project
