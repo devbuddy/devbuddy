@@ -186,6 +186,11 @@ func (e *TestContext) AssertExist(path string) {
 	require.NoError(e.t, err, "expected file %s to exist", quotedPath)
 }
 
+func (e *TestContext) AssertContains(path, expected string) {
+	value := e.Cat(path)
+	require.Equal(e.t, expected, value, "expected file %s to contain %s", strconv.Quote(path), strconv.Quote(expected))
+}
+
 func (e *TestContext) GetEnv(name string) string {
 	lines, err := e.shell.Run("echo ${" + name + "}")
 	require.NoError(e.t, err)
