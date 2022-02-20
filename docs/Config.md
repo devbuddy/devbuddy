@@ -140,14 +140,17 @@ in your shell (with `GOROOT`).
 
 ```yaml
 up:
-  - go: 1.10.1
+  - go: "1.17.6"
 ```
 
-Force the usage of Go modules:
+The `modules` option automatically sets `GO111MODULE=on`. 
+The option is disabled by default until version 1.16 (which [enables modules by default](https://go.dev/doc/go1.16#modules))
+
+For Go 1.15 and below, enable Go modules like this:
 ```yaml
 up:
   - go:
-      version: '1.12'
+      version: "1.12"
       modules: true
 ```
 

@@ -16,10 +16,7 @@ func Test_Task_Go_Module(t *testing.T) {
 		`up:`,
 		`- go:`,
 		`    version: "1.15"`,
-		`    modules: true`,
 	)
-
-	c.Run("export GOPATH=~")
 
 	lines := c.Run("bud up", context.Timeout(2*time.Minute))
 	OutputContains(t, lines, "Golang (1.15)", "install golang distribution")
@@ -52,7 +49,9 @@ func Test_Task_Go_Pre_Module(t *testing.T) {
 
 	_ = CreateProject(c, "project",
 		`up:`,
-		`- go: "1.15"`,
+		`- go:`,
+		`    version: "1.15"`,
+		`    modules: false`,
 	)
 
 	c.Run("export GOPATH=~")
@@ -71,7 +70,9 @@ func Test_Task_Go_Check_GOPATH(t *testing.T) {
 
 	CreateProject(c, "project",
 		`up:`,
-		`- go: "1.15"`,
+		`- go:`,
+		`    version: "1.15"`,
+		`    modules: false`,
 	)
 
 	lines := c.Run("bud up", context.ExitCode(1))

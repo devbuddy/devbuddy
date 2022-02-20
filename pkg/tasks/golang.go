@@ -16,13 +16,23 @@ func parseGolang(config *api.TaskConfig, task *api.Task) error {
 		return err
 	}
 
-	modulesEnabled := false
+	goversion, err := helpers.ParseGOVersion(version)
+	if err != nil {
+		return err
+	}
+
+	modulesEnabled := true
+	if goversion.LessThan(helpers.NewGOVersion(1, 17)) {
+		modulesEnabled = false
+	}
+
 	if config.IsHash() {
-		modulesEnabled, err = config.GetBooleanPropertyDefault("modules", false)
+		modulesEnabled, err = config.GetBooleanPropertyDefault("modules", modulesEnabled)
 		if err != nil {
 			return err
 		}
 	}
+
 	featureVersion := version
 	if modulesEnabled {
 		featureVersion += "+mod"
@@ -30,17 +40,19 @@ func parseGolang(config *api.TaskConfig, task *api.Task) error {
 
 	task.Info = version
 
-	checkPATHVar := func(ctx *context.Context) *api.ActionResult {
-		if ctx.Env.Get("GOPATH") == "" {
-			return api.Needed("GOPATH is not set")
+	if !modulesEnabled {
+		checkPATHVar := func(ctx *context.Context) *api.ActionResult {
+			if ctx.Env.Get("GOPATH") == "" {
+				return api.Needed("GOPATH is not set")
+			}
+			return api.NotNeeded()
 		}
-		return api.NotNeeded()
+		showPATHWarning := func(ctx *context.Context) error {
+			ctx.UI.TaskWarning("The GOPATH environment variable should be set to ~/")
+			return nil
+		}
+		task.AddActionBuilder("", showPATHWarning).On(api.FuncCondition(checkPATHVar))
 	}
-	showPATHWarning := func(ctx *context.Context) error {
-		ctx.UI.TaskWarning("The GOPATH environment variable should be set to ~/")
-		return nil
-	}
-	task.AddActionBuilder("", showPATHWarning).On(api.FuncCondition(checkPATHVar))
 
 	installNeeded := func(ctx *context.Context) *api.ActionResult {
 		if !helpers.NewGolang(ctx.Cfg, version).Exists() {
