@@ -16,7 +16,7 @@ func Test_Task_Pipfile(t *testing.T) {
 		`- pipfile`,
 	)
 
-	c.Write("Pipfile", `[packages]\n"pyreleaser" = "==0.5.2"\n`)
+	c.Write("Pipfile", "[packages]\n\"pyreleaser\" = \"==0.5.2\"\n")
 
 	c.Run("bud up", context.Timeout(2*time.Minute))
 
