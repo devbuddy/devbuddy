@@ -1,6 +1,7 @@
 package context
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strconv"
@@ -101,39 +102,39 @@ func (c *TestContext) Debug() {
 	c.expect.Debug = true
 }
 
-func (e *TestContext) Close() error {
-	return e.expect.Stop()
+func (c *TestContext) Close() error {
+	return c.expect.Stop()
 }
 
-func (e *TestContext) Run(cmd string, optFns ...runOptionsFn) []string {
-	lines, err := e.run(cmd, optFns...)
-	require.NoError(e.t, err, "running command: %q", cmd)
+func (c *TestContext) Run(cmd string, optFns ...runOptionsFn) []string {
+	lines, err := c.run(cmd, optFns...)
+	require.NoError(c.t, err, "running command: %q", cmd)
 	return lines
 }
 
-func (e *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) {
+func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) {
 	opt := buildRunOptions(optFns)
 
-	e.debugLine("Running command %q", cmd)
-	e.debugLine("Options: %+v", opt)
+	c.debugLine("Running command %q", cmd)
+	c.debugLine("Options: %+v", opt)
 
 	var lines []string
 	var err error
 
 	done := make(chan bool)
 	go func() {
-		lines, err = e.shell.Run(cmd)
+		lines, err = c.shell.Run(cmd)
 		close(done)
 	}()
 
 	select {
 	case <-done:
-		e.debugLine("command completed")
+		c.debugLine("command completed")
 	case <-time.After(opt.timeout):
 		return nil, fmt.Errorf("timed out after %s", opt.timeout)
 	}
 
-	codeLines, err := e.shell.Run("echo $?")
+	codeLines, err := c.shell.Run("echo $?")
 	if err != nil {
 		return nil, fmt.Errorf("getting exit code: %w", err)
 	}
@@ -156,50 +157,56 @@ func (e *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 	return StripAnsiSlice(lines), nil
 }
 
-func (e *TestContext) Write(path, content string) {
-	_, err := e.shell.Run(fmt.Sprintf("echo -e %q > %q", content, path))
-	require.NoError(e.t, err)
+func (c *TestContext) Write(path, content string) {
+	b64content := base64.StdEncoding.EncodeToString([]byte(content))
+	_, err := c.shell.Run(fmt.Sprintf("echo %s | base64 --decode > %q", b64content, path))
+	require.NoError(c.t, err)
 }
 
-func (e *TestContext) Cwd() string {
-	lines, err := e.shell.Run("pwd")
-	require.NoError(e.t, err)
-	require.Len(e.t, lines, 1, "unexpected output for 'pwd'")
+func (c *TestContext) Cwd() string {
+	lines, err := c.shell.Run("pwd")
+	require.NoError(c.t, err)
+	require.Len(c.t, lines, 1, "unexpected output for 'pwd'")
 	return lines[0]
 }
 
-func (e *TestContext) Cat(path string) string {
-	lines, err := e.shell.Run("cat " + strconv.Quote(path))
-	require.NoError(e.t, err)
+func (c *TestContext) Cat(path string) string {
+	lines, err := c.shell.Run("cat " + strconv.Quote(path))
+	require.NoError(c.t, err)
 	return strings.Join(lines, "\n")
 }
 
-func (e *TestContext) Ls(path string) []string {
-	lines, err := e.shell.Run("ls -1 " + strconv.Quote(path))
-	require.NoError(e.t, err)
+func (c *TestContext) Ls(path string) []string {
+	lines, err := c.shell.Run("ls -1 " + strconv.Quote(path))
+	require.NoError(c.t, err)
 	return lines
 }
 
-func (e *TestContext) AssertExist(path string) {
+func (c *TestContext) AssertExist(path string) {
 	quotedPath := strconv.Quote(path)
-	_, err := e.shell.Run("test -e " + strconv.Quote(quotedPath))
-	require.NoError(e.t, err, "expected file %s to exist", quotedPath)
+	_, err := c.shell.Run("test -e " + strconv.Quote(quotedPath))
+	require.NoError(c.t, err, "expected file %s to exist", quotedPath)
 }
 
-func (e *TestContext) GetEnv(name string) string {
-	lines, err := e.shell.Run("echo ${" + name + "}")
-	require.NoError(e.t, err)
-	require.Len(e.t, lines, 1)
+func (c *TestContext) AssertContains(path, expected string) {
+	value := c.Cat(path)
+	require.Equal(c.t, expected, value, "expected file %s to contain %s", strconv.Quote(path), strconv.Quote(expected))
+}
+
+func (c *TestContext) GetEnv(name string) string {
+	lines, err := c.shell.Run("echo ${" + name + "}")
+	require.NoError(c.t, err)
+	require.Len(c.t, lines, 1)
 	return lines[0]
 }
 
-func (e *TestContext) Cd(path string) {
-	_, err := e.shell.Run("cd " + strconv.Quote(path))
-	require.NoError(e.t, err)
+func (c *TestContext) Cd(path string) {
+	_, err := c.shell.Run("cd " + strconv.Quote(path))
+	require.NoError(c.t, err)
 }
 
-func (e *TestContext) debugLine(format string, a ...interface{}) {
-	if e.debug {
+func (c *TestContext) debugLine(format string, a ...interface{}) {
+	if c.debug {
 		format = strings.TrimSuffix(format, "\n") + "\n"
 		fmt.Printf(format, a...)
 	}

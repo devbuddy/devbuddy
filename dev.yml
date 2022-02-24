@@ -1,5 +1,6 @@
 env:
   SOME_VAR: some_value
+  TEST_DOCKER_IMAGE: ghcr.io/devbuddy/docker-testing:sha-7fd13f4
 
 up:
   - go:
@@ -25,14 +26,12 @@ commands:
   integration:
     desc: Run the integration tests with Bash
     run: |
-      export TEST_DOCKER_IMAGE=ghcr.io/devbuddy/docker-testing:sha-f11e362 
       docker pull $TEST_DOCKER_IMAGE
       TEST_SHELL=bash go test -v ./tests
 
   integration-zsh:
     desc: Run the integration tests with Zsh
     run: |
-      export TEST_DOCKER_IMAGE=ghcr.io/devbuddy/docker-testing:sha-f11e362 
       docker pull $TEST_DOCKER_IMAGE
       TEST_SHELL=zsh go test -v ./tests
 

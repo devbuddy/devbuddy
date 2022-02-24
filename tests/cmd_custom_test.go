@@ -41,6 +41,21 @@ func Test_Cmd_Custom_Short_Syntax(t *testing.T) {
 	OutputEqual(t, lines, "🐼  running touch somefile")
 }
 
+func Test_Cmd_Custom_Envs_Are_Applied(t *testing.T) {
+	c := CreateContextAndInit(t)
+
+	project := CreateProject(c, "project",
+		`env:`,
+		`  MYVAR: poipoi`,
+		`commands:`,
+		`  mycmd: "echo __${MYVAR}__ > result"`,
+	)
+	c.Cd(project.Path)
+
+	c.Run("bud mycmd")
+	c.AssertContains("result", "__poipoi__")
+}
+
 func Test_Cmd_Custom_Always_Run_In_Project_Root(t *testing.T) {
 	c := CreateContextAndInit(t)
 
