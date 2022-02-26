@@ -46,7 +46,7 @@ func parserPythonInstallPyenv(task *taskapi.Task, version string) {
 		}
 		return nil
 	}
-	task.AddActionBuilder("install PyEnv", run).OnFunc(needed)
+	task.AddActionBuilder("install PyEnv", run).On(taskapi.FuncCondition(needed))
 }
 
 func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
@@ -71,7 +71,7 @@ func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
 		}
 		return nil
 	}
-	task.AddActionBuilder("install Python version with PyEnv", run).OnFunc(needed)
+	task.AddActionBuilder("install Python version with PyEnv", run).On(taskapi.FuncCondition(needed))
 }
 
 func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
@@ -97,7 +97,7 @@ func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
 		}
 		return nil
 	}
-	task.AddActionBuilder("install virtualenv", run).OnFunc(needed)
+	task.AddActionBuilder("install virtualenv", run).On(taskapi.FuncCondition(needed))
 }
 
 func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
@@ -127,6 +127,6 @@ func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
 		return nil
 	}
 	task.AddActionBuilder("create virtualenv", run).
-		OnFunc(needed).
+		On(taskapi.FuncCondition(needed)).
 		SetFeature("python", version)
 }

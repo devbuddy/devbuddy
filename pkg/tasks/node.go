@@ -29,7 +29,7 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return taskapi.ActionNotNeeded()
 	}
 	task.AddActionBuilder("install nodejs from https://nodejs.org", run).
-		OnFunc(condition).
+		On(taskapi.FuncCondition(condition)).
 		SetFeature("node", version)
 
 	npmInstall := func(ctx *context.Context) error {
@@ -40,7 +40,7 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return command(ctx, "npm", "install", "--no-progress").Run().Error
 	}
 	task.AddActionBuilder("install dependencies with NPM", npmInstall).
-		OnFileChange("package.json")
+		On(taskapi.FileCondition("package.json"))
 
 	return nil
 }

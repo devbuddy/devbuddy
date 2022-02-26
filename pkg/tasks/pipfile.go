@@ -35,7 +35,7 @@ func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return taskapi.ActionNotNeeded()
 	}
 	task.AddActionBuilder("install pipfile command", installPipfile).
-		OnFunc(installPipfileNeeded)
+		On(taskapi.FuncCondition(installPipfileNeeded))
 
 	runPipfileInstall := func(ctx *context.Context) error {
 		result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
@@ -45,8 +45,8 @@ func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return nil
 	}
 	task.AddActionBuilder("install dependencies from the Pipfile", runPipfileInstall).
-		OnFileChange("Pipfile").
-		OnFileChange("Pipfile.lock")
+		On(taskapi.FileCondition("Pipfile")).
+		On(taskapi.FileCondition("Pipfile.lock"))
 
 	return nil
 }

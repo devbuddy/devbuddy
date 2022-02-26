@@ -33,8 +33,8 @@ func parserPythonDevelop(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return nil
 	}
 	task.AddActionBuilder("install python package in develop mode", pipInstall).
-		OnFileChange("setup.py").
-		OnFileChange("setup.cfg")
+		On(taskapi.FileCondition("setup.py")).
+		On(taskapi.FileCondition("setup.cfg"))
 
 	return nil
 }

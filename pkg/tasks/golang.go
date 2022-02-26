@@ -40,7 +40,7 @@ func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		ctx.UI.TaskWarning("The GOPATH environment variable should be set to ~/")
 		return nil
 	}
-	task.AddActionBuilder("", showPATHWarning).OnFunc(checkPATHVar)
+	task.AddActionBuilder("", showPATHWarning).On(taskapi.FuncCondition(checkPATHVar))
 
 	installNeeded := func(ctx *context.Context) *taskapi.ActionResult {
 		if !helpers.NewGolang(ctx.Cfg, version).Exists() {
@@ -52,7 +52,7 @@ func parseGolang(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return helpers.NewGolang(ctx.Cfg, version).Install()
 	}
 	task.AddActionBuilder("install golang distribution", installGo).
-		OnFunc(installNeeded).
+		On(taskapi.FuncCondition(installNeeded)).
 		SetFeature("golang", featureVersion)
 
 	return nil

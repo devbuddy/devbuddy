@@ -33,7 +33,7 @@ func parserPip(config *taskapi.TaskConfig, task *taskapi.Task) error {
 			return nil
 		}
 		task.AddActionBuilder(fmt.Sprintf("install %s", file), pipInstall).
-			OnFileChange(file)
+			On(taskapi.FileCondition(file))
 	}
 
 	return nil
