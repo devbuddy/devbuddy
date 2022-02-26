@@ -24,15 +24,15 @@ func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	installPipfileNeeded := func(ctx *context.Context) *taskapi.ActionResult {
 		version, err := findAutoEnvFeatureParam(ctx, "python")
 		if err != nil {
-			return taskapi.ActionFailed("missing python feature: %s", err)
+			return taskapi.Failed("missing python feature: %s", err)
 		}
 		name := helpers.VirtualenvName(ctx.Project, version)
 		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		pipenvCmd := venv.Which("pipenv")
 		if !utils.PathExists(pipenvCmd) {
-			return taskapi.ActionNeeded("Pipenv is not installed in the virtualenv")
+			return taskapi.Needed("Pipenv is not installed in the virtualenv")
 		}
-		return taskapi.ActionNotNeeded()
+		return taskapi.NotNeeded()
 	}
 	task.AddActionBuilder("install pipfile command", installPipfile).
 		On(taskapi.FuncCondition(installPipfileNeeded))

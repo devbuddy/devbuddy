@@ -3,9 +3,10 @@ package tasks
 import (
 	"testing"
 
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 	"github.com/stretchr/testify/require"
 	yaml "gopkg.in/yaml.v2"
+
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 func loadTestTask(t *testing.T, payload string) (*taskapi.Task, error) {

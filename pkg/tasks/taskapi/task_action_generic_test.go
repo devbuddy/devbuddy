@@ -84,16 +84,16 @@ func (c *recorderCondition) After(ctx *context.Context) *ActionResult {
 
 func TestTaskActionGenericConditions(t *testing.T) {
 	cond1 := &recorderCondition{
-		beforeResult: ActionNotNeeded(),
-		afterResult:  ActionNotNeeded(),
+		beforeResult: NotNeeded(),
+		afterResult:  NotNeeded(),
 	}
 	cond2 := &recorderCondition{
-		beforeResult: ActionNeeded("pre reason"),
-		afterResult:  ActionNeeded("post reason"),
+		beforeResult: Needed("pre reason"),
+		afterResult:  Needed("post reason"),
 	}
 	cond3 := &recorderCondition{
-		beforeResult: ActionNotNeeded(),
-		afterResult:  ActionNotNeeded(),
+		beforeResult: NotNeeded(),
+		afterResult:  NotNeeded(),
 	}
 
 	builder := newBuilder("", func(ctx *context.Context) error { return nil })
@@ -125,7 +125,7 @@ func TestTaskActionGenericConditions(t *testing.T) {
 
 func TestTaskActionGenericOnFunc(t *testing.T) {
 	calls := 0
-	results := []*ActionResult{ActionNeeded("reason 1"), ActionNotNeeded()}
+	results := []*ActionResult{Needed("reason 1"), NotNeeded()}
 
 	builder := newBuilder("", func(ctx *context.Context) error { return nil })
 	builder.On(FuncCondition(func(_ *context.Context) *ActionResult {

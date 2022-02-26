@@ -24,9 +24,9 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	}
 	condition := func(ctx *context.Context) *taskapi.ActionResult {
 		if !helpers.NewNode(ctx.Cfg, version).Exists() {
-			return taskapi.ActionNeeded("node version is not installed")
+			return taskapi.Needed("node version is not installed")
 		}
-		return taskapi.ActionNotNeeded()
+		return taskapi.NotNeeded()
 	}
 	task.AddActionBuilder("install nodejs from https://nodejs.org", run).
 		On(taskapi.FuncCondition(condition)).

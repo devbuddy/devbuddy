@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
-
 	"github.com/stretchr/testify/require"
+
+	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
 )
 
 type taskRunnerMock struct {

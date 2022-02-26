@@ -38,7 +38,7 @@ func (a *taskAction) Feature() *autoenv.FeatureInfo {
 
 func (a *taskAction) before(ctx *context.Context) (result *ActionResult) {
 	if len(a.conditions) == 0 {
-		return ActionNeeded("action without conditions")
+		return Needed("action without conditions")
 	}
 
 	for _, condition := range a.conditions {
@@ -58,5 +58,5 @@ func (a *taskAction) after(ctx *context.Context) (result *ActionResult) {
 			return result
 		}
 	}
-	return ActionNotNeeded()
+	return NotNeeded()
 }

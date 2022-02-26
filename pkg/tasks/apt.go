@@ -45,7 +45,7 @@ func (a *aptInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 	for _, name := range a.packageNames {
 		result := shellSilent(ctx, fmt.Sprintf("dpkg -s \"%s\" | grep -q 'Status: install'", name)).Capture()
 		if result.LaunchError != nil {
-			return taskapi.ActionFailed("failed to check if package is installed: %s", result.LaunchError)
+			return taskapi.Failed("failed to check if package is installed: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
 			a.missingPackageNames = append(a.missingPackageNames, name)
@@ -53,10 +53,10 @@ func (a *aptInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 	}
 
 	if len(a.missingPackageNames) > 0 {
-		return taskapi.ActionNeeded("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
+		return taskapi.Needed("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
 	}
 
-	return taskapi.ActionNotNeeded()
+	return taskapi.NotNeeded()
 }
 
 func (a *aptInstall) Run(ctx *context.Context) error {

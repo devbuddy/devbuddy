@@ -35,9 +35,9 @@ func parserPythonInstallPyenv(task *taskapi.Task, version string) {
 	needed := func(ctx *context.Context) *taskapi.ActionResult {
 		_, err := helpers.NewPyEnv()
 		if err != nil {
-			return taskapi.ActionNeeded("Pyenv is not installed: %s", err)
+			return taskapi.Needed("Pyenv is not installed: %s", err)
 		}
-		return taskapi.ActionNotNeeded()
+		return taskapi.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
 		result := command(ctx, "brew", "install", "pyenv").Run()
@@ -53,16 +53,16 @@ func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
 	needed := func(ctx *context.Context) *taskapi.ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
-			return taskapi.ActionFailed("cannot use pyenv: %s", err)
+			return taskapi.Failed("cannot use pyenv: %s", err)
 		}
 		installed, err := pyEnv.VersionInstalled(version)
 		if err != nil {
-			return taskapi.ActionFailed("failed to check if python version is installed: %s", err)
+			return taskapi.Failed("failed to check if python version is installed: %s", err)
 		}
 		if !installed {
-			return taskapi.ActionNeeded("python version is not installed")
+			return taskapi.Needed("python version is not installed")
 		}
-		return taskapi.ActionNotNeeded()
+		return taskapi.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
 		result := command(ctx, "pyenv", "install", version).Run()
@@ -78,13 +78,13 @@ func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
 	needed := func(ctx *context.Context) *taskapi.ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
-			return taskapi.ActionFailed("cannot use pyenv: %s", err)
+			return taskapi.Failed("cannot use pyenv: %s", err)
 		}
 		installed := utils.PathExists(pyEnv.Which(version, "virtualenv"))
 		if !installed {
-			return taskapi.ActionNeeded("virtualenv is not installed")
+			return taskapi.Needed("virtualenv is not installed")
 		}
-		return taskapi.ActionNotNeeded()
+		return taskapi.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
 		pyEnv, err := helpers.NewPyEnv()
@@ -105,9 +105,9 @@ func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
 		name := helpers.VirtualenvName(ctx.Project, version)
 		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		if !venv.Exists() {
-			return taskapi.ActionNeeded("project virtualenv does not exists")
+			return taskapi.Needed("project virtualenv does not exists")
 		}
-		return taskapi.ActionNotNeeded()
+		return taskapi.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
 		name := helpers.VirtualenvName(ctx.Project, version)

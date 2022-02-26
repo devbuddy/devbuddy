@@ -41,51 +41,51 @@ func (c fileCondition) Before(ctx *context.Context) *ActionResult {
 	fullPath := filepath.Join(ctx.Project.Path, c.path)
 
 	if !utils.PathExists(fullPath) {
-		return ActionNotNeeded()
+		return NotNeeded()
 	}
 
 	fileChecksum, err := utils.FileChecksum(fullPath)
 	if err != nil {
-		return ActionFailed("failed to get the file checksum: %s", err)
+		return Failed("failed to get the file checksum: %s", err)
 	}
 
 	checksumStore, err := store.Open(ctx.Project.Path, "checksum")
 	if err != nil {
-		return ActionFailed("failed to open the internal project state: %s", err)
+		return Failed("failed to open the internal project state: %s", err)
 	}
 
 	storedChecksum, err := checksumStore.GetString(c.path)
 	if err != nil {
-		return ActionFailed("failed to read the previous file checksum: %s", err)
+		return Failed("failed to read the previous file checksum: %s", err)
 	}
 
 	if fileChecksum != storedChecksum {
-		return ActionNeeded("file %s has changed", c.path)
+		return Needed("file %s has changed", c.path)
 	}
-	return ActionNotNeeded()
+	return NotNeeded()
 }
 
 func (c fileCondition) After(ctx *context.Context) *ActionResult {
 	fullPath := filepath.Join(ctx.Project.Path, c.path)
 
 	if !utils.PathExists(fullPath) {
-		return ActionNotNeeded()
+		return NotNeeded()
 	}
 
 	fileChecksum, err := utils.FileChecksum(fullPath)
 	if err != nil {
-		return ActionFailed("failed to get the file checksum: %s", err)
+		return Failed("failed to get the file checksum: %s", err)
 	}
 
 	checksumStore, err := store.Open(ctx.Project.Path, "checksum")
 	if err != nil {
-		return ActionFailed("failed to open the internal project state: %s", err)
+		return Failed("failed to open the internal project state: %s", err)
 	}
 
 	err = checksumStore.SetString(c.path, fileChecksum)
 	if err != nil {
-		return ActionFailed("failed to store the current file checksum: %s", err)
+		return Failed("failed to store the current file checksum: %s", err)
 	}
 
-	return ActionNotNeeded()
+	return NotNeeded()
 }

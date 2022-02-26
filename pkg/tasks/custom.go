@@ -33,12 +33,12 @@ func parserCustom(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	runNeeded := func(ctx *context.Context) *taskapi.ActionResult {
 		result := shellSilent(ctx, condition).Capture()
 		if result.LaunchError != nil {
-			return taskapi.ActionFailed("failed to run the condition command: %s", result.LaunchError)
+			return taskapi.Failed("failed to run the condition command: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
-			return taskapi.ActionNeeded("the met? command exited with a non-zero code")
+			return taskapi.Needed("the met? command exited with a non-zero code")
 		}
-		return taskapi.ActionNotNeeded()
+		return taskapi.NotNeeded()
 	}
 
 	task.AddActionBuilder("", runCommand).On(taskapi.FuncCondition(runNeeded))

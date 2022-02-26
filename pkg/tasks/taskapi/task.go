@@ -23,6 +23,7 @@ func (t *Task) AddActionBuilder(description string, runFunc func(*context.Contex
 	}
 	action := &taskAction{desc: description, runFunc: runFunc}
 	t.Actions = append(t.Actions, action)
+
 	return &taskActionBuilder{action}
 }
 
