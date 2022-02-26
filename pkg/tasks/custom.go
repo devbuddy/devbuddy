@@ -41,7 +41,7 @@ func parserCustom(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return taskapi.ActionNotNeeded()
 	}
 
-	task.AddActionWithBuilder("", runCommand).OnFunc(runNeeded)
+	task.AddActionBuilder("", runCommand).OnFunc(runNeeded)
 
 	return nil
 }

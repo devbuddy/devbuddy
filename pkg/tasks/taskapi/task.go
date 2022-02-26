@@ -17,13 +17,13 @@ func (t *Task) AddAction(action TaskAction) {
 	t.Actions = append(t.Actions, action)
 }
 
-func (t *Task) AddActionWithBuilder(description string, runFunc func(*context.Context) error) *genericTaskActionBuilder {
+func (t *Task) AddActionBuilder(description string, runFunc func(*context.Context) error) *taskActionBuilder {
 	if runFunc == nil {
 		panic("runFunc cannot be nil")
 	}
-	action := &genericTaskAction{desc: description, runFunc: runFunc}
+	action := &taskAction{desc: description, runFunc: runFunc}
 	t.Actions = append(t.Actions, action)
-	return &genericTaskActionBuilder{action}
+	return &taskActionBuilder{action}
 }
 
 func (t *Task) Describe() string {

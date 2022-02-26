@@ -28,7 +28,7 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		}
 		return taskapi.ActionNotNeeded()
 	}
-	task.AddActionWithBuilder("install nodejs from https://nodejs.org", run).
+	task.AddActionBuilder("install nodejs from https://nodejs.org", run).
 		OnFunc(condition).
 		SetFeature("node", version)
 
@@ -39,7 +39,7 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		}
 		return command(ctx, "npm", "install", "--no-progress").Run().Error
 	}
-	task.AddActionWithBuilder("install dependencies with NPM", npmInstall).
+	task.AddActionBuilder("install dependencies with NPM", npmInstall).
 		OnFileChange("package.json")
 
 	return nil

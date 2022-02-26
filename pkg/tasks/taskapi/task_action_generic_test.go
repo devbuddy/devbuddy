@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newBuilder(description string, runFunc func(*context.Context) error) *genericTaskActionBuilder {
-	return &genericTaskActionBuilder{&genericTaskAction{desc: description, runFunc: runFunc}}
+func newBuilder(description string, runFunc func(*context.Context) error) *taskActionBuilder {
+	return &taskActionBuilder{&taskAction{desc: description, runFunc: runFunc}}
 }
 
 func TestTaskActionGenericRun(t *testing.T) {
@@ -21,7 +21,7 @@ func TestTaskActionGenericRun(t *testing.T) {
 	action := newBuilder("", func(ctx *context.Context) error {
 		runCalls++
 		return nil
-	}).genericTaskAction
+	}).taskAction
 
 	action.Run(&context.Context{})
 	require.Equal(t, 1, runCalls)
@@ -32,7 +32,7 @@ func TestTaskActionGenericRunError(t *testing.T) {
 
 	action := newBuilder("", func(ctx *context.Context) error {
 		return dummyError
-	}).genericTaskAction
+	}).taskAction
 
 	err := action.Run(&context.Context{})
 	require.Equal(t, dummyError, err)
@@ -52,7 +52,7 @@ func TestTaskActionGenericFeature(t *testing.T) {
 }
 
 func TestTaskActionGenericNoConditions(t *testing.T) {
-	action := newBuilder("", func(ctx *context.Context) error { return nil }).genericTaskAction
+	action := newBuilder("", func(ctx *context.Context) error { return nil }).taskAction
 
 	result := action.Needed(&context.Context{})
 	require.NoError(t, result.Error)
@@ -77,19 +77,19 @@ func TestTaskActionGenericConditions(t *testing.T) {
 	result2 := ActionNeeded("post reason")
 
 	builder := newBuilder("", func(ctx *context.Context) error { return nil })
-	builder.On(&genericTaskActionCondition{
+	builder.On(&taskActionCondition{
 		pre:  func(ctx *context.Context) *ActionResult { pre1Calls++; return ActionNotNeeded() },
 		post: func(ctx *context.Context) *ActionResult { post1Calls++; return ActionNotNeeded() },
 	})
-	builder.On(&genericTaskActionCondition{
+	builder.On(&taskActionCondition{
 		pre:  func(ctx *context.Context) *ActionResult { pre2Calls++; return result1 },
 		post: func(ctx *context.Context) *ActionResult { post2Calls++; return result2 },
 	})
-	builder.On(&genericTaskActionCondition{
+	builder.On(&taskActionCondition{
 		pre:  func(ctx *context.Context) *ActionResult { pre3Calls++; return ActionNotNeeded() },
 		post: func(ctx *context.Context) *ActionResult { post3Calls++; return ActionNotNeeded() },
 	})
-	action := builder.genericTaskAction
+	action := builder.taskAction
 
 	result := action.Needed(&context.Context{})
 	require.Equal(t, result1, result)
@@ -122,7 +122,7 @@ func TestTaskActionGenericOnFunc(t *testing.T) {
 		calls++
 		return results[index]
 	})
-	action := builder.genericTaskAction
+	action := builder.taskAction
 
 	result := action.Needed(&context.Context{})
 	require.NoError(t, result.Error)
@@ -145,7 +145,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	// Without file
 
-	action := newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
+	action := newBuilder("", runFunc).OnFileChange("testfile").taskAction
 
 	result := action.Needed(ctx)
 	require.NoError(t, result.Error)
@@ -161,7 +161,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	test.WriteFile(tmpfile, []byte("content-A"))
 
-	action = newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
+	action = newBuilder("", runFunc).OnFileChange("testfile").taskAction
 
 	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
@@ -176,7 +176,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	// The file did not change
 
-	action = newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
+	action = newBuilder("", runFunc).OnFileChange("testfile").taskAction
 
 	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
@@ -186,7 +186,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	test.WriteFile(tmpfile, []byte("content-B"))
 
-	action = newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
+	action = newBuilder("", runFunc).OnFileChange("testfile").taskAction
 
 	result = action.Needed(ctx)
 	require.NoError(t, result.Error)

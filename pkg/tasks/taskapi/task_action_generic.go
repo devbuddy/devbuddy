@@ -9,9 +9,9 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
-type genericTaskAction struct {
+type taskAction struct {
 	desc           string
-	conditions     []*genericTaskActionCondition
+	conditions     []*taskActionCondition
 	monitoredFiles []string
 	runFunc        func(*context.Context) error
 	feature        *autoenv.FeatureInfo
@@ -19,34 +19,34 @@ type genericTaskAction struct {
 	runCalled bool
 }
 
-type genericTaskActionCondition struct {
+type taskActionCondition struct {
 	pre  func(*context.Context) *ActionResult
 	post func(*context.Context) *ActionResult
 }
 
-func (a *genericTaskAction) Description() string {
+func (a *taskAction) Description() string {
 	return a.desc
 }
 
-func (a *genericTaskAction) Needed(ctx *context.Context) (result *ActionResult) {
+func (a *taskAction) Needed(ctx *context.Context) (result *ActionResult) {
 	if a.runCalled {
 		return a.post(ctx)
 	}
 	return a.pre(ctx)
 }
 
-func (a *genericTaskAction) Run(ctx *context.Context) error {
+func (a *taskAction) Run(ctx *context.Context) error {
 	a.runCalled = true
 	return a.runFunc(ctx)
 }
 
-func (a *genericTaskAction) Feature() *autoenv.FeatureInfo {
+func (a *taskAction) Feature() *autoenv.FeatureInfo {
 	return a.feature
 }
 
 // internals
 
-func (a *genericTaskAction) pre(ctx *context.Context) (result *ActionResult) {
+func (a *taskAction) pre(ctx *context.Context) (result *ActionResult) {
 	hasConditions := false
 
 	for _, condition := range a.conditions {
@@ -61,7 +61,7 @@ func (a *genericTaskAction) pre(ctx *context.Context) (result *ActionResult) {
 	for _, filePath := range a.monitoredFiles {
 		hasConditions = true
 
-		result = genericTaskActionPreConditionForFile(ctx, filePath)
+		result = taskActionPreConditionForFile(ctx, filePath)
 		if result.Error != nil || result.Needed {
 			return result
 		}
@@ -73,7 +73,7 @@ func (a *genericTaskAction) pre(ctx *context.Context) (result *ActionResult) {
 	return ActionNeeded("action without conditions")
 }
 
-func (a *genericTaskAction) post(ctx *context.Context) (result *ActionResult) {
+func (a *taskAction) post(ctx *context.Context) (result *ActionResult) {
 	for _, condition := range a.conditions {
 		result = condition.post(ctx)
 		if result.Error != nil || result.Needed {
@@ -81,7 +81,7 @@ func (a *genericTaskAction) post(ctx *context.Context) (result *ActionResult) {
 		}
 	}
 	for _, filePath := range a.monitoredFiles {
-		result = genericTaskActionPostConditionForFile(ctx, filePath)
+		result = taskActionPostConditionForFile(ctx, filePath)
 		if result.Error != nil || result.Needed {
 			return result
 		}
@@ -89,7 +89,7 @@ func (a *genericTaskAction) post(ctx *context.Context) (result *ActionResult) {
 	return ActionNotNeeded()
 }
 
-func genericTaskActionPreConditionForFile(ctx *context.Context, path string) *ActionResult {
+func taskActionPreConditionForFile(ctx *context.Context, path string) *ActionResult {
 	fullPath := filepath.Join(ctx.Project.Path, path)
 
 	if !utils.PathExists(fullPath) {
@@ -117,7 +117,7 @@ func genericTaskActionPreConditionForFile(ctx *context.Context, path string) *Ac
 	return ActionNotNeeded()
 }
 
-func genericTaskActionPostConditionForFile(ctx *context.Context, path string) *ActionResult {
+func taskActionPostConditionForFile(ctx *context.Context, path string) *ActionResult {
 	fullPath := filepath.Join(ctx.Project.Path, path)
 
 	if !utils.PathExists(fullPath) {

@@ -15,7 +15,7 @@ func parseEnvfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	check := func(ctx *context.Context) error {
 		return nil
 	}
-	task.AddActionWithBuilder("", check).SetFeature("envfile", envfilePath)
+	task.AddActionBuilder("", check).SetFeature("envfile", envfilePath)
 
 	return nil
 }

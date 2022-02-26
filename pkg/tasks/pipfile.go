@@ -34,7 +34,7 @@ func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		}
 		return taskapi.ActionNotNeeded()
 	}
-	task.AddActionWithBuilder("install pipfile command", installPipfile).
+	task.AddActionBuilder("install pipfile command", installPipfile).
 		OnFunc(installPipfileNeeded)
 
 	runPipfileInstall := func(ctx *context.Context) error {
@@ -44,7 +44,7 @@ func parserPipfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		}
 		return nil
 	}
-	task.AddActionWithBuilder("install dependencies from the Pipfile", runPipfileInstall).
+	task.AddActionBuilder("install dependencies from the Pipfile", runPipfileInstall).
 		OnFileChange("Pipfile").
 		OnFileChange("Pipfile.lock")
 

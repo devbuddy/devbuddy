@@ -13,7 +13,7 @@ func parseEnv(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	check := func(ctx *context.Context) error {
 		return nil
 	}
-	task.AddActionWithBuilder("", check).SetFeature("env", "")
+	task.AddActionBuilder("", check).SetFeature("env", "")
 
 	return nil
 }

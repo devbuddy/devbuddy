@@ -57,7 +57,7 @@ func GetDefinitionOrUnknown(name string) *TaskDefinition {
 
 func newUnknownTaskDefinition() *TaskDefinition {
 	parser := func(config *TaskConfig, task *Task) error {
-		task.AddActionWithBuilder("", func(ctx *context.Context) error {
+		task.AddActionBuilder("", func(ctx *context.Context) error {
 			ctx.UI.TaskWarning(fmt.Sprintf("Unknown task: \"%s\"", config.name))
 			return nil
 		})
