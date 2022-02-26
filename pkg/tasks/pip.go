@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 func init() {
-	taskapi.Register("pip", "Pip", parserPip).SetRequiredTask(pythonTaskName)
+	api.Register("pip", "Pip", parserPip).SetRequiredTask(pythonTaskName)
 }
 
-func parserPip(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parserPip(config *api.TaskConfig, task *api.Task) error {
 	files, err := config.GetListOfStrings()
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func parserPip(config *taskapi.TaskConfig, task *taskapi.Task) error {
 			return nil
 		}
 		task.AddActionBuilder(fmt.Sprintf("install %s", file), pipInstall).
-			On(taskapi.FileCondition(file))
+			On(api.FileCondition(file))
 	}
 
 	return nil

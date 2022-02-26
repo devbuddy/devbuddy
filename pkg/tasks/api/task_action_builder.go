@@ -1,4 +1,4 @@
-package taskapi
+package api
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv"

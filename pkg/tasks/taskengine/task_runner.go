@@ -7,11 +7,11 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 type TaskRunner interface {
-	Run(*taskapi.Task) error
+	Run(*api.Task) error
 }
 
 type TaskRunnerImpl struct {
@@ -22,7 +22,7 @@ func NewTaskRunner(ctx *context.Context) TaskRunner {
 	return &TaskRunnerImpl{ctx: ctx}
 }
 
-func (r *TaskRunnerImpl) Run(task *taskapi.Task) (err error) {
+func (r *TaskRunnerImpl) Run(task *api.Task) (err error) {
 	for _, action := range task.Actions {
 		err = r.runAction(action)
 		if err != nil {
@@ -32,7 +32,7 @@ func (r *TaskRunnerImpl) Run(task *taskapi.Task) (err error) {
 	return nil
 }
 
-func (r *TaskRunnerImpl) runAction(action taskapi.TaskAction) error {
+func (r *TaskRunnerImpl) runAction(action api.TaskAction) error {
 	desc := action.Description()
 
 	result := action.Needed(r.ctx)

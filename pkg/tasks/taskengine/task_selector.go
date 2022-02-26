@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers/osidentity"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 type TaskSelector interface {
-	ShouldRun(*taskapi.Task) (bool, error)
+	ShouldRun(*api.Task) (bool, error)
 }
 
 type TaskSelectorImpl struct {
@@ -19,7 +19,7 @@ func NewTaskSelector() *TaskSelectorImpl {
 	return &TaskSelectorImpl{osIdent: osidentity.Detect()}
 }
 
-func (s *TaskSelectorImpl) ShouldRun(task *taskapi.Task) (bool, error) {
+func (s *TaskSelectorImpl) ShouldRun(task *api.Task) (bool, error) {
 	shouldRun, err := s.osRequirementMatch(task)
 	if err != nil {
 		return false, err
@@ -31,7 +31,7 @@ func (s *TaskSelectorImpl) ShouldRun(task *taskapi.Task) (bool, error) {
 	return true, nil
 }
 
-func (s *TaskSelectorImpl) osRequirementMatch(task *taskapi.Task) (bool, error) {
+func (s *TaskSelectorImpl) osRequirementMatch(task *api.Task) (bool, error) {
 	switch task.OSRequirement {
 	case "":
 		break

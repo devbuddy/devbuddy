@@ -7,14 +7,14 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 func init() {
-	taskapi.Register("homebrew", "Homebrew", parserHomebrew).SetOSRequirement("macos")
+	api.Register("homebrew", "Homebrew", parserHomebrew).SetOSRequirement("macos")
 }
 
-func parserHomebrew(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parserHomebrew(config *api.TaskConfig, task *api.Task) error {
 	formulas, err := config.GetListOfStrings()
 	if err != nil {
 		return err
@@ -41,13 +41,13 @@ func (b *brewInstall) Description() string {
 	return fmt.Sprintf("installing %s", b.formula)
 }
 
-func (b *brewInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
+func (b *brewInstall) Needed(ctx *context.Context) *api.ActionResult {
 	brew := helpers.NewHomebrew()
 
 	if brew.IsInstalled(b.formula) {
-		return taskapi.NotNeeded()
+		return api.NotNeeded()
 	}
-	return taskapi.Needed("package %s is not installed", b.formula)
+	return api.Needed("package %s is not installed", b.formula)
 }
 
 func (b *brewInstall) Run(ctx *context.Context) error {

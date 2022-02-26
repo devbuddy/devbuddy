@@ -1,4 +1,4 @@
-package taskapi
+package api
 
 import "fmt"
 

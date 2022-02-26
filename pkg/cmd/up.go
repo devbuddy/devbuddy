@@ -7,7 +7,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/tasks"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/devbuddy/devbuddy/pkg/tasks/taskengine"
 )
 
@@ -26,7 +26,7 @@ func upRun(cmd *cobra.Command, args []string) {
 	ctx, err := context.LoadWithProject()
 	checkError(err)
 
-	taskList, err := taskapi.GetTasksFromProject(ctx.Project)
+	taskList, err := api.GetTasksFromProject(ctx.Project)
 	checkError(err)
 
 	runner := taskengine.NewTaskRunner(ctx)

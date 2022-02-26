@@ -2,14 +2,14 @@ package tasks
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 func init() {
-	taskapi.Register("custom", "Custom", parserCustom)
+	api.Register("custom", "Custom", parserCustom)
 }
 
-func parserCustom(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parserCustom(config *api.TaskConfig, task *api.Task) error {
 	command, err := config.GetStringProperty("meet")
 	if err != nil {
 		return err
@@ -30,18 +30,18 @@ func parserCustom(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return result.Error
 	}
 
-	runNeeded := func(ctx *context.Context) *taskapi.ActionResult {
+	runNeeded := func(ctx *context.Context) *api.ActionResult {
 		result := shellSilent(ctx, condition).Capture()
 		if result.LaunchError != nil {
-			return taskapi.Failed("failed to run the condition command: %s", result.LaunchError)
+			return api.Failed("failed to run the condition command: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
-			return taskapi.Needed("the met? command exited with a non-zero code")
+			return api.Needed("the met? command exited with a non-zero code")
 		}
-		return taskapi.NotNeeded()
+		return api.NotNeeded()
 	}
 
-	task.AddActionBuilder("", runCommand).On(taskapi.FuncCondition(runNeeded))
+	task.AddActionBuilder("", runCommand).On(api.FuncCondition(runNeeded))
 
 	return nil
 }

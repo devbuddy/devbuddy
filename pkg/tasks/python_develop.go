@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 func init() {
-	taskapi.Register("python_develop", "Python develop", parserPythonDevelop).SetRequiredTask(pythonTaskName)
+	api.Register("python_develop", "Python develop", parserPythonDevelop).SetRequiredTask(pythonTaskName)
 }
 
-func parserPythonDevelop(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parserPythonDevelop(config *api.TaskConfig, task *api.Task) error {
 	extras, err := config.GetListOfStringsPropertyDefault("extras", []string{})
 	if err != nil {
 		return err
@@ -33,8 +33,8 @@ func parserPythonDevelop(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return nil
 	}
 	task.AddActionBuilder("install python package in develop mode", pipInstall).
-		On(taskapi.FileCondition("setup.py")).
-		On(taskapi.FileCondition("setup.cfg"))
+		On(api.FileCondition("setup.py")).
+		On(api.FileCondition("setup.cfg"))
 
 	return nil
 }

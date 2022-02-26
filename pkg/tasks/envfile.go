@@ -2,14 +2,14 @@ package tasks
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 func init() {
-	taskapi.Register("envfile", "EnvFile", parseEnvfile)
+	api.Register("envfile", "EnvFile", parseEnvfile)
 }
 
-func parseEnvfile(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parseEnvfile(config *api.TaskConfig, task *api.Task) error {
 	envfilePath := ".env"
 
 	check := func(ctx *context.Context) error {

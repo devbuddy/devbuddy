@@ -3,15 +3,15 @@ package tasks
 import (
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 func init() {
-	taskapi.Register("node", "NodeJS", parseNode)
+	api.Register("node", "NodeJS", parseNode)
 }
 
-func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parseNode(config *api.TaskConfig, task *api.Task) error {
 	version, err := config.GetStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
@@ -22,14 +22,14 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	run := func(ctx *context.Context) error {
 		return helpers.NewNode(ctx.Cfg, version).Install()
 	}
-	condition := func(ctx *context.Context) *taskapi.ActionResult {
+	condition := func(ctx *context.Context) *api.ActionResult {
 		if !helpers.NewNode(ctx.Cfg, version).Exists() {
-			return taskapi.Needed("node version is not installed")
+			return api.Needed("node version is not installed")
 		}
-		return taskapi.NotNeeded()
+		return api.NotNeeded()
 	}
 	task.AddActionBuilder("install nodejs from https://nodejs.org", run).
-		On(taskapi.FuncCondition(condition)).
+		On(api.FuncCondition(condition)).
 		SetFeature("node", version)
 
 	npmInstall := func(ctx *context.Context) error {
@@ -40,7 +40,7 @@ func parseNode(config *taskapi.TaskConfig, task *taskapi.Task) error {
 		return command(ctx, "npm", "install", "--no-progress").Run().Error
 	}
 	task.AddActionBuilder("install dependencies with NPM", npmInstall).
-		On(taskapi.FileCondition("package.json"))
+		On(api.FileCondition("package.json"))
 
 	return nil
 }

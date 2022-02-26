@@ -2,14 +2,14 @@ package tasks
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 func init() {
-	taskapi.Register("env", "Env", parseEnv)
+	api.Register("env", "Env", parseEnv)
 }
 
-func parseEnv(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parseEnv(config *api.TaskConfig, task *api.Task) error {
 	check := func(ctx *context.Context) error {
 		return nil
 	}

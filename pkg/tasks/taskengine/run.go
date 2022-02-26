@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 // Run accepts a list of tasks and check for their requirements and runs them if their conditions are met
-func Run(ctx *context.Context, executor TaskRunner, selector TaskSelector, taskList []*taskapi.Task) (bool, error) {
+func Run(ctx *context.Context, executor TaskRunner, selector TaskSelector, taskList []*api.Task) (bool, error) {
 	err := checkRequiredTasks(taskList)
 	if err != nil {
 		return false, err
@@ -36,7 +36,7 @@ func Run(ctx *context.Context, executor TaskRunner, selector TaskSelector, taskL
 	return true, nil
 }
 
-func checkRequiredTasks(taskList []*taskapi.Task) error {
+func checkRequiredTasks(taskList []*api.Task) error {
 	seen := map[string]bool{}
 	for _, task := range taskList {
 		if task.RequiredTask != "" && !seen[task.RequiredTask] {

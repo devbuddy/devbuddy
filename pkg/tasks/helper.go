@@ -7,7 +7,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 // RegisterTasks is a hack to force the execution of the task registration (in the init functions)
@@ -54,11 +54,11 @@ func fileModTime(ctx *context.Context, path string) (int64, error) {
 }
 
 func findAutoEnvFeatureParam(ctx *context.Context, name string) (string, error) {
-	taskList, err := taskapi.GetTasksFromProject(ctx.Project)
+	taskList, err := api.GetTasksFromProject(ctx.Project)
 	if err != nil {
 		return "", err
 	}
-	feature := taskapi.GetFeaturesFromTasks(taskList).Get(name)
+	feature := api.GetFeaturesFromTasks(taskList).Get(name)
 	if feature == nil {
 		return "", fmt.Errorf("no autoenv feature with name %s", name)
 	}

@@ -6,14 +6,14 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 func init() {
-	taskapi.Register("apt", "Apt", parserApt).SetOSRequirement("debian")
+	api.Register("apt", "Apt", parserApt).SetOSRequirement("debian")
 }
 
-func parserApt(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parserApt(config *api.TaskConfig, task *api.Task) error {
 	packages, err := config.GetListOfStrings()
 	if err != nil {
 		return err
@@ -39,13 +39,13 @@ func (a *aptInstall) Description() string {
 	return ""
 }
 
-func (a *aptInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
+func (a *aptInstall) Needed(ctx *context.Context) *api.ActionResult {
 	a.missingPackageNames = []string{}
 
 	for _, name := range a.packageNames {
 		result := shellSilent(ctx, fmt.Sprintf("dpkg -s \"%s\" | grep -q 'Status: install'", name)).Capture()
 		if result.LaunchError != nil {
-			return taskapi.Failed("failed to check if package is installed: %s", result.LaunchError)
+			return api.Failed("failed to check if package is installed: %s", result.LaunchError)
 		}
 		if result.Code != 0 {
 			a.missingPackageNames = append(a.missingPackageNames, name)
@@ -53,10 +53,10 @@ func (a *aptInstall) Needed(ctx *context.Context) *taskapi.ActionResult {
 	}
 
 	if len(a.missingPackageNames) > 0 {
-		return taskapi.Needed("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
+		return api.Needed("packages are not installed: %s", strings.Join(a.missingPackageNames, ", "))
 	}
 
-	return taskapi.NotNeeded()
+	return api.NotNeeded()
 }
 
 func (a *aptInstall) Run(ctx *context.Context) error {
