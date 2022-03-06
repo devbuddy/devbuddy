@@ -7,7 +7,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 func Run() {
@@ -47,11 +47,11 @@ func getFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
 		// So we continue with an empty feature map
 		return autoenv.NewFeatureSet(), nil
 	}
-	allTasks, err := taskapi.GetTasksFromProject(proj)
+	allTasks, err := api.GetTasksFromProject(proj)
 	if err != nil {
 		return nil, err
 	}
-	return taskapi.GetFeaturesFromTasks(allTasks), nil
+	return api.GetFeaturesFromTasks(allTasks), nil
 }
 
 func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {

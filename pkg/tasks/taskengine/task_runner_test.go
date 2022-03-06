@@ -4,14 +4,13 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
-
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRunActionNeeded(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), taskapi.ActionNotNeeded(), nil)
+	action := newTestingAction("Action X", api.Needed("some-reason"), api.NotNeeded(), nil)
 	task := newTaskWithAction("testtask", action)
 
 	taskRunner := &TaskRunnerImpl{ctx: ctx}
@@ -26,7 +25,7 @@ func TestRunActionNeeded(t *testing.T) {
 
 func TestRunActionNotNeeded(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", taskapi.ActionNotNeeded(), nil, nil)
+	action := newTestingAction("Action X", api.NotNeeded(), nil, nil)
 	task := newTaskWithAction("testtask", action)
 
 	taskRunner := &TaskRunnerImpl{ctx: ctx}
@@ -41,7 +40,7 @@ func TestRunActionNotNeeded(t *testing.T) {
 
 func TestRunActionFailureOnNeeded(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action := newTestingAction("Action X", taskapi.ActionFailed("ERROR_X"), nil, nil)
+	action := newTestingAction("Action X", api.Failed("ERROR_X"), nil, nil)
 	task := newTaskWithAction("testtask", action)
 
 	taskRunner := &TaskRunnerImpl{ctx: ctx}
@@ -54,7 +53,7 @@ func TestRunActionFailureOnNeeded(t *testing.T) {
 
 func TestRunActionFailureOnRun(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), nil, errors.New("RunFailed"))
+	action := newTestingAction("Action X", api.Needed("some-reason"), nil, errors.New("RunFailed"))
 	task := newTaskWithAction("testtask", action)
 
 	taskRunner := &TaskRunnerImpl{ctx: ctx}
@@ -69,7 +68,7 @@ func TestRunActionFailureOnRun(t *testing.T) {
 
 func TestRunActionStillNeeded(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action := newTestingAction("Action X", taskapi.ActionNeeded("some-reason"), taskapi.ActionNeeded("some-reason"), nil)
+	action := newTestingAction("Action X", api.Needed("some-reason"), api.Needed("some-reason"), nil)
 	task := newTaskWithAction("testtask", action)
 
 	taskRunner := &TaskRunnerImpl{ctx: ctx}
@@ -82,12 +81,12 @@ func TestRunActionStillNeeded(t *testing.T) {
 
 func TestTaskRunner(t *testing.T) {
 	ctx, output := setupTaskTesting()
-	action1 := newTestingAction("Action 1", taskapi.ActionNeeded("some-reason"), taskapi.ActionNotNeeded(), nil)
-	action2 := newTestingAction("Action 2", taskapi.ActionNeeded("some-reason"), taskapi.ActionNotNeeded(), nil)
+	action1 := newTestingAction("Action 1", api.Needed("some-reason"), api.NotNeeded(), nil)
+	action2 := newTestingAction("Action 2", api.Needed("some-reason"), api.NotNeeded(), nil)
 
-	task := &taskapi.Task{
-		TaskDefinition: &taskapi.TaskDefinition{Name: "testtask"},
-		Actions:        []taskapi.TaskAction{action1, action2},
+	task := &api.Task{
+		TaskDefinition: &api.TaskDefinition{Name: "testtask"},
+		Actions:        []api.TaskAction{action1, action2},
 	}
 
 	taskRunner := &TaskRunnerImpl{ctx: ctx}
@@ -105,12 +104,12 @@ func TestTaskRunner(t *testing.T) {
 
 func TestTaskRunnerWithError(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	action1 := newTestingAction("Action 1", taskapi.ActionFailed("CRASH 1"), nil, nil)
+	action1 := newTestingAction("Action 1", api.Failed("CRASH 1"), nil, nil)
 	action2 := newTestingAction("Action 2", nil, nil, nil)
 
-	task := &taskapi.Task{
-		TaskDefinition: &taskapi.TaskDefinition{Name: "testtask"},
-		Actions:        []taskapi.TaskAction{action1, action2},
+	task := &api.Task{
+		TaskDefinition: &api.TaskDefinition{Name: "testtask"},
+		Actions:        []api.TaskAction{action1, action2},
 	}
 
 	taskRunner := &TaskRunnerImpl{ctx: ctx}

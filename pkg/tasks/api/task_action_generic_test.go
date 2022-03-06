@@ -1,4 +1,4 @@
-package taskapi
+package api
 
 import (
 	"errors"
@@ -11,17 +11,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newBuilder(description string, runFunc func(*context.Context) error) *genericTaskActionBuilder {
-	return &genericTaskActionBuilder{&genericTaskAction{desc: description, runFunc: runFunc}}
+func newBuilder(description string, runFunc func(*context.Context) error) *taskActionBuilder {
+	return &taskActionBuilder{&taskAction{desc: description, runFunc: runFunc}}
 }
 
 func TestTaskActionGenericRun(t *testing.T) {
 	runCalls := 0
 
-	action := newBuilder("", func(ctx *context.Context) error {
+	action := newBuilder("", func(_ *context.Context) error {
 		runCalls++
 		return nil
-	}).genericTaskAction
+	}).taskAction
 
 	action.Run(&context.Context{})
 	require.Equal(t, 1, runCalls)
@@ -32,7 +32,7 @@ func TestTaskActionGenericRunError(t *testing.T) {
 
 	action := newBuilder("", func(ctx *context.Context) error {
 		return dummyError
-	}).genericTaskAction
+	}).taskAction
 
 	err := action.Run(&context.Context{})
 	require.Equal(t, dummyError, err)
@@ -52,7 +52,7 @@ func TestTaskActionGenericFeature(t *testing.T) {
 }
 
 func TestTaskActionGenericNoConditions(t *testing.T) {
-	action := newBuilder("", func(ctx *context.Context) error { return nil }).genericTaskAction
+	action := newBuilder("", func(ctx *context.Context) error { return nil }).taskAction
 
 	result := action.Needed(&context.Context{})
 	require.NoError(t, result.Error)
@@ -65,64 +65,75 @@ func TestTaskActionGenericNoConditions(t *testing.T) {
 	require.False(t, result.Needed)
 }
 
-func TestTaskActionGenericConditions(t *testing.T) {
-	pre1Calls := 0
-	post1Calls := 0
-	pre2Calls := 0
-	post2Calls := 0
-	pre3Calls := 0
-	post3Calls := 0
+type recorderCondition struct {
+	beforeResult *ActionResult
+	beforeCalled int
+	afterResult  *ActionResult
+	afterCalled  int
+}
 
-	result1 := ActionNeeded("pre reason")
-	result2 := ActionNeeded("post reason")
+func (c *recorderCondition) Before(ctx *context.Context) *ActionResult {
+	c.beforeCalled++
+	return c.beforeResult
+}
+
+func (c *recorderCondition) After(ctx *context.Context) *ActionResult {
+	c.afterCalled++
+	return c.afterResult
+}
+
+func TestTaskActionGenericConditions(t *testing.T) {
+	cond1 := &recorderCondition{
+		beforeResult: NotNeeded(),
+		afterResult:  NotNeeded(),
+	}
+	cond2 := &recorderCondition{
+		beforeResult: Needed("pre reason"),
+		afterResult:  Needed("post reason"),
+	}
+	cond3 := &recorderCondition{
+		beforeResult: NotNeeded(),
+		afterResult:  NotNeeded(),
+	}
 
 	builder := newBuilder("", func(ctx *context.Context) error { return nil })
-	builder.On(&genericTaskActionCondition{
-		pre:  func(ctx *context.Context) *ActionResult { pre1Calls++; return ActionNotNeeded() },
-		post: func(ctx *context.Context) *ActionResult { post1Calls++; return ActionNotNeeded() },
-	})
-	builder.On(&genericTaskActionCondition{
-		pre:  func(ctx *context.Context) *ActionResult { pre2Calls++; return result1 },
-		post: func(ctx *context.Context) *ActionResult { post2Calls++; return result2 },
-	})
-	builder.On(&genericTaskActionCondition{
-		pre:  func(ctx *context.Context) *ActionResult { pre3Calls++; return ActionNotNeeded() },
-		post: func(ctx *context.Context) *ActionResult { post3Calls++; return ActionNotNeeded() },
-	})
-	action := builder.genericTaskAction
+	builder.On(cond1)
+	builder.On(cond2)
+	builder.On(cond3)
+	action := builder.taskAction
 
 	result := action.Needed(&context.Context{})
-	require.Equal(t, result1, result)
-	require.Equal(t, 1, pre1Calls)
-	require.Equal(t, 0, post1Calls)
-	require.Equal(t, 1, pre2Calls)
-	require.Equal(t, 0, post2Calls)
-	require.Equal(t, 0, pre3Calls)
-	require.Equal(t, 0, post3Calls)
+	require.Equal(t, cond2.beforeResult, result)
+	require.Equal(t, 1, cond1.beforeCalled)
+	require.Equal(t, 0, cond1.afterCalled)
+	require.Equal(t, 1, cond2.beforeCalled)
+	require.Equal(t, 0, cond2.afterCalled)
+	require.Equal(t, 0, cond3.beforeCalled)
+	require.Equal(t, 0, cond3.afterCalled)
 
 	action.Run(&context.Context{})
 
 	result = action.Needed(&context.Context{})
-	require.Equal(t, result2, result)
-	require.Equal(t, 1, pre1Calls)
-	require.Equal(t, 1, post1Calls)
-	require.Equal(t, 1, pre2Calls)
-	require.Equal(t, 1, post2Calls)
-	require.Equal(t, 0, pre3Calls)
-	require.Equal(t, 0, post3Calls)
+	require.Equal(t, cond2.afterResult, result)
+	require.Equal(t, 1, cond1.beforeCalled)
+	require.Equal(t, 1, cond1.afterCalled)
+	require.Equal(t, 1, cond2.beforeCalled)
+	require.Equal(t, 1, cond2.afterCalled)
+	require.Equal(t, 0, cond3.beforeCalled)
+	require.Equal(t, 0, cond3.afterCalled)
 }
 
 func TestTaskActionGenericOnFunc(t *testing.T) {
 	calls := 0
-	results := []*ActionResult{ActionNeeded("reason 1"), ActionNotNeeded()}
+	results := []*ActionResult{Needed("reason 1"), NotNeeded()}
 
 	builder := newBuilder("", func(ctx *context.Context) error { return nil })
-	builder.OnFunc(func(ctx *context.Context) *ActionResult {
+	builder.On(FuncCondition(func(_ *context.Context) *ActionResult {
 		index := calls
 		calls++
 		return results[index]
-	})
-	action := builder.genericTaskAction
+	}))
+	action := builder.taskAction
 
 	result := action.Needed(&context.Context{})
 	require.NoError(t, result.Error)
@@ -145,7 +156,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	// Without file
 
-	action := newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
+	action := newBuilder("", runFunc).On(FileCondition("testfile")).taskAction
 
 	result := action.Needed(ctx)
 	require.NoError(t, result.Error)
@@ -161,7 +172,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	test.WriteFile(tmpfile, []byte("content-A"))
 
-	action = newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
+	action = newBuilder("", runFunc).On(FileCondition("testfile")).taskAction
 
 	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
@@ -176,7 +187,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	// The file did not change
 
-	action = newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
+	action = newBuilder("", runFunc).On(FileCondition("testfile")).taskAction
 
 	result = action.Needed(ctx)
 	require.NoError(t, result.Error)
@@ -186,7 +197,7 @@ func TestTaskActionGenericFileChange(t *testing.T) {
 
 	test.WriteFile(tmpfile, []byte("content-B"))
 
-	action = newBuilder("", runFunc).OnFileChange("testfile").genericTaskAction
+	action = newBuilder("", runFunc).On(FileCondition("testfile")).taskAction
 
 	result = action.Needed(ctx)
 	require.NoError(t, result.Error)

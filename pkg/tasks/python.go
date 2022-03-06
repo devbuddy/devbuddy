@@ -7,17 +7,17 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 const pythonTaskName = "python"
 
 func init() {
-	taskapi.Register(pythonTaskName, "Python", parserPython)
+	api.Register(pythonTaskName, "Python", parserPython)
 }
 
-func parserPython(config *taskapi.TaskConfig, task *taskapi.Task) error {
+func parserPython(config *api.TaskConfig, task *api.Task) error {
 	version, err := config.GetStringPropertyAllowSingle("version")
 	if err != nil {
 		return err
@@ -31,13 +31,13 @@ func parserPython(config *taskapi.TaskConfig, task *taskapi.Task) error {
 	return nil
 }
 
-func parserPythonInstallPyenv(task *taskapi.Task, version string) {
-	needed := func(ctx *context.Context) *taskapi.ActionResult {
+func parserPythonInstallPyenv(task *api.Task, version string) {
+	needed := func(ctx *context.Context) *api.ActionResult {
 		_, err := helpers.NewPyEnv()
 		if err != nil {
-			return taskapi.ActionNeeded("Pyenv is not installed: %s", err)
+			return api.Needed("Pyenv is not installed: %s", err)
 		}
-		return taskapi.ActionNotNeeded()
+		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
 		result := command(ctx, "brew", "install", "pyenv").Run()
@@ -46,23 +46,23 @@ func parserPythonInstallPyenv(task *taskapi.Task, version string) {
 		}
 		return nil
 	}
-	task.AddActionWithBuilder("install PyEnv", run).OnFunc(needed)
+	task.AddActionBuilder("install PyEnv", run).On(api.FuncCondition(needed))
 }
 
-func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
-	needed := func(ctx *context.Context) *taskapi.ActionResult {
+func parserPythonInstallPythonVersion(task *api.Task, version string) {
+	needed := func(ctx *context.Context) *api.ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
-			return taskapi.ActionFailed("cannot use pyenv: %s", err)
+			return api.Failed("cannot use pyenv: %s", err)
 		}
 		installed, err := pyEnv.VersionInstalled(version)
 		if err != nil {
-			return taskapi.ActionFailed("failed to check if python version is installed: %s", err)
+			return api.Failed("failed to check if python version is installed: %s", err)
 		}
 		if !installed {
-			return taskapi.ActionNeeded("python version is not installed")
+			return api.Needed("python version is not installed")
 		}
-		return taskapi.ActionNotNeeded()
+		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
 		result := command(ctx, "pyenv", "install", version).Run()
@@ -71,20 +71,20 @@ func parserPythonInstallPythonVersion(task *taskapi.Task, version string) {
 		}
 		return nil
 	}
-	task.AddActionWithBuilder("install Python version with PyEnv", run).OnFunc(needed)
+	task.AddActionBuilder("install Python version with PyEnv", run).On(api.FuncCondition(needed))
 }
 
-func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
-	needed := func(ctx *context.Context) *taskapi.ActionResult {
+func parserPythonInstallVirtualenv(task *api.Task, version string) {
+	needed := func(ctx *context.Context) *api.ActionResult {
 		pyEnv, err := helpers.NewPyEnv()
 		if err != nil {
-			return taskapi.ActionFailed("cannot use pyenv: %s", err)
+			return api.Failed("cannot use pyenv: %s", err)
 		}
 		installed := utils.PathExists(pyEnv.Which(version, "virtualenv"))
 		if !installed {
-			return taskapi.ActionNeeded("virtualenv is not installed")
+			return api.Needed("virtualenv is not installed")
 		}
-		return taskapi.ActionNotNeeded()
+		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
 		pyEnv, err := helpers.NewPyEnv()
@@ -97,17 +97,17 @@ func parserPythonInstallVirtualenv(task *taskapi.Task, version string) {
 		}
 		return nil
 	}
-	task.AddActionWithBuilder("install virtualenv", run).OnFunc(needed)
+	task.AddActionBuilder("install virtualenv", run).On(api.FuncCondition(needed))
 }
 
-func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
-	needed := func(ctx *context.Context) *taskapi.ActionResult {
+func parserPythonCreateVirtualenv(task *api.Task, version string) {
+	needed := func(ctx *context.Context) *api.ActionResult {
 		name := helpers.VirtualenvName(ctx.Project, version)
 		venv := helpers.NewVirtualenv(ctx.Cfg, name)
 		if !venv.Exists() {
-			return taskapi.ActionNeeded("project virtualenv does not exists")
+			return api.Needed("project virtualenv does not exists")
 		}
-		return taskapi.ActionNotNeeded()
+		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
 		name := helpers.VirtualenvName(ctx.Project, version)
@@ -126,7 +126,7 @@ func parserPythonCreateVirtualenv(task *taskapi.Task, version string) {
 		}
 		return nil
 	}
-	task.AddActionWithBuilder("create virtualenv", run).
-		OnFunc(needed).
+	task.AddActionBuilder("create virtualenv", run).
+		On(api.FuncCondition(needed)).
 		SetFeature("python", version)
 }

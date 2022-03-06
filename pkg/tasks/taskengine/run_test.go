@@ -4,17 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
-
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/stretchr/testify/require"
 )
 
 type taskRunnerMock struct {
 	taskError error
-	tasks     []*taskapi.Task
+	tasks     []*api.Task
 }
 
-func (r *taskRunnerMock) Run(task *taskapi.Task) error {
+func (r *taskRunnerMock) Run(task *api.Task) error {
 	r.tasks = append(r.tasks, task)
 	return r.taskError
 }
@@ -23,13 +22,13 @@ type taskSelectorMock struct {
 	should bool
 }
 
-func (s *taskSelectorMock) ShouldRun(task *taskapi.Task) (bool, error) {
+func (s *taskSelectorMock) ShouldRun(task *api.Task) (bool, error) {
 	return s.should, nil
 }
 
 func TestRun(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	tasks := []*taskapi.Task{dummyTask("1"), dummyTask("2")}
+	tasks := []*api.Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{}
 	taskSelector := &taskSelectorMock{true}
@@ -43,8 +42,8 @@ func TestRun(t *testing.T) {
 
 func TestRunRequiredTaskCheck(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	tasks := []*taskapi.Task{
-		&taskapi.Task{TaskDefinition: &taskapi.TaskDefinition{Key: "pip", RequiredTask: "python"}},
+	tasks := []*api.Task{
+		&api.Task{TaskDefinition: &api.TaskDefinition{Key: "pip", RequiredTask: "python"}},
 	}
 
 	success, err := Run(ctx, nil, nil, tasks)
@@ -54,7 +53,7 @@ func TestRunRequiredTaskCheck(t *testing.T) {
 
 func TestRunWithTaskError(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	tasks := []*taskapi.Task{dummyTask("1"), dummyTask("2")}
+	tasks := []*api.Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
 	taskSelector := &taskSelectorMock{true}
@@ -69,7 +68,7 @@ func TestRunWithTaskError(t *testing.T) {
 
 func TestRunWithTaskWithOsRequirement(t *testing.T) {
 	ctx, _ := setupTaskTesting()
-	tasks := []*taskapi.Task{dummyTask("1"), dummyTask("2")}
+	tasks := []*api.Task{dummyTask("1"), dummyTask("2")}
 
 	taskRunner := &taskRunnerMock{taskError: fmt.Errorf("oops")}
 	taskSelector := &taskSelectorMock{false}

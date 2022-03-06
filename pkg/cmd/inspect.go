@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
 var inspectCmd = &cobra.Command{
@@ -22,7 +22,7 @@ func inspectRun(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("Found project at %s\n", proj.Path)
 
-	projectTasks, err := taskapi.GetTasksFromProject(proj)
+	projectTasks, err := api.GetTasksFromProject(proj)
 	checkError(err)
 
 	for _, task := range projectTasks {

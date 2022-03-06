@@ -8,17 +8,17 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/tasks/taskapi"
+	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
-func dummyTask(name string) *taskapi.Task {
-	return &taskapi.Task{TaskDefinition: &taskapi.TaskDefinition{Name: name}}
+func dummyTask(name string) *api.Task {
+	return &api.Task{TaskDefinition: &api.TaskDefinition{Name: name}}
 }
 
 type testingAction struct {
 	desc            string
-	neededResults   []*taskapi.ActionResult
+	neededResults   []*api.ActionResult
 	neededCallCount int
 
 	feature *autoenv.FeatureInfo
@@ -31,7 +31,7 @@ func (a *testingAction) Description() string {
 	return a.desc
 }
 
-func (a *testingAction) Needed(ctx *context.Context) *taskapi.ActionResult {
+func (a *testingAction) Needed(ctx *context.Context) *api.ActionResult {
 	result := a.neededResults[a.neededCallCount]
 	if result == nil {
 		panic("the task should not have been called")
@@ -49,18 +49,18 @@ func (a *testingAction) Feature() *autoenv.FeatureInfo {
 	return a.feature
 }
 
-func newTestingAction(desc string, resultBefore, resultAfter *taskapi.ActionResult, runResult error) *testingAction {
+func newTestingAction(desc string, resultBefore, resultAfter *api.ActionResult, runResult error) *testingAction {
 	return &testingAction{
 		desc:          desc,
-		neededResults: []*taskapi.ActionResult{resultBefore, resultAfter},
+		neededResults: []*api.ActionResult{resultBefore, resultAfter},
 		runResult:     runResult,
 	}
 }
 
-func newTaskWithAction(name string, action taskapi.TaskAction) *taskapi.Task {
-	return &taskapi.Task{
-		TaskDefinition: &taskapi.TaskDefinition{Name: name},
-		Actions:        []taskapi.TaskAction{action},
+func newTaskWithAction(name string, action api.TaskAction) *api.Task {
+	return &api.Task{
+		TaskDefinition: &api.TaskDefinition{Name: name},
+		Actions:        []api.TaskAction{action},
 	}
 }
 
