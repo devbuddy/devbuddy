@@ -6,7 +6,7 @@ require (
 	github.com/creack/pty v1.1.17
 	github.com/devbuddy/expect v0.0.0-20210723163049-dbaeb92456c7
 	github.com/dnaeon/go-vcr v1.2.0
-	github.com/joho/godotenv v1.4.0
+	github.com/joho/godotenv v1.5.1
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/sahilm/fuzzy v0.1.0
