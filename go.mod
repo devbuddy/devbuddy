@@ -12,7 +12,7 @@ require (
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.3.0
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b
+	golang.org/x/term v0.5.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -22,6 +22,6 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
+	golang.org/x/sys v0.5.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
