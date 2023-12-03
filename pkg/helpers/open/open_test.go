@@ -48,10 +48,10 @@ func TestFindLinkGithub(t *testing.T) {
 	proj := project.NewFromPath(tmpdir)
 
 	nameToURL := map[string]string{
-		"pullrequest": "https://github.com/org1/repo1/pull/master?expand=1",
-		"pr":          "https://github.com/org1/repo1/pull/master?expand=1",
-		"github":      "https://github.com/org1/repo1/tree/master",
-		"gh":          "https://github.com/org1/repo1/tree/master",
+		"pullrequest": "https://github.com/org1/repo1/pull/main?expand=1",
+		"pr":          "https://github.com/org1/repo1/pull/main?expand=1",
+		"github":      "https://github.com/org1/repo1/tree/main",
+		"gh":          "https://github.com/org1/repo1/tree/main",
 	}
 	for name, expectedURL := range nameToURL {
 		url, err := FindLink(proj, name)

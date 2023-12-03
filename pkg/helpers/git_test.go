@@ -16,7 +16,7 @@ func TestGitGithubProjectURL(t *testing.T) {
 	url, err := NewGitRepo(tmpdir).BuildGithubProjectURL()
 
 	require.NoError(t, err, "BuildGithubProjectURL() failed")
-	require.Equal(t, "https://github.com/org1/repo1/tree/master", url)
+	require.Equal(t, "https://github.com/org1/repo1/tree/main", url)
 }
 
 func TestGitGithubPullrequestURL(t *testing.T) {
@@ -27,5 +27,5 @@ func TestGitGithubPullrequestURL(t *testing.T) {
 	url, err := NewGitRepo(tmpdir).BuildGithubPullrequestURL()
 
 	require.NoError(t, err, "BuildGithubProjectURL() failed")
-	require.Equal(t, "https://github.com/org1/repo1/pull/master?expand=1", url)
+	require.Equal(t, "https://github.com/org1/repo1/pull/main?expand=1", url)
 }

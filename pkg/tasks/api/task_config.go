@@ -50,9 +50,9 @@ func (c *TaskConfig) IsHash() bool {
 // GetListOfStrings expects the payload to be a list of string, returns it.
 //
 // YAML Example:
-//   - TASKNAME:
-//     - foo
-//     - bar
+// - TASKNAME:
+// ....- foo
+// ....- bar
 func (c *TaskConfig) GetListOfStrings() ([]string, error) {
 	return asListOfStrings(c.payload)
 }
@@ -61,9 +61,9 @@ func (c *TaskConfig) GetListOfStrings() ([]string, error) {
 // Or returns the default value specified if the payload is nil.
 //
 // YAML Example:
-//   - TASKNAME:
-//     - foo
-//     - bar
+// - TASKNAME:
+// ....- foo
+// ....- bar
 func (c *TaskConfig) GetListOfStringsPropertyDefault(name string, defaultValue []string) ([]string, error) {
 	value, err := c.getPropertyDefault(name, defaultValue)
 	if err != nil {
@@ -78,9 +78,10 @@ func (c *TaskConfig) GetListOfStringsPropertyDefault(name string, defaultValue [
 //
 // YAML Example:
 //   - TASKNAME: foo
+//
 // or
 //   - TASKNAME:
-//       PROPERTYNAME: foo
+//     PROPERTYNAME: foo
 func (c *TaskConfig) GetStringPropertyAllowSingle(name string) (string, error) {
 	if value, ok := c.payload.(string); ok {
 		return value, nil
@@ -92,7 +93,7 @@ func (c *TaskConfig) GetStringPropertyAllowSingle(name string) (string, error) {
 //
 // YAML Example:
 //   - TASKNAME:
-//       PROPERTYNAME: foo
+//     PROPERTYNAME: foo
 func (c *TaskConfig) GetStringProperty(name string) (string, error) {
 	value, err := c.getProperty(name)
 	if err != nil {
@@ -110,7 +111,7 @@ func (c *TaskConfig) GetStringProperty(name string) (string, error) {
 //
 // YAML Example:
 //   - TASKNAME:
-//       PROPERTYNAME: foo
+//     PROPERTYNAME: foo
 func (c *TaskConfig) GetStringPropertyDefault(name string, defaultValue string) (string, error) {
 	value, err := c.getPropertyDefault(name, defaultValue)
 	if err != nil {
@@ -128,7 +129,7 @@ func (c *TaskConfig) GetStringPropertyDefault(name string, defaultValue string) 
 //
 // YAML Example:
 //   - TASKNAME:
-//       PROPERTYNAME: on
+//     PROPERTYNAME: on
 func (c *TaskConfig) GetBooleanPropertyDefault(name string, defaultValue bool) (bool, error) {
 	value, err := c.getPropertyDefault(name, defaultValue)
 	if err != nil {
