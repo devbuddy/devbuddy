@@ -39,6 +39,10 @@ func (p *projectWriter) runGit(t *testing.T, args ...string) {
 		"GIT_AUTHOR_NAME=John",
 		"GIT_COMMITTER_EMAIL=john@doo.com",
 		"GIT_AUTHOR_EMAIL=john@doo.com",
+
+		"GIT_CONFIG_COUNT=1",
+		"GIT_CONFIG_KEY_0=init.defaultBranch",
+		"GIT_CONFIG_VALUE_0=main",
 	}
 	output, err := cmd.CombinedOutput()
 	fmt.Printf("git output: %s\n", output)
