@@ -33,7 +33,7 @@ func NewUpgraderWithHTTPClient(client *http.Client, useSudo bool) (u *Upgrader) 
 }
 
 // Perform is fetching a new executable from `release`
-//   and upgrading the executable at `destinationPath` with it
+// and upgrading the executable at `destinationPath` with it
 func (u *Upgrader) Perform(ui *termui.UI, destinationPath string, sourceURL string) (err error) {
 	data, err := u.github.Get(sourceURL)
 
