@@ -21,52 +21,52 @@ commands:
 func Test_Cmd_Custom(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	project := CreateProject(c, "project", devYmlMyCmd)
-	c.Cd(project.Path)
+	project := CreateProject(t, c, "project", devYmlMyCmd)
+	c.Cd(t, project.Path)
 
-	lines := c.Run("bud mycmd")
+	lines := c.Run(t, "bud mycmd")
 	OutputEqual(t, lines, "🐼  running touch somefile")
 
-	files := c.Ls(".")
+	files := c.Ls(t, ".")
 	require.ElementsMatch(t, files, []string{"dev.yml", "somefile"})
 }
 
 func Test_Cmd_Custom_Short_Syntax(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	project := CreateProject(c, "project", devYmlMyCmdShort)
-	c.Cd(project.Path)
+	project := CreateProject(t, c, "project", devYmlMyCmdShort)
+	c.Cd(t, project.Path)
 
-	lines := c.Run("bud mycmd")
+	lines := c.Run(t, "bud mycmd")
 	OutputEqual(t, lines, "🐼  running touch somefile")
 }
 
 func Test_Cmd_Custom_Envs_Are_Applied(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	project := CreateProject(c, "project",
+	project := CreateProject(t, c, "project",
 		`env:`,
 		`  MYVAR: poipoi`,
 		`commands:`,
 		`  mycmd: "echo __${MYVAR}__ > result"`,
 	)
-	c.Cd(project.Path)
+	c.Cd(t, project.Path)
 
-	c.Run("bud mycmd")
-	c.AssertContains("result", "__poipoi__")
+	c.Run(t, "bud mycmd")
+	c.AssertContains(t, "result", "__poipoi__")
 }
 
 func Test_Cmd_Custom_Always_Run_In_Project_Root(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	project := CreateProject(c, "project", devYmlMyCmd)
-	c.Cd(project.Path)
-	c.Run("mkdir foobar")
-	c.Cd("foobar")
+	project := CreateProject(t, c, "project", devYmlMyCmd)
+	c.Cd(t, project.Path)
+	c.Run(t, "mkdir foobar")
+	c.Cd(t, "foobar")
 
-	lines := c.Run("bud mycmd")
+	lines := c.Run(t, "bud mycmd")
 	OutputEqual(t, lines, "🐼  running touch somefile")
 
-	files := c.Ls("..")
+	files := c.Ls(t, "..")
 	require.ElementsMatch(t, files, []string{"dev.yml", "foobar", "somefile"})
 }

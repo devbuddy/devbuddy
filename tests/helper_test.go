@@ -14,7 +14,7 @@ var config context.Config // Initialized by TestMain()
 func CreateContext(t *testing.T) *context.TestContext {
 	t.Helper()
 
-	c, err := context.New(t, config)
+	c, err := context.New(config)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
@@ -29,7 +29,7 @@ func CreateContextAndInit(t *testing.T) *context.TestContext {
 	t.Helper()
 
 	c := CreateContext(t)
-	output := c.Run(`eval "$(bud --shell-init)"`)
+	output := c.Run(t, `eval "$(bud --shell-init)"`)
 	require.Len(t, output, 0)
 	return c
 }
@@ -68,18 +68,18 @@ type Project struct {
 	Path string
 }
 
-func CreateProject(c *context.TestContext, name string, devYmlLines ...string) Project {
+func CreateProject(t *testing.T, c *context.TestContext, name string, devYmlLines ...string) Project {
 	projectPath := "/home/tester/src/github.com/orgname/" + name
-	c.Run("mkdir -p " + projectPath)
+	c.Run(t, "mkdir -p "+projectPath)
 
 	path := projectPath + "/dev.yml"
-	c.Write(path, strings.Join(devYmlLines, "\n"))
-	c.Run("bud cd " + name)
+	c.Write(t, path, strings.Join(devYmlLines, "\n"))
+	c.Run(t, "bud cd "+name)
 
 	return Project{name, projectPath}
 }
 
-func (p *Project) UpdateDevYml(c *context.TestContext, devYmlLines ...string) {
+func (p *Project) UpdateDevYml(t *testing.T, c *context.TestContext, devYmlLines ...string) {
 	path := p.Path + "/dev.yml"
-	c.Write(path, strings.Join(devYmlLines, "\n"))
+	c.Write(t, path, strings.Join(devYmlLines, "\n"))
 }

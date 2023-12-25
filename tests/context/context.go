@@ -18,13 +18,10 @@ type TestContext struct {
 	shell  interface {
 		Run(string) ([]string, error)
 	}
-	t     *testing.T
 	debug bool
 }
 
-func New(t *testing.T, config Config) (*TestContext, error) {
-	t.Helper()
-
+func New(config Config) (*TestContext, error) {
 	var (
 		shellPath string
 		args      []string
@@ -72,7 +69,7 @@ func New(t *testing.T, config Config) (*TestContext, error) {
 	tc := &TestContext{
 		expect: e,
 		shell:  c,
-		t:      t,
+		// t:      t,
 	}
 	tc.debugLine("Expect command: %q", dockerCommand)
 
@@ -106,9 +103,10 @@ func (c *TestContext) Close() error {
 	return c.expect.Stop()
 }
 
-func (c *TestContext) Run(cmd string, optFns ...runOptionsFn) []string {
+func (c *TestContext) Run(t *testing.T, cmd string, optFns ...runOptionsFn) []string {
+	t.Helper()
 	lines, err := c.run(cmd, optFns...)
-	require.NoError(c.t, err, "running command: %q", cmd)
+	require.NoError(t, err, "running command: %q", cmd)
 	return lines
 }
 
@@ -157,52 +155,60 @@ func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 	return StripAnsiSlice(lines), nil
 }
 
-func (c *TestContext) Write(path, content string) {
+func (c *TestContext) Write(t *testing.T, path, content string) {
+	t.Helper()
 	b64content := base64.StdEncoding.EncodeToString([]byte(content))
 	_, err := c.shell.Run(fmt.Sprintf("echo %s | base64 --decode > %q", b64content, path))
-	require.NoError(c.t, err)
+	require.NoError(t, err)
 }
 
-func (c *TestContext) Cwd() string {
+func (c *TestContext) Cwd(t *testing.T) string {
+	t.Helper()
 	lines, err := c.shell.Run("pwd")
-	require.NoError(c.t, err)
-	require.Len(c.t, lines, 1, "unexpected output for 'pwd'")
+	require.NoError(t, err)
+	require.Len(t, lines, 1, "unexpected output for 'pwd'")
 	return lines[0]
 }
 
-func (c *TestContext) Cat(path string) string {
+func (c *TestContext) Cat(t *testing.T, path string) string {
+	t.Helper()
 	lines, err := c.shell.Run("cat " + strconv.Quote(path))
-	require.NoError(c.t, err)
+	require.NoError(t, err)
 	return strings.Join(lines, "\n")
 }
 
-func (c *TestContext) Ls(path string) []string {
+func (c *TestContext) Ls(t *testing.T, path string) []string {
+	t.Helper()
 	lines, err := c.shell.Run("ls -1 " + strconv.Quote(path))
-	require.NoError(c.t, err)
+	require.NoError(t, err)
 	return lines
 }
 
-func (c *TestContext) AssertExist(path string) {
+func (c *TestContext) AssertExist(t *testing.T, path string) {
+	t.Helper()
 	quotedPath := strconv.Quote(path)
 	_, err := c.shell.Run("test -e " + strconv.Quote(quotedPath))
-	require.NoError(c.t, err, "expected file %s to exist", quotedPath)
+	require.NoError(t, err, "expected file %s to exist", quotedPath)
 }
 
-func (c *TestContext) AssertContains(path, expected string) {
-	value := c.Cat(path)
-	require.Equal(c.t, expected, value, "expected file %s to contain %s", strconv.Quote(path), strconv.Quote(expected))
+func (c *TestContext) AssertContains(t *testing.T, path, expected string) {
+	t.Helper()
+	value := c.Cat(t, path)
+	require.Equal(t, expected, value, "expected file %s to contain %s", strconv.Quote(path), strconv.Quote(expected))
 }
 
-func (c *TestContext) GetEnv(name string) string {
+func (c *TestContext) GetEnv(t *testing.T, name string) string {
+	t.Helper()
 	lines, err := c.shell.Run("echo ${" + name + "}")
-	require.NoError(c.t, err)
-	require.Len(c.t, lines, 1)
+	require.NoError(t, err)
+	require.Len(t, lines, 1)
 	return lines[0]
 }
 
-func (c *TestContext) Cd(path string) {
+func (c *TestContext) Cd(t *testing.T, path string) {
+	t.Helper()
 	_, err := c.shell.Run("cd " + strconv.Quote(path))
-	require.NoError(c.t, err)
+	require.NoError(t, err)
 }
 
 func (c *TestContext) debugLine(format string, a ...interface{}) {
