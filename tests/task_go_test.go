@@ -4,33 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/devbuddy/devbuddy/tests/context"
 )
 
-func Test_Task_Go_Module(t *testing.T) {
-	c := CreateContextAndInit(t)
-
-	CreateProject(t, c, "project",
-		`up:`,
-		`- go:`,
-		`    version: "1.15"`,
-		`    modules: true`,
-	)
-
-	c.Run(t, "export GOPATH=~")
-
-	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
-	OutputContains(t, lines, "Golang (1.15)", "install golang distribution")
-	OutputContains(t, lines, "golang activated. (1.15+mod)")
-
-	lines = c.Run(t, "go version")
-	OutputContains(t, lines, "go version go1.15")
-
-	// Compile source with a dependency with a module
-
-	c.Write(t, "main.go", `
+const testingGoMain = `
 package main
 
 import (
@@ -41,39 +18,96 @@ import (
 func main() {
 	fmt.Println("Is it working:", tiny.Working())
 }
-	`)
-	c.Run(t, "go mod init")
-	lines = c.Run(t, "go run main.go", context.Timeout(time.Minute))
-	OutputContains(t, lines, "Is it working: true")
-}
+`
 
-func Test_Task_Go_Pre_Module(t *testing.T) {
+func Test_Task_Go(t *testing.T) {
+	// Test with Go 1.20
+	// Use sub-tests to avoid downloading the go runtime multiple times.
 	c := CreateContextAndInit(t)
 
-	_ = CreateProject(t, c, "project",
-		`up:`,
-		`- go: "1.15"`,
-	)
+	t.Run("gomod_with_gopath", func(t *testing.T) {
+		// Most common configuration, Modules and GOPATH set.
 
-	c.Run(t, "export GOPATH=~")
+		c.Run(t, "export GOPATH=~")
 
-	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
-	OutputContains(t, lines, "Golang (1.15)", "install golang distribution")
-	OutputContains(t, lines, "golang activated. (1.15)")
+		CreateProject(t, c, "project",
+			`up:`,
+			`- go:`,
+			`    version: "1.20"`,
+		)
 
-	lines = c.Run(t, "go version")
-	require.Len(t, lines, 1)
-	require.Contains(t, lines[0], "go version go1.15")
-}
+		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
+		OutputContains(t, lines, "Golang (1.20)", "install golang distribution")
+		OutputContains(t, lines, "golang activated. (1.20)")
 
-func Test_Task_Go_Check_GOPATH(t *testing.T) {
-	c := CreateContextAndInit(t)
+		lines = c.Run(t, "go version")
+		OutputContains(t, lines, "go version go1.20")
 
-	CreateProject(t, c, "project",
-		`up:`,
-		`- go: "1.15"`,
-	)
+		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
+		OutputContains(t, lines, "GO111MODULE=#")
 
-	lines := c.Run(t, "bud up", context.ExitCode(1))
-	OutputContains(t, lines, "The GOPATH environment variable should be set to ~")
+		c.Write(t, "main.go", testingGoMain) // depends on github.com/devbuddy/tiny-test-go-package
+		c.Run(t, "go mod init")
+		c.Run(t, "go mod tidy")
+		lines = c.Run(t, "go run main.go", context.Timeout(time.Minute))
+		OutputContains(t, lines, "Is it working: true")
+	})
+
+	t.Run("gopath_absent", func(t *testing.T) {
+		// Less common configuration, Modules but no GOPATH set.
+
+		c.Run(t, "unset GOPATH")
+
+		CreateProject(t, c, "project2",
+			`up:`,
+			`- go:`,
+			`    version: "1.20"`,
+			`    modules: true`,
+		)
+
+		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
+		OutputContains(t, lines, "◼︎ Golang (1.20)")
+
+		lines = c.Run(t, "go version")
+		OutputContains(t, lines, "go version go1.20")
+
+		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
+		OutputContains(t, lines, "GO111MODULE=on#")
+
+		c.Write(t, "main.go", testingGoMain)
+		c.Run(t, "go mod init project2")
+		c.Run(t, "go mod tidy")
+		lines = c.Run(t, "go run main.go", context.Timeout(time.Minute))
+		OutputContains(t, lines, "Is it working: true")
+	})
+
+	t.Run("legacy_gopath_mode", func(t *testing.T) {
+		// Old configuration: Modules disabled.
+		// This is named "Legacy Go path mode" in https://go.dev/ref/mod#mod-commands
+
+		c.Run(t, "export GOPATH=~")
+
+		CreateProject(t, c, "project3",
+			`up:`,
+			`- go:`,
+			`    version: "1.20"`,
+			`    modules: false`,
+		)
+
+		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
+		OutputContains(t, lines, "◼︎ Golang (1.20)")
+
+		lines = c.Run(t, "go version")
+		OutputContains(t, lines, "go version go1.20")
+
+		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
+		OutputContains(t, lines, "GO111MODULE=off#")
+
+		c.Write(t, "main.go", testingGoMain)
+
+		c.Run(t, "go get github.com/devbuddy/tiny-test-go-package")
+
+		lines = c.Run(t, "go run main.go", context.Timeout(time.Minute))
+		OutputContains(t, lines, "Is it working: true")
+	})
 }

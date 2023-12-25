@@ -124,18 +124,24 @@ func (c *TaskConfig) GetStringPropertyDefault(name string, defaultValue string) 
 	return str, nil
 }
 
-// GetBooleanPropertyDefault expects the payload to be a hash, returns the value as a boolean for the name specified.
-// Or returns the default value specified if the payload is nil.
+// GetBooleanProperty expects the payload to be a hash, returns the value as a boolean for the name specified.
 //
 // YAML Example:
 //   - TASKNAME:
 //     PROPERTYNAME: on
-func (c *TaskConfig) GetBooleanPropertyDefault(name string, defaultValue bool) (bool, error) {
-	value, err := c.getPropertyDefault(name, defaultValue)
-	if err != nil {
-		return false, err
+func (c *TaskConfig) GetBooleanProperty(name string) (value bool, present bool, err error) {
+	propValue, err := c.getProperty(name)
+	if err == nil {
+		b, err := asBool(propValue)
+		if err != nil {
+			return false, false, err
+		}
+		return b, true, nil
 	}
-	return asBool(value)
+	if _, ok := err.(propertyNotFoundError); ok {
+		return false, false, nil
+	}
+	return false, false, err
 }
 
 func (c *TaskConfig) getProperty(name string) (interface{}, error) {
