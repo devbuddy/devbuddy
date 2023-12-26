@@ -9,19 +9,19 @@ import (
 func Test_Env_EnvFile(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	c.Write("dev.yml", `up: [envfile]`)
-	c.Write(".env", `TESTVAR=FooBAr`)
+	c.Write(t, "dev.yml", `up: [envfile]`)
+	c.Write(t, ".env", `TESTVAR=FooBAr`)
 
-	lines := c.Run("bud up")
+	lines := c.Run(t, "bud up")
 	OutputEqual(t, lines, "◼︎ EnvFile")
 
-	value := c.GetEnv("TESTVAR")
+	value := c.GetEnv(t, "TESTVAR")
 	require.Equal(t, "FooBAr", value)
 
 	// Clean the env when leaving the project directory
-	c.Run("cd /")
+	c.Run(t, "cd /")
 
-	value = c.GetEnv("TESTVAR")
+	value = c.GetEnv(t, "TESTVAR")
 	require.Equal(t, "", value)
 }
 
@@ -38,10 +38,10 @@ up:
     met?: test -n "${TESTVAR}"
     meet: echo "TESTVAR is not set"; false
 `
-	c.Write("dev.yml", devYml)
-	c.Write(".env", `TESTVAR=FooBAr`)
+	c.Write(t, "dev.yml", devYml)
+	c.Write(t, ".env", `TESTVAR=FooBAr`)
 
-	c.Run("bud up")
+	c.Run(t, "bud up")
 }
 
 func Test_Env_EnvFile_Changes(t *testing.T) {
@@ -49,17 +49,17 @@ func Test_Env_EnvFile_Changes(t *testing.T) {
 
 	c := CreateContextAndInit(t)
 
-	c.Write("dev.yml", `up: [envfile]`)
-	c.Write(".env", `TESTVAR=one`)
-	c.Run("bud up")
+	c.Write(t, "dev.yml", `up: [envfile]`)
+	c.Write(t, ".env", `TESTVAR=one`)
+	c.Run(t, "bud up")
 
-	value := c.GetEnv("TESTVAR")
+	value := c.GetEnv(t, "TESTVAR")
 	require.Equal(t, "one", value)
 
 	// Change .env file
-	c.Write(".env", `TESTVAR=two`)
-	c.Run("bud up")
+	c.Write(t, ".env", `TESTVAR=two`)
+	c.Run(t, "bud up")
 
-	value = c.GetEnv("TESTVAR")
+	value = c.GetEnv(t, "TESTVAR")
 	require.Equal(t, "two", value)
 }

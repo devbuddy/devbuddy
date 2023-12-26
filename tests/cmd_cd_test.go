@@ -9,16 +9,16 @@ import (
 func Test_Cmd_Cd(t *testing.T) {
 	c := CreateContext(t)
 
-	c.Run("mkdir -p /home/tester/src/github.com/orgname/projname")
+	c.Run(t, "mkdir -p /home/tester/src/github.com/orgname/projname")
 
-	output := c.Run(`eval "$(bud --shell-init)"`)
+	output := c.Run(t, `eval "$(bud --shell-init)"`)
 	require.Len(t, output, 0)
 
-	output = c.Run("bud cd projname")
+	output = c.Run(t, "bud cd projname")
 	require.Len(t, output, 1)
 	require.Equal(t, output[0], "🐼  jumping to github.com:orgname/projname")
 
-	cwd := c.Cwd()
+	cwd := c.Cwd(t)
 	require.Equal(t, "/home/tester/src/github.com/orgname/projname", cwd)
 }
 
@@ -28,10 +28,10 @@ func Test_Cmd_Cd_Matching(t *testing.T) {
 	project1 := "/home/tester/src/github.com/devbuddy_tests/project"
 	project2 := "/home/tester/src/github.com/devbuddy_tests/project2"
 
-	c.Run("mkdir -p " + project1)
-	c.Run("mkdir -p " + project2)
+	c.Run(t, "mkdir -p "+project1)
+	c.Run(t, "mkdir -p "+project2)
 
-	output := c.Run(`eval "$(bud --shell-init)"`)
+	output := c.Run(t, `eval "$(bud --shell-init)"`)
 	require.Len(t, output, 0)
 
 	tests := map[string]string{
@@ -50,9 +50,9 @@ func Test_Cmd_Cd_Matching(t *testing.T) {
 
 	for test, projectPath := range tests {
 		t.Run(test, func(t *testing.T) {
-			c.Run("bud cd " + test)
+			c.Run(t, "bud cd "+test)
 
-			cwd := c.Cwd()
+			cwd := c.Cwd(t)
 			require.Equal(t, projectPath, cwd)
 		})
 	}

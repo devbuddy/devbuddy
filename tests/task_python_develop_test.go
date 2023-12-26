@@ -11,31 +11,32 @@ import (
 
 func Test_Task_Python_Develop(t *testing.T) {
 	c := CreateContextAndInit(t)
+	c.Debug()
 
 	devYml := `
 up:
 - python: 3.9.0
 - python_develop
 `
-	CreateProject(c, "project", devYml)
+	CreateProject(t, c, "project", devYml)
 
 	// Install in develop mode
 
-	c.Write("setup.py", generateTestSetupPy(42))
+	c.Write(t, "setup.py", generateTestSetupPy(42))
 
-	lines := c.Run("bud up", context.Timeout(2*time.Minute))
+	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
 	OutputContains(t, lines, "python activated. (3.9.0)")
 
-	lines = c.Run("pip show devbuddy-test-pkg")
+	lines = c.Run(t, "pip show devbuddy-test-pkg")
 	OutputContains(t, lines, "Version: 42")
 
 	// Update the package
 
-	c.Write("setup.py", generateTestSetupPy(84))
+	c.Write(t, "setup.py", generateTestSetupPy(84))
 
-	c.Run("bud up", context.Timeout(2*time.Minute))
+	c.Run(t, "bud up", context.Timeout(2*time.Minute))
 
-	lines = c.Run("pip show devbuddy-test-pkg")
+	lines = c.Run(t, "pip show devbuddy-test-pkg")
 	OutputContains(t, lines, "Version: 84")
 
 }
@@ -49,13 +50,13 @@ up:
 - python_develop:
     extras: [test]
 `
-	CreateProject(c, "project", devYml)
+	CreateProject(t, c, "project", devYml)
 
-	c.Write("setup.py", generateTestSetupPy(1))
+	c.Write(t, "setup.py", generateTestSetupPy(1))
 
-	c.Run("bud up", context.Timeout(2*time.Minute))
+	c.Run(t, "bud up", context.Timeout(2*time.Minute))
 
-	lines := c.Run("pip freeze")
+	lines := c.Run(t, "pip freeze")
 	OutputContains(t, lines, "pyreleaser==0.5.2")
 }
 
@@ -67,13 +68,13 @@ up:
 - python: 3.9.0
 - python_develop:
 `
-	CreateProject(c, "project", devYml)
+	CreateProject(t, c, "project", devYml)
 
-	c.Write("setup.py", generateTestSetupPy(1))
+	c.Write(t, "setup.py", generateTestSetupPy(1))
 
-	c.Run("bud up", context.Timeout(2*time.Minute))
+	c.Run(t, "bud up", context.Timeout(2*time.Minute))
 
-	lines := c.Run("pip freeze")
+	lines := c.Run(t, "pip freeze")
 	OutputNotContain(t, lines, "pyreleaser==0.5.2")
 }
 

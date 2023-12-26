@@ -10,14 +10,14 @@ import (
 func Test_Cmd_Init(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	output := c.Run("bud init")
+	output := c.Run(t, "bud init")
 	require.Equal(t, []string{
 		"🐼  Creating a default dev.yml file.",
 		"⚠️   Open dev.yml to adjust for your needs.",
 		"🐼  env activated.",
 	}, output)
 
-	devFile := c.Cat("dev.yml")
+	devFile := c.Cat(t, "dev.yml")
 	require.Contains(t, devFile, "# DevBuddy config file")
 
 	var data map[string]interface{}
