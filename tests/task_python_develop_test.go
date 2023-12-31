@@ -11,14 +11,13 @@ import (
 
 func Test_Task_Python_Develop(t *testing.T) {
 	c := CreateContextAndInit(t)
-	c.Debug()
 
 	devYml := `
 up:
 - python: 3.9.0
 - python_develop
 `
-	CreateProject(t, c, "project", devYml)
+	CreateProject(t, c, devYml)
 
 	// Install in develop mode
 
@@ -50,7 +49,7 @@ up:
 - python_develop:
     extras: [test]
 `
-	CreateProject(t, c, "project", devYml)
+	CreateProject(t, c, devYml)
 
 	c.Write(t, "setup.py", generateTestSetupPy(1))
 
@@ -68,7 +67,7 @@ up:
 - python: 3.9.0
 - python_develop:
 `
-	CreateProject(t, c, "project", devYml)
+	CreateProject(t, c, devYml)
 
 	c.Write(t, "setup.py", generateTestSetupPy(1))
 

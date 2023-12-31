@@ -3,7 +3,7 @@ package helpers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 )
@@ -35,7 +35,7 @@ func (g *Github) listReleases() (releases *GithubReleaseList, err error) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return
 	}
@@ -81,7 +81,7 @@ func (g *Github) Get(url string) (data []byte, err error) {
 		return
 	}
 
-	data, err = ioutil.ReadAll(response.Body)
+	data, err = io.ReadAll(response.Body)
 
 	if err != nil {
 		return

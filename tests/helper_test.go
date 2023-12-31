@@ -1,6 +1,8 @@
 package integration
 
 import (
+	"crypto/rand"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -68,15 +70,19 @@ type Project struct {
 	Path string
 }
 
-func CreateProject(t *testing.T, c *context.TestContext, name string, devYmlLines ...string) Project {
-	projectPath := "/home/tester/src/github.com/orgname/" + name
+func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) Project {
+	rnd := make([]byte, 4)
+	rand.Read(rnd)
+	projectName := fmt.Sprintf("project-%x", rnd)
+
+	projectPath := "/home/tester/src/github.com/orgname/" + projectName
 	c.Run(t, "mkdir -p "+projectPath)
 
 	path := projectPath + "/dev.yml"
 	c.Write(t, path, strings.Join(devYmlLines, "\n"))
 	c.Cd(t, projectPath)
 
-	return Project{name, projectPath}
+	return Project{projectName, projectPath}
 }
 
 func (p *Project) UpdateDevYml(t *testing.T, c *context.TestContext, devYmlLines ...string) {

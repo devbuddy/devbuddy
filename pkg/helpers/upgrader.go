@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -41,7 +40,7 @@ func (u *Upgrader) Perform(ui *termui.UI, destinationPath string, sourceURL stri
 		return
 	}
 
-	tmpFile, err := ioutil.TempFile("", "bud-")
+	tmpFile, err := os.CreateTemp("", "bud-")
 	if err != nil {
 		return
 	}

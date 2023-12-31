@@ -152,7 +152,7 @@ func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 	if exitCode != opt.exitCode {
 		exert := "no output"
 		if len(lines) > 0 {
-			exert = lines[0]
+			exert = strings.Join(lines[:min(5, len(lines))], "\n")
 		}
 		return nil, fmt.Errorf("exit code %d. first output line: %s", exitCode, exert)
 	}

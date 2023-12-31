@@ -21,7 +21,7 @@ commands:
 func Test_Cmd_Custom(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	project := CreateProject(t, c, "project", devYmlMyCmd)
+	project := CreateProject(t, c, devYmlMyCmd)
 	c.Cd(t, project.Path)
 
 	lines := c.Run(t, "bud mycmd")
@@ -34,7 +34,7 @@ func Test_Cmd_Custom(t *testing.T) {
 func Test_Cmd_Custom_Short_Syntax(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	project := CreateProject(t, c, "project", devYmlMyCmdShort)
+	project := CreateProject(t, c, devYmlMyCmdShort)
 	c.Cd(t, project.Path)
 
 	lines := c.Run(t, "bud mycmd")
@@ -44,7 +44,7 @@ func Test_Cmd_Custom_Short_Syntax(t *testing.T) {
 func Test_Cmd_Custom_Envs_Are_Applied(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	project := CreateProject(t, c, "project",
+	project := CreateProject(t, c,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`commands:`,
@@ -59,7 +59,7 @@ func Test_Cmd_Custom_Envs_Are_Applied(t *testing.T) {
 func Test_Cmd_Custom_Always_Run_In_Project_Root(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	project := CreateProject(t, c, "project", devYmlMyCmd)
+	project := CreateProject(t, c, devYmlMyCmd)
 	c.Cd(t, project.Path)
 	c.Run(t, "mkdir foobar")
 	c.Cd(t, "foobar")

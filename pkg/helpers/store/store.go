@@ -3,7 +3,7 @@ package store
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers/projectmetadata"
@@ -33,7 +33,7 @@ func (s *Store) read() (*fileData, error) {
 	data := &fileData{Entries: make(map[string]string)}
 
 	if utils.PathExists(s.path) {
-		serialized, err := ioutil.ReadFile(s.path)
+		serialized, err := os.ReadFile(s.path)
 		if err != nil {
 			return nil, err
 		}
@@ -52,7 +52,7 @@ func (s *Store) write(data *fileData) error {
 		return err
 	}
 
-	return ioutil.WriteFile(s.path, serialized, 0644)
+	return os.WriteFile(s.path, serialized, 0644)
 }
 
 // SetString stores a string for a key

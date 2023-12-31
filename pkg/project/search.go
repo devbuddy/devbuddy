@@ -2,7 +2,7 @@ package project
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/sahilm/fuzzy"
@@ -113,7 +113,7 @@ func getAllProjects(sourceDir string) ([]*Project, error) {
 }
 
 func listChildDir(path string) (paths []string, err error) {
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		err = fmt.Errorf("error listing files in %s: %w", path, err)
 		return

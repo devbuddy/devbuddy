@@ -2,7 +2,7 @@ package manifest
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"gopkg.in/yaml.v2"
@@ -72,7 +72,7 @@ func Load(path string) (*Manifest, error) {
 		return nil, fmt.Errorf("no manifest at %s", manifestPath)
 	}
 
-	file, err := ioutil.ReadFile(manifestPath)
+	file, err := os.ReadFile(manifestPath)
 	if err != nil {
 		return nil, err
 	}
