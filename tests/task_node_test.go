@@ -4,10 +4,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 func Test_Task_Node(t *testing.T) {
+	if !helpers.NodeJSIsSupportedOnThisPlatform() {
+		t.Skip("NodeJS is not supported on this platform")
+	}
+
 	c := CreateContextAndInit(t)
 
 	CreateProject(t, c,
@@ -24,6 +29,10 @@ func Test_Task_Node(t *testing.T) {
 }
 
 func Test_Task_Node_Npm_Install(t *testing.T) {
+	if !helpers.NodeJSIsSupportedOnThisPlatform() {
+		t.Skip("NodeJS is not supported on this platform")
+	}
+
 	c := CreateContextAndInit(t)
 
 	CreateProject(t, c,

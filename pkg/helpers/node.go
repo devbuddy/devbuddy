@@ -41,8 +41,12 @@ func (n *Node) Which(program string) string {
 	return path.Join(n.path, "bin", program)
 }
 
+func NodeJSIsSupportedOnThisPlatform() bool {
+	return runtime.GOARCH == "amd64"
+}
+
 func (n *Node) Install() error {
-	if runtime.GOARCH != "amd64" {
+	if !NodeJSIsSupportedOnThisPlatform() {
 		return fmt.Errorf("NodeJS installation is only supported on %s by DevBuddy", runtime.GOARCH)
 	}
 
