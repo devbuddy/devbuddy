@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
@@ -16,31 +17,23 @@ func parseGolang(config *api.TaskConfig, task *api.Task) error {
 		return err
 	}
 
-	modulesEnabled := false
+	featureVersion := version
+
 	if config.IsHash() {
-		modulesEnabled, err = config.GetBooleanPropertyDefault("modules", false)
+		enabled, present, err := config.GetBooleanProperty("modules")
 		if err != nil {
 			return err
 		}
-	}
-	featureVersion := version
-	if modulesEnabled {
-		featureVersion += "+mod"
+		if present {
+			if enabled {
+				featureVersion += features.GolangSuffixMod
+			} else {
+				featureVersion += features.GolangSuffixGopath
+			}
+		}
 	}
 
 	task.Info = version
-
-	checkPATHVar := func(ctx *context.Context) *api.ActionResult {
-		if ctx.Env.Get("GOPATH") == "" {
-			return api.Needed("GOPATH is not set")
-		}
-		return api.NotNeeded()
-	}
-	showPATHWarning := func(ctx *context.Context) error {
-		ctx.UI.TaskWarning("The GOPATH environment variable should be set to ~/")
-		return nil
-	}
-	task.AddActionBuilder("", showPATHWarning).On(api.FuncCondition(checkPATHVar))
 
 	installNeeded := func(ctx *context.Context) *api.ActionResult {
 		if !helpers.NewGolang(ctx.Cfg, version).Exists() {

@@ -100,7 +100,12 @@ func (c *TestContext) Debug() {
 }
 
 func (c *TestContext) Close() error {
-	return c.expect.Stop()
+	c.debugLine("Stopping docker container")
+	err := c.expect.Stop()
+	if err != nil {
+		c.debugLine("ERROR when stopping docker: %s", err)
+	}
+	return err
 }
 
 func (c *TestContext) Run(t *testing.T, cmd string, optFns ...runOptionsFn) []string {
@@ -160,6 +165,11 @@ func (c *TestContext) Write(t *testing.T, path, content string) {
 	b64content := base64.StdEncoding.EncodeToString([]byte(content))
 	_, err := c.shell.Run(fmt.Sprintf("echo %s | base64 --decode > %q", b64content, path))
 	require.NoError(t, err)
+}
+
+func (c *TestContext) WriteLines(t *testing.T, path string, lines ...string) {
+	t.Helper()
+	c.Write(t, path, strings.Join(lines, "\n"))
 }
 
 func (c *TestContext) Cwd(t *testing.T) string {

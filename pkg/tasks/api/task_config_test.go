@@ -54,12 +54,14 @@ func TestTaskConfigGetBooleanPropertyDefault(t *testing.T) {
 	payload := map[interface{}]interface{}{"flag": true}
 	config := &TaskConfig{name: "test", payload: payload}
 
-	val, err := config.GetBooleanPropertyDefault("flag", false)
+	val, present, err := config.GetBooleanProperty("flag")
 	require.NoError(t, err)
+	require.Equal(t, present, true)
 	require.Equal(t, val, true)
 
-	val, err = config.GetBooleanPropertyDefault("nope", false)
+	val, present, err = config.GetBooleanProperty("nope")
 	require.NoError(t, err)
+	require.Equal(t, present, false)
 	require.Equal(t, val, false)
 }
 

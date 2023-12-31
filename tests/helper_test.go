@@ -74,7 +74,7 @@ func CreateProject(t *testing.T, c *context.TestContext, name string, devYmlLine
 
 	path := projectPath + "/dev.yml"
 	c.Write(t, path, strings.Join(devYmlLines, "\n"))
-	c.Run(t, "bud cd "+name)
+	c.Cd(t, projectPath)
 
 	return Project{name, projectPath}
 }
