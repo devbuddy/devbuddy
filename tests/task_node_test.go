@@ -10,7 +10,7 @@ import (
 func Test_Task_Node(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project",
+	CreateProject(t, c,
 		`up:`,
 		`- node: '10.15.0'`,
 	)
@@ -26,7 +26,7 @@ func Test_Task_Node(t *testing.T) {
 func Test_Task_Node_Npm_Install(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, "project",
+	CreateProject(t, c,
 		`up:`,
 		`- node: '10.15.0'`,
 	)

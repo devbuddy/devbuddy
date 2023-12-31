@@ -30,7 +30,7 @@ func Test_Task_Go(t *testing.T) {
 
 		c.Run(t, "export GOPATH=~")
 
-		CreateProject(t, c, "project",
+		CreateProject(t, c,
 			`up:`,
 			`- go:`,
 			`    version: "1.20"`,
@@ -58,7 +58,7 @@ func Test_Task_Go(t *testing.T) {
 
 		c.Run(t, "unset GOPATH")
 
-		CreateProject(t, c, "project2",
+		CreateProject(t, c,
 			`up:`,
 			`- go:`,
 			`    version: "1.20"`,
@@ -87,7 +87,7 @@ func Test_Task_Go(t *testing.T) {
 
 		c.Run(t, "export GOPATH=~")
 
-		CreateProject(t, c, "project3",
+		CreateProject(t, c,
 			`up:`,
 			`- go:`,
 			`    version: "1.20"`,

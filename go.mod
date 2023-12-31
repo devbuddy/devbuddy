@@ -1,6 +1,6 @@
 module github.com/devbuddy/devbuddy
 
-go 1.17
+go 1.21
 
 require (
 	github.com/creack/pty v1.1.21
