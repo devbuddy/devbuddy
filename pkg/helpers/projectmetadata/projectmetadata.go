@@ -2,7 +2,6 @@ package projectmetadata
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -47,7 +46,7 @@ func (p *ProjectMetadata) prepare() error {
 
 	gitignore := filepath.Join(p.path, ".gitignore")
 	if !utils.PathExists(gitignore) {
-		err := ioutil.WriteFile(gitignore, []byte("*"), 0644)
+		err := os.WriteFile(gitignore, []byte("*"), 0644)
 		if err != nil {
 			return err
 		}

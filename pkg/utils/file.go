@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"hash/adler32"
-	"io/ioutil"
 	"os"
 	"time"
 )
@@ -31,7 +30,7 @@ func Touch(path string, atime, mtime time.Time) error {
 
 // FileChecksum reads a file and return the Adler32 checksum of its data as a string
 func FileChecksum(path string) (string, error) {
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}

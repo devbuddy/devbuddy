@@ -9,13 +9,12 @@ up:
   - homebrew:
     - curl
     - shellcheck
-    - golangci/tap/golangci-lint
   - apt:
     - curl
     - shellcheck
   - custom:
       name: Install golangci-lint
-      met?: which golangci-lint
+      met?: which golangci-lint && golangci-lint --version | grep -q '1.55.2'
       meet: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
 
 commands:

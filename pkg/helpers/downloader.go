@@ -3,7 +3,6 @@ package helpers
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -34,7 +33,7 @@ func (d *downloader) DownloadToFile(file string) error {
 	}()
 
 	// Create a temp file
-	tmpFile, err := ioutil.TempFile(os.TempDir(), "devbuddy-")
+	tmpFile, err := os.CreateTemp(os.TempDir(), "devbuddy-")
 	if err != nil {
 		return err
 	}
