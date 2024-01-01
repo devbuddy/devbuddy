@@ -15,10 +15,11 @@ func Test_Task_Node(t *testing.T) {
 
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c,
+	p := CreateProject(t, c,
 		`up:`,
 		`- node: '10.15.0'`,
 	)
+	c.Cd(t, p.Path)
 
 	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
 	OutputContains(t, lines, "NodeJS (10.15.0)")
@@ -35,10 +36,11 @@ func Test_Task_Node_Npm_Install(t *testing.T) {
 
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c,
+	p := CreateProject(t, c,
 		`up:`,
 		`- node: '10.15.0'`,
 	)
+	c.Cd(t, p.Path)
 
 	c.Write(t, "package.json", `{"dependencies": {"testpackage": "1.0.0"}}`)
 

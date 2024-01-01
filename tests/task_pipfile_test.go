@@ -10,11 +10,12 @@ import (
 func Test_Task_Pipfile(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c,
+	p := CreateProject(t, c,
 		`up:`,
 		`- python: 3.9.0`,
 		`- pipfile`,
 	)
+	c.Cd(t, p.Path)
 
 	c.Write(t, "Pipfile", "[packages]\n\"pyreleaser\" = \"==0.5.2\"\n")
 

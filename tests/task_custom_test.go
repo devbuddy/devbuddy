@@ -19,7 +19,8 @@ up:
 func Test_Task_Custom(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, customTaskDevYml)
+	p := CreateProject(t, c, customTaskDevYml)
+	c.Cd(t, p.Path)
 
 	// file does not exist -> task must run
 	c.Run(t, "bud up")
@@ -35,7 +36,8 @@ func Test_Task_Custom(t *testing.T) {
 func Test_Task_Custom_Subdir(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, customTaskDevYml)
+	p := CreateProject(t, c, customTaskDevYml)
+	c.Cd(t, p.Path)
 
 	// The command must work in a sub-dir, but run in the project root
 	c.Run(t, "mkdir subdir")
@@ -50,13 +52,14 @@ func Test_Task_Custom_Subdir(t *testing.T) {
 func Test_Task_Custom_Fails(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c, `
-up:
-- custom:
-    name: TestCustom
-    met?: exit 1
-    meet: exit 1
-`)
+	p := CreateProject(t, c,
+		`up:`,
+		`- custom:`,
+		`    name: TestCustom`,
+		`    met?: exit 1`,
+		`    meet: exit 1`,
+	)
+	c.Cd(t, p.Path)
 
 	lines := c.Run(t, "bud up", context.ExitCode(1))
 	OutputContains(t, lines, "Running: exit 1", `action "": failed to run: command failed with exit code 1`)
@@ -67,7 +70,7 @@ func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
 
 	c.Run(t, "export MYVAR=poipoi")
 
-	CreateProject(t, c,
+	p := CreateProject(t, c,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,
@@ -76,6 +79,8 @@ func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
 		`    met?: echo $MYVAR > somefile`,
 		`    meet: exit 0`,
 	)
+	c.Cd(t, p.Path)
+
 	c.Run(t, "bud up")
 
 	content := c.Cat(t, "somefile")
@@ -86,7 +91,7 @@ func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
 	t.Skip("Fixme: env vars not set before tasks?")
 	c := CreateContextAndInit(t)
 
-	CreateProject(t, c,
+	p := CreateProject(t, c,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,
@@ -95,6 +100,7 @@ func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
 		`    met?: echo $MYVAR > somefile`,
 		`    meet: exit 0`,
 	)
+	c.Cd(t, p.Path)
 
 	c.Run(t, "bud up")
 
@@ -111,9 +117,11 @@ func Test_Task_Custom_With_Env_Previously_Set_By_DevBuddy(t *testing.T) {
 		`env:`,
 		`  MYVAR: poipoi`,
 	)
+	c.Cd(t, p.Path)
+
 	c.Run(t, "bud up")
 
-	p.UpdateDevYml(t, c,
+	p.WriteDevYml(t,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,

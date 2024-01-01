@@ -30,11 +30,12 @@ func Test_Task_Go(t *testing.T) {
 
 		c.Run(t, "export GOPATH=~")
 
-		CreateProject(t, c,
+		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
 			`    version: "1.20"`,
 		)
+		c.Cd(t, p.Path)
 
 		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
 		OutputContains(t, lines, "Golang (1.20)", "install golang distribution")
@@ -58,12 +59,13 @@ func Test_Task_Go(t *testing.T) {
 
 		c.Run(t, "unset GOPATH")
 
-		CreateProject(t, c,
+		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
 			`    version: "1.20"`,
 			`    modules: true`,
 		)
+		c.Cd(t, p.Path)
 
 		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
 		OutputContains(t, lines, "◼︎ Golang (1.20)")
@@ -87,12 +89,13 @@ func Test_Task_Go(t *testing.T) {
 
 		c.Run(t, "export GOPATH=~")
 
-		CreateProject(t, c,
+		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
 			`    version: "1.20"`,
 			`    modules: false`,
 		)
+		c.Cd(t, p.Path)
 
 		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
 		OutputContains(t, lines, "◼︎ Golang (1.20)")

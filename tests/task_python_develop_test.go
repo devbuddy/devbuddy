@@ -12,12 +12,12 @@ import (
 func Test_Task_Python_Develop(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	devYml := `
-up:
-- python: 3.9.0
-- python_develop
-`
-	CreateProject(t, c, devYml)
+	p := CreateProject(t, c,
+		`up:`,
+		`- python: 3.9.0`,
+		`- python_develop`,
+	)
+	c.Cd(t, p.Path)
 
 	// Install in develop mode
 
@@ -37,19 +37,18 @@ up:
 
 	lines = c.Run(t, "pip show devbuddy-test-pkg")
 	OutputContains(t, lines, "Version: 84")
-
 }
 
 func Test_Task_Python_Develop_With_Extra_Packages(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	devYml := `
-up:
-- python: 3.9.0
-- python_develop:
-    extras: [test]
-`
-	CreateProject(t, c, devYml)
+	p := CreateProject(t, c,
+		`up:`,
+		`- python: 3.9.0`,
+		`- python_develop:`,
+		`    extras: [test]`,
+	)
+	c.Cd(t, p.Path)
 
 	c.Write(t, "setup.py", generateTestSetupPy(1))
 
@@ -62,12 +61,12 @@ up:
 func Test_Task_Python_Develop_Without_Extra_Packages(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	devYml := `
-up:
-- python: 3.9.0
-- python_develop:
-`
-	CreateProject(t, c, devYml)
+	p := CreateProject(t, c,
+		`up:`,
+		`- python: 3.9.0`,
+		`- python_develop:`,
+	)
+	c.Cd(t, p.Path)
 
 	c.Write(t, "setup.py", generateTestSetupPy(1))
 
