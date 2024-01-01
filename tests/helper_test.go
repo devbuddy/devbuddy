@@ -11,8 +11,6 @@ import (
 	"github.com/devbuddy/devbuddy/tests/context"
 )
 
-var config context.Config // Initialized by TestMain()
-
 func CreateContext(t *testing.T) *context.TestContext {
 	t.Helper()
 

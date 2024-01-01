@@ -10,6 +10,8 @@ import (
 	"github.com/devbuddy/devbuddy/tests/context"
 )
 
+var config context.Config
+
 func TestMain(m *testing.M) {
 	// call flag.Parse() here if TestMain uses flags
 
