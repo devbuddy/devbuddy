@@ -17,10 +17,10 @@ func Test_Task_Pipfile(t *testing.T) {
 	)
 	c.Cd(t, p.Path)
 
-	c.Write(t, "Pipfile", "[packages]\n\"pyreleaser\" = \"==0.5.2\"\n")
+	c.Write(t, "Pipfile", "[packages]\n\"pkginfo\" = \"==1.9.6\"\n")
 
 	c.Run(t, "bud up", context.Timeout(2*time.Minute))
 
 	lines := c.Run(t, "pip freeze")
-	OutputContains(t, lines, "pyreleaser==0.5.2")
+	OutputContains(t, lines, "pkginfo==1.9.6")
 }

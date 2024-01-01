@@ -55,7 +55,7 @@ func Test_Task_Python_Develop_With_Extra_Packages(t *testing.T) {
 	c.Run(t, "bud up", context.Timeout(2*time.Minute))
 
 	lines := c.Run(t, "pip freeze")
-	OutputContains(t, lines, "pyreleaser==0.5.2")
+	OutputContains(t, lines, "pkginfo==1.9.6")
 }
 
 func Test_Task_Python_Develop_Without_Extra_Packages(t *testing.T) {
@@ -73,14 +73,13 @@ func Test_Task_Python_Develop_Without_Extra_Packages(t *testing.T) {
 	c.Run(t, "bud up", context.Timeout(2*time.Minute))
 
 	lines := c.Run(t, "pip freeze")
-	OutputNotContain(t, lines, "pyreleaser==0.5.2")
+	OutputNotContain(t, lines, "pkginfo==1.9.6")
 }
 
 func generateTestSetupPy(version int) string {
 	lines := []string{
 		`from setuptools import setup, find_packages`,
-		fmt.Sprintf(`setup(name='devbuddy-test-pkg', version='%d', extras_require={'test': ['pyreleaser==0.5.2']})`, version),
-		`open("sentinel", "w").write("")`,
+		fmt.Sprintf(`setup(name='devbuddy-test-pkg', version='%d', extras_require={'test': ['pkginfo==1.9.6']})`, version),
 	}
 	return strings.Join(lines, "\n")
 }
