@@ -10,10 +10,11 @@ import (
 )
 
 var cdCmd = &cobra.Command{
-	Use:   "cd [PROJECT]",
-	Short: "Jump to a local project",
-	Run:   cdRun,
-	Args:  onlyOneArg,
+	Use:     "cd [PROJECT]",
+	Short:   "Jump to a local project",
+	Run:     cdRun,
+	Args:    onlyOneArg,
+	GroupID: "devbuddy",
 }
 
 func cdRun(cmd *cobra.Command, args []string) {

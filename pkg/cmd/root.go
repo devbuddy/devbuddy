@@ -19,6 +19,13 @@ func build(version string) *cobra.Command {
 		Version: version,
 	}
 
+	rootCmd.AddGroup(
+		&cobra.Group{ID: "devbuddy", Title: "DevBuddy Commands:"},
+		&cobra.Group{ID: "project", Title: "Project Commands:"},
+	)
+	rootCmd.SetHelpCommandGroupID("devbuddy")
+	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+
 	rootCmd.Flags().Bool("shell-init", false, "Shell initialization")
 	rootCmd.Flags().Bool("with-completion", false, "Enable completion during initialization")
 
@@ -41,7 +48,7 @@ func build(version string) *cobra.Command {
 	return rootCmd
 }
 
-func rootRun(cmd *cobra.Command, args []string) {
+func rootRun(cmd *cobra.Command, _ []string) {
 	var err error
 
 	if GetFlagBool(cmd, "shell-init") {

@@ -10,10 +10,10 @@ func Test_Cmd_Help(t *testing.T) {
 	c := CreateContext(t)
 
 	lines := c.Run(t, "bud")
-	OutputContains(t, lines, "Usage:", "Available Commands:", "Flags:")
+	OutputContains(t, lines, "Usage:", "DevBuddy Commands:", "  cd", "  clone", "  up", "Flags:")
 
 	lines = c.Run(t, "bud --help")
-	OutputContains(t, lines, "Usage:", "Available Commands:", "Flags:")
+	OutputContains(t, lines, "Usage:", "DevBuddy Commands:", "  cd", "  clone", "  up", "Flags:")
 }
 
 func Test_Cmd_Version(t *testing.T) {

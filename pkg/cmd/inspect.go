@@ -10,13 +10,14 @@ import (
 )
 
 var inspectCmd = &cobra.Command{
-	Use:   "inspect",
-	Short: "Inspect the project and its tasks",
-	Run:   inspectRun,
-	Args:  noArgs,
+	Use:     "inspect",
+	Short:   "Inspect the project and its tasks",
+	Run:     inspectRun,
+	Args:    noArgs,
+	GroupID: "devbuddy",
 }
 
-func inspectRun(cmd *cobra.Command, args []string) {
+func inspectRun(_ *cobra.Command, _ []string) {
 	proj, err := project.FindCurrent()
 	checkError(err)
 

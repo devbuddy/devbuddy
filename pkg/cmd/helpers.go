@@ -17,7 +17,7 @@ func GetFlagBool(cmd *cobra.Command, flag string) bool {
 	return b
 }
 
-func onlyOneArg(cmd *cobra.Command, args []string) error {
+func onlyOneArg(_ *cobra.Command, args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("expecting one argument")
 	}
@@ -31,7 +31,7 @@ func noArgs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func zeroOrOneArg(cmd *cobra.Command, args []string) error {
+func zeroOrOneArg(_ *cobra.Command, args []string) error {
 	if len(args) > 1 {
 		return fmt.Errorf("expecting zero or one argument")
 	}

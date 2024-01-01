@@ -10,10 +10,11 @@ import (
 )
 
 var openCmd = &cobra.Command{
-	Use:   "open [github|pullrequest]",
-	Short: "Open a link about your project",
-	Run:   openRun,
-	Args:  zeroOrOneArg,
+	Use:     "open [github|pullrequest]",
+	Short:   "Open a link about your project",
+	Run:     openRun,
+	Args:    zeroOrOneArg,
+	GroupID: "devbuddy",
 }
 
 func init() {

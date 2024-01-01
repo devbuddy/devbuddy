@@ -16,10 +16,11 @@ func init() {
 }
 
 var upCmd = &cobra.Command{
-	Use:   "up",
-	Short: "Ensure the project is up and running",
-	Run:   upRun,
-	Args:  noArgs,
+	Use:     "up",
+	Short:   "Ensure the project is up and running",
+	Run:     upRun,
+	Args:    noArgs,
+	GroupID: "devbuddy",
 }
 
 func upRun(cmd *cobra.Command, args []string) {
