@@ -40,11 +40,10 @@ func OutputContains(t *testing.T, lines []string, subStrings ...string) {
 	t.Helper()
 
 	text := strings.Join(lines, "\n")
+	text = StripANSI(text)
 
 	for _, subString := range subStrings {
-		if !strings.Contains(text, subString) {
-			t.Fatalf("Substring %q was not found in:\n%s", subString, text)
-		}
+		require.Contains(t, text, subString)
 	}
 }
 
@@ -52,11 +51,10 @@ func OutputNotContain(t *testing.T, lines []string, subStrings ...string) {
 	t.Helper()
 
 	text := strings.Join(lines, "\n")
+	text = StripANSI(text)
 
 	for _, subString := range subStrings {
-		if strings.Contains(text, subString) {
-			t.Fatalf("Substring %q was found in:\n%s", subString, text)
-		}
+		require.NotContains(t, text, subString)
 	}
 }
 

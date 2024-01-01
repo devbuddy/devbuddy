@@ -65,9 +65,10 @@ func Test_Task_Go(t *testing.T) {
 			`    version: "1.20"`,
 			`    modules: true`,
 		)
-		c.Cd(t, p.Path)
+		lines := c.Cd(t, p.Path)
+		OutputContains(t, lines, "golang activated. (1.20+mod)")
 
-		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
+		lines = c.Run(t, "bud up", context.Timeout(2*time.Minute))
 		OutputContains(t, lines, "◼︎ Golang (1.20)")
 
 		lines = c.Run(t, "go version")
