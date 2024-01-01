@@ -66,24 +66,15 @@ func buildCustomCommands(rootCmd *cobra.Command) {
 		return
 	}
 
-	var cmd *cobra.Command
-
 	for name, spec := range man.GetCommands() {
-		desc := "Custom"
-		if spec.Description != "" {
-			desc = fmt.Sprintf("Custom: %s", spec.Description)
-		}
-
-		useLine := fmt.Sprintf("%s [ARGS...]", name)
-
-		cmd = &cobra.Command{
-			Use:                useLine,
-			Short:              desc,
+		rootCmd.AddCommand(&cobra.Command{
+			Use:                fmt.Sprintf("%s [ARGS...]", name),
+			Short:              spec.Description,
 			RunE:               customCommandRun,
 			Annotations:        map[string]string{"name": name},
 			DisableFlagParsing: true,
 			SilenceUsage:       true,
-		}
-		rootCmd.AddCommand(cmd)
+			GroupID:            "project",
+		})
 	}
 }

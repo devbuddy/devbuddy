@@ -11,10 +11,11 @@ import (
 )
 
 var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Initialize a project in the current directory",
-	Run:   initRun,
-	Args:  noArgs,
+	Use:     "init",
+	Short:   "Initialize a project in the current directory",
+	Run:     initRun,
+	Args:    noArgs,
+	GroupID: "devbuddy",
 }
 
 func initRun(cmd *cobra.Command, args []string) {

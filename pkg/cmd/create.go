@@ -10,13 +10,14 @@ import (
 )
 
 var createCmd = &cobra.Command{
-	Use:   "create [PROJECT]",
-	Short: "Create a new project",
-	Run:   createRun,
-	Args:  onlyOneArg,
+	Use:     "create [PROJECT]",
+	Short:   "Create a new project",
+	Run:     createRun,
+	Args:    onlyOneArg,
+	GroupID: "devbuddy",
 }
 
-func createRun(cmd *cobra.Command, args []string) {
+func createRun(_ *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	checkError(err)
 
