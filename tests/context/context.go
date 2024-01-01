@@ -215,10 +215,11 @@ func (c *TestContext) GetEnv(t *testing.T, name string) string {
 	return lines[0]
 }
 
-func (c *TestContext) Cd(t *testing.T, path string) {
+func (c *TestContext) Cd(t *testing.T, path string) []string {
 	t.Helper()
-	_, err := c.shell.Run("cd " + strconv.Quote(path))
+	lines, err := c.shell.Run("cd " + strconv.Quote(path))
 	require.NoError(t, err)
+	return lines
 }
 
 func (c *TestContext) debugLine(format string, a ...interface{}) {

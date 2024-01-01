@@ -10,11 +10,11 @@ import (
 func Test_Env_Python(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	devYml := `
-up:
-- python: 3.9.0
-`
-	CreateProject(t, c, devYml)
+	p := CreateProject(t, c,
+		`up:`,
+		`- python: 3.9.0`,
+	)
+	c.Cd(t, p.Path)
 
 	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
 	OutputContains(t, lines, "python activated. (3.9.0)")

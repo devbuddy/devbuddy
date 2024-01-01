@@ -30,15 +30,14 @@ func Test_Env_EnvFile_In_Process(t *testing.T) {
 
 	c := CreateContextAndInit(t)
 
-	devYml := `
-up:
-- envfile
-- custom:
-    name: succeed if TESTVAR is set
-    met?: test -n "${TESTVAR}"
-    meet: echo "TESTVAR is not set"; false
-`
-	c.Write(t, "dev.yml", devYml)
+	c.WriteLines(t, "dev.yml",
+		`up:`,
+		`- envfile`,
+		`- custom:`,
+		`    name: succeed if TESTVAR is set`,
+		`    met?: test -n "${TESTVAR}"`,
+		`    meet: echo "TESTVAR is not set"; false`,
+	)
 	c.Write(t, ".env", `TESTVAR=FooBAr`)
 
 	c.Run(t, "bud up")

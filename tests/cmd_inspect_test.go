@@ -14,6 +14,7 @@ func Test_Cmd_Inspect(t *testing.T) {
 		`- node: '10.15.0'`,
 		`- pip: [requirements.txt]`,
 	)
+	c.Cd(t, project.Path)
 
 	lines := c.Run(t, "bud inspect")
 	OutputEqual(t, lines[0:3],
