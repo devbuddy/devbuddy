@@ -42,9 +42,7 @@ func (b *brewInstall) Description() string {
 }
 
 func (b *brewInstall) Needed(ctx *context.Context) *api.ActionResult {
-	brew := helpers.NewHomebrew()
-
-	if brew.IsInstalled(b.formula) {
+	if helpers.HomeBrewPackageIsInstalled(b.formula) {
 		return api.NotNeeded()
 	}
 	return api.Needed("package %s is not installed", b.formula)

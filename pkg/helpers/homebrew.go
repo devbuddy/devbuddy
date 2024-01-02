@@ -1,44 +1,42 @@
 package helpers
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
-type caskroom struct {
-	prefixes []string
-}
+const EnvHomebrewPrefix = "HOMEBREW_PREFIX"
 
-type cellar struct {
-	prefixes []string
-}
+func HomeBrewPackageIsInstalled(formula string) bool {
+	formulaPath := buildFormulaPath(formula)
 
-// Homebrew represent an homebrew installation
-type Homebrew struct {
-	caskroom *caskroom
-	cellar   *cellar
-}
+	var searchPaths []string
 
-// NewHomebrew is returning a new Cellar
-func NewHomebrew() *Homebrew {
-	return NewHomebrewWithPrefix("/usr/local", "/opt/homebrew")
-}
-
-// NewHomebrewWithPrefix is returning a new Cellar at prefix
-func NewHomebrewWithPrefix(prefixes ...string) *Homebrew {
-	return &Homebrew{
-		cellar:   &cellar{prefixes: prefixes},
-		caskroom: &caskroom{prefixes: prefixes},
+	prefix, ok := os.LookupEnv(EnvHomebrewPrefix)
+	if ok {
+		searchPaths = []string{
+			filepath.Join(prefix, "Caskroom", formulaPath),
+			filepath.Join(prefix, "Cellar", formulaPath),
+		}
+	} else {
+		searchPaths = []string{
+			filepath.Join("/usr/local", "Caskroom", formulaPath),         // on Intel
+			filepath.Join("/opt/homebrew", "Caskroom", formulaPath),      // on Apple Silicon
+			filepath.Join("/opt/homebrew-cask", "Caskroom", formulaPath), // legacy prefix
+			filepath.Join("/usr/local", "Cellar", formulaPath),           // on Intel
+			filepath.Join("/opt/homebrew", "Cellar", formulaPath),        // on Apple Silicon
+		}
 	}
-}
 
-// IsInstalled returns true if `pkg` is installed in cellar or in caskroom
-func (h *Homebrew) IsInstalled(formula string) (installed bool) {
-	path := buildFormulaPath(formula)
-
-	return h.cellar.isInstalled(path) || h.caskroom.isInstalled(path)
+	for _, searchPath := range searchPaths {
+		if utils.PathExists(searchPath) {
+			return true
+		}
+	}
+	return false
 }
 
 // buildFormulaPath building a formula name from a full path by doing the following operations:
@@ -50,30 +48,4 @@ func buildFormulaPath(path string) string {
 	results := strings.Split(path, "/")
 	formula := results[len(results)-1]
 	return strings.TrimSuffix(formula, filepath.Ext(formula))
-}
-
-// isInstalled returns true if formulua was installed in Caskrook
-func (c *caskroom) isInstalled(formula string) bool {
-	legacyPrefix := "/opt/homebrew-cask"
-
-	if utils.PathExists(filepath.Join(legacyPrefix, "Caskroom", formula)) {
-		return true
-	}
-
-	for _, prefix := range c.prefixes {
-		if utils.PathExists(filepath.Join(prefix, "Caskroom", formula)) {
-			return true
-		}
-	}
-	return false
-}
-
-// isInstalled returns true if formulua was installed in cellar
-func (c *cellar) isInstalled(formula string) bool {
-	for _, prefix := range c.prefixes {
-		if utils.PathExists(filepath.Join(prefix, "Cellar", formula)) {
-			return true
-		}
-	}
-	return false
 }
