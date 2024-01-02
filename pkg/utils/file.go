@@ -1,14 +1,16 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"hash/adler32"
+	"io/fs"
 	"os"
 	"time"
 )
 
 func PathExists(path string) (exists bool) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if _, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
 		return false
 	}
 	return true
