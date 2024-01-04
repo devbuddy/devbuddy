@@ -10,17 +10,17 @@ import (
 // When a param changes, the feature is deactivated with the current param then activated with the new param.
 func Sync(ctx *context.Context, set FeatureSet) {
 	runner := &runner{
-		ctx:   ctx,
-		state: &StateManager{ctx.Env, ctx.UI},
-		reg:   features.GlobalRegister(),
+		ctx:      ctx,
+		state:    &StateManager{ctx.Env, ctx.UI},
+		features: features.All(),
 	}
 	runner.sync(set)
 }
 
 type runner struct {
-	ctx   *context.Context
-	state *StateManager
-	reg   features.Register
+	ctx      *context.Context
+	state    *StateManager
+	features features.Features
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
@@ -48,7 +48,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 
 	activeFeatures := r.state.GetActiveFeatures()
 
-	for _, name := range r.reg.Names() {
+	for _, name := range r.features.Names() {
 		wantFeatureInfo := featureSet.Get(name)
 		activeFeatureInfo := activeFeatures.Get(name)
 
@@ -81,9 +81,9 @@ func (r *runner) sync(featureSet FeatureSet) {
 func (r *runner) activateFeature(featureInfo *FeatureInfo) {
 	r.ctx.UI.Debug("activating %s (%s)", featureInfo.Name, featureInfo.Param)
 
-	environment, err := r.reg.Get(featureInfo.Name)
-	if err != nil {
-		r.ctx.UI.Warningf("%s (ignoring)", err)
+	environment := r.features.Get(featureInfo.Name)
+	if environment == nil {
+		r.ctx.UI.Warningf("unknown feature: %s (ignoring)", featureInfo.Name)
 		return
 	}
 
@@ -103,9 +103,9 @@ func (r *runner) activateFeature(featureInfo *FeatureInfo) {
 func (r *runner) deactivateFeature(featureInfo *FeatureInfo) {
 	r.ctx.UI.Debug("deactivating %s (%s)", featureInfo.Name, featureInfo.Param)
 
-	environment, err := r.reg.Get(featureInfo.Name)
-	if err != nil {
-		r.ctx.UI.Warningf("%s (ignoring)", err)
+	environment := r.features.Get(featureInfo.Name)
+	if environment == nil {
+		r.ctx.UI.Warningf("unknown feature: %s (ignoring)", featureInfo.Name)
 		return
 	}
 

@@ -6,10 +6,16 @@ import (
 )
 
 func init() {
-	register("envfile", envfileActivate, nil)
+	register.Register(envfile{})
 }
 
-func envfileActivate(ctx *context.Context, param string) (bool, error) {
+type envfile struct{}
+
+func (envfile) Name() string {
+	return "envfile"
+}
+
+func (envfile) Activate(ctx *context.Context, param string) (bool, error) {
 	envfilePath := param
 
 	err := helpers.LoadEnvfile(ctx.Env, envfilePath)
@@ -19,3 +25,5 @@ func envfileActivate(ctx *context.Context, param string) (bool, error) {
 
 	return false, nil
 }
+
+func (envfile) Deactivate(ctx *context.Context, param string) {}

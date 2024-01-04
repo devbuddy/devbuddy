@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	register("golang", golangActivate, nil)
+	register.Register(golang{})
 }
 
 const (
@@ -16,8 +16,14 @@ const (
 	GolangSuffixGopath = "+gopath"
 )
 
-func golangActivate(ctx *context.Context, version string) (bool, error) {
-	golang := helpers.NewGolang(ctx.Cfg, strings.Split(version, "+")[0])
+type golang struct{}
+
+func (golang) Name() string {
+	return "golang"
+}
+
+func (golang) Activate(ctx *context.Context, param string) (bool, error) {
+	golang := helpers.NewGolang(ctx.Cfg, strings.Split(param, "+")[0])
 
 	if !golang.Exists() {
 		return true, nil
@@ -28,11 +34,13 @@ func golangActivate(ctx *context.Context, version string) (bool, error) {
 	ctx.Env.Set("GOROOT", golang.Path())
 
 	switch {
-	case strings.HasSuffix(version, GolangSuffixMod):
+	case strings.HasSuffix(param, GolangSuffixMod):
 		ctx.Env.Set("GO111MODULE", "on")
-	case strings.HasSuffix(version, GolangSuffixGopath):
+	case strings.HasSuffix(param, GolangSuffixGopath):
 		ctx.Env.Set("GO111MODULE", "off")
 	}
 
 	return false, nil
 }
+
+func (golang) Deactivate(ctx *context.Context, param string) {}
