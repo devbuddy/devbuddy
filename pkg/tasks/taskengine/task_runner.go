@@ -69,9 +69,9 @@ func (r *TaskRunnerImpl) runAction(action api.TaskAction) error {
 }
 
 func (r *TaskRunnerImpl) activateFeature(feature autoenv.FeatureInfo) error {
-	def, err := features.GlobalRegister().Get(feature.Name)
-	if err != nil {
-		return err
+	def := features.All().Get(feature.Name)
+	if def == nil {
+		return fmt.Errorf("unknown feature: %s", feature.Name)
 	}
 
 	devUpNeeded, err := def.Activate(r.ctx, feature.Param)

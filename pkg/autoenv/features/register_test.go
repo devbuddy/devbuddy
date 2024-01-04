@@ -8,36 +8,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRegister(t *testing.T) {
-	reg := NewRegister()
+type testFeature string
 
-	activate := func(ctx *context.Context, param string) (bool, error) {
-		return false, nil
-	}
-	deactivate1 := func(ctx *context.Context, param string) {}
-	deactivate2 := func(ctx *context.Context, param string) {}
-
-	reg.Register("env1", activate, deactivate1)
-	reg.Register("env2", activate, deactivate2)
-
-	require.ElementsMatch(t, reg.Names(), []string{"env1", "env2"})
-
-	env, err := reg.Get("env1")
-	require.NoError(t, err)
-	require.Equal(t, env.Name, "env1")
-	require.NotNil(t, env.Activate)
-	require.NotNil(t, env.Deactivate)
-
-	env, err = reg.Get("env2")
-	require.NoError(t, err)
-	require.Equal(t, env.Name, "env2")
-	require.NotNil(t, env.Activate)
-	require.NotNil(t, env.Deactivate)
+func (t testFeature) Name() string {
+	return string(t)
 }
 
-func TestRegisterNotFound(t *testing.T) {
-	reg := NewRegister()
+func (testFeature) Activate(ctx *context.Context, param string) (bool, error) {
+	return false, nil
+}
 
-	_, err := reg.Get("nope")
-	require.Error(t, err)
+func (testFeature) Deactivate(ctx *context.Context, param string) {}
+
+func TestRegister(t *testing.T) {
+	reg := Register{}
+
+	reg.Register(python{})
+	reg.Register(golang{})
+
+	require.ElementsMatch(t, reg.Names(), []string{"python", "golang"})
+
+	env := reg.Get("python")
+	require.Equal(t, env.Name(), "python")
+
+	env = reg.Get("golang")
+	require.Equal(t, env.Name(), "golang")
+
+	env = reg.Get("nope")
+	require.Nil(t, env, "unknown feature: nope")
 }

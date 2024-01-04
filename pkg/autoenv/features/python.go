@@ -6,11 +6,17 @@ import (
 )
 
 func init() {
-	register("python", pythonActivate, nil)
+	register.Register(python{})
 }
 
-func pythonActivate(ctx *context.Context, version string) (bool, error) {
-	name := helpers.VirtualenvName(ctx.Project, version)
+type python struct{}
+
+func (python) Name() string {
+	return "python"
+}
+
+func (python) Activate(ctx *context.Context, param string) (bool, error) {
+	name := helpers.VirtualenvName(ctx.Project, param)
 	venv := helpers.NewVirtualenv(ctx.Cfg, name)
 
 	if !venv.Exists() {
@@ -22,3 +28,5 @@ func pythonActivate(ctx *context.Context, version string) (bool, error) {
 
 	return false, nil
 }
+
+func (python) Deactivate(ctx *context.Context, param string) {}

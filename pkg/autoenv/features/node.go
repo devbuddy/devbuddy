@@ -6,14 +6,22 @@ import (
 )
 
 func init() {
-	register("node", nodeActivate, nil)
+	register.Register(node{})
 }
 
-func nodeActivate(ctx *context.Context, version string) (bool, error) {
-	node := helpers.NewNode(ctx.Cfg, version)
+type node struct{}
+
+func (node) Name() string {
+	return "node"
+}
+
+func (node) Activate(ctx *context.Context, param string) (bool, error) {
+	node := helpers.NewNode(ctx.Cfg, param)
 	if !node.Exists() {
 		return true, nil
 	}
 	ctx.Env.PrependToPath(node.BinPath())
 	return false, nil
 }
+
+func (node) Deactivate(ctx *context.Context, param string) {}
