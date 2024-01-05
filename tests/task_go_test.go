@@ -21,7 +21,7 @@ func main() {
 `
 
 func Test_Task_Go(t *testing.T) {
-	// Test with Go 1.20
+	// Test with Go 1.21.5
 	// Use sub-tests to avoid downloading the go runtime multiple times.
 	c := CreateContextAndInit(t)
 
@@ -33,16 +33,16 @@ func Test_Task_Go(t *testing.T) {
 		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
-			`    version: "1.20"`,
+			`    version: "1.21.5"`,
 		)
 		c.Cd(t, p.Path)
 
 		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
-		OutputContains(t, lines, "Golang (1.20)", "install golang distribution")
-		OutputContains(t, lines, "golang activated. (1.20)")
+		OutputContains(t, lines, "Golang (1.21.5)", "install golang distribution")
+		OutputContains(t, lines, "golang activated. (1.21.5)")
 
 		lines = c.Run(t, "go version")
-		OutputContains(t, lines, "go version go1.20")
+		OutputContains(t, lines, "go version go1.21.5")
 
 		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
 		OutputContains(t, lines, "GO111MODULE=#")
@@ -62,17 +62,17 @@ func Test_Task_Go(t *testing.T) {
 		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
-			`    version: "1.20"`,
+			`    version: "1.21.5"`,
 			`    modules: true`,
 		)
 		lines := c.Cd(t, p.Path)
-		OutputContains(t, lines, "golang activated. (1.20+mod)")
+		OutputContains(t, lines, "golang activated. (1.21.5+mod)")
 
 		lines = c.Run(t, "bud up", context.Timeout(2*time.Minute))
-		OutputContains(t, lines, "◼︎ Golang (1.20)")
+		OutputContains(t, lines, "◼︎ Golang (1.21.5)")
 
 		lines = c.Run(t, "go version")
-		OutputContains(t, lines, "go version go1.20")
+		OutputContains(t, lines, "go version go1.21.5")
 
 		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
 		OutputContains(t, lines, "GO111MODULE=on#")
@@ -93,16 +93,16 @@ func Test_Task_Go(t *testing.T) {
 		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
-			`    version: "1.20"`,
+			`    version: "1.21.5"`,
 			`    modules: false`,
 		)
 		c.Cd(t, p.Path)
 
 		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
-		OutputContains(t, lines, "◼︎ Golang (1.20)")
+		OutputContains(t, lines, "◼︎ Golang (1.21.5)")
 
 		lines = c.Run(t, "go version")
-		OutputContains(t, lines, "go version go1.20")
+		OutputContains(t, lines, "go version go1.21.5")
 
 		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
 		OutputContains(t, lines, "GO111MODULE=off#")
