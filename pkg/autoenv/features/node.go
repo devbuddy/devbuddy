@@ -6,16 +6,16 @@ import (
 )
 
 func init() {
-	register.Register(node{})
+	register.Register(Node{})
 }
 
-type node struct{}
+type Node struct{}
 
-func (node) Name() string {
+func (Node) Name() string {
 	return "node"
 }
 
-func (node) Activate(ctx *context.Context, param string) (bool, error) {
+func (Node) Activate(ctx *context.Context, param string) (bool, error) {
 	node := helpers.NewNode(ctx.Cfg, param)
 	if !node.Exists() {
 		return true, nil
@@ -24,4 +24,4 @@ func (node) Activate(ctx *context.Context, param string) (bool, error) {
 	return false, nil
 }
 
-func (node) Deactivate(ctx *context.Context, param string) {}
+func (Node) Deactivate(ctx *context.Context, param string) {}

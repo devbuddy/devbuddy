@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	register.Register(golang{})
+	register.Register(Golang{})
 }
 
 const (
@@ -16,13 +16,13 @@ const (
 	GolangSuffixGopath = "+gopath"
 )
 
-type golang struct{}
+type Golang struct{}
 
-func (golang) Name() string {
+func (Golang) Name() string {
 	return "golang"
 }
 
-func (golang) Activate(ctx *context.Context, param string) (bool, error) {
+func (Golang) Activate(ctx *context.Context, param string) (bool, error) {
 	golang := helpers.NewGolang(ctx.Cfg, strings.Split(param, "+")[0])
 
 	if !golang.Exists() {
@@ -43,4 +43,4 @@ func (golang) Activate(ctx *context.Context, param string) (bool, error) {
 	return false, nil
 }
 
-func (golang) Deactivate(ctx *context.Context, param string) {}
+func (Golang) Deactivate(ctx *context.Context, param string) {}

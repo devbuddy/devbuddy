@@ -6,16 +6,16 @@ import (
 )
 
 func init() {
-	register.Register(python{})
+	register.Register(Python{})
 }
 
-type python struct{}
+type Python struct{}
 
-func (python) Name() string {
+func (Python) Name() string {
 	return "python"
 }
 
-func (python) Activate(ctx *context.Context, param string) (bool, error) {
+func (Python) Activate(ctx *context.Context, param string) (bool, error) {
 	name := helpers.VirtualenvName(ctx.Project, param)
 	venv := helpers.NewVirtualenv(ctx.Cfg, name)
 
@@ -29,4 +29,4 @@ func (python) Activate(ctx *context.Context, param string) (bool, error) {
 	return false, nil
 }
 
-func (python) Deactivate(ctx *context.Context, param string) {}
+func (Python) Deactivate(ctx *context.Context, param string) {}

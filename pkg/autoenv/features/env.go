@@ -6,16 +6,16 @@ import (
 )
 
 func init() {
-	register.Register(env{})
+	register.Register(Env{})
 }
 
-type env struct{}
+type Env struct{}
 
-func (env) Name() string {
+func (Env) Name() string {
 	return "env"
 }
 
-func (env) Activate(ctx *context.Context, param string) (bool, error) {
+func (Env) Activate(ctx *context.Context, param string) (bool, error) {
 	man, err := manifest.Load(ctx.Project.Path)
 	if err != nil {
 		return false, err
@@ -28,4 +28,4 @@ func (env) Activate(ctx *context.Context, param string) (bool, error) {
 	return false, nil
 }
 
-func (env) Deactivate(ctx *context.Context, param string) {}
+func (Env) Deactivate(ctx *context.Context, param string) {}
