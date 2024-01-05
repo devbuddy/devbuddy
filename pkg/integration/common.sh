@@ -1,6 +1,3 @@
-package integration
-
-var shellSource = `
 # Be careful! This runs in the user shell.
 
 # Mask the command bud with this shell function
@@ -66,4 +63,3 @@ bud-disable-debug() {
 if [[ -n "${BUD_DEBUG:-}" ]]; then
     echo "BUD_DEBUG: DevBuddy is now enabled..."
 fi
-`
