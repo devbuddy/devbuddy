@@ -2,6 +2,7 @@ package integration
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"io"
 	"os"
@@ -9,6 +10,15 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
+
+//go:embed common.sh
+var shellSource string
+
+//go:embed bash.sh
+var bashSource string
+
+//go:embed zsh.sh
+var zshSource string
 
 type CompletionScriptProvider interface {
 	GenBashCompletion(w io.Writer) error
