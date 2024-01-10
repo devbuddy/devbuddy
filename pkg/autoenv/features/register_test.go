@@ -23,8 +23,8 @@ func (testFeature) Deactivate(ctx *context.Context, param string) {}
 func TestRegister(t *testing.T) {
 	reg := Register{}
 
-	reg.Register(python{})
-	reg.Register(golang{})
+	reg.Register(Python{})
+	reg.Register(Golang{})
 
 	require.ElementsMatch(t, reg.Names(), []string{"python", "golang"})
 

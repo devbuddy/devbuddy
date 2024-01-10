@@ -7,6 +7,7 @@ import (
 type Feature interface {
 	Name() string
 	Activate(ctx *context.Context, param string) (devUpNeeded bool, err error)
+	Refresh(ctx *context.Context, param string)
 	Deactivate(ctx *context.Context, param string)
 }
 
