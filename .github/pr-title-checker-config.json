@@ -1,0 +1,13 @@
+{
+    "LABEL": {
+      "name": ""
+    },
+    "CHECKS": {
+      "prefixes": ["CODE: ", "FEAT: ", "PROJ: ", "UX: ", "DOC: "]
+    },
+    "MESSAGES": {
+      "success": "All OK",
+      "failure": "Failing CI test",
+      "notice": ""
+    }
+  }
