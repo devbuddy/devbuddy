@@ -43,4 +43,5 @@ func (Golang) Activate(ctx *context.Context, param string) (bool, error) {
 	return false, nil
 }
 
+func (Golang) Refresh(ctx *context.Context, param string)    {}
 func (Golang) Deactivate(ctx *context.Context, param string) {}

@@ -26,6 +26,10 @@ func (r *RecorderFeature) Activate(ctx *context.Context, param string) (bool, er
 	return false, nil
 }
 
+func (r *RecorderFeature) Refresh(ctx *context.Context, param string) {
+	r.calls = append(r.calls, "refresh "+param)
+}
+
 func (r *RecorderFeature) Deactivate(ctx *context.Context, param string) {
 	r.calls = append(r.calls, "deactivate "+param)
 }
@@ -74,7 +78,7 @@ func TestRunner(t *testing.T) {
 	// Second time with the same feature
 	runner = newRunner(testEnv, reg)
 	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")))
-	require.Empty(t, rust.getCallsAndReset())
+	require.Equal(t, []string{"refresh 1.0"}, rust.getCallsAndReset())
 
 	// Change the feature param
 	runner = newRunner(testEnv, reg)
@@ -104,16 +108,16 @@ func TestRunnerWithTwoFeatures(t *testing.T) {
 	runner = newRunner(testEnv, reg)
 	runner.sync(NewFeatureSet().With(NewFeatureInfo("elixir", "0.4")))
 	require.Equal(t, []string{"deactivate 1.0"}, rust.getCallsAndReset())
-	require.Empty(t, elixir.getCallsAndReset())
+	require.Equal(t, []string{"refresh 0.4"}, elixir.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
 	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")).With(NewFeatureInfo("elixir", "0.4")))
 	require.Equal(t, []string{"activate 1.0"}, rust.getCallsAndReset())
-	require.Empty(t, elixir.getCallsAndReset())
+	require.Equal(t, []string{"refresh 0.4"}, elixir.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)
 	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")).With(NewFeatureInfo("elixir", "0.5")))
-	require.Empty(t, rust.getCallsAndReset())
+	require.Equal(t, []string{"refresh 1.0"}, rust.getCallsAndReset())
 	require.Equal(t, []string{"deactivate 0.4", "activate 0.5"}, elixir.getCallsAndReset())
 
 	runner = newRunner(testEnv, reg)

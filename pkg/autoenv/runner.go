@@ -37,8 +37,8 @@ func (r *runner) sync(featureSet FeatureSet) {
 
 			// Since it's a different project, we just deactivate all features
 			// For example, "python:3.7" is activating a virtualenv built for a specific project
-			for _, featureInfo := range r.state.GetActiveFeatures() {
-				r.deactivateFeature(featureInfo)
+			for _, fi := range r.state.GetActiveFeatures() {
+				r.deactivate(fi)
 			}
 
 			r.state.RestoreEnv()
@@ -49,21 +49,23 @@ func (r *runner) sync(featureSet FeatureSet) {
 	activeFeatures := r.state.GetActiveFeatures()
 
 	for _, name := range r.features.Names() {
-		wantFeatureInfo := featureSet.Get(name)
-		activeFeatureInfo := activeFeatures.Get(name)
+		want := featureSet.Get(name)
+		active := activeFeatures.Get(name)
 
-		if wantFeatureInfo != nil {
-			if activeFeatureInfo != nil {
-				if wantFeatureInfo.Param != activeFeatureInfo.Param {
-					r.deactivateFeature(activeFeatureInfo)
-					r.activateFeature(wantFeatureInfo)
+		if want != nil {
+			if active != nil {
+				if want.Param == active.Param {
+					r.refresh(want)
+				} else {
+					r.deactivate(active)
+					r.activate(want)
 				}
 			} else {
-				r.activateFeature(wantFeatureInfo)
+				r.activate(want)
 			}
 		} else {
-			if activeFeatureInfo != nil {
-				r.deactivateFeature(activeFeatureInfo)
+			if active != nil {
+				r.deactivate(active)
 			}
 		}
 	}
@@ -78,37 +80,49 @@ func (r *runner) sync(featureSet FeatureSet) {
 	}
 }
 
-func (r *runner) activateFeature(featureInfo *FeatureInfo) {
-	r.ctx.UI.Debug("activating %s (%s)", featureInfo.Name, featureInfo.Param)
+func (r *runner) activate(fi *FeatureInfo) {
+	r.ctx.UI.Debug("activating %s (%s)", fi.Name, fi.Param)
 
-	environment := r.features.Get(featureInfo.Name)
-	if environment == nil {
-		r.ctx.UI.Warningf("unknown feature: %s (ignoring)", featureInfo.Name)
+	feature := r.features.Get(fi.Name)
+	if feature == nil {
+		r.ctx.UI.Warningf("unknown feature: %s (ignoring)", fi.Name)
 		return
 	}
 
-	devUpNeeded, err := environment.Activate(r.ctx, featureInfo.Param)
+	devUpNeeded, err := feature.Activate(r.ctx, fi.Param)
 	if err != nil {
 		r.ctx.UI.Debug("failed: %s", err)
 		return
 	}
 	if devUpNeeded {
-		r.ctx.UI.HookFeatureFailure(featureInfo.Name, featureInfo.Param)
+		r.ctx.UI.HookFeatureFailure(fi.Name, fi.Param)
 		return
 	}
-	r.ctx.UI.HookFeatureActivated(featureInfo.Name, featureInfo.Param)
-	r.state.SetFeature(featureInfo)
+	r.ctx.UI.HookFeatureActivated(fi.Name, fi.Param)
+	r.state.SetFeature(fi)
 }
 
-func (r *runner) deactivateFeature(featureInfo *FeatureInfo) {
-	r.ctx.UI.Debug("deactivating %s (%s)", featureInfo.Name, featureInfo.Param)
+func (r *runner) refresh(fi *FeatureInfo) {
+	r.ctx.UI.Debug("refresh %s (%s)", fi.Name, fi.Param)
 
-	environment := r.features.Get(featureInfo.Name)
-	if environment == nil {
-		r.ctx.UI.Warningf("unknown feature: %s (ignoring)", featureInfo.Name)
+	feature := r.features.Get(fi.Name)
+	if feature == nil {
+		r.ctx.UI.Warningf("unknown feature: %s (ignoring)", fi.Name)
 		return
 	}
 
-	environment.Deactivate(r.ctx, featureInfo.Param)
-	r.state.UnsetFeature(featureInfo.Name)
+	feature.Refresh(r.ctx, fi.Param)
+}
+
+func (r *runner) deactivate(fi *FeatureInfo) {
+	r.ctx.UI.Debug("deactivating %s (%s)", fi.Name, fi.Param)
+
+	feature := r.features.Get(fi.Name)
+	if feature == nil {
+		r.ctx.UI.Warningf("unknown feature: %s (ignoring)", fi.Name)
+		return
+	}
+
+	feature.Deactivate(r.ctx, fi.Param)
+	r.state.UnsetFeature(fi.Name)
 }

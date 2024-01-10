@@ -29,4 +29,5 @@ func (Python) Activate(ctx *context.Context, param string) (bool, error) {
 	return false, nil
 }
 
+func (Python) Refresh(ctx *context.Context, param string)    {}
 func (Python) Deactivate(ctx *context.Context, param string) {}

@@ -26,4 +26,8 @@ func (Envfile) Activate(ctx *context.Context, param string) (bool, error) {
 	return false, nil
 }
 
+func (e Envfile) Refresh(ctx *context.Context, param string) {
+	_, _ = e.Activate(ctx, param)
+}
+
 func (Envfile) Deactivate(ctx *context.Context, param string) {}

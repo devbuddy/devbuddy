@@ -24,4 +24,5 @@ func (Node) Activate(ctx *context.Context, param string) (bool, error) {
 	return false, nil
 }
 
+func (Node) Refresh(ctx *context.Context, param string)    {}
 func (Node) Deactivate(ctx *context.Context, param string) {}
