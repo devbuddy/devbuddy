@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -33,7 +34,7 @@ func (d *downloader) DownloadToFile(file string) error {
 	}()
 
 	// Create a temp file
-	tmpFile, err := os.CreateTemp(os.TempDir(), "devbuddy-")
+	tmpFile, err := os.CreateTemp(filepath.Dir(file), "")
 	if err != nil {
 		return err
 	}
