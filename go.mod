@@ -3,7 +3,7 @@ module github.com/devbuddy/devbuddy
 go 1.21
 
 require (
-	github.com/creack/pty v1.1.21
+	github.com/creack/pty v1.1.23
 	github.com/devbuddy/expect v0.1.0
 	github.com/dnaeon/go-vcr v1.2.0
 	github.com/joho/godotenv v1.5.1
