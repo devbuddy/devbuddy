@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -63,7 +64,7 @@ func (pp *progressPrinterReader) display(msg string) {
 }
 
 func (pp *progressPrinterReader) progress(n int, err error) {
-	if err == io.EOF {
+	if errors.Is(err, io.EOF) {
 		pp.display("Download complete\n")
 		return
 	}

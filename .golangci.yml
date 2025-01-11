@@ -16,8 +16,23 @@ linters:
     - thelper
     - unconvert
     - wastedassign
+    - durationcheck
+    # - err113
+    - asasalint
+    - asciicheck
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - errchkjson
+    - errname
+    - exhaustive
+    - fatcontext
 
 
 linters-settings:
   gci:
-    local-prefixes: github.com/devbuddy/devbuddy
+    sections:
+      - standard
+      - default
+      - prefix(github.com/devbuddy/devbuddy)

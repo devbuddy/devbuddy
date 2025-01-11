@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"syscall"
@@ -18,7 +19,8 @@ func buildResult(output string, err error) *Result {
 	code := 0
 
 	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
 			code = exitError.Sys().(syscall.WaitStatus).ExitStatus()
 			err = nil
 		} else {

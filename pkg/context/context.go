@@ -1,6 +1,8 @@
 package context
 
 import (
+	"errors"
+
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
@@ -29,7 +31,7 @@ func Load(hookMode bool) (*Context, error) {
 
 	proj, err := project.FindCurrent()
 	if err != nil {
-		if err != project.ErrProjectNotFound {
+		if errors.Is(err, project.ErrProjectNotFound) {
 			return nil, err
 		}
 		ui.Debug("Project not found")
