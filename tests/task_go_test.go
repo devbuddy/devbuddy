@@ -49,7 +49,7 @@ func Test_Task_Go(t *testing.T) {
 
 		c.Write(t, "main.go", testingGoMain) // depends on github.com/devbuddy/tiny-test-go-package
 		c.Run(t, "go mod init")
-		c.Run(t, "go mod tidy")
+		c.Run(t, "go mod tidy", context.Timeout(15*time.Second))
 		lines = c.Run(t, "go run main.go", context.Timeout(time.Minute))
 		OutputContains(t, lines, "Is it working: true")
 	})
@@ -79,7 +79,7 @@ func Test_Task_Go(t *testing.T) {
 
 		c.Write(t, "main.go", testingGoMain)
 		c.Run(t, "go mod init project2")
-		c.Run(t, "go mod tidy")
+		c.Run(t, "go mod tidy", context.Timeout(15*time.Second))
 		lines = c.Run(t, "go run main.go", context.Timeout(time.Minute))
 		OutputContains(t, lines, "Is it working: true")
 	})
