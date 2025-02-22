@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"os/exec"
 	"strconv"
 	"strings"
 	"testing"
@@ -40,8 +41,14 @@ func New(config Config) (*TestContext, error) {
 		panic("unknown shell " + config.ShellName)
 	}
 
+	dockerExec := "docker"
+	cmd := exec.Command("docker", "-v")
+	if cmd.Run() != nil {
+		dockerExec = "podman"
+	}
+
 	dockerCommand := []string{
-		"docker", "run",
+		dockerExec, "run",
 		"-ti",
 		"-v", config.BinaryPath + ":/usr/local/bin/bud",
 		"-e", "PROMPT=##\n",
