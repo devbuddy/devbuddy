@@ -34,7 +34,7 @@ linters:
 
 formatters:
   enable:
-    - goimports
+    - gci
     - gofmt
   exclusions:
     generated: lax
@@ -42,7 +42,9 @@ formatters:
       - third_party$
       - builtin$
       - examples$
-
-linters-settings:
-  goimports:
-    local-prefixes: github.com/devbuddy/devbuddy
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/devbuddy/devbuddy)
