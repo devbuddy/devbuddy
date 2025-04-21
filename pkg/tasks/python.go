@@ -40,7 +40,7 @@ func parserPythonInstallPyenv(task *api.Task, version string) {
 		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
-		result := command(ctx, "brew", "install", "pyenv").Run()
+		result := command(ctx, "brew", "install", "pyenv").SetEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1").Run()
 		if result.Error != nil {
 			return fmt.Errorf("failed to install pyenv: %w", result.Error)
 		}

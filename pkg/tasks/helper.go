@@ -19,10 +19,7 @@ func command(ctx *context.Context, program string, args ...string) executor.Exec
 }
 
 func sudoCommand(ctx *context.Context, program string, args ...string) executor.Executor {
-	args = append([]string{program}, args...)
-	program = "sudo"
-	ctx.UI.TaskCommand(program, args...)
-	return commandSilent(ctx, program, args...)
+	return command(ctx, "sudo", append([]string{program}, args...)...)
 }
 
 func commandSilent(ctx *context.Context, program string, args ...string) executor.Executor {
