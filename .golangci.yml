@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   tests: false
 
@@ -5,19 +7,42 @@ linters:
   enable:
     - asciicheck
     - errname
-    # - errorlint
     - exhaustive
-    - gci
     - gocritic
-    - gofmt
     - makezero
     - misspell
-    - tenv
     - thelper
     - unconvert
     - wastedassign
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 
+  settings:
+    staticcheck:
+      checks:
+        - all
+        - '-ST1005' # ST1005: error strings should not be capitalized
+
+formatters:
+  enable:
+    - goimports
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 
 linters-settings:
-  gci:
+  goimports:
     local-prefixes: github.com/devbuddy/devbuddy
