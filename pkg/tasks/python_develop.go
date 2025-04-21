@@ -32,9 +32,7 @@ func parserPythonDevelop(config *api.TaskConfig, task *api.Task) error {
 
 		return nil
 	}
-	task.AddActionBuilder("install python package in develop mode", pipInstall).
-		On(api.FileCondition("setup.py")).
-		On(api.FileCondition("setup.cfg"))
+	task.AddActionBuilder("install python package in develop mode", pipInstall)
 
 	return nil
 }
