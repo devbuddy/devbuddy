@@ -3,6 +3,7 @@ env:
   TEST_DOCKER_IMAGE: ghcr.io/devbuddy/docker-testing:sha-7fd13f4
 
 up:
+  - ruby: 2.6.4
   - go:
       version: '1.24.2'
       modules: true
