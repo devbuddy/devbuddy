@@ -37,7 +37,7 @@ func createRun(_ *cobra.Command, args []string) error {
 		if err := proj.Create(); err != nil {
 			return err
 		}
-		if err := createManifest(ui, proj.Path); err != nil {
+		if err := createManifest(ui, proj.Path, ""); err != nil {
 			return err
 		}
 	}
