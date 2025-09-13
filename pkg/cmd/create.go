@@ -32,7 +32,7 @@ func createRun(_ *cobra.Command, args []string) {
 		err = proj.Create()
 		checkError(err)
 
-		err = createManifest(ui, proj.Path)
+		err = createManifest(ui, proj.Path, "")
 		checkError(err)
 	}
 

@@ -1,0 +1,32 @@
+# DevBuddy config file
+# See https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md
+
+env:
+  ENV: development
+
+up:
+  # MacOS:
+  # - homebrew:
+  #   - curl
+  #   - golangci/tap/golangci-lint
+
+  # Linux:
+  # - apt:
+  #   - python3-dev
+
+  - go:
+      version: 1.25.1
+      modules: true
+
+  # - custom:
+  #     name: Create the local tmp directory
+  #     met?: test -d tmp
+  #     meet: mkdir tmp
+
+commands:
+  test:
+    desc: Run tests
+    run: go test -cover ./...
+
+open:
+  devbuddy: https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md#config-devyml
