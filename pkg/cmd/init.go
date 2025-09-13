@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"os"
+	"slices"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
@@ -11,14 +13,19 @@ import (
 )
 
 var initCmd = &cobra.Command{
-	Use:     "init",
+	Use:     "init [template]",
 	Short:   "Initialize a project in the current directory",
 	Run:     initRun,
-	Args:    noArgs,
+	Args:    zeroOrOneArg,
 	GroupID: "devbuddy",
 }
 
 func initRun(cmd *cobra.Command, args []string) {
+	var templateName string
+	if len(args) == 1 {
+		templateName = args[0]
+	}
+
 	cfg, err := config.Load()
 	checkError(err)
 
@@ -27,14 +34,31 @@ func initRun(cmd *cobra.Command, args []string) {
 	projectPath, err := os.Getwd()
 	checkError(err)
 
-	err = createManifest(ui, projectPath)
+	err = createManifest(ui, projectPath, templateName)
 	checkError(err)
 }
 
-func createManifest(ui *termui.UI, projectPath string) error {
-	ui.ActionHeader("Creating a default dev.yml file.")
+func createManifest(ui *termui.UI, projectPath string, templateName string) error {
+	templates := manifest.ListTemplates()
 
-	err := manifest.Create(projectPath)
+	if templateName == "" || !slices.Contains(templates, templateName) {
+		prompt := promptui.Select{
+			Label:        "Select a template",
+			Items:        templates,
+			HideSelected: true,
+		}
+
+		_, result, err := prompt.Run()
+		if err != nil {
+			return err
+		}
+
+		templateName = result
+	}
+
+	ui.ActionHeader("Created dev.yml file with template " + templateName)
+
+	err := manifest.Create(projectPath, templateName)
 	if err != nil {
 		return err
 	}

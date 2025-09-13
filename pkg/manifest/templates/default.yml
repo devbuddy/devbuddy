@@ -1,0 +1,48 @@
+# DevBuddy config file
+# See https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md
+
+env:
+  ENV: development
+
+up:
+  # MacOS:
+  # - homebrew:
+  #   - curl
+  #   - golangci/tap/golangci-lint
+
+  # Linux:
+  # - apt:
+  #   - python3-dev
+
+  # Go:
+  # - go:
+  #     version: 1.25.1
+  #     modules: true
+  # - golang_dep
+
+  # Python:
+  # - python: 3.13.7
+  # - pipfile
+  # - pip:
+  #   - requirements.txt
+  #   - tests/requirements.txt
+  # - python_develop
+
+  # Custom task:
+  # - custom:
+  #     name: Create the local tmp directory
+  #     met?: test -d tmp
+  #     meet: mkdir tmp
+
+  - custom:
+      name: Edit dev.yml then remove me
+      met?: 'false'
+      meet: $EDITOR dev.yml
+
+commands:
+  test:
+    desc: Run all tests
+    run: go test ./... -cover
+
+open:
+  devbuddy: https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md#config-devyml

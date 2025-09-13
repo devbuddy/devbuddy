@@ -10,7 +10,7 @@ import (
 func Test_Cmd_Init(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	output := c.Run(t, "bud init")
+	output := c.Run(t, "bud init default")
 	require.Equal(t, []string{
 		"🐼  Creating a default dev.yml file.",
 		"⚠️   Open dev.yml to adjust for your needs.",
