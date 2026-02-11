@@ -2,6 +2,7 @@ package executor
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -125,7 +126,7 @@ func (e *executorImpl) Run() *Result {
 	var err error
 	if e.enablePTY {
 		if len(e.filterSubstrings) != 0 || len(e.outputPrefix) != 0 {
-			panic("command output filter not implemented with allocated pseudo-terminal")
+			return buildResult("", fmt.Errorf("command output filter not implemented with allocated pseudo-terminal"))
 		}
 		err = runWithPTY(e.cmd, e.outputWriter)
 	} else {

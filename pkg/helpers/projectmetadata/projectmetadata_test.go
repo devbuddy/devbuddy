@@ -13,7 +13,10 @@ import (
 func Test(t *testing.T) {
 	tmpdir, gitignorePath := test.File(t, ".devbuddy/.gitignore")
 
-	path, err := projectmetadata.New(tmpdir).Path()
+	pm, err := projectmetadata.New(tmpdir)
+	require.NoError(t, err)
+
+	path, err := pm.Path()
 	require.NoError(t, err)
 
 	require.Equal(t, filepath.Join(tmpdir, ".devbuddy"), path)
