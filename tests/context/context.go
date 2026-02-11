@@ -207,9 +207,8 @@ func (c *TestContext) Ls(t *testing.T, path string) []string {
 
 func (c *TestContext) AssertExist(t *testing.T, path string) {
 	t.Helper()
-	quotedPath := strconv.Quote(path)
-	_, err := c.shell.Run("test -e " + strconv.Quote(quotedPath))
-	require.NoError(t, err, "expected file %s to exist", quotedPath)
+	_, err := c.shell.Run("test -e " + strconv.Quote(path))
+	require.NoError(t, err, "expected file %s to exist", path)
 }
 
 func (c *TestContext) AssertContains(t *testing.T, path, expected string) {
