@@ -1,6 +1,8 @@
 package autoenv
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
@@ -8,6 +10,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 
 	"github.com/stretchr/testify/require"
 )
@@ -35,12 +38,23 @@ func (r *RecorderFeature) getCallsAndReset() []string {
 	return r.calls
 }
 
+// WatcherRecorderFeature is a RecorderFeature that also implements FileWatcher.
+type WatcherRecorderFeature struct {
+	RecorderFeature
+	watchedFiles []string
+}
+
+func (w *WatcherRecorderFeature) WatchedFiles(_ string) []string {
+	return w.watchedFiles
+}
+
 func newRunner(env *env.Env, reg *features.Register) *runner {
 	return newRunnerWithProject(env, reg, "/project")
 }
 
 func newRunnerWithProject(env *env.Env, reg *features.Register, projectPath string) *runner {
 	_, ui := termui.NewTesting(false)
+	state := &StateManager{env, ui}
 	return &runner{
 		ctx: &context.Context{
 			Cfg:     nil,
@@ -48,8 +62,9 @@ func newRunnerWithProject(env *env.Env, reg *features.Register, projectPath stri
 			UI:      ui,
 			Env:     env,
 		},
-		state:    &StateManager{env, ui},
-		features: reg,
+		state:       state,
+		features:    reg,
+		fileTracker: utils.NewFileTracker(state.GetFileChecksums()),
 	}
 }
 
@@ -138,4 +153,40 @@ func TestRunnerChangeProject(t *testing.T) {
 	runner = newRunnerWithProject(testEnv, reg, "/project-b")
 	runner.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")))
 	require.Equal(t, []string{"deactivate 1.0", "activate 1.0"}, rust.getCallsAndReset())
+}
+
+func TestRunnerFileWatcher(t *testing.T) {
+	tmpdir := t.TempDir()
+	envPath := filepath.Join(tmpdir, ".env")
+	os.WriteFile(envPath, []byte("VAR=one"), 0644)
+
+	testEnv := env.New([]string{})
+	reg := &features.Register{}
+	watcher := &WatcherRecorderFeature{
+		RecorderFeature: RecorderFeature{name: "envfile"},
+		watchedFiles:    []string{envPath},
+	}
+	reg.Register(watcher)
+
+	// Initial activation
+	r := newRunner(testEnv, reg)
+	r.sync(NewFeatureSet().With(NewFeatureInfo("envfile", envPath)))
+	require.Equal(t, []string{"activate " + envPath}, watcher.getCallsAndReset())
+
+	// Same param, file unchanged → no reactivation
+	r = newRunner(testEnv, reg)
+	r.sync(NewFeatureSet().With(NewFeatureInfo("envfile", envPath)))
+	require.Empty(t, watcher.getCallsAndReset())
+
+	// Modify the watched file → reactivation
+	os.WriteFile(envPath, []byte("VAR=two"), 0644)
+
+	r = newRunner(testEnv, reg)
+	r.sync(NewFeatureSet().With(NewFeatureInfo("envfile", envPath)))
+	require.Equal(t, []string{"activate " + envPath}, watcher.getCallsAndReset())
+
+	// File unchanged again → no reactivation
+	r = newRunner(testEnv, reg)
+	r.sync(NewFeatureSet().With(NewFeatureInfo("envfile", envPath)))
+	require.Empty(t, watcher.getCallsAndReset())
 }

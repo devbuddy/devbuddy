@@ -26,7 +26,6 @@ func Test_Env_EnvFile(t *testing.T) {
 }
 
 func Test_Env_EnvFile_In_Process(t *testing.T) {
-	t.Skip("to be fixed")
 
 	c := CreateContextAndInit(t)
 
@@ -44,7 +43,6 @@ func Test_Env_EnvFile_In_Process(t *testing.T) {
 }
 
 func Test_Env_EnvFile_Changes(t *testing.T) {
-	t.Skip("to be fixed")
 
 	c := CreateContextAndInit(t)
 
