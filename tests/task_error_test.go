@@ -32,11 +32,8 @@ func Test_Task_Error_UnknownTask(t *testing.T) {
 
 	c.Write(t, "dev.yml", `up: [notatask]`)
 
-	lines := c.Run(t, "bud up", context.ExitCode(0)) // TODO: This should probably return 1
-	OutputEqual(t, lines,
-		"◼︎ Unknown",
-		`  Warning: Unknown task: "notatask"`,
-	)
+	lines := c.Run(t, "bud up", context.ExitCode(1))
+	OutputContains(t, lines, `unknown task: "notatask"`)
 }
 
 func Test_Task_Error_Invalid_Hash_Type(t *testing.T) {

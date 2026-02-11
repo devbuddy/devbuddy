@@ -1,6 +1,7 @@
 package context
 
 import (
+	"fmt"
 	"os"
 	"path"
 )
@@ -11,33 +12,25 @@ type Config struct {
 	DockerImage string
 }
 
-func LoadConfig() Config {
-	return Config{
-		ShellName:   env("TEST_SHELL", "bash"),
-		BinaryPath:  path.Join(cwd(), "bud"),
-		DockerImage: mustEnv("TEST_DOCKER_IMAGE"),
-	}
-}
-
-func cwd() string {
+func LoadConfig() (Config, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		panic("Error when getting the current working directory: " + err.Error())
+		return Config{}, fmt.Errorf("getting current working directory: %w", err)
 	}
-	return cwd
-}
 
-func env(name string, defaultValue string) string {
-	if v, ok := os.LookupEnv(name); ok {
-		return v
-	}
-	return defaultValue
-}
-
-func mustEnv(name string) string {
-	v, ok := os.LookupEnv(name)
+	dockerImage, ok := os.LookupEnv("TEST_DOCKER_IMAGE")
 	if !ok {
-		panic("missing env var " + name)
+		return Config{}, fmt.Errorf("missing env var TEST_DOCKER_IMAGE")
 	}
-	return v
+
+	shellName := "bash"
+	if v, ok := os.LookupEnv("TEST_SHELL"); ok {
+		shellName = v
+	}
+
+	return Config{
+		ShellName:   shellName,
+		BinaryPath:  path.Join(cwd, "bud"),
+		DockerImage: dockerImage,
+	}, nil
 }

@@ -15,7 +15,12 @@ var config context.Config
 func TestMain(m *testing.M) {
 	// call flag.Parse() here if TestMain uses flags
 
-	config = context.LoadConfig()
+	var err error
+	config, err = context.LoadConfig()
+	if err != nil {
+		fmt.Printf("Error loading config: %s\n", err)
+		os.Exit(1)
+	}
 	fmt.Printf("Starting with config: %+v\n", config)
 
 	fmt.Printf("Building linux binary\n")

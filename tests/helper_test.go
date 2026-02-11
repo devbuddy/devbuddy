@@ -38,7 +38,7 @@ func OutputContains(t *testing.T, lines []string, subStrings ...string) {
 	t.Helper()
 
 	text := strings.Join(lines, "\n")
-	text = StripANSI(text)
+	text = context.StripAnsi(text)
 
 	for _, subString := range subStrings {
 		require.Contains(t, text, subString)
@@ -49,7 +49,7 @@ func OutputNotContain(t *testing.T, lines []string, subStrings ...string) {
 	t.Helper()
 
 	text := strings.Join(lines, "\n")
-	text = StripANSI(text)
+	text = context.StripAnsi(text)
 
 	for _, subString := range subStrings {
 		require.NotContains(t, text, subString)
