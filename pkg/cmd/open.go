@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers/open"
@@ -10,11 +8,12 @@ import (
 )
 
 var openCmd = &cobra.Command{
-	Use:     "open [github|pullrequest]",
-	Short:   "Open a link about your project",
-	Run:     openRun,
-	Args:    zeroOrOneArg,
-	GroupID: "devbuddy",
+	Use:          "open [github|pullrequest]",
+	Short:        "Open a link about your project",
+	RunE:         openRun,
+	Args:         zeroOrOneArg,
+	GroupID:      "devbuddy",
+	SilenceUsage: true,
 }
 
 func init() {
@@ -22,24 +21,25 @@ func init() {
 	_ = openCmd.MarkZshCompPositionalArgumentWords(1, "github", "gh", "pullrequest", "pr")
 }
 
-func openRun(cmd *cobra.Command, args []string) {
+func openRun(cmd *cobra.Command, args []string) error {
 	linkName := ""
 	if len(args) == 1 {
 		linkName = args[0]
 	}
 
 	proj, err := project.FindCurrent()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	if GetFlagBool(cmd, "list") {
-		err = open.PrintLinks(proj)
-		checkError(err)
-		os.Exit(0)
+		return open.PrintLinks(proj)
 	}
 
 	url, err := open.FindLink(proj, linkName)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
-	err = open.Open(url)
-	checkError(err)
+	return open.Open(url)
 }

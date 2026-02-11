@@ -10,23 +10,29 @@ import (
 )
 
 var inspectCmd = &cobra.Command{
-	Use:     "inspect",
-	Short:   "Inspect the project and its tasks",
-	Run:     inspectRun,
-	Args:    noArgs,
-	GroupID: "devbuddy",
+	Use:          "inspect",
+	Short:        "Inspect the project and its tasks",
+	RunE:         inspectRun,
+	Args:         noArgs,
+	GroupID:      "devbuddy",
+	SilenceUsage: true,
 }
 
-func inspectRun(_ *cobra.Command, _ []string) {
+func inspectRun(_ *cobra.Command, _ []string) error {
 	proj, err := project.FindCurrent()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	fmt.Printf("Found project at %s\n", proj.Path)
 
 	projectTasks, err := api.GetTasksFromProject(proj)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	for _, task := range projectTasks {
 		fmt.Printf("- %s\n", task.Describe())
 	}
+	return nil
 }

@@ -10,30 +10,35 @@ import (
 )
 
 var cloneCmd = &cobra.Command{
-	Use:     "clone [REMOTE]",
-	Short:   "Clone a project from github.com",
-	Run:     cloneRun,
-	Args:    onlyOneArg,
-	GroupID: "devbuddy",
+	Use:          "clone [REMOTE]",
+	Short:        "Clone a project from github.com",
+	RunE:         cloneRun,
+	Args:         onlyOneArg,
+	GroupID:      "devbuddy",
+	SilenceUsage: true,
 }
 
-func cloneRun(cmd *cobra.Command, args []string) {
+func cloneRun(_ *cobra.Command, args []string) error {
 	cfg, err := config.Load()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	ui := termui.New(cfg)
 
 	proj, err := project.NewFromID(args[0], cfg)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	if proj.Exists() {
 		ui.ProjectExists()
 	} else {
-		err = proj.Clone()
-		checkError(err)
+		if err := proj.Clone(); err != nil {
+			return err
+		}
 	}
 
 	ui.JumpProject(proj.FullName())
-	err = integration.AddFinalizerCd(proj.Path)
-	checkError(err)
+	return integration.AddFinalizerCd(proj.Path)
 }

@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
@@ -16,26 +14,34 @@ func init() {
 }
 
 var upCmd = &cobra.Command{
-	Use:     "up",
-	Short:   "Ensure the project is up and running",
-	Run:     upRun,
-	Args:    noArgs,
-	GroupID: "devbuddy",
+	Use:          "up",
+	Short:        "Ensure the project is up and running",
+	RunE:         upRun,
+	Args:         noArgs,
+	GroupID:      "devbuddy",
+	SilenceUsage: true,
 }
 
-func upRun(cmd *cobra.Command, args []string) {
+func upRun(_ *cobra.Command, _ []string) error {
 	ctx, err := context.LoadWithProject()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	taskList, err := api.GetTasksFromProject(ctx.Project)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	runner := taskengine.NewTaskRunner(ctx)
 	selector := taskengine.NewTaskSelector()
 
 	success, err := taskengine.Run(ctx, runner, selector, taskList)
-	checkError(err)
-	if !success {
-		os.Exit(1)
+	if err != nil {
+		return err
 	}
+	if !success {
+		return errTasksFailed
+	}
+	return nil
 }

@@ -11,24 +11,28 @@ import (
 )
 
 var initCmd = &cobra.Command{
-	Use:     "init",
-	Short:   "Initialize a project in the current directory",
-	Run:     initRun,
-	Args:    noArgs,
-	GroupID: "devbuddy",
+	Use:          "init",
+	Short:        "Initialize a project in the current directory",
+	RunE:         initRun,
+	Args:         noArgs,
+	GroupID:      "devbuddy",
+	SilenceUsage: true,
 }
 
-func initRun(cmd *cobra.Command, args []string) {
+func initRun(_ *cobra.Command, _ []string) error {
 	cfg, err := config.Load()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	ui := termui.New(cfg)
 
 	projectPath, err := os.Getwd()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
-	err = createManifest(ui, projectPath)
-	checkError(err)
+	return createManifest(ui, projectPath)
 }
 
 func createManifest(ui *termui.UI, projectPath string) error {

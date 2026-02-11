@@ -13,16 +13,19 @@ import (
 )
 
 var upgradeCmd = &cobra.Command{
-	Use:     "upgrade",
-	Short:   "[experimental] Upgrade DevBuddy to the latest available release.",
-	Run:     upgradeRun,
-	Args:    noArgs,
-	GroupID: "devbuddy",
+	Use:          "upgrade",
+	Short:        "[experimental] Upgrade DevBuddy to the latest available release.",
+	RunE:         upgradeRun,
+	Args:         noArgs,
+	GroupID:      "devbuddy",
+	SilenceUsage: true,
 }
 
-func upgradeRun(cmd *cobra.Command, args []string) {
+func upgradeRun(_ *cobra.Command, _ []string) error {
 	cfg, err := config.Load()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	ui := termui.New(cfg)
 
@@ -32,15 +35,21 @@ func upgradeRun(cmd *cobra.Command, args []string) {
 
 	upgrader := helpers.NewUpgrader(true)
 	release, err := upgrader.LatestRelease(plateform)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	destinationPath, err := os.Executable()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	ui.CommandRun("Downloading", release.DownloadURL)
 
-	err = upgrader.Perform(ui, destinationPath, release.DownloadURL)
-	checkError(err)
+	if err := upgrader.Perform(ui, destinationPath, release.DownloadURL); err != nil {
+		return err
+	}
 
 	ui.CommandActed()
+	return nil
 }

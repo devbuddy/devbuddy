@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
+	color "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/helpers/debug"
@@ -12,11 +14,17 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/integration"
 )
 
+// errTasksFailed is returned by `bud up` when one or more tasks fail.
+var errTasksFailed = errors.New("some tasks failed")
+
 func build(version string) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:     "bud",
-		Run:     rootRun,
-		Version: version,
+		Use:               "bud",
+		RunE:              rootRun,
+		Version:           version,
+		SilenceUsage:      true,
+		SilenceErrors:     true,
+		DisableAutoGenTag: true,
 	}
 
 	rootCmd.AddGroup(
@@ -33,8 +41,9 @@ func build(version string) *cobra.Command {
 	rootCmd.Flags().Bool("report-issue", false, "Create an issue about DevBuddy on Github")
 
 	rootCmd.Flags().Bool("shell-hook", false, "Shell prompt hook")
-	err := rootCmd.Flags().MarkHidden("shell-hook")
-	checkError(err)
+	if err := rootCmd.Flags().MarkHidden("shell-hook"); err != nil {
+		panic(fmt.Sprintf("bug: failed to mark flag as hidden: %s", err))
+	}
 
 	rootCmd.AddCommand(cdCmd)
 	rootCmd.AddCommand(cloneCmd)
@@ -48,34 +57,29 @@ func build(version string) *cobra.Command {
 	return rootCmd
 }
 
-func rootRun(cmd *cobra.Command, _ []string) {
-	var err error
-
+func rootRun(cmd *cobra.Command, _ []string) error {
 	if GetFlagBool(cmd, "shell-init") {
 		withCompletion := GetFlagBool(cmd, "with-completion")
 		integration.Print(withCompletion, cmd)
-		os.Exit(0)
+		return nil
 	}
 
 	if GetFlagBool(cmd, "shell-hook") {
 		hook.Run()
-		os.Exit(0)
+		return nil
 	}
 
 	if GetFlagBool(cmd, "debug-info") {
 		fmt.Println(debug.FormatDebugInfo(cmd.Version, os.Environ(), debug.SafeFindCurrentProject()))
-		os.Exit(0)
+		return nil
 	}
 
 	if GetFlagBool(cmd, "report-issue") {
 		url := debug.NewGithubIssueURL(cmd.Version, os.Environ(), debug.SafeFindCurrentProject())
-		err := open.Open(url)
-		checkError(err)
-		os.Exit(0)
+		return open.Open(url)
 	}
 
-	err = cmd.Help()
-	checkError(err)
+	return cmd.Help()
 }
 
 func Execute(version string) {
@@ -83,6 +87,9 @@ func Execute(version string) {
 	buildCustomCommands(rootCmd)
 
 	if err := rootCmd.Execute(); err != nil {
+		if !errors.Is(err, errTasksFailed) {
+			fmt.Fprintln(os.Stderr, color.Red("Error:"), err)
+		}
 		os.Exit(1)
 	}
 }

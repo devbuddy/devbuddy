@@ -10,33 +10,38 @@ import (
 )
 
 var createCmd = &cobra.Command{
-	Use:     "create [PROJECT]",
-	Short:   "Create a new project",
-	Run:     createRun,
-	Args:    onlyOneArg,
-	GroupID: "devbuddy",
+	Use:          "create [PROJECT]",
+	Short:        "Create a new project",
+	RunE:         createRun,
+	Args:         onlyOneArg,
+	GroupID:      "devbuddy",
+	SilenceUsage: true,
 }
 
-func createRun(_ *cobra.Command, args []string) {
+func createRun(_ *cobra.Command, args []string) error {
 	cfg, err := config.Load()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	ui := termui.New(cfg)
 
 	proj, err := project.NewFromID(args[0], cfg)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	if proj.Exists() {
 		ui.ProjectExists()
 	} else {
-		err = proj.Create()
-		checkError(err)
-
-		err = createManifest(ui, proj.Path)
-		checkError(err)
+		if err := proj.Create(); err != nil {
+			return err
+		}
+		if err := createManifest(ui, proj.Path); err != nil {
+			return err
+		}
 	}
 
 	ui.JumpProject(proj.FullName())
-	err = integration.AddFinalizerCd(proj.Path)
-	checkError(err)
+	return integration.AddFinalizerCd(proj.Path)
 }

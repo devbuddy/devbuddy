@@ -3,9 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os"
 
-	color "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
@@ -36,15 +34,4 @@ func zeroOrOneArg(_ *cobra.Command, args []string) error {
 		return fmt.Errorf("expecting zero or one argument")
 	}
 	return nil
-}
-
-func checkError(err error) {
-	if err != nil {
-		exitWithMessage(err.Error())
-	}
-}
-
-func exitWithMessage(msg string) {
-	fmt.Println(color.Red("Error:"), msg)
-	os.Exit(1)
 }
