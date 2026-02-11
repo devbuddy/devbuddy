@@ -45,9 +45,9 @@ func (e *executorImpl) SetEnv(env []string) Executor {
 
 // SetEnvVar sets a single variable in the environment that will be used to run the command
 func (e *executorImpl) SetEnvVar(name, value string) Executor {
-	env := env.New(e.cmd.Env)
-	env.Set(name, value)
-	e.cmd.Env = env.Environ()
+	environ := env.New(e.cmd.Env)
+	environ.Set(name, value)
+	e.cmd.Env = environ.Environ()
 	return e
 }
 
