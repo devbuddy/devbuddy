@@ -17,10 +17,7 @@ up:
 `
 
 func Test_Task_Custom(t *testing.T) {
-	c := CreateContextAndInit(t)
-
-	p := CreateProject(t, c, customTaskDevYml)
-	c.Cd(t, p.Path)
+	c, _ := CreateContextAndProject(t, customTaskDevYml)
 
 	// file does not exist -> task must run
 	c.Run(t, "bud up")
@@ -34,10 +31,7 @@ func Test_Task_Custom(t *testing.T) {
 }
 
 func Test_Task_Custom_Subdir(t *testing.T) {
-	c := CreateContextAndInit(t)
-
-	p := CreateProject(t, c, customTaskDevYml)
-	c.Cd(t, p.Path)
+	c, _ := CreateContextAndProject(t, customTaskDevYml)
 
 	// The command must work in a sub-dir, but run in the project root
 	c.Run(t, "mkdir subdir")
@@ -50,16 +44,13 @@ func Test_Task_Custom_Subdir(t *testing.T) {
 }
 
 func Test_Task_Custom_Fails(t *testing.T) {
-	c := CreateContextAndInit(t)
-
-	p := CreateProject(t, c,
+	c, _ := CreateContextAndProject(t,
 		`up:`,
 		`- custom:`,
 		`    name: TestCustom`,
 		`    met?: exit 1`,
 		`    meet: exit 1`,
 	)
-	c.Cd(t, p.Path)
 
 	lines := c.Run(t, "bud up", context.ExitCode(1))
 	OutputContains(t, lines, "Running: exit 1", `action "": failed to run: command failed with exit code 1`)
@@ -88,9 +79,7 @@ func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
 }
 
 func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
-	c := CreateContextAndInit(t)
-
-	p := CreateProject(t, c,
+	c, _ := CreateContextAndProject(t,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,
@@ -99,7 +88,6 @@ func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
 		`    met?: echo $MYVAR > somefile`,
 		`    meet: exit 0`,
 	)
-	c.Cd(t, p.Path)
 
 	c.Run(t, "bud up")
 

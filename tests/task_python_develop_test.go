@@ -73,7 +73,7 @@ func Test_Task_Python_Develop_Without_Extra_Packages(t *testing.T) {
 	c.Run(t, "bud up", context.Timeout(2*time.Minute))
 
 	lines := c.Run(t, "pip freeze")
-	OutputNotContain(t, lines, "pkginfo==1.9.6")
+	OutputNotContains(t, lines, "pkginfo==1.9.6")
 }
 
 func generateTestSetupPy(version int) string {
