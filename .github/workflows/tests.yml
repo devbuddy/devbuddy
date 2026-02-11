@@ -9,7 +9,7 @@ on:
   pull_request:
 
 env:
-  TEST_DOCKER_IMAGE: ghcr.io/devbuddy/docker-testing:sha-f11e362
+  TEST_DOCKER_IMAGE: ghcr.io/devbuddy/docker-testing:sha-7fd13f4
 
 jobs:
   linters:
