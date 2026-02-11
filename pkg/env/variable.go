@@ -1,6 +1,7 @@
 package env
 
 import (
+	"slices"
 	"strings"
 )
 
@@ -53,9 +54,11 @@ func (vs Variables) unset(name string) {
 	delete(vs, name)
 }
 
-func (vs Variables) asEnviron() (vars []string) {
-	for _, variable := range vs {
-		vars = append(vars, variable.Name+"="+variable.Value)
+func (vs Variables) asEnviron() []string {
+	vars := make([]string, 0, len(vs))
+	for _, v := range vs {
+		vars = append(vars, v.Name+"="+v.Value)
 	}
+	slices.Sort(vars)
 	return vars
 }
