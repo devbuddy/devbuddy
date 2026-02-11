@@ -2,7 +2,7 @@ package integration
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"testing"
 
@@ -67,7 +67,7 @@ type Project struct {
 }
 
 func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) Project {
-	name := fmt.Sprintf("project-%x", rand.Int31())
+	name := fmt.Sprintf("project-%x", rand.Int32())
 
 	p := Project{
 		c:    c,

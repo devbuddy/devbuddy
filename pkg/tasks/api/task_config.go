@@ -16,10 +16,10 @@ func (e propertyNotFoundError) Error() string {
 // TaskConfig represents a task as defined in dev.yml
 type TaskConfig struct {
 	name    string
-	payload interface{}
+	payload any
 }
 
-func NewTaskConfig(definition interface{}) (*TaskConfig, error) {
+func NewTaskConfig(definition any) (*TaskConfig, error) {
 	val := reflect.ValueOf(definition)
 
 	if val.Kind() == reflect.Map {
@@ -144,12 +144,12 @@ func (c *TaskConfig) GetBooleanProperty(name string) (value bool, present bool, 
 	return false, false, err
 }
 
-func (c *TaskConfig) getProperty(name string) (interface{}, error) {
+func (c *TaskConfig) getProperty(name string) (any, error) {
 	if c.payload == nil {
 		return nil, propertyNotFoundError{name: name}
 	}
 
-	properties, ok := c.payload.(map[interface{}]interface{})
+	properties, ok := c.payload.(map[any]any)
 	if !ok {
 		return "", fmt.Errorf("expecting a hash, found a %T (%+v)", c.payload, c.payload)
 	}
@@ -161,7 +161,7 @@ func (c *TaskConfig) getProperty(name string) (interface{}, error) {
 	return nil, propertyNotFoundError{name: name}
 }
 
-func (c *TaskConfig) getPropertyDefault(name string, defaultValue interface{}) (interface{}, error) {
+func (c *TaskConfig) getPropertyDefault(name string, defaultValue any) (any, error) {
 	value, err := c.getProperty(name)
 	if err == nil {
 		return value, nil

@@ -14,10 +14,10 @@ var manifestFilename = "dev.yml"
 
 // Manifest is a representation of the project manifest
 type Manifest struct {
-	Env      map[string]string      `yaml:"env"`
-	Up       []interface{}          `yaml:"up"`
-	Commands map[string]interface{} `yaml:"commands"`
-	Open     map[string]string      `yaml:"open"`
+	Env      map[string]string `yaml:"env"`
+	Up       []any             `yaml:"up"`
+	Commands map[string]any    `yaml:"commands"`
+	Open     map[string]string `yaml:"open"`
 }
 
 func (m *Manifest) commands() (map[string]*Command, error) {

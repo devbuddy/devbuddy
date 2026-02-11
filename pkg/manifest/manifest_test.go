@@ -38,7 +38,7 @@ func TestLoad(t *testing.T) {
 	require.NotEqual(t, nil, man)
 
 	require.Equal(t, map[string]string{"TESTENV": "TESTVALUE"}, man.Env)
-	require.Equal(t, []interface{}{"task1", "task2"}, man.Up)
+	require.Equal(t, []any{"task1", "task2"}, man.Up)
 
 	commands := map[string]*Command{
 		"cmd1": {Run: "command1", Description: "description1"},
