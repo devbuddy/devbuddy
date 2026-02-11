@@ -49,9 +49,9 @@ func (m *Manifest) commands() (map[string]*Command, error) {
 	return cmds, nil
 }
 
-func (m *Manifest) GetCommands() map[string]*Command {
-	cmds, _ := m.commands()
-	return cmds
+// GetCommands parses the commands section of the manifest
+func (m *Manifest) GetCommands() (map[string]*Command, error) {
+	return m.commands()
 }
 
 // Command is a representation of the `command` section of a manifest
@@ -60,7 +60,7 @@ type Command struct {
 	Description string `yaml:"desc"`
 }
 
-// Load returns a Manifest struct populated from a manifest file
+// ExistsIn returns whether a manifest file exists in the given directory
 func ExistsIn(path string) bool {
 	return utils.PathExists(filepath.Join(path, manifestFilename))
 }

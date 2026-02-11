@@ -32,8 +32,13 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	cmds, err := man.GetCommands()
+	if err != nil {
+		return err
+	}
+
 	name := cmd.Annotations["name"]
-	spec, ok := man.GetCommands()[name]
+	spec, ok := cmds[name]
 	if !ok {
 		return fmt.Errorf("custom command is not found: %s", name)
 	}
@@ -66,7 +71,12 @@ func buildCustomCommands(rootCmd *cobra.Command) {
 		return
 	}
 
-	for name, spec := range man.GetCommands() {
+	cmds, err := man.GetCommands()
+	if err != nil {
+		return
+	}
+
+	for name, spec := range cmds {
 		rootCmd.AddCommand(&cobra.Command{
 			Use:                fmt.Sprintf("%s [ARGS...]", name),
 			Short:              spec.Description,

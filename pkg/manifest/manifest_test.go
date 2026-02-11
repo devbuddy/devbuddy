@@ -45,7 +45,9 @@ func TestLoad(t *testing.T) {
 		"cmd2": {Run: "command2"},
 		"cmd3": {Run: "command3"},
 	}
-	require.Equal(t, commands, man.GetCommands())
+	gotCommands, err := man.GetCommands()
+	require.NoError(t, err)
+	require.Equal(t, commands, gotCommands)
 
 	require.Equal(t, map[string]string{"app": "http://localhost:5000"}, man.Open)
 }
