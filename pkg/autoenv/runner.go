@@ -3,24 +3,28 @@ package autoenv
 import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 // Sync activates / deactivates the features in the instance of env.Env.
 // When a feature is already active but unknown, it will be ignored completely.
 // When a param changes, the feature is deactivated with the current param then activated with the new param.
 func Sync(ctx *context.Context, set FeatureSet) {
+	state := &StateManager{ctx.Env, ctx.UI}
 	runner := &runner{
-		ctx:      ctx,
-		state:    &StateManager{ctx.Env, ctx.UI},
-		features: features.All(),
+		ctx:         ctx,
+		state:       state,
+		features:    features.All(),
+		fileTracker: utils.NewFileTracker(state.GetFileChecksums()),
 	}
 	runner.sync(set)
 }
 
 type runner struct {
-	ctx      *context.Context
-	state    *StateManager
-	features features.Features
+	ctx         *context.Context
+	state       *StateManager
+	features    features.Features
+	fileTracker *utils.FileTracker
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
@@ -57,6 +61,9 @@ func (r *runner) sync(featureSet FeatureSet) {
 				if wantFeatureInfo.Param != activeFeatureInfo.Param {
 					r.deactivateFeature(activeFeatureInfo)
 					r.activateFeature(wantFeatureInfo)
+				} else {
+					// Same param — check if watched files changed
+					r.reactivateIfFilesChanged(wantFeatureInfo)
 				}
 			} else {
 				r.activateFeature(wantFeatureInfo)
@@ -67,6 +74,8 @@ func (r *runner) sync(featureSet FeatureSet) {
 			}
 		}
 	}
+
+	r.state.SetFileChecksums(r.fileTracker.Checksums())
 
 	if r.ctx.Project != nil {
 		// Record the project and the environment mutations made by this project
@@ -98,6 +107,41 @@ func (r *runner) activateFeature(featureInfo *FeatureInfo) {
 	}
 	r.ctx.UI.HookFeatureActivated(featureInfo.Name, featureInfo.Param)
 	r.state.SetFeature(featureInfo)
+
+	// Prime the file tracker so the next check has a baseline
+	r.primeFileTracker(featureInfo)
+}
+
+func (r *runner) reactivateIfFilesChanged(featureInfo *FeatureInfo) {
+	def := r.features.Get(featureInfo.Name)
+	if def == nil {
+		return
+	}
+	watcher, ok := def.(features.FileWatcher)
+	if !ok {
+		return
+	}
+	for _, path := range watcher.WatchedFiles(featureInfo.Param) {
+		if changed, _ := r.fileTracker.HasChanged(path); changed {
+			r.ctx.UI.Debug("watched file changed: %s", path)
+			r.activateFeature(featureInfo)
+			return
+		}
+	}
+}
+
+func (r *runner) primeFileTracker(featureInfo *FeatureInfo) {
+	def := r.features.Get(featureInfo.Name)
+	if def == nil {
+		return
+	}
+	watcher, ok := def.(features.FileWatcher)
+	if !ok {
+		return
+	}
+	for _, path := range watcher.WatchedFiles(featureInfo.Param) {
+		_, _ = r.fileTracker.HasChanged(path) // stores the current checksum
+	}
 }
 
 func (r *runner) deactivateFeature(featureInfo *FeatureInfo) {

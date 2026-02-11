@@ -88,7 +88,6 @@ func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
 }
 
 func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
-	t.Skip("Fixme: env vars not set before tasks?")
 	c := CreateContextAndInit(t)
 
 	p := CreateProject(t, c,

@@ -27,3 +27,7 @@ func (envfile) Activate(ctx *context.Context, param string) (bool, error) {
 }
 
 func (envfile) Deactivate(ctx *context.Context, param string) {}
+
+func (envfile) WatchedFiles(param string) []string {
+	return []string{param}
+}

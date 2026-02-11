@@ -27,9 +27,10 @@ func (p savedEnv) String() string {
 }
 
 type StateData struct {
-	ProjectSlug string     `json:"project"`
-	Features    FeatureSet `json:"features"`
-	SavedEnv    savedEnv   `json:"saved_env"`
+	ProjectSlug   string            `json:"project"`
+	Features      FeatureSet        `json:"features"`
+	SavedEnv      savedEnv          `json:"saved_env"`
+	FileChecksums map[string]string `json:"file_checksums,omitempty"`
 }
 
 // StateManager remember the current state of the features (whether they are active)
@@ -133,5 +134,17 @@ func (s *StateManager) RestoreEnv() {
 func (s *StateManager) ForgetEnv() {
 	state := s.read()
 	state.SavedEnv = savedEnv{}
+	s.write(state)
+}
+
+// GetFileChecksums returns the file checksums recorded in the state
+func (s *StateManager) GetFileChecksums() map[string]string {
+	return s.read().FileChecksums
+}
+
+// SetFileChecksums records file checksums in the state
+func (s *StateManager) SetFileChecksums(checksums map[string]string) {
+	state := s.read()
+	state.FileChecksums = checksums
 	s.write(state)
 }
