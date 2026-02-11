@@ -141,7 +141,11 @@ func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 	case <-done:
 		c.debugLine("command completed")
 	case <-time.After(opt.timeout):
-		return nil, fmt.Errorf("timed out after %s", opt.timeout)
+		excerpt := "no output yet"
+		if len(lines) > 0 {
+			excerpt = strings.Join(lines[:min(10, len(lines))], "\n")
+		}
+		return nil, fmt.Errorf("timed out after %s running %q. output so far:\n%s", opt.timeout, cmd, excerpt)
 	}
 
 	codeLines, err := c.shell.Run("echo $?")
@@ -157,11 +161,11 @@ func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 		return nil, fmt.Errorf("unexpected exit code %s: %w", codeLines[0], err)
 	}
 	if exitCode != opt.exitCode {
-		exert := "no output"
+		excerpt := "no output"
 		if len(lines) > 0 {
-			exert = strings.Join(lines[:min(5, len(lines))], "\n")
+			excerpt = strings.Join(lines[:min(10, len(lines))], "\n")
 		}
-		return nil, fmt.Errorf("exit code %d. first output line: %s", exitCode, exert)
+		return nil, fmt.Errorf("unexpected exit code %d (expected %d) running %q. output:\n%s", exitCode, opt.exitCode, cmd, excerpt)
 	}
 
 	return StripAnsiSlice(lines), nil
@@ -229,7 +233,7 @@ func (c *TestContext) Cd(t *testing.T, path string) []string {
 	return lines
 }
 
-func (c *TestContext) debugLine(format string, a ...interface{}) {
+func (c *TestContext) debugLine(format string, a ...any) {
 	if c.debug {
 		format = strings.TrimSuffix(format, "\n") + "\n"
 		fmt.Printf(format, a...)
