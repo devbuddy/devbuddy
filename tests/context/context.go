@@ -38,7 +38,7 @@ func New(config Config) (*TestContext, error) {
 		shellPath = "/bin/zsh"
 		args = append(args, "--no-globalrcs", "--no-rcs", "--no-zle", "--no-promptcr")
 	default:
-		panic("unknown shell " + config.ShellName)
+		return nil, fmt.Errorf("unknown shell: %s", config.ShellName)
 	}
 
 	dockerExec := "docker"
