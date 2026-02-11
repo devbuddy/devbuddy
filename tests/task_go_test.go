@@ -21,7 +21,7 @@ func main() {
 `
 
 func Test_Task_Go(t *testing.T) {
-	// Test with Go 1.21.5
+	// Test with Go 1.23.6
 	// Use sub-tests to avoid downloading the go runtime multiple times.
 	c := CreateContextAndInit(t)
 
@@ -33,16 +33,16 @@ func Test_Task_Go(t *testing.T) {
 		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
-			`    version: "1.21.5"`,
+			`    version: "1.23.6"`,
 		)
 		c.Cd(t, p.Path)
 
 		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
-		OutputContains(t, lines, "Golang (1.21.5)", "install golang distribution")
-		OutputContains(t, lines, "golang activated. (1.21.5)")
+		OutputContains(t, lines, "Golang (1.23.6)", "install golang distribution")
+		OutputContains(t, lines, "golang activated. (1.23.6)")
 
 		lines = c.Run(t, "go version")
-		OutputContains(t, lines, "go version go1.21.5")
+		OutputContains(t, lines, "go version go1.23.6")
 
 		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
 		OutputContains(t, lines, "GO111MODULE=#")
@@ -62,17 +62,17 @@ func Test_Task_Go(t *testing.T) {
 		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
-			`    version: "1.21.5"`,
+			`    version: "1.23.6"`,
 			`    modules: true`,
 		)
 		lines := c.Cd(t, p.Path)
-		OutputContains(t, lines, "golang activated. (1.21.5+mod)")
+		OutputContains(t, lines, "golang activated. (1.23.6+mod)")
 
 		lines = c.Run(t, "bud up", context.Timeout(2*time.Minute))
-		OutputContains(t, lines, "◼︎ Golang (1.21.5)")
+		OutputContains(t, lines, "◼︎ Golang (1.23.6)")
 
 		lines = c.Run(t, "go version")
-		OutputContains(t, lines, "go version go1.21.5")
+		OutputContains(t, lines, "go version go1.23.6")
 
 		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
 		OutputContains(t, lines, "GO111MODULE=on#")
@@ -87,31 +87,26 @@ func Test_Task_Go(t *testing.T) {
 	t.Run("legacy_gopath_mode", func(t *testing.T) {
 		// Old configuration: Modules disabled.
 		// This is named "Legacy Go path mode" in https://go.dev/ref/mod#mod-commands
+		// Note: GOPATH-mode `go get` was removed in Go 1.22, so we only verify
+		// that bud configures the environment correctly.
 
 		c.Run(t, "export GOPATH=~")
 
 		p := CreateProject(t, c,
 			`up:`,
 			`- go:`,
-			`    version: "1.21.5"`,
+			`    version: "1.23.6"`,
 			`    modules: false`,
 		)
 		c.Cd(t, p.Path)
 
 		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
-		OutputContains(t, lines, "◼︎ Golang (1.21.5)")
+		OutputContains(t, lines, "◼︎ Golang (1.23.6)")
 
 		lines = c.Run(t, "go version")
-		OutputContains(t, lines, "go version go1.21.5")
+		OutputContains(t, lines, "go version go1.23.6")
 
 		lines = c.Run(t, "echo GO111MODULE=${GO111MODULE}#")
 		OutputContains(t, lines, "GO111MODULE=off#")
-
-		c.Write(t, "main.go", testingGoMain)
-
-		c.Run(t, "go get github.com/devbuddy/tiny-test-go-package")
-
-		lines = c.Run(t, "go run main.go", context.Timeout(time.Minute))
-		OutputContains(t, lines, "Is it working: true")
 	})
 }
