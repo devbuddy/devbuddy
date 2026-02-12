@@ -60,6 +60,16 @@ func (s *StateManager) write(state *StateData) error {
 	return nil
 }
 
+// update reads the state, applies fn, and writes it back.
+func (s *StateManager) update(fn func(*StateData)) error {
+	state, err := s.read()
+	if err != nil {
+		return err
+	}
+	fn(state)
+	return s.write(state)
+}
+
 // GetActiveFeatures returns the FeatureSet recorded in the state
 func (s *StateManager) GetActiveFeatures() (FeatureSet, error) {
 	state, err := s.read()
@@ -71,12 +81,9 @@ func (s *StateManager) GetActiveFeatures() (FeatureSet, error) {
 
 // SetProjectSlug records the project slug in the state
 func (s *StateManager) SetProjectSlug(slug string) error {
-	state, err := s.read()
-	if err != nil {
-		return err
-	}
-	state.ProjectSlug = slug
-	return s.write(state)
+	return s.update(func(state *StateData) {
+		state.ProjectSlug = slug
+	})
 }
 
 // GetProjectSlug returns the slug of the project in which DevBuddy was when the state was written
@@ -90,49 +97,38 @@ func (s *StateManager) GetProjectSlug() (string, error) {
 
 // SetFeature marks a feature as active
 func (s *StateManager) SetFeature(featureInfo *FeatureInfo) error {
-	state, err := s.read()
-	if err != nil {
-		return err
-	}
-	state.Features = state.Features.With(featureInfo)
-	return s.write(state)
+	return s.update(func(state *StateData) {
+		state.Features = state.Features.With(featureInfo)
+	})
 }
 
 // UnsetFeature marks a feature as inactive
 func (s *StateManager) UnsetFeature(name string) error {
-	state, err := s.read()
-	if err != nil {
-		return err
-	}
-	state.Features = state.Features.Without(name)
-	return s.write(state)
+	return s.update(func(state *StateData) {
+		state.Features = state.Features.Without(name)
+	})
 }
 
 // SaveEnv records the environment mutations in the state
 func (s *StateManager) SaveEnv() error {
-	state, err := s.read()
-	if err != nil {
-		return err
-	}
+	return s.update(func(state *StateData) {
+		for _, mutation := range s.env.Mutations() {
+			if mutation.Name == autoEnvVariableName {
+				continue // skip our own variable
+			}
 
-	for _, mutation := range s.env.Mutations() {
-		if mutation.Name == autoEnvVariableName {
-			continue // skip our own variable
+			if _, present := state.SavedEnv[mutation.Name]; present {
+				continue // skip if we already recorded the initial value for this variable
+			}
+
+			if mutation.Previous == nil {
+				state.SavedEnv[mutation.Name] = nil
+			} else {
+				copiedValue := fmt.Sprint(mutation.Previous.Value) // trick to make a copy of the string
+				state.SavedEnv[mutation.Name] = &copiedValue
+			}
 		}
-
-		if _, present := state.SavedEnv[mutation.Name]; present {
-			continue // skip if we already recorded the initial value for this variable
-		}
-
-		if mutation.Previous == nil {
-			state.SavedEnv[mutation.Name] = nil
-		} else {
-			copiedValue := fmt.Sprint(mutation.Previous.Value) // trick to make a copy of the string
-			state.SavedEnv[mutation.Name] = &copiedValue
-		}
-	}
-
-	return s.write(state)
+	})
 }
 
 // RestoreEnv reverts the environment as recorded in the state
@@ -156,12 +152,9 @@ func (s *StateManager) RestoreEnv() error {
 
 // ForgetEnv clears the environment mutations previously recorded in the state
 func (s *StateManager) ForgetEnv() error {
-	state, err := s.read()
-	if err != nil {
-		return err
-	}
-	state.SavedEnv = savedEnv{}
-	return s.write(state)
+	return s.update(func(state *StateData) {
+		state.SavedEnv = savedEnv{}
+	})
 }
 
 // GetFileChecksums returns the file checksums recorded in the state
@@ -175,10 +168,7 @@ func (s *StateManager) GetFileChecksums() (map[string]string, error) {
 
 // SetFileChecksums records file checksums in the state
 func (s *StateManager) SetFileChecksums(checksums map[string]string) error {
-	state, err := s.read()
-	if err != nil {
-		return err
-	}
-	state.FileChecksums = checksums
-	return s.write(state)
+	return s.update(func(state *StateData) {
+		state.FileChecksums = checksums
+	})
 }
