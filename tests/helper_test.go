@@ -2,7 +2,7 @@ package integration
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"testing"
 
@@ -34,6 +34,18 @@ func CreateContextAndInit(t *testing.T) *context.TestContext {
 	return c
 }
 
+// CreateContextAndProject creates an initialized context, a project with the
+// given dev.yml content, and cd's into the project directory. This combines the
+// common 3-line boilerplate of CreateContextAndInit + CreateProject + Cd.
+func CreateContextAndProject(t *testing.T, devYmlLines ...string) (*context.TestContext, Project) {
+	t.Helper()
+
+	c := CreateContextAndInit(t)
+	p := CreateProject(t, c, devYmlLines...)
+	c.Cd(t, p.Path)
+	return c, p
+}
+
 func OutputContains(t *testing.T, lines []string, subStrings ...string) {
 	t.Helper()
 
@@ -45,7 +57,7 @@ func OutputContains(t *testing.T, lines []string, subStrings ...string) {
 	}
 }
 
-func OutputNotContain(t *testing.T, lines []string, subStrings ...string) {
+func OutputNotContains(t *testing.T, lines []string, subStrings ...string) {
 	t.Helper()
 
 	text := strings.Join(lines, "\n")
@@ -67,7 +79,7 @@ type Project struct {
 }
 
 func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) Project {
-	name := fmt.Sprintf("project-%x", rand.Int31())
+	name := fmt.Sprintf("project-%x", rand.Int32())
 
 	p := Project{
 		c:    c,

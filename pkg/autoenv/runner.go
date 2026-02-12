@@ -11,11 +11,18 @@ import (
 // When a param changes, the feature is deactivated with the current param then activated with the new param.
 func Sync(ctx *context.Context, set FeatureSet) {
 	state := &StateManager{ctx.Env, ctx.UI}
+
+	checksums, err := state.GetFileChecksums()
+	if err != nil {
+		ctx.UI.Warningf("autoenv: failed to read state: %s", err)
+		return
+	}
+
 	runner := &runner{
 		ctx:         ctx,
 		state:       state,
 		features:    features.All(),
-		fileTracker: utils.NewFileTracker(state.GetFileChecksums()),
+		fileTracker: utils.NewFileTracker(checksums),
 	}
 	runner.sync(set)
 }
@@ -28,29 +35,53 @@ type runner struct {
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
-	if r.state.GetProjectSlug() != "" {
+	projectSlug, err := r.state.GetProjectSlug()
+	if err != nil {
+		r.ctx.UI.Warningf("autoenv: failed to read state: %s", err)
+		return
+	}
+
+	if projectSlug != "" {
 		// A project was active until now
 
 		if r.ctx.Project == nil {
 			// We jumped out of the project
 
-			r.state.RestoreEnv()
-			r.state.ForgetEnv()
-		} else if r.state.GetProjectSlug() != r.ctx.Project.Slug() {
+			if err := r.state.RestoreEnv(); err != nil {
+				r.ctx.UI.Warningf("autoenv: failed to restore env: %s", err)
+				return
+			}
+			if err := r.state.ForgetEnv(); err != nil {
+				r.ctx.UI.Warningf("autoenv: failed to forget env: %s", err)
+				return
+			}
+		} else if projectSlug != r.ctx.Project.Slug() {
 			// We jumped to a different project
 
 			// Since it's a different project, we just deactivate all features
 			// For example, "python:3.7" is activating a virtualenv built for a specific project
-			for _, featureInfo := range r.state.GetActiveFeatures() {
+			activeFeatures, err := r.state.GetActiveFeatures()
+			if err != nil {
+				r.ctx.UI.Warningf("autoenv: failed to read state: %s", err)
+				return
+			}
+			for _, featureInfo := range activeFeatures {
 				r.deactivateFeature(featureInfo)
 			}
 
-			r.state.RestoreEnv()
+			if err := r.state.RestoreEnv(); err != nil {
+				r.ctx.UI.Warningf("autoenv: failed to restore env: %s", err)
+				return
+			}
 			// No ForgetEnv(), we keep the SavedEnv until we jump out of a project
 		}
 	}
 
-	activeFeatures := r.state.GetActiveFeatures()
+	activeFeatures, err := r.state.GetActiveFeatures()
+	if err != nil {
+		r.ctx.UI.Warningf("autoenv: failed to read state: %s", err)
+		return
+	}
 
 	for _, name := range r.features.Names() {
 		wantFeatureInfo := featureSet.Get(name)
@@ -75,15 +106,27 @@ func (r *runner) sync(featureSet FeatureSet) {
 		}
 	}
 
-	r.state.SetFileChecksums(r.fileTracker.Checksums())
+	if err := r.state.SetFileChecksums(r.fileTracker.Checksums()); err != nil {
+		r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
+		return
+	}
 
 	if r.ctx.Project != nil {
 		// Record the project and the environment mutations made by this project
-		r.state.SetProjectSlug(r.ctx.Project.Slug())
-		r.state.SaveEnv()
+		if err := r.state.SetProjectSlug(r.ctx.Project.Slug()); err != nil {
+			r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
+			return
+		}
+		if err := r.state.SaveEnv(); err != nil {
+			r.ctx.UI.Warningf("autoenv: failed to save env: %s", err)
+			return
+		}
 	} else {
 		// Record that we are NOT in a project
-		r.state.SetProjectSlug("")
+		if err := r.state.SetProjectSlug(""); err != nil {
+			r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
+			return
+		}
 	}
 }
 
@@ -106,7 +149,10 @@ func (r *runner) activateFeature(featureInfo *FeatureInfo) {
 		return
 	}
 	r.ctx.UI.HookFeatureActivated(featureInfo.Name, featureInfo.Param)
-	r.state.SetFeature(featureInfo)
+	if err := r.state.SetFeature(featureInfo); err != nil {
+		r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
+		return
+	}
 
 	// Prime the file tracker so the next check has a baseline
 	r.primeFileTracker(featureInfo)
@@ -154,5 +200,7 @@ func (r *runner) deactivateFeature(featureInfo *FeatureInfo) {
 	}
 
 	environment.Deactivate(r.ctx, featureInfo.Param)
-	r.state.UnsetFeature(featureInfo.Name)
+	if err := r.state.UnsetFeature(featureInfo.Name); err != nil {
+		r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
+	}
 }

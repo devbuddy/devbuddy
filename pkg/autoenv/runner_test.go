@@ -55,6 +55,7 @@ func newRunner(env *env.Env, reg *features.Register) *runner {
 func newRunnerWithProject(env *env.Env, reg *features.Register, projectPath string) *runner {
 	_, ui := termui.NewTesting(false)
 	state := &StateManager{env, ui}
+	checksums, _ := state.GetFileChecksums()
 	return &runner{
 		ctx: &context.Context{
 			Cfg:     nil,
@@ -64,7 +65,7 @@ func newRunnerWithProject(env *env.Env, reg *features.Register, projectPath stri
 		},
 		state:       state,
 		features:    reg,
-		fileTracker: utils.NewFileTracker(state.GetFileChecksums()),
+		fileTracker: utils.NewFileTracker(checksums),
 	}
 }
 

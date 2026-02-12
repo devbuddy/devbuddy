@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -36,7 +35,7 @@ func TestData(t *testing.T) {
 	err := NewDownloader(server.URL + "/download").DownloadToFile(testfile)
 	require.NoError(t, err)
 
-	buffer, err := ioutil.ReadFile(testfile)
+	buffer, err := os.ReadFile(testfile)
 	require.NoError(t, err)
 
 	require.Equal(t, "Hello", string(buffer))

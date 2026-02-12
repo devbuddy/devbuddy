@@ -16,14 +16,14 @@ type ProjectMetadata struct {
 }
 
 // New returns an instance of ProjectMetadata
-func New(projectPath string) *ProjectMetadata {
+func New(projectPath string) (*ProjectMetadata, error) {
 	if !utils.PathExists(projectPath) {
-		panic("project path does not exist: " + projectPath)
+		return nil, fmt.Errorf("project path does not exist: %s", projectPath)
 	}
 
 	return &ProjectMetadata{
 		path: filepath.Join(projectPath, dirName),
-	}
+	}, nil
 }
 
 // Path returns the path of the project metadata directory.

@@ -21,7 +21,11 @@ type Store struct {
 
 // Open returns an instance of Store
 func Open(projectPath, tableName string) (*Store, error) {
-	path, err := projectmetadata.New(projectPath).Path()
+	pm, err := projectmetadata.New(projectPath)
+	if err != nil {
+		return nil, err
+	}
+	path, err := pm.Path()
 	if err != nil {
 		return nil, err
 	}

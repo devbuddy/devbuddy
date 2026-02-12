@@ -71,7 +71,7 @@ func (p *Project) GetRemoteURL() (url string, err error) {
 // Exists checks whether the project exists locally
 func (p *Project) Exists() bool {
 	if p.Path == "" {
-		panic("Project path can't be null")
+		return false
 	}
 	if _, err := os.Stat(p.Path); err == nil {
 		return true

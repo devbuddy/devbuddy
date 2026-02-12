@@ -2,6 +2,7 @@ package executor
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -44,9 +45,9 @@ func (e *executorImpl) SetEnv(env []string) Executor {
 
 // SetEnvVar sets a single variable in the environment that will be used to run the command
 func (e *executorImpl) SetEnvVar(name, value string) Executor {
-	env := env.New(e.cmd.Env)
-	env.Set(name, value)
-	e.cmd.Env = env.Environ()
+	environ := env.New(e.cmd.Env)
+	environ.Set(name, value)
+	e.cmd.Env = environ.Environ()
 	return e
 }
 
@@ -125,7 +126,7 @@ func (e *executorImpl) Run() *Result {
 	var err error
 	if e.enablePTY {
 		if len(e.filterSubstrings) != 0 || len(e.outputPrefix) != 0 {
-			panic("command output filter not implemented with allocated pseudo-terminal")
+			return buildResult("", fmt.Errorf("command output filter not implemented with allocated pseudo-terminal"))
 		}
 		err = runWithPTY(e.cmd, e.outputWriter)
 	} else {

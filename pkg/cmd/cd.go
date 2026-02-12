@@ -10,24 +10,28 @@ import (
 )
 
 var cdCmd = &cobra.Command{
-	Use:     "cd [PROJECT]",
-	Short:   "Jump to a local project",
-	Run:     cdRun,
-	Args:    onlyOneArg,
-	GroupID: "devbuddy",
+	Use:          "cd [PROJECT]",
+	Short:        "Jump to a local project",
+	RunE:         cdRun,
+	Args:         onlyOneArg,
+	GroupID:      "devbuddy",
+	SilenceUsage: true,
 }
 
-func cdRun(cmd *cobra.Command, args []string) {
+func cdRun(_ *cobra.Command, args []string) error {
 	cfg, err := config.Load()
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	ui := termui.New(cfg)
 
 	proj, err := project.FindBestMatch(args[0], cfg)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	ui.JumpProject(proj.FullName())
 
-	err = integration.AddFinalizerCd(proj.Path)
-	checkError(err)
+	return integration.AddFinalizerCd(proj.Path)
 }

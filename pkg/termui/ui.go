@@ -13,7 +13,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 )
 
-func Fprintf(w io.Writer, format string, a ...interface{}) {
+func Fprintf(w io.Writer, format string, a ...any) {
 	_, err := fmt.Fprintf(w, format, a...)
 	if err != nil {
 		log.Fatalf("failed to write to console: %s", err)
@@ -44,7 +44,7 @@ func (u *UI) SetOutputToStderr() {
 	u.out = os.Stderr
 }
 
-func (u *UI) Debug(format string, params ...interface{}) {
+func (u *UI) Debug(format string, params ...any) {
 	if u.debugEnabled {
 		msg := fmt.Sprintf(format, params...)
 		msg = strings.TrimSuffix(msg, "\n")
@@ -52,7 +52,7 @@ func (u *UI) Debug(format string, params ...interface{}) {
 	}
 }
 
-func (u *UI) Warningf(format string, params ...interface{}) {
+func (u *UI) Warningf(format string, params ...any) {
 	msg := fmt.Sprintf(format, params...)
 	Fprintf(u.out, "%s: %s\n", color.Bold(color.Yellow("WARNING")), msg)
 }
