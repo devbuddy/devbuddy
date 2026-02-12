@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -60,6 +61,17 @@ func buildCompletionScript(shell ShellIdentity, withCompletion bool, completionS
 // AddFinalizerCd declares a "cd" finalizer (change directory)
 func AddFinalizerCd(path string) error {
 	return addFinalizer("cd", path)
+}
+
+// AddFinalizerSetEnv declares a "setenv" finalizer (export an env var in the calling shell).
+// The value is escaped for bash double-quote context because the shell wrapper
+// processes it via: export "${fin//setenv:/}" (double-quoted expansion).
+func AddFinalizerSetEnv(name, value string) error {
+	escaped := strings.ReplaceAll(value, `\`, `\\`)
+	escaped = strings.ReplaceAll(escaped, `"`, `\"`)
+	escaped = strings.ReplaceAll(escaped, `$`, `\$`)
+	escaped = strings.ReplaceAll(escaped, "`", "\\`")
+	return addFinalizer("setenv", name+"="+escaped)
 }
 
 func formatError(message string) error {

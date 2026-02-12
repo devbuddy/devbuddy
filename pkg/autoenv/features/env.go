@@ -1,8 +1,10 @@
 package features
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/manifest"
 )
 
 func init() {
@@ -15,16 +17,15 @@ func (env) Name() string {
 	return "env"
 }
 
+// Activate sets the env vars encoded as JSON in param.
 func (env) Activate(ctx *context.Context, param string) (bool, error) {
-	man, err := manifest.Load(ctx.Project.Path)
-	if err != nil {
-		return false, err
+	var envVars map[string]string
+	if err := json.Unmarshal([]byte(param), &envVars); err != nil {
+		return false, fmt.Errorf("env feature: invalid param: %w", err)
 	}
-
-	for name, value := range man.Env {
+	for name, value := range envVars {
 		ctx.Env.Set(name, value)
 	}
-
 	return false, nil
 }
 

@@ -3,6 +3,7 @@ package termui
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	color "github.com/logrusorgru/aurora"
 )
@@ -11,7 +12,7 @@ func (u *UI) HookFeatureActivated(name string, param string) {
 	msg := fmt.Sprintf("%s activated.", name)
 
 	paramStr := ""
-	if param != "" {
+	if param != "" && !strings.HasPrefix(param, "{") {
 		paramStr = fmt.Sprintf(" (%s)", param)
 	}
 
@@ -27,6 +28,10 @@ func (u *UI) HookFeatureFailure(name string, param string) {
 	}
 
 	Fprintf(u.out, "🐼  %s%s\n", color.Red(msg), color.Yellow(paramStr))
+}
+
+func (u *UI) HookDevYmlChanged() {
+	Fprintf(u.out, "🐼  %s\n", color.Yellow("dev.yml changed, run `bud up` to apply"))
 }
 
 func HookShellDetectionError(err error) {
