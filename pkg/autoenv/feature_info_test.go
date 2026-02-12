@@ -14,6 +14,25 @@ func TestFeatureInfo(t *testing.T) {
 	require.Equal(t, "NAME:PARAM", fi.String())
 }
 
+func TestFeatureInfoDisplayString(t *testing.T) {
+	tests := []struct {
+		name  string
+		param string
+		want  string
+	}{
+		{"python", "3.6.5", "python 3.6.5"},
+		{"golang", "1.13.1+mod", "golang 1.13.1+mod"},
+		{"env", `{"VAR":"val"}`, "env"},
+		{"env", "", "env"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name+"_"+tt.param, func(t *testing.T) {
+			fi := autoenv.NewFeatureInfo(tt.name, tt.param)
+			require.Equal(t, tt.want, fi.DisplayString())
+		})
+	}
+}
+
 func TestFeatureSet(t *testing.T) {
 	fs := autoenv.NewFeatureSet()
 	require.Nil(t, fs.Get("python"))
