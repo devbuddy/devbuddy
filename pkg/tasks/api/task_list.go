@@ -1,9 +1,11 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
 )
@@ -17,7 +19,7 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	}
 
 	if len(manifest.Env) != 0 {
-		task, err = NewTaskFromPayload("env")
+		task, err = newEnvTask(manifest.Env)
 		if err != nil {
 			return nil, err
 		}
@@ -35,7 +37,7 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	return taskList, nil
 }
 
-func NewTaskFromPayload(payload interface{}) (*Task, error) {
+func NewTaskFromPayload(payload any) (*Task, error) {
 	taskConfig, err := NewTaskConfig(payload)
 	if err != nil {
 		return nil, fmt.Errorf("parsing task: %w", err)
@@ -65,4 +67,18 @@ func GetFeaturesFromTasks(tasks []*Task) autoenv.FeatureSet {
 	}
 
 	return featureSet
+}
+
+// newEnvTask builds an env task directly, encoding the env vars as JSON in the
+// feature param so the env feature can activate without re-loading dev.yml.
+func newEnvTask(envVars map[string]string) (*Task, error) {
+	encoded, err := json.Marshal(envVars)
+	if err != nil {
+		return nil, fmt.Errorf("encoding env vars: %w", err)
+	}
+	taskDef := GetDefinitionOrUnknown("env")
+	task := &Task{TaskDefinition: taskDef}
+	noop := func(ctx *context.Context) error { return nil }
+	task.AddActionBuilder("", noop).SetFeature("env", string(encoded))
+	return task, nil
 }

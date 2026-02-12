@@ -2,12 +2,14 @@ package hook
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 func Run() {
@@ -28,7 +30,7 @@ func Run() {
 }
 
 func run(ctx *context.Context) error {
-	allFeatures, err := getFeaturesFromProject(ctx.Project)
+	allFeatures, err := getDesiredFeatures(ctx)
 	if err != nil {
 		return err
 	}
@@ -41,12 +43,33 @@ func run(ctx *context.Context) error {
 	return nil
 }
 
-func getFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
-	if proj == nil {
-		// When no project was found, we must deactivate all potentially active features
-		// So we continue with an empty feature map
+func getDesiredFeatures(ctx *context.Context) (autoenv.FeatureSet, error) {
+	if ctx.Project == nil {
 		return autoenv.NewFeatureSet(), nil
 	}
+
+	cache := autoenv.ReadFeatureCache(ctx.Env)
+
+	if cache != nil && cache.ProjectSlug == ctx.Project.Slug() {
+		// Cache hit: use cached features, but check if dev.yml changed
+		checksum, err := utils.FileChecksum(filepath.Join(ctx.Project.Path, "dev.yml"))
+		if err == nil && checksum != cache.Checksum {
+			ctx.UI.HookDevYmlChanged()
+		}
+		return cache.Features, nil
+	}
+
+	// No cache for this project (first visit in session): parse once and cache
+	features, err := loadFeaturesFromProject(ctx.Project)
+	if err != nil {
+		return nil, err
+	}
+	checksum, _ := utils.FileChecksum(filepath.Join(ctx.Project.Path, "dev.yml"))
+	autoenv.WriteFeatureCache(ctx.Env, autoenv.NewFeatureCache(ctx.Project.Slug(), checksum, features))
+	return features, nil
+}
+
+func loadFeaturesFromProject(proj *project.Project) (autoenv.FeatureSet, error) {
 	allTasks, err := api.GetTasksFromProject(proj)
 	if err != nil {
 		return nil, err
@@ -61,10 +84,19 @@ func emitEnvironmentChangeAsShellCommands(ctx *context.Context) {
 		if mutation.Current == nil {
 			fmt.Printf("unset %s\n", mutation.Name)
 		} else {
-			escaped := strings.ReplaceAll(mutation.Current.Value, "\"", "\\\"")
-			fmt.Printf("export %s=\"%s\"\n", mutation.Name, escaped)
+			fmt.Printf("export %s=\"%s\"\n", mutation.Name, shellEscapeDoubleQuoted(mutation.Current.Value))
 		}
 	}
+}
+
+// shellEscapeDoubleQuoted escapes a string for safe inclusion in a bash
+// double-quoted context. In double quotes, \, ", $, and ` are special.
+func shellEscapeDoubleQuoted(s string) string {
+	s = strings.ReplaceAll(s, `\`, `\\`)
+	s = strings.ReplaceAll(s, `"`, `\"`)
+	s = strings.ReplaceAll(s, `$`, `\$`)
+	s = strings.ReplaceAll(s, "`", "\\`")
+	return s
 }
 
 func emitShellHashResetCommand(ctx *context.Context) {
