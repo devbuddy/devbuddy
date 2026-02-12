@@ -53,8 +53,10 @@ func getDesiredFeatures(ctx *context.Context) (autoenv.FeatureSet, error) {
 	if cache != nil && cache.ProjectSlug == ctx.Project.Slug() {
 		// Cache hit: use cached features, but check if dev.yml changed
 		checksum, err := utils.FileChecksum(filepath.Join(ctx.Project.Path, "dev.yml"))
-		if err == nil && checksum != cache.Checksum {
+		if err == nil && checksum != cache.Checksum && cache.ShouldWarnDevYmlChanged() {
 			ctx.UI.HookDevYmlChanged()
+			cache.MarkWarned()
+			autoenv.WriteFeatureCache(ctx.Env, cache)
 		}
 		return cache.Features, nil
 	}

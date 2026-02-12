@@ -2,6 +2,7 @@ package autoenv
 
 import (
 	"testing"
+	"time"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/stretchr/testify/require"
@@ -63,4 +64,45 @@ func TestFeatureCacheOverwrite(t *testing.T) {
 	require.Equal(t, "proj-b", got.ProjectSlug)
 	require.Equal(t, "222", got.Checksum)
 	require.Equal(t, "python:3.9", got.Features.String())
+}
+
+func TestShouldWarnDevYmlChanged(t *testing.T) {
+	t.Run("warns when never warned before", func(t *testing.T) {
+		cache := NewFeatureCache("proj", "111", NewFeatureSet())
+		require.True(t, cache.ShouldWarnDevYmlChanged())
+	})
+
+	t.Run("suppresses when warned recently", func(t *testing.T) {
+		cache := NewFeatureCache("proj", "111", NewFeatureSet())
+		cache.WarnedAt = time.Now().Unix()
+		require.False(t, cache.ShouldWarnDevYmlChanged())
+	})
+
+	t.Run("warns again after interval elapsed", func(t *testing.T) {
+		cache := NewFeatureCache("proj", "111", NewFeatureSet())
+		cache.WarnedAt = time.Now().Add(-2 * devYmlChangedWarningInterval).Unix()
+		require.True(t, cache.ShouldWarnDevYmlChanged())
+	})
+}
+
+func TestMarkWarned(t *testing.T) {
+	cache := NewFeatureCache("proj", "111", NewFeatureSet())
+	require.Equal(t, int64(0), cache.WarnedAt)
+
+	cache.MarkWarned()
+	require.InDelta(t, time.Now().Unix(), cache.WarnedAt, 2)
+	require.False(t, cache.ShouldWarnDevYmlChanged())
+}
+
+func TestWarnedAtRoundTrips(t *testing.T) {
+	e := env.New([]string{})
+
+	cache := NewFeatureCache("proj", "111", NewFeatureSet())
+	cache.MarkWarned()
+	WriteFeatureCache(e, cache)
+
+	got := ReadFeatureCache(e)
+	require.NotNil(t, got)
+	require.Equal(t, cache.WarnedAt, got.WarnedAt)
+	require.False(t, got.ShouldWarnDevYmlChanged())
 }
