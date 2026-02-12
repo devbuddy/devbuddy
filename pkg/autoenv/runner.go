@@ -14,7 +14,7 @@ func Sync(ctx *context.Context, set FeatureSet) {
 
 	checksums, err := state.GetFileChecksums()
 	if err != nil {
-		ctx.UI.Debug("autoenv: failed to read state: %s", err)
+		ctx.UI.Warningf("autoenv: failed to read state: %s", err)
 		return
 	}
 
@@ -37,7 +37,7 @@ type runner struct {
 func (r *runner) sync(featureSet FeatureSet) {
 	projectSlug, err := r.state.GetProjectSlug()
 	if err != nil {
-		r.ctx.UI.Debug("autoenv: failed to read state: %s", err)
+		r.ctx.UI.Warningf("autoenv: failed to read state: %s", err)
 		return
 	}
 
@@ -48,11 +48,11 @@ func (r *runner) sync(featureSet FeatureSet) {
 			// We jumped out of the project
 
 			if err := r.state.RestoreEnv(); err != nil {
-				r.ctx.UI.Debug("autoenv: failed to restore env: %s", err)
+				r.ctx.UI.Warningf("autoenv: failed to restore env: %s", err)
 				return
 			}
 			if err := r.state.ForgetEnv(); err != nil {
-				r.ctx.UI.Debug("autoenv: failed to forget env: %s", err)
+				r.ctx.UI.Warningf("autoenv: failed to forget env: %s", err)
 				return
 			}
 		} else if projectSlug != r.ctx.Project.Slug() {
@@ -62,7 +62,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 			// For example, "python:3.7" is activating a virtualenv built for a specific project
 			activeFeatures, err := r.state.GetActiveFeatures()
 			if err != nil {
-				r.ctx.UI.Debug("autoenv: failed to read state: %s", err)
+				r.ctx.UI.Warningf("autoenv: failed to read state: %s", err)
 				return
 			}
 			for _, featureInfo := range activeFeatures {
@@ -70,7 +70,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 			}
 
 			if err := r.state.RestoreEnv(); err != nil {
-				r.ctx.UI.Debug("autoenv: failed to restore env: %s", err)
+				r.ctx.UI.Warningf("autoenv: failed to restore env: %s", err)
 				return
 			}
 			// No ForgetEnv(), we keep the SavedEnv until we jump out of a project
@@ -79,7 +79,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 
 	activeFeatures, err := r.state.GetActiveFeatures()
 	if err != nil {
-		r.ctx.UI.Debug("autoenv: failed to read state: %s", err)
+		r.ctx.UI.Warningf("autoenv: failed to read state: %s", err)
 		return
 	}
 
@@ -107,24 +107,24 @@ func (r *runner) sync(featureSet FeatureSet) {
 	}
 
 	if err := r.state.SetFileChecksums(r.fileTracker.Checksums()); err != nil {
-		r.ctx.UI.Debug("autoenv: failed to write state: %s", err)
+		r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
 		return
 	}
 
 	if r.ctx.Project != nil {
 		// Record the project and the environment mutations made by this project
 		if err := r.state.SetProjectSlug(r.ctx.Project.Slug()); err != nil {
-			r.ctx.UI.Debug("autoenv: failed to write state: %s", err)
+			r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
 			return
 		}
 		if err := r.state.SaveEnv(); err != nil {
-			r.ctx.UI.Debug("autoenv: failed to save env: %s", err)
+			r.ctx.UI.Warningf("autoenv: failed to save env: %s", err)
 			return
 		}
 	} else {
 		// Record that we are NOT in a project
 		if err := r.state.SetProjectSlug(""); err != nil {
-			r.ctx.UI.Debug("autoenv: failed to write state: %s", err)
+			r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
 			return
 		}
 	}
@@ -150,7 +150,7 @@ func (r *runner) activateFeature(featureInfo *FeatureInfo) {
 	}
 	r.ctx.UI.HookFeatureActivated(featureInfo.Name, featureInfo.Param)
 	if err := r.state.SetFeature(featureInfo); err != nil {
-		r.ctx.UI.Debug("autoenv: failed to write state: %s", err)
+		r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
 		return
 	}
 
@@ -201,6 +201,6 @@ func (r *runner) deactivateFeature(featureInfo *FeatureInfo) {
 
 	environment.Deactivate(r.ctx, featureInfo.Param)
 	if err := r.state.UnsetFeature(featureInfo.Name); err != nil {
-		r.ctx.UI.Debug("autoenv: failed to write state: %s", err)
+		r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
 	}
 }
