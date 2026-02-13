@@ -14,7 +14,7 @@ func Test_Cmd_Create(t *testing.T) {
 		"🐼  Creating a default dev.yml file.",
 		"⚠️   Open dev.yml to adjust for your needs.",
 		"🐼  jumping to github.com:orgname/projname",
-		"🐼  env activated.",
+		"🐼  activated: env",
 	}, output)
 
 	cwd := c.Cwd(t)

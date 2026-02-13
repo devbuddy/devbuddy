@@ -23,7 +23,7 @@ func Test_Task_Node(t *testing.T) {
 
 	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
 	OutputContains(t, lines, "NodeJS (10.15.0)")
-	OutputContains(t, lines, "node activated. (10.15.0)")
+	OutputContains(t, lines, "activated: node 10.15.0")
 
 	lines = c.Run(t, "node -v")
 	OutputEqual(t, lines, "v10.15.0")

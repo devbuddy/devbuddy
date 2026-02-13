@@ -39,7 +39,7 @@ func Test_Task_Go(t *testing.T) {
 
 		lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
 		OutputContains(t, lines, "Golang (1.23.6)", "install golang distribution")
-		OutputContains(t, lines, "golang activated. (1.23.6)")
+		OutputContains(t, lines, "activated: golang 1.23.6")
 
 		lines = c.Run(t, "go version")
 		OutputContains(t, lines, "go version go1.23.6")
@@ -66,7 +66,7 @@ func Test_Task_Go(t *testing.T) {
 			`    modules: true`,
 		)
 		lines := c.Cd(t, p.Path)
-		OutputContains(t, lines, "golang activated. (1.23.6+mod)")
+		OutputContains(t, lines, "activated: golang 1.23.6+mod")
 
 		lines = c.Run(t, "bud up", context.Timeout(2*time.Minute))
 		OutputContains(t, lines, "◼︎ Golang (1.23.6)")

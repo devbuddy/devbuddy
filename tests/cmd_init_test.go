@@ -14,7 +14,7 @@ func Test_Cmd_Init(t *testing.T) {
 	require.Equal(t, []string{
 		"🐼  Creating a default dev.yml file.",
 		"⚠️   Open dev.yml to adjust for your needs.",
-		"🐼  env activated.",
+		"🐼  activated: env",
 	}, output)
 
 	devFile := c.Cat(t, "dev.yml")
