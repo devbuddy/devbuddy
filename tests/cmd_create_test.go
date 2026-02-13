@@ -9,9 +9,9 @@ import (
 func Test_Cmd_Create(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	output := c.Run(t, "bud create orgname/projname")
+	output := c.Run(t, "bud create --template default orgname/projname")
 	require.Equal(t, []string{
-		"🐼  Creating a default dev.yml file.",
+		"🐼  Created dev.yml with template default",
 		"⚠️   Open dev.yml to adjust for your needs.",
 		"🐼  jumping to github.com:orgname/projname",
 		"🐼  env activated.",
