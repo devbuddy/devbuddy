@@ -41,18 +41,23 @@ func (r *GitRepo) GetCurrentBranch() (string, error) {
 	return result.Output, nil
 }
 
+var githubRemotePatterns = []*regexp.Regexp{
+	regexp.MustCompile(`^git@github\.com:([^/]+)/([^/.]+?)(?:\.git)?$`),
+	regexp.MustCompile(`^https?://github\.com/([^/]+)/([^/.]+?)(?:\.git)?$`),
+}
+
 func (r *GitRepo) buildGithubURL() (string, error) {
 	remoteURL, err := r.GetRemoteURL()
 	if err != nil {
 		return "", err
 	}
-	re := regexp.MustCompile("git@github.com:([^/]+)/([^.]+).git")
-	matches := re.FindStringSubmatch(remoteURL)
-	if matches == nil {
-		return "", fmt.Errorf("unrecognized git remote url: %s", remoteURL)
+	for _, re := range githubRemotePatterns {
+		matches := re.FindStringSubmatch(remoteURL)
+		if matches != nil {
+			return fmt.Sprintf("https://github.com/%s/%s", matches[1], matches[2]), nil
+		}
 	}
-	url := fmt.Sprintf("https://github.com/%s/%s", matches[1], matches[2])
-	return url, nil
+	return "", fmt.Errorf("unrecognized git remote url: %s", remoteURL)
 }
 
 // BuildGithubProjectURL builds the Github page url from the git remote url for a specific branch
