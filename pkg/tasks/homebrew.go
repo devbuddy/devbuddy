@@ -49,7 +49,7 @@ func (b *brewInstall) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (b *brewInstall) Run(ctx *context.Context) error {
-	result := command(ctx, "brew", "install", b.formula).SetEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1").Run()
+	result := command(ctx, "brew", "install", b.formula).AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1").Run()
 	if result.Error != nil {
 		return fmt.Errorf("failed to run brew install: %w", result.Error)
 	}

@@ -47,17 +47,21 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 
 	ui.CommandHeader(cmdline)
 
-	exec := executor.NewShell(cmdline).SetPassthrough(true).SetCwd(proj.Path)
-
 	envs := env.NewFromOS()
 	for name, value := range man.Env {
 		if !envs.Has(name) {
 			envs.Set(name, value)
 		}
 	}
-	exec.SetEnv(envs.Environ())
 
-	return exec.Run().Error
+	execCmd := &executor.Command{
+		Program:     cmdline,
+		Shell:       true,
+		Passthrough: true,
+		Cwd:         proj.Path,
+		Env:         envs.Environ(),
+	}
+	return execCmd.Run().Error
 }
 
 func buildCustomCommands(rootCmd *cobra.Command) {

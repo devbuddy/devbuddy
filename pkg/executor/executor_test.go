@@ -63,7 +63,9 @@ func TestShellCaptureAndTrim(t *testing.T) {
 }
 
 func TestShellCapturePWD(t *testing.T) {
-	result := NewShell("echo $PWD").SetCwd("/opt").Capture()
+	cmd := NewShell("echo $PWD")
+	cmd.Cwd = "/opt"
+	result := cmd.Capture()
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -87,7 +89,9 @@ func TestCommandNotFound(t *testing.T) {
 }
 
 func TestSetEnv(t *testing.T) {
-	result := NewShell("echo $POIPOI").SetEnv([]string{"POIPOI=something"}).Capture()
+	cmd := NewShell("echo $POIPOI")
+	cmd.Env = []string{"POIPOI=something"}
+	result := cmd.Capture()
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -95,8 +99,8 @@ func TestSetEnv(t *testing.T) {
 	require.Equal(t, "something\n", result.Output)
 }
 
-func TestSetEnvVar(t *testing.T) {
-	result := NewShell("echo ${V1}-${V2}").SetEnvVar("V1", "v1").SetEnvVar("V2", "v2").Capture()
+func TestAddEnvVar(t *testing.T) {
+	result := NewShell("echo ${V1}-${V2}").AddEnvVar("V1", "v1").AddEnvVar("V2", "v2").Capture()
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -107,11 +111,10 @@ func TestSetEnvVar(t *testing.T) {
 func TestPrefix(t *testing.T) {
 	buf := &bytes.Buffer{}
 
-	executor := NewShell("echo \"line1\nline2\nline3\"")
-	impl := executor.(*executorImpl)
-	impl.outputWriter = buf
-	impl.SetOutputPrefix("---")
-	result := impl.Run()
+	cmd := NewShell("echo \"line1\nline2\nline3\"")
+	cmd.OutputWriter = buf
+	cmd.OutputPrefix = "---"
+	result := cmd.Run()
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -122,12 +125,11 @@ func TestPrefix(t *testing.T) {
 func TestFilter(t *testing.T) {
 	buf := &bytes.Buffer{}
 
-	executor := NewShell("echo \"line1\nline2\nline3\nline4\"")
-	impl := executor.(*executorImpl)
-	impl.outputWriter = buf
-	impl.AddOutputFilter("line2")
-	impl.AddOutputFilter("line4")
-	result := impl.Run()
+	cmd := NewShell("echo \"line1\nline2\nline3\nline4\"")
+	cmd.OutputWriter = buf
+	cmd.AddOutputFilter("line2")
+	cmd.AddOutputFilter("line4")
+	result := cmd.Run()
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
