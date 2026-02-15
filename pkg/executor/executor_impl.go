@@ -2,14 +2,11 @@ package executor
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
-
-	"golang.org/x/term"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
@@ -20,7 +17,6 @@ type executorImpl struct {
 	outputPrefix      string
 	filterSubstrings  []string
 	outputWriter      io.Writer
-	enablePTY         bool
 	enablePassthrough bool
 }
 
@@ -57,12 +53,6 @@ func (e *executorImpl) SetEnvVar(name, value string) Executor {
 // SetOutputPrefix sets a prefix for each line printed by the command
 func (e *executorImpl) SetOutputPrefix(prefix string) Executor {
 	e.outputPrefix = prefix
-	return e
-}
-
-// SetPTY enables or disable the pseudo-terminal allocation
-func (e *executorImpl) SetPTY(enabled bool) Executor {
-	e.enablePTY = enabled
 	return e
 }
 
@@ -136,15 +126,6 @@ func (e *executorImpl) Run() *Result {
 	switch {
 	case e.enablePassthrough:
 		err = runPassthrough(e.cmd)
-	case e.enablePTY:
-		if len(e.filterSubstrings) != 0 || len(e.outputPrefix) != 0 {
-			return buildResult("", fmt.Errorf("command output filter not implemented with allocated pseudo-terminal"))
-		}
-		if term.IsTerminal(int(os.Stdin.Fd())) {
-			err = runWithPTY(e.cmd, e.outputWriter)
-		} else {
-			err = runPassthrough(e.cmd)
-		}
 	default:
 		err = e.runWithOutputFilter()
 	}
