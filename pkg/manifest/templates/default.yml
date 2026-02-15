@@ -17,7 +17,6 @@ up:
   # Go:
   # - go:
   #     version: 1.25.1
-  #     modules: true
   # - golang_dep
 
   # Python:
