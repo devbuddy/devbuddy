@@ -1,7 +1,8 @@
 package tasks
 
 import (
-	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
+	"fmt"
+
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
@@ -17,19 +18,13 @@ func parseGolang(config *api.TaskConfig, task *api.Task) error {
 		return err
 	}
 
-	featureVersion := version
-
 	if config.IsHash() {
 		enabled, present, err := config.GetBooleanProperty("modules")
 		if err != nil {
 			return err
 		}
-		if present {
-			if enabled {
-				featureVersion += features.GolangSuffixMod
-			} else {
-				featureVersion += features.GolangSuffixGopath
-			}
+		if present && !enabled {
+			return fmt.Errorf(`"modules: false" is no longer supported for task "go"`)
 		}
 	}
 
@@ -46,7 +41,7 @@ func parseGolang(config *api.TaskConfig, task *api.Task) error {
 	}
 	task.AddActionBuilder("install golang distribution", installGo).
 		On(api.FuncCondition(installNeeded)).
-		SetFeature("golang", featureVersion)
+		SetFeature("golang", version)
 
 	return nil
 }

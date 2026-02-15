@@ -1,8 +1,6 @@
 package features
 
 import (
-	"strings"
-
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 )
@@ -11,11 +9,6 @@ func init() {
 	register.Register(golang{})
 }
 
-const (
-	GolangSuffixMod    = "+mod"
-	GolangSuffixGopath = "+gopath"
-)
-
 type golang struct{}
 
 func (golang) Name() string {
@@ -23,7 +16,7 @@ func (golang) Name() string {
 }
 
 func (golang) Activate(ctx *context.Context, param string) (bool, error) {
-	golang := helpers.NewGolang(ctx, strings.Split(param, "+")[0])
+	golang := helpers.NewGolang(ctx, param)
 
 	if !golang.Exists() {
 		return true, nil
@@ -32,13 +25,6 @@ func (golang) Activate(ctx *context.Context, param string) (bool, error) {
 	ctx.Env.PrependToPath(golang.BinPath())
 
 	ctx.Env.Set("GOROOT", golang.Path())
-
-	switch {
-	case strings.HasSuffix(param, GolangSuffixMod):
-		ctx.Env.Set("GO111MODULE", "on")
-	case strings.HasSuffix(param, GolangSuffixGopath):
-		ctx.Env.Set("GO111MODULE", "off")
-	}
 
 	return false, nil
 }

@@ -19,7 +19,6 @@ The `open` section describes the project links available through `bud open <name
 up:
   - go:
       version: '1.12'
-      modules: true
   - golang_dep
   - python: 3.6.5
   - apt: [git, curl]
@@ -143,12 +142,11 @@ up:
   - go: 1.10.1
 ```
 
-Force the usage of Go modules:
+Go task with explicit version:
 ```yaml
 up:
   - go:
       version: '1.12'
-      modules: true
 ```
 
 ### `golang_dep`
