@@ -43,16 +43,24 @@ func (n *Node) Which(program string) string {
 	return path.Join(n.path, "bin", program)
 }
 
-func NodeJSIsSupportedOnThisPlatform() bool {
-	return runtime.GOARCH == "amd64"
+func nodeArchString() string {
+	switch runtime.GOARCH {
+	case "amd64":
+		return "x64"
+	case "arm64":
+		return "arm64"
+	default:
+		return ""
+	}
 }
 
 func (n *Node) Install() error {
-	if !NodeJSIsSupportedOnThisPlatform() {
-		return fmt.Errorf("NodeJS installation is only supported on %s by DevBuddy", runtime.GOARCH)
+	arch := nodeArchString()
+	if arch == "" {
+		return fmt.Errorf("NodeJS installation is not supported on %s by DevBuddy", runtime.GOARCH)
 	}
 
-	archiveName := fmt.Sprintf("node-v%s-%s-x64.tar.gz", n.version, runtime.GOOS)
+	archiveName := fmt.Sprintf("node-v%s-%s-%s.tar.gz", n.version, runtime.GOOS, arch)
 	tarPath := path.Join(n.tarDir, archiveName)
 
 	if !utils.PathExists(tarPath) {
