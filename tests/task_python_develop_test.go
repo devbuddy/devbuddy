@@ -24,7 +24,7 @@ func Test_Task_Python_Develop(t *testing.T) {
 	c.Write(t, "setup.py", generateTestSetupPy(42))
 
 	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
-	OutputContains(t, lines, "python activated. (3.9.0)")
+	OutputContains(t, lines, "activated: python 3.9.0")
 
 	lines = c.Run(t, "pip show devbuddy-test-pkg")
 	OutputContains(t, lines, "Version: 42")

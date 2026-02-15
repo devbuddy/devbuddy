@@ -20,6 +20,15 @@ func (f FeatureInfo) String() string {
 	return fmt.Sprintf("%s:%s", f.Name, f.Param)
 }
 
+// DisplayString returns a human-friendly representation like "python 3.6.5".
+// JSON params (e.g. from the env feature) are omitted.
+func (f FeatureInfo) DisplayString() string {
+	if f.Param == "" || strings.HasPrefix(f.Param, "{") {
+		return f.Name
+	}
+	return f.Name + " " + f.Param
+}
+
 // FeatureSet represents a set of parameterized features
 type FeatureSet []*FeatureInfo
 

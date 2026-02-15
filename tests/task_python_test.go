@@ -17,7 +17,7 @@ func Test_Env_Python(t *testing.T) {
 	c.Cd(t, p.Path)
 
 	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
-	OutputContains(t, lines, "python activated. (3.9.0)")
+	OutputContains(t, lines, "activated: python 3.9.0")
 
 	lines = c.Run(t, "python --version")
 	OutputEqual(t, lines, "Python 3.9.0")

@@ -1,8 +1,10 @@
 package autoenv
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
@@ -48,24 +50,32 @@ func (w *WatcherRecorderFeature) WatchedFiles(_ string) []string {
 	return w.watchedFiles
 }
 
-func newRunner(env *env.Env, reg *features.Register) *runner {
-	return newRunnerWithProject(env, reg, "/project")
+type runnerWithOutput struct {
+	*runner
+	output *bytes.Buffer
 }
 
-func newRunnerWithProject(env *env.Env, reg *features.Register, projectPath string) *runner {
-	_, ui := termui.NewTesting(false)
+func newRunner(env *env.Env, reg *features.Register) *runner {
+	return newRunnerWithProject(env, reg, "/project").runner
+}
+
+func newRunnerWithProject(env *env.Env, reg *features.Register, projectPath string) *runnerWithOutput {
+	buf, ui := termui.NewTesting(false)
 	state := &StateManager{env, ui}
 	checksums, _ := state.GetFileChecksums()
-	return &runner{
-		ctx: &context.Context{
-			Cfg:     nil,
-			Project: project.NewFromPath(projectPath),
-			UI:      ui,
-			Env:     env,
+	return &runnerWithOutput{
+		runner: &runner{
+			ctx: &context.Context{
+				Cfg:     nil,
+				Project: project.NewFromPath(projectPath),
+				UI:      ui,
+				Env:     env,
+			},
+			state:       state,
+			features:    reg,
+			fileTracker: utils.NewFileTracker(checksums),
 		},
-		state:       state,
-		features:    reg,
-		fileTracker: utils.NewFileTracker(checksums),
+		output: buf,
 	}
 }
 
@@ -190,4 +200,60 @@ func TestRunnerFileWatcher(t *testing.T) {
 	r = newRunner(testEnv, reg)
 	r.sync(NewFeatureSet().With(NewFeatureInfo("envfile", envPath)))
 	require.Empty(t, watcher.getCallsAndReset())
+}
+
+func TestRunnerConsolidatedOutput(t *testing.T) {
+	t.Run("single feature", func(t *testing.T) {
+		testEnv := env.New([]string{})
+		reg := &features.Register{}
+		reg.Register(&RecorderFeature{name: "rust"})
+
+		r := newRunnerWithProject(testEnv, reg, "/project")
+		r.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")))
+
+		output := r.output.String()
+		require.True(t, strings.Contains(output, "activated:"), "expected consolidated message, got: %s", output)
+		require.True(t, strings.Contains(output, "rust 1.0"), "expected feature name in message, got: %s", output)
+		// Should be exactly one line (one newline)
+		require.Equal(t, 1, strings.Count(output, "\n"), "expected single line, got: %s", output)
+	})
+
+	t.Run("multiple features", func(t *testing.T) {
+		testEnv := env.New([]string{})
+		reg := &features.Register{}
+		reg.Register(&RecorderFeature{name: "rust"})
+		reg.Register(&RecorderFeature{name: "elixir"})
+
+		r := newRunnerWithProject(testEnv, reg, "/project")
+		r.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")).With(NewFeatureInfo("elixir", "0.4")))
+
+		output := r.output.String()
+		require.True(t, strings.Contains(output, "rust 1.0"), "got: %s", output)
+		require.True(t, strings.Contains(output, "elixir 0.4"), "got: %s", output)
+		require.Equal(t, 1, strings.Count(output, "\n"), "expected single line, got: %s", output)
+	})
+
+	t.Run("json param is omitted", func(t *testing.T) {
+		testEnv := env.New([]string{})
+		reg := &features.Register{}
+		reg.Register(&RecorderFeature{name: "env"})
+
+		r := newRunnerWithProject(testEnv, reg, "/project")
+		r.sync(NewFeatureSet().With(NewFeatureInfo("env", `{"VAR":"val"}`)))
+
+		output := r.output.String()
+		require.True(t, strings.Contains(output, "env"), "got: %s", output)
+		require.False(t, strings.Contains(output, "VAR"), "JSON param should be omitted, got: %s", output)
+	})
+
+	t.Run("no features no output", func(t *testing.T) {
+		testEnv := env.New([]string{})
+		reg := &features.Register{}
+		reg.Register(&RecorderFeature{name: "rust"})
+
+		r := newRunnerWithProject(testEnv, reg, "/project")
+		r.sync(NewFeatureSet())
+
+		require.Equal(t, "", r.output.String())
+	})
 }

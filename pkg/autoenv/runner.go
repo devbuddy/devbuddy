@@ -32,6 +32,8 @@ type runner struct {
 	state       *StateManager
 	features    features.Features
 	fileTracker *utils.FileTracker
+	activated   []*FeatureInfo
+	failed      []*FeatureInfo
 }
 
 func (r *runner) sync(featureSet FeatureSet) {
@@ -106,6 +108,17 @@ func (r *runner) sync(featureSet FeatureSet) {
 		}
 	}
 
+	if len(r.activated) > 0 {
+		names := make([]string, len(r.activated))
+		for i, f := range r.activated {
+			names[i] = f.DisplayString()
+		}
+		r.ctx.UI.HookFeaturesActivated(names)
+	}
+	for _, f := range r.failed {
+		r.ctx.UI.HookFeatureFailure(f.Name, f.Param)
+	}
+
 	if err := r.state.SetFileChecksums(r.fileTracker.Checksums()); err != nil {
 		r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
 		return
@@ -145,10 +158,10 @@ func (r *runner) activateFeature(featureInfo *FeatureInfo) {
 		return
 	}
 	if devUpNeeded {
-		r.ctx.UI.HookFeatureFailure(featureInfo.Name, featureInfo.Param)
+		r.failed = append(r.failed, featureInfo)
 		return
 	}
-	r.ctx.UI.HookFeatureActivated(featureInfo.Name, featureInfo.Param)
+	r.activated = append(r.activated, featureInfo)
 	if err := r.state.SetFeature(featureInfo); err != nil {
 		r.ctx.UI.Warningf("autoenv: failed to write state: %s", err)
 		return
