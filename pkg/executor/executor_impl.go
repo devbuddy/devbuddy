@@ -9,16 +9,19 @@ import (
 	"strings"
 	"sync"
 
+	"golang.org/x/term"
+
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 type executorImpl struct {
-	cmd              *exec.Cmd
-	outputPrefix     string
-	filterSubstrings []string
-	outputWriter     io.Writer
-	enablePTY        bool
+	cmd               *exec.Cmd
+	outputPrefix      string
+	filterSubstrings  []string
+	outputWriter      io.Writer
+	enablePTY         bool
+	enablePassthrough bool
 }
 
 // New returns an Executor that will run the program with arguments
@@ -60,6 +63,12 @@ func (e *executorImpl) SetOutputPrefix(prefix string) Executor {
 // SetPTY enables or disable the pseudo-terminal allocation
 func (e *executorImpl) SetPTY(enabled bool) Executor {
 	e.enablePTY = enabled
+	return e
+}
+
+// SetPassthrough enables direct fd inheritance (stdin/stdout/stderr passed to subprocess)
+func (e *executorImpl) SetPassthrough(enabled bool) Executor {
+	e.enablePassthrough = enabled
 	return e
 }
 
@@ -124,12 +133,19 @@ func (e *executorImpl) Run() *Result {
 		e.outputWriter = os.Stdout
 	}
 	var err error
-	if e.enablePTY {
+	switch {
+	case e.enablePassthrough:
+		err = runPassthrough(e.cmd)
+	case e.enablePTY:
 		if len(e.filterSubstrings) != 0 || len(e.outputPrefix) != 0 {
 			return buildResult("", fmt.Errorf("command output filter not implemented with allocated pseudo-terminal"))
 		}
-		err = runWithPTY(e.cmd, e.outputWriter)
-	} else {
+		if term.IsTerminal(int(os.Stdin.Fd())) {
+			err = runWithPTY(e.cmd, e.outputWriter)
+		} else {
+			err = runPassthrough(e.cmd)
+		}
+	default:
 		err = e.runWithOutputFilter()
 	}
 	return buildResult("", err)

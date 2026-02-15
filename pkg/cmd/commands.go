@@ -47,7 +47,7 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 
 	ui.CommandHeader(cmdline)
 
-	exec := executor.NewShell(cmdline).SetPTY(true).SetCwd(proj.Path)
+	exec := executor.NewShell(cmdline).SetPassthrough(true).SetCwd(proj.Path)
 
 	envs := env.NewFromOS()
 	for name, value := range man.Env {
