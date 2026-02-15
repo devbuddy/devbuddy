@@ -19,13 +19,19 @@ func Project(path string) *projectWriter {
 	return &projectWriter{path}
 }
 
-// GitInit initializes a simple Git repo
+// CreateGitRepo initializes a simple Git repo with an SSH remote
 func (p *projectWriter) CreateGitRepo(t *testing.T) {
+	t.Helper()
+	p.CreateGitRepoWithRemote(t, "git@github.com:org1/repo1.git")
+}
+
+// CreateGitRepoWithRemote initializes a simple Git repo with the given remote URL
+func (p *projectWriter) CreateGitRepoWithRemote(t *testing.T, remoteURL string) {
 	t.Helper()
 
 	p.runGit(t, "init")
 	p.runGit(t, "commit", "-m", "Commit1", "--allow-empty")
-	p.runGit(t, "remote", "add", "origin", "git@github.com:org1/repo1.git")
+	p.runGit(t, "remote", "add", "origin", remoteURL)
 }
 
 func (p *projectWriter) runGit(t *testing.T, args ...string) {
