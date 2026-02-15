@@ -8,7 +8,7 @@ bud() {
     finalizer_file="$(mktemp /tmp/bud-finalize-XXXXXX)"
 
     # Run the actual command
-    env BUD_FINALIZER_FILE=$finalizer_file bud $@
+    env BUD_FINALIZER_FILE=$finalizer_file bud "$@"
     return_code=$?
 
     # Perform finalizers
@@ -33,21 +33,25 @@ bud() {
 }
 
 __bud_prompt_command() {
+    local previous_exit=$?
+
     # In shell hook mode, the command will use stderr to print in the console
     # and stdout to mutate the shell (like activating a Python virtualenv)
 
     # Fail fast if no bud executable is reachable
-    which bud > /dev/null || return
+    which bud > /dev/null || return ${previous_exit}
 
     local hook_eval
     hook_eval="$(command bud --shell-hook)"
     __bud_log_debug "Hook eval:\n--------\n${hook_eval}\n--------"
     eval "${hook_eval}"
+
+    return ${previous_exit}
 }
 
 __bud_log_debug() {
     [ -n "${BUD_DEBUG:-}" ] || return
-    echo -e "\033[33mBUD_HOOK_DEBUG\033[0m: $@"
+    echo -e "\033[33mBUD_HOOK_DEBUG\033[0m: $*"
 }
 
 bud-enable-debug() {
