@@ -4,8 +4,23 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/stretchr/testify/require"
 )
+
+type runnerSpy struct {
+	runCmd *Command
+}
+
+func (s *runnerSpy) Run(cmd *Command) *Result {
+	s.runCmd = cmd
+	return &Result{}
+}
+
+func (s *runnerSpy) Capture(cmd *Command) *Result {
+	s.runCmd = cmd
+	return &Result{}
+}
 
 func TestCommandFalse(t *testing.T) {
 	exec := NewExecutor()
@@ -116,6 +131,22 @@ func TestAddEnvVar(t *testing.T) {
 	require.NoError(t, result.LaunchError)
 	require.Equal(t, 0, result.Code)
 	require.Equal(t, "v1-v2\n", result.Output)
+}
+
+func TestExecutorRun_MergesDefaultAndCommandEnv(t *testing.T) {
+	spy := &runnerSpy{}
+	exec := &Executor{
+		Runner: spy,
+		Env:    env.New([]string{"BASE=base", "OVERRIDE=from-default"}),
+	}
+
+	cmd := New("program").AddEnvVar("CUSTOM", "custom").AddEnvVar("OVERRIDE", "from-command")
+	exec.Run(cmd)
+
+	require.NotNil(t, spy.runCmd)
+	require.Equal(t, "base", env.New(spy.runCmd.Env).Get("BASE"))
+	require.Equal(t, "custom", env.New(spy.runCmd.Env).Get("CUSTOM"))
+	require.Equal(t, "from-command", env.New(spy.runCmd.Env).Get("OVERRIDE"))
 }
 
 func TestPrefix(t *testing.T) {

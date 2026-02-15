@@ -35,8 +35,12 @@ func (e *Executor) applyDefaults(cmd *Command) {
 	if cmd.Cwd == "" && e.Cwd != "" {
 		cmd.Cwd = e.Cwd
 	}
-	if cmd.Env == nil && e.Env != nil {
-		cmd.Env = e.Env.Environ()
+	if e.Env != nil {
+		if cmd.Env == nil {
+			cmd.Env = e.Env.Environ()
+		} else {
+			cmd.Env = env.MergeEnviron(e.Env.Environ(), cmd.Env)
+		}
 	}
 	if cmd.OutputPrefix == "" && e.OutputPrefix != "" {
 		cmd.OutputPrefix = e.OutputPrefix

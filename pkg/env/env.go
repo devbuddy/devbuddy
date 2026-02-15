@@ -75,6 +75,20 @@ func (e *Env) setPathParts(elems ...string) {
 	e.Set("PATH", strings.Join(elems, ":"))
 }
 
+// MergeEnviron combines defaults with overrides using shell env format (KEY=VALUE).
+// When a key exists in both, the value from overrides wins.
+func MergeEnviron(defaults []string, overrides []string) []string {
+	merged := New(defaults)
+	for _, raw := range overrides {
+		key, value, ok := strings.Cut(raw, "=")
+		if !ok {
+			continue
+		}
+		merged.Set(key, value)
+	}
+	return merged.Environ()
+}
+
 // Mutations returns a list of variable mutations (previous and current value)
 func (e *Env) Mutations() []VariableMutation {
 	return buildMutations(e.env, e.verbatimEnv)

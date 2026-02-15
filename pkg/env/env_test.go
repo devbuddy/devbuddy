@@ -100,3 +100,15 @@ func TestMutationsDiffString(t *testing.T) {
 	m = VariableMutation{"NAME", &variable{"NAME", "V1"}, nil}
 	require.Equal(t, "  - V1\n", m.DiffString())
 }
+
+func TestMergeEnviron(t *testing.T) {
+	merged := MergeEnviron(
+		[]string{"BASE=base", "OVERRIDE=default"},
+		[]string{"CUSTOM=custom", "OVERRIDE=override", "MALFORMED"},
+	)
+
+	env := New(merged)
+	require.Equal(t, "base", env.Get("BASE"))
+	require.Equal(t, "custom", env.Get("CUSTOM"))
+	require.Equal(t, "override", env.Get("OVERRIDE"))
+}
