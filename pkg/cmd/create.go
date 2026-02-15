@@ -18,7 +18,11 @@ var createCmd = &cobra.Command{
 	SilenceUsage: true,
 }
 
-func createRun(_ *cobra.Command, args []string) error {
+func init() {
+	createCmd.Flags().StringP("template", "t", "", "Template to use for dev.yml (e.g. default, go, python)")
+}
+
+func createRun(cmd *cobra.Command, args []string) error {
 	cfg, err := config.Load()
 	if err != nil {
 		return err
@@ -31,13 +35,15 @@ func createRun(_ *cobra.Command, args []string) error {
 		return err
 	}
 
+	templateName, _ := cmd.Flags().GetString("template")
+
 	if proj.Exists() {
 		ui.ProjectExists()
 	} else {
 		if err := proj.Create(); err != nil {
 			return err
 		}
-		if err := createManifest(ui, proj.Path); err != nil {
+		if err := createManifest(ui, proj.Path, templateName); err != nil {
 			return err
 		}
 	}
