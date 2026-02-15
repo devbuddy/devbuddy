@@ -42,10 +42,3 @@ func (c *Command) AddOutputFilter(substring string) *Command {
 	c.OutputFilters = append(c.OutputFilters, substring)
 	return c
 }
-
-// Convenience methods that delegate to the package-level functions (real executor).
-// When Executor is injected via context in a follow-up, callers switch to ctx.Executor.Run(cmd).
-
-func (c *Command) Run() *Result            { return Run(c) }
-func (c *Command) Capture() *Result        { return Capture(c) }
-func (c *Command) CaptureAndTrim() *Result { return CaptureAndTrim(c) }

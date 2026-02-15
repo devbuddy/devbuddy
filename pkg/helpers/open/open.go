@@ -7,6 +7,7 @@ import (
 
 	color "github.com/logrusorgru/aurora"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
@@ -26,8 +27,8 @@ func Open(location string) error {
 // FindLink returns the url of a link about the project.
 // Possible links are github/pullrequest pages and arbitrary links declared in dev.yml. In case of collision, links
 // declared in dev.yml have precedence over Github links.
-func FindLink(proj *project.Project, linkName string) (url string, err error) {
-	man, err := manifest.Load(proj.Path)
+func FindLink(ctx *context.Context, linkName string) (url string, err error) {
+	man, err := manifest.Load(ctx.Project.Path)
 	if err != nil {
 		return "", err
 	}
@@ -50,10 +51,10 @@ func FindLink(proj *project.Project, linkName string) (url string, err error) {
 
 	switch linkName {
 	case "github", "gh":
-		url, err = helpers.NewGitRepo(proj.Path).BuildGithubProjectURL()
+		url, err = helpers.NewGitRepo(ctx, ctx.Project.Path).BuildGithubProjectURL()
 		return
 	case "pullrequest", "pr":
-		url, err = helpers.NewGitRepo(proj.Path).BuildGithubPullrequestURL()
+		url, err = helpers.NewGitRepo(ctx, ctx.Project.Path).BuildGithubPullrequestURL()
 		return
 	default:
 		err = fmt.Errorf("no link for '%s'", linkName)

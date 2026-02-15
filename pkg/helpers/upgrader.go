@@ -5,26 +5,28 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
-	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 type Upgrader struct {
+	ctx     *context.Context
 	github  *Github
 	client  *http.Client
 	useSudo bool
 }
 
 // NewUpgrader returns a new upgrade helper using the default http client
-func NewUpgrader(useSudo bool) (u *Upgrader) {
-	return NewUpgraderWithHTTPClient(http.DefaultClient, useSudo)
+func NewUpgrader(ctx *context.Context, useSudo bool) (u *Upgrader) {
+	return NewUpgraderWithHTTPClient(ctx, http.DefaultClient, useSudo)
 }
 
 // NewUpgraderWithHTTPClient returns a new upgrade helper using the provided http client
-func NewUpgraderWithHTTPClient(client *http.Client, useSudo bool) (u *Upgrader) {
+func NewUpgraderWithHTTPClient(ctx *context.Context, client *http.Client, useSudo bool) (u *Upgrader) {
 	g := NewGithubWithClient(client)
 
 	return &Upgrader{
+		ctx:     ctx,
 		github:  g,
 		client:  client,
 		useSudo: useSudo,
@@ -33,7 +35,7 @@ func NewUpgraderWithHTTPClient(client *http.Client, useSudo bool) (u *Upgrader) 
 
 // Perform is fetching a new executable from `release`
 // and upgrading the executable at `destinationPath` with it
-func (u *Upgrader) Perform(ui *termui.UI, destinationPath string, sourceURL string) (err error) {
+func (u *Upgrader) Perform(destinationPath string, sourceURL string) (err error) {
 	data, err := u.github.Get(sourceURL)
 
 	if err != nil {
@@ -64,9 +66,9 @@ func (u *Upgrader) Perform(ui *termui.UI, destinationPath string, sourceURL stri
 		cmdline = fmt.Sprintf("sudo %s", cmdline)
 	}
 
-	ui.CommandHeader(cmdline)
+	u.ctx.UI.CommandHeader(cmdline)
 
-	return executor.NewShell(cmdline).Run().Error
+	return u.ctx.Executor.Run(executor.NewShell(cmdline)).Error
 }
 
 // LatestRelease get latest release item for current platform

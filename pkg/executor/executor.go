@@ -8,31 +8,66 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
-// Executor runs commands.
-type Executor interface {
+// Runner is the mock point for command execution.
+type Runner interface {
 	Run(cmd *Command) *Result
 	Capture(cmd *Command) *Result
 }
 
-type realExecutor struct{}
+// Executor runs commands using a Runner, applying defaults (Cwd, Env, OutputPrefix).
+type Executor struct {
+	Runner       Runner
+	Cwd          string
+	Env          *env.Env // live reference, evaluated at run time
+	OutputPrefix string
+}
 
-// NewExecutor returns a real Executor that runs commands via os/exec.
-func NewExecutor() Executor { return &realExecutor{} }
+// NewExecutor returns an Executor backed by a real os/exec Runner.
+func NewExecutor() *Executor {
+	return &Executor{Runner: &osRunner{}}
+}
 
-// Package-level convenience functions using the real executor.
+func (e *Executor) applyDefaults(cmd *Command) {
+	if cmd.Cwd == "" && e.Cwd != "" {
+		cmd.Cwd = e.Cwd
+	}
+	if e.Env != nil {
+		if cmd.Env == nil {
+			cmd.Env = e.Env.Environ()
+		} else {
+			cmd.Env = env.MergeEnviron(e.Env.Environ(), cmd.Env)
+		}
+	}
+	if cmd.OutputPrefix == "" && e.OutputPrefix != "" {
+		cmd.OutputPrefix = e.OutputPrefix
+	}
+}
 
-func Run(cmd *Command) *Result { return (&realExecutor{}).Run(cmd) }
+// Run executes the command with visible output.
+func (e *Executor) Run(cmd *Command) *Result {
+	e.applyDefaults(cmd)
+	return e.Runner.Run(cmd)
+}
 
-func Capture(cmd *Command) *Result { return (&realExecutor{}).Capture(cmd) }
+// Capture executes the command and captures its stdout.
+func (e *Executor) Capture(cmd *Command) *Result {
+	e.applyDefaults(cmd)
+	return e.Runner.Capture(cmd)
+}
 
-func CaptureAndTrim(cmd *Command) *Result {
-	r := Capture(cmd)
+// CaptureAndTrim captures and trims trailing newlines from the output.
+func (e *Executor) CaptureAndTrim(cmd *Command) *Result {
+	r := e.Capture(cmd)
 	r.Output = strings.Trim(r.Output, "\n")
 	return r
 }
+
+// osRunner implements Runner via os/exec.
+type osRunner struct{}
 
 func buildExecCmd(cmd *Command) *exec.Cmd {
 	var c *exec.Cmd
@@ -50,7 +85,7 @@ func buildExecCmd(cmd *Command) *exec.Cmd {
 	return c
 }
 
-func (e *realExecutor) Run(cmd *Command) *Result {
+func (r *osRunner) Run(cmd *Command) *Result {
 	c := buildExecCmd(cmd)
 
 	outputWriter := cmd.OutputWriter
@@ -68,7 +103,7 @@ func (e *realExecutor) Run(cmd *Command) *Result {
 	return buildResult("", err)
 }
 
-func (e *realExecutor) Capture(cmd *Command) *Result {
+func (r *osRunner) Capture(cmd *Command) *Result {
 	c := buildExecCmd(cmd)
 	output, err := c.Output()
 	return buildResult(string(output), err)

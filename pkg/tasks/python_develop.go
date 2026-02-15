@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
@@ -25,7 +26,8 @@ func parserPythonDevelop(config *api.TaskConfig, task *api.Task) error {
 	pipArgs := []string{"install", "--require-virtualenv", "-e", pipTarget}
 
 	pipInstall := func(ctx *context.Context) error {
-		result := command(ctx, "pip", pipArgs...).AddOutputFilter("already satisfied").Run()
+		ctx.UI.TaskCommand("pip", pipArgs...)
+		result := ctx.Executor.Run(executor.New("pip", pipArgs...).AddOutputFilter("already satisfied"))
 		if result.Error != nil {
 			return fmt.Errorf("Pip failed: %w", result.Error)
 		}

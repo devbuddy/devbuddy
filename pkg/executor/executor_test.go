@@ -4,11 +4,27 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/stretchr/testify/require"
 )
 
+type runnerSpy struct {
+	runCmd *Command
+}
+
+func (s *runnerSpy) Run(cmd *Command) *Result {
+	s.runCmd = cmd
+	return &Result{}
+}
+
+func (s *runnerSpy) Capture(cmd *Command) *Result {
+	s.runCmd = cmd
+	return &Result{}
+}
+
 func TestCommandFalse(t *testing.T) {
-	result := New("false").Run()
+	exec := NewExecutor()
+	result := exec.Run(New("false"))
 
 	require.Error(t, result.Error)
 	require.Equal(t, "command failed with exit code 1", result.Error.Error())
@@ -18,7 +34,8 @@ func TestCommandFalse(t *testing.T) {
 }
 
 func TestCommandTrue(t *testing.T) {
-	result := New("true").Run()
+	exec := NewExecutor()
+	result := exec.Run(New("true"))
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -27,7 +44,8 @@ func TestCommandTrue(t *testing.T) {
 }
 
 func TestShellTrue(t *testing.T) {
-	result := NewShell("true").Run()
+	exec := NewExecutor()
+	result := exec.Run(NewShell("true"))
 
 	require.NoError(t, result.Error)
 	require.Equal(t, 0, result.Code)
@@ -35,7 +53,8 @@ func TestShellTrue(t *testing.T) {
 }
 
 func TestShellFalse(t *testing.T) {
-	result := NewShell("false").Run()
+	exec := NewExecutor()
+	result := exec.Run(NewShell("false"))
 
 	require.Error(t, result.Error)
 	require.Equal(t, "command failed with exit code 1", result.Error.Error())
@@ -45,7 +64,8 @@ func TestShellFalse(t *testing.T) {
 }
 
 func TestShellCapture(t *testing.T) {
-	result := NewShell("echo poipoi").Capture()
+	exec := NewExecutor()
+	result := exec.Capture(NewShell("echo poipoi"))
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -54,7 +74,8 @@ func TestShellCapture(t *testing.T) {
 }
 
 func TestShellCaptureAndTrim(t *testing.T) {
-	result := NewShell("echo poipoi").CaptureAndTrim()
+	exec := NewExecutor()
+	result := exec.CaptureAndTrim(NewShell("echo poipoi"))
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -63,9 +84,10 @@ func TestShellCaptureAndTrim(t *testing.T) {
 }
 
 func TestShellCapturePWD(t *testing.T) {
+	exec := NewExecutor()
 	cmd := NewShell("echo $PWD")
 	cmd.Cwd = "/opt"
-	result := cmd.Capture()
+	result := exec.Capture(cmd)
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -74,7 +96,8 @@ func TestShellCapturePWD(t *testing.T) {
 }
 
 func TestCommandNotFound(t *testing.T) {
-	result := New("cmd-that-does-not-exist").Run()
+	exec := NewExecutor()
+	result := exec.Run(New("cmd-that-does-not-exist"))
 
 	require.Error(t, result.Error)
 	require.Equal(t,
@@ -89,9 +112,10 @@ func TestCommandNotFound(t *testing.T) {
 }
 
 func TestSetEnv(t *testing.T) {
+	exec := NewExecutor()
 	cmd := NewShell("echo $POIPOI")
 	cmd.Env = []string{"POIPOI=something"}
-	result := cmd.Capture()
+	result := exec.Capture(cmd)
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -100,7 +124,8 @@ func TestSetEnv(t *testing.T) {
 }
 
 func TestAddEnvVar(t *testing.T) {
-	result := NewShell("echo ${V1}-${V2}").AddEnvVar("V1", "v1").AddEnvVar("V2", "v2").Capture()
+	exec := NewExecutor()
+	result := exec.Capture(NewShell("echo ${V1}-${V2}").AddEnvVar("V1", "v1").AddEnvVar("V2", "v2"))
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -108,13 +133,30 @@ func TestAddEnvVar(t *testing.T) {
 	require.Equal(t, "v1-v2\n", result.Output)
 }
 
+func TestExecutorRun_MergesDefaultAndCommandEnv(t *testing.T) {
+	spy := &runnerSpy{}
+	exec := &Executor{
+		Runner: spy,
+		Env:    env.New([]string{"BASE=base", "OVERRIDE=from-default"}),
+	}
+
+	cmd := New("program").AddEnvVar("CUSTOM", "custom").AddEnvVar("OVERRIDE", "from-command")
+	exec.Run(cmd)
+
+	require.NotNil(t, spy.runCmd)
+	require.Equal(t, "base", env.New(spy.runCmd.Env).Get("BASE"))
+	require.Equal(t, "custom", env.New(spy.runCmd.Env).Get("CUSTOM"))
+	require.Equal(t, "from-command", env.New(spy.runCmd.Env).Get("OVERRIDE"))
+}
+
 func TestPrefix(t *testing.T) {
+	exec := NewExecutor()
 	buf := &bytes.Buffer{}
 
 	cmd := NewShell("echo \"line1\nline2\nline3\"")
 	cmd.OutputWriter = buf
 	cmd.OutputPrefix = "---"
-	result := cmd.Run()
+	result := exec.Run(cmd)
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)
@@ -123,13 +165,14 @@ func TestPrefix(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
+	exec := NewExecutor()
 	buf := &bytes.Buffer{}
 
 	cmd := NewShell("echo \"line1\nline2\nline3\nline4\"")
 	cmd.OutputWriter = buf
 	cmd.AddOutputFilter("line2")
 	cmd.AddOutputFilter("line4")
-	result := cmd.Run()
+	result := exec.Run(cmd)
 
 	require.NoError(t, result.Error)
 	require.NoError(t, result.LaunchError)

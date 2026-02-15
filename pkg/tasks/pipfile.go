@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -15,7 +16,8 @@ func init() {
 
 func parserPipfile(config *api.TaskConfig, task *api.Task) error {
 	installPipfile := func(ctx *context.Context) error {
-		result := command(ctx, "pip", "install", "--require-virtualenv", "pipenv").Run()
+		ctx.UI.TaskCommand("pip", "install", "--require-virtualenv", "pipenv")
+		result := ctx.Executor.Run(executor.New("pip", "install", "--require-virtualenv", "pipenv"))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install pipenv: %w", result.Error)
 		}
@@ -38,7 +40,8 @@ func parserPipfile(config *api.TaskConfig, task *api.Task) error {
 		On(api.FuncCondition(installPipfileNeeded))
 
 	runPipfileInstall := func(ctx *context.Context) error {
-		result := command(ctx, "pipenv", "install", "--system", "--dev").AddEnvVar("PIPENV_QUIET", "1").Run()
+		ctx.UI.TaskCommand("pipenv", "install", "--system", "--dev")
+		result := ctx.Executor.Run(executor.New("pipenv", "install", "--system", "--dev").AddEnvVar("PIPENV_QUIET", "1"))
 		if result.Error != nil {
 			return fmt.Errorf("pipenv failed: %w", result.Error)
 		}

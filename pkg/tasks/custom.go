@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
@@ -26,12 +27,12 @@ func parserCustom(config *api.TaskConfig, task *api.Task) error {
 	task.Info = name
 
 	runCommand := func(ctx *context.Context) error {
-		result := shell(ctx, command).Run()
-		return result.Error
+		ctx.UI.TaskShell(command)
+		return ctx.Executor.Run(executor.NewShell(command)).Error
 	}
 
 	runNeeded := func(ctx *context.Context) *api.ActionResult {
-		result := shellSilent(ctx, condition).Capture()
+		result := ctx.Executor.Capture(executor.NewShell(condition))
 		if result.LaunchError != nil {
 			return api.Failed("failed to run the condition command: %s", result.LaunchError)
 		}
