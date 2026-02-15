@@ -6,22 +6,24 @@ import (
 	"path"
 	"runtime"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 type Golang struct {
+	ctx     *context.Context
 	version string
 	path    string
 	tarDir  string
 }
 
-func NewGolang(cfg *config.Config, version string) *Golang {
+func NewGolang(ctx *context.Context, version string) *Golang {
 	return &Golang{
+		ctx:     ctx,
 		version: version,
-		path:    cfg.DataDir("golang", version),
-		tarDir:  cfg.DataDir("golang"),
+		path:    ctx.Cfg.DataDir("golang", version),
+		tarDir:  ctx.Cfg.DataDir("golang"),
 	}
 }
 
@@ -63,7 +65,7 @@ func (g *Golang) Install() (err error) {
 		return
 	}
 
-	result := executor.New("tar", "--strip", "1", "-xzC", g.path, "-f", tarPath).Run()
+	result := g.ctx.Executor.Run(executor.New("tar", "--strip", "1", "-xzC", g.path, "-f", tarPath))
 	if result.Error != nil {
 		return fmt.Errorf("failed to extract %s to %s: %w", tarPath, g.path, result.Error)
 	}

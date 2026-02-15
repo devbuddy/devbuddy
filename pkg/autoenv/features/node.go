@@ -16,7 +16,7 @@ func (node) Name() string {
 }
 
 func (node) Activate(ctx *context.Context, param string) (bool, error) {
-	node := helpers.NewNode(ctx.Cfg, param)
+	node := helpers.NewNode(ctx, param)
 	if !node.Exists() {
 		return true, nil
 	}

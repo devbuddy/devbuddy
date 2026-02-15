@@ -6,6 +6,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
@@ -43,7 +44,7 @@ func (a *aptInstall) Needed(ctx *context.Context) *api.ActionResult {
 	a.missingPackageNames = []string{}
 
 	for _, name := range a.packageNames {
-		result := shellSilent(ctx, fmt.Sprintf("dpkg -s \"%s\" | grep -q 'Status: install'", name)).Capture()
+		result := ctx.Executor.Capture(executor.NewShell(fmt.Sprintf("dpkg -s \"%s\" | grep -q 'Status: install'", name)))
 		if result.LaunchError != nil {
 			return api.Failed("failed to check if package is installed: %s", result.LaunchError)
 		}
@@ -60,13 +61,15 @@ func (a *aptInstall) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (a *aptInstall) Run(ctx *context.Context) error {
-	result := sudoCommand(ctx, "apt-get", "update").Run()
+	ctx.UI.TaskCommand("sudo", "apt-get", "update")
+	result := ctx.Executor.Run(executor.New("sudo", "apt-get", "update"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get update: %w", result.Error)
 	}
 
 	args := append([]string{"install", "--no-install-recommends", "-y"}, a.missingPackageNames...)
-	result = sudoCommand(ctx, "apt-get", args...).Run()
+	ctx.UI.TaskCommand("sudo", append([]string{"apt-get"}, args...)...)
+	result = ctx.Executor.Run(executor.New("sudo", append([]string{"apt-get"}, args...)...))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get install: %w", result.Error)
 	}

@@ -6,22 +6,24 @@ import (
 	"path"
 	"runtime"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 type Node struct {
+	ctx     *context.Context
 	version string
 	path    string
 	tarDir  string
 }
 
-func NewNode(cfg *config.Config, version string) *Node {
+func NewNode(ctx *context.Context, version string) *Node {
 	return &Node{
+		ctx:     ctx,
 		version: version,
-		path:    cfg.DataDir("node", version),
-		tarDir:  cfg.DataDir("node"),
+		path:    ctx.Cfg.DataDir("node", version),
+		tarDir:  ctx.Cfg.DataDir("node"),
 	}
 }
 
@@ -71,7 +73,7 @@ func (n *Node) Install() error {
 		return err
 	}
 
-	result := executor.New("tar", "--strip", "1", "-xzC", n.path, "-f", tarPath).Run()
+	result := n.ctx.Executor.Run(executor.New("tar", "--strip", "1", "-xzC", n.path, "-f", tarPath))
 	if result.Error != nil {
 		return fmt.Errorf("failed to extract %s to %s: %w", tarPath, n.path, result.Error)
 	}

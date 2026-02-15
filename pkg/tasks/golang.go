@@ -36,13 +36,13 @@ func parseGolang(config *api.TaskConfig, task *api.Task) error {
 	task.Info = version
 
 	installNeeded := func(ctx *context.Context) *api.ActionResult {
-		if !helpers.NewGolang(ctx.Cfg, version).Exists() {
+		if !helpers.NewGolang(ctx, version).Exists() {
 			return api.Needed("golang distribution is not installed")
 		}
 		return api.NotNeeded()
 	}
 	installGo := func(ctx *context.Context) error {
-		return helpers.NewGolang(ctx.Cfg, version).Install()
+		return helpers.NewGolang(ctx, version).Install()
 	}
 	task.AddActionBuilder("install golang distribution", installGo).
 		On(api.FuncCondition(installNeeded)).

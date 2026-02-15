@@ -23,7 +23,7 @@ func (golang) Name() string {
 }
 
 func (golang) Activate(ctx *context.Context, param string) (bool, error) {
-	golang := helpers.NewGolang(ctx.Cfg, strings.Split(param, "+")[0])
+	golang := helpers.NewGolang(ctx, strings.Split(param, "+")[0])
 
 	if !golang.Exists() {
 		return true, nil

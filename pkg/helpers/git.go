@@ -4,24 +4,26 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 )
 
 // GitRepo represents a local git repository
 type GitRepo struct {
+	ctx  *context.Context
 	path string
 }
 
-// NewGitRepo returns a  GitRepo
-func NewGitRepo(path string) *GitRepo {
-	return &GitRepo{path: path}
+// NewGitRepo returns a GitRepo
+func NewGitRepo(ctx *context.Context, path string) *GitRepo {
+	return &GitRepo{ctx: ctx, path: path}
 }
 
 // GetRemoteURL returns the URL of the origin remote
 func (r *GitRepo) GetRemoteURL() (string, error) {
 	cmd := executor.New("git", "config", "--get", "remote.origin.url")
 	cmd.Cwd = r.path
-	result := cmd.CaptureAndTrim()
+	result := r.ctx.Executor.CaptureAndTrim(cmd)
 	if result.Error != nil {
 		return "", fmt.Errorf("failed to get the origin remote url: %w", result.Error)
 	}
@@ -32,7 +34,7 @@ func (r *GitRepo) GetRemoteURL() (string, error) {
 func (r *GitRepo) GetCurrentBranch() (string, error) {
 	cmd := executor.New("git", "rev-parse", "--abbrev-ref", "HEAD")
 	cmd.Cwd = r.path
-	result := cmd.CaptureAndTrim()
+	result := r.ctx.Executor.CaptureAndTrim(cmd)
 	if result.Error != nil {
 		return "", fmt.Errorf("failed to get the current branch: %w", result.Error)
 	}

@@ -80,13 +80,13 @@ func (p *Project) Exists() bool {
 }
 
 // Clone runs the Git command needed to clone the project
-func (p *Project) Clone() (err error) {
+func (p *Project) Clone(exec *executor.Executor) (err error) {
 	err = os.MkdirAll(filepath.Dir(p.Path), 0755)
 	if err != nil {
 		return
 	}
 
-	return executor.New("git", "clone", p.hosting.remoteURL, p.Path).Run().Error
+	return exec.Run(executor.New("git", "clone", p.hosting.remoteURL, p.Path)).Error
 }
 
 // Create creates the project directory locally

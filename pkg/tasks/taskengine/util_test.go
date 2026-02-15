@@ -7,6 +7,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/devbuddy/devbuddy/pkg/termui"
@@ -68,10 +69,11 @@ func setupTaskTesting() (*context.Context, *bytes.Buffer) {
 	buf, ui := termui.NewTesting(false)
 
 	ctx := &context.Context{
-		Project: project.NewFromPath("/src/myproject"),
-		UI:      ui,
-		Cfg:     config.NewTestConfig(),
-		Env:     env.New([]string{}),
+		Project:  project.NewFromPath("/src/myproject"),
+		UI:       ui,
+		Cfg:      config.NewTestConfig(),
+		Env:      env.New([]string{}),
+		Executor: executor.NewExecutor(),
 	}
 
 	return ctx, buf

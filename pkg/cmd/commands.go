@@ -6,28 +6,19 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 func customCommandRun(cmd *cobra.Command, args []string) error {
-	cfg, err := config.Load()
+	ctx, err := context.LoadWithProject()
 	if err != nil {
 		return err
 	}
 
-	ui := termui.New(cfg)
-
-	proj, err := project.FindCurrent()
-	if err != nil {
-		return err
-	}
-
-	man, err := manifest.Load(proj.Path)
+	man, err := manifest.Load(ctx.Project.Path)
 	if err != nil {
 		return err
 	}
@@ -45,23 +36,17 @@ func customCommandRun(cmd *cobra.Command, args []string) error {
 
 	cmdline := strings.Join(append([]string{spec.Run}, args...), " ")
 
-	ui.CommandHeader(cmdline)
+	ctx.UI.CommandHeader(cmdline)
 
-	envs := env.NewFromOS()
 	for name, value := range man.Env {
-		if !envs.Has(name) {
-			envs.Set(name, value)
+		if !ctx.Env.Has(name) {
+			ctx.Env.Set(name, value)
 		}
 	}
 
-	execCmd := &executor.Command{
-		Program:     cmdline,
-		Shell:       true,
-		Passthrough: true,
-		Cwd:         proj.Path,
-		Env:         envs.Environ(),
-	}
-	return execCmd.Run().Error
+	execCmd := executor.NewShell(cmdline)
+	execCmd.Passthrough = true
+	return ctx.Executor.Run(execCmd).Error
 }
 
 func buildCustomCommands(rootCmd *cobra.Command) {

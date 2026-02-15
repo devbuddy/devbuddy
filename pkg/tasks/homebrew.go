@@ -6,6 +6,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
@@ -49,7 +50,8 @@ func (b *brewInstall) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (b *brewInstall) Run(ctx *context.Context) error {
-	result := command(ctx, "brew", "install", b.formula).AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1").Run()
+	ctx.UI.TaskCommand("brew", "install", b.formula)
+	result := ctx.Executor.Run(executor.New("brew", "install", b.formula).AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run brew install: %w", result.Error)
 	}

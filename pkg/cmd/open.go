@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers/open"
-	"github.com/devbuddy/devbuddy/pkg/project"
 )
 
 var openCmd = &cobra.Command{
@@ -22,21 +22,21 @@ func init() {
 }
 
 func openRun(cmd *cobra.Command, args []string) error {
+	ctx, err := context.LoadWithProject()
+	if err != nil {
+		return err
+	}
+
 	linkName := ""
 	if len(args) == 1 {
 		linkName = args[0]
 	}
 
-	proj, err := project.FindCurrent()
-	if err != nil {
-		return err
-	}
-
 	if GetFlagBool(cmd, "list") {
-		return open.PrintLinks(proj)
+		return open.PrintLinks(ctx.Project)
 	}
 
-	url, err := open.FindLink(proj, linkName)
+	url, err := open.FindLink(ctx, linkName)
 	if err != nil {
 		return err
 	}

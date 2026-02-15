@@ -7,9 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
-	"github.com/devbuddy/devbuddy/pkg/termui"
 )
 
 var upgradeCmd = &cobra.Command{
@@ -22,18 +21,16 @@ var upgradeCmd = &cobra.Command{
 }
 
 func upgradeRun(_ *cobra.Command, _ []string) error {
-	cfg, err := config.Load()
+	ctx, err := context.Load(false)
 	if err != nil {
 		return err
 	}
 
-	ui := termui.New(cfg)
-
 	plateform := fmt.Sprintf("bud-%s-%s", runtime.GOOS, runtime.GOARCH)
 
-	ui.CommandRun("Getting latest release for", plateform)
+	ctx.UI.CommandRun("Getting latest release for", plateform)
 
-	upgrader := helpers.NewUpgrader(true)
+	upgrader := helpers.NewUpgrader(ctx, true)
 	release, err := upgrader.LatestRelease(plateform)
 	if err != nil {
 		return err
@@ -44,12 +41,12 @@ func upgradeRun(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	ui.CommandRun("Downloading", release.DownloadURL)
+	ctx.UI.CommandRun("Downloading", release.DownloadURL)
 
-	if err := upgrader.Perform(ui, destinationPath, release.DownloadURL); err != nil {
+	if err := upgrader.Perform(destinationPath, release.DownloadURL); err != nil {
 		return err
 	}
 
-	ui.CommandActed()
+	ctx.UI.CommandActed()
 	return nil
 }

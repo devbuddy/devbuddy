@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -33,14 +34,15 @@ func parserPython(config *api.TaskConfig, task *api.Task) error {
 
 func parserPythonInstallPyenv(task *api.Task, version string) {
 	needed := func(ctx *context.Context) *api.ActionResult {
-		_, err := helpers.NewPyEnv()
+		_, err := helpers.NewPyEnv(ctx)
 		if err != nil {
 			return api.Needed("Pyenv is not installed: %s", err)
 		}
 		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
-		result := command(ctx, "brew", "install", "pyenv").AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1").Run()
+		ctx.UI.TaskCommand("brew", "install", "pyenv")
+		result := ctx.Executor.Run(executor.New("brew", "install", "pyenv").AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install pyenv: %w", result.Error)
 		}
@@ -51,7 +53,7 @@ func parserPythonInstallPyenv(task *api.Task, version string) {
 
 func parserPythonInstallPythonVersion(task *api.Task, version string) {
 	needed := func(ctx *context.Context) *api.ActionResult {
-		pyEnv, err := helpers.NewPyEnv()
+		pyEnv, err := helpers.NewPyEnv(ctx)
 		if err != nil {
 			return api.Failed("cannot use pyenv: %s", err)
 		}
@@ -65,7 +67,8 @@ func parserPythonInstallPythonVersion(task *api.Task, version string) {
 		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
-		result := command(ctx, "pyenv", "install", version).Run()
+		ctx.UI.TaskCommand("pyenv", "install", version)
+		result := ctx.Executor.Run(executor.New("pyenv", "install", version))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install the required python version: %w", result.Error)
 		}
@@ -76,7 +79,7 @@ func parserPythonInstallPythonVersion(task *api.Task, version string) {
 
 func parserPythonInstallVirtualenv(task *api.Task, version string) {
 	needed := func(ctx *context.Context) *api.ActionResult {
-		pyEnv, err := helpers.NewPyEnv()
+		pyEnv, err := helpers.NewPyEnv(ctx)
 		if err != nil {
 			return api.Failed("cannot use pyenv: %s", err)
 		}
@@ -87,11 +90,12 @@ func parserPythonInstallVirtualenv(task *api.Task, version string) {
 		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
-		pyEnv, err := helpers.NewPyEnv()
+		pyEnv, err := helpers.NewPyEnv(ctx)
 		if err != nil {
 			return err
 		}
-		result := command(ctx, pyEnv.Which(version, "python"), "-m", "pip", "install", "virtualenv").Run()
+		ctx.UI.TaskCommand(pyEnv.Which(version, "python"), "-m", "pip", "install", "virtualenv")
+		result := ctx.Executor.Run(executor.New(pyEnv.Which(version, "python"), "-m", "pip", "install", "virtualenv"))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install virtualenv: %w", result.Error)
 		}
@@ -116,11 +120,12 @@ func parserPythonCreateVirtualenv(task *api.Task, version string) {
 		if err != nil {
 			return err
 		}
-		pyEnv, err := helpers.NewPyEnv()
+		pyEnv, err := helpers.NewPyEnv(ctx)
 		if err != nil {
 			return err
 		}
-		result := command(ctx, pyEnv.Which(version, "virtualenv"), venv.Path()).Run()
+		ctx.UI.TaskCommand(pyEnv.Which(version, "virtualenv"), venv.Path())
+		result := ctx.Executor.Run(executor.New(pyEnv.Which(version, "virtualenv"), venv.Path()))
 		if result.Error != nil {
 			return fmt.Errorf("failed to create the virtualenv: %w", result.Error)
 		}

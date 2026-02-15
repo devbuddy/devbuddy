@@ -9,6 +9,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/devbuddy/devbuddy/pkg/test"
 )
@@ -28,10 +31,16 @@ func TestUpgraderLatestRelease(t *testing.T) {
 
 	client := &http.Client{Transport: r}
 
-	u := NewUpgraderWithHTTPClient(client, false)
+	ctx := &context.Context{
+		Cfg:      config.NewTestConfig(),
+		UI:       termui.New(config.NewTestConfig()),
+		Env:      env.New([]string{}),
+		Executor: executor.NewExecutor(),
+	}
 
-	ui := termui.New(config.NewTestConfig())
-	err = u.Perform(ui, tmpfile, "https://github.com/devbuddy/devbuddy/releases/download/v0.1.0/bud-darwin-amd64")
+	u := NewUpgraderWithHTTPClient(ctx, client, false)
+
+	err = u.Perform(tmpfile, "https://github.com/devbuddy/devbuddy/releases/download/v0.1.0/bud-darwin-amd64")
 	require.NoError(t, err, "upgrader.Perform() failed")
 
 	result := test.ReadFile(tmpfile)

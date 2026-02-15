@@ -6,6 +6,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 )
 
@@ -36,7 +37,8 @@ func (p *golangDepInstall) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (p *golangDepInstall) Run(ctx *context.Context) error {
-	result := command(ctx, "go", "get", "-u", "github.com/golang/dep/cmd/dep").Run()
+	ctx.UI.TaskCommand("go", "get", "-u", "github.com/golang/dep/cmd/dep")
+	result := ctx.Executor.Run(executor.New("go", "get", "-u", "github.com/golang/dep/cmd/dep"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to install Go GolangDep: %w", result.Error)
 	}
@@ -80,7 +82,8 @@ func (p *golangDepEnsure) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (p *golangDepEnsure) Run(ctx *context.Context) error {
-	result := command(ctx, "dep", "ensure").Run()
+	ctx.UI.TaskCommand("dep", "ensure")
+	result := ctx.Executor.Run(executor.New("dep", "ensure"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run dep ensure: %w", result.Error)
 	}

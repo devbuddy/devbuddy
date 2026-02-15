@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -20,10 +21,10 @@ func parseNode(config *api.TaskConfig, task *api.Task) error {
 	task.Info = version
 
 	run := func(ctx *context.Context) error {
-		return helpers.NewNode(ctx.Cfg, version).Install()
+		return helpers.NewNode(ctx, version).Install()
 	}
 	condition := func(ctx *context.Context) *api.ActionResult {
-		if !helpers.NewNode(ctx.Cfg, version).Exists() {
+		if !helpers.NewNode(ctx, version).Exists() {
 			return api.Needed("node version is not installed")
 		}
 		return api.NotNeeded()
@@ -37,7 +38,8 @@ func parseNode(config *api.TaskConfig, task *api.Task) error {
 			ctx.UI.TaskWarning("No package.json found.")
 			return nil
 		}
-		return command(ctx, "npm", "install", "--no-progress").Run().Error
+		ctx.UI.TaskCommand("npm", "install", "--no-progress")
+		return ctx.Executor.Run(executor.New("npm", "install", "--no-progress")).Error
 	}
 	task.AddActionBuilder("install dependencies with NPM", npmInstall).
 		On(api.FileCondition("package.json"))
