@@ -38,7 +38,7 @@ func parserPipfile(config *api.TaskConfig, task *api.Task) error {
 		On(api.FuncCondition(installPipfileNeeded))
 
 	runPipfileInstall := func(ctx *context.Context) error {
-		result := command(ctx, "pipenv", "install", "--system", "--dev").SetEnvVar("PIPENV_QUIET", "1").Run()
+		result := command(ctx, "pipenv", "install", "--system", "--dev").AddEnvVar("PIPENV_QUIET", "1").Run()
 		if result.Error != nil {
 			return fmt.Errorf("pipenv failed: %w", result.Error)
 		}
