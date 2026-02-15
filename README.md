@@ -19,14 +19,14 @@ The project is evolving slowly, mostly because DevBuddy covers my current needs.
 
 I would love to help people implement their languages/environments/tools/dev-flow.
 
-## What is this?
+## What is DevBuddy?
 
-**DevBuddy** is an open-source implementation of an amazing internal tool developed at
+**DevBuddy** is an open-source implementation of an internal tool developed at
 [Shopify](https://engineering.shopify.com) called "**Dev**".
 
-The first goal of this tools is to automate the **setup** tasks required to work on a project.
+The first goal of this tool is to automate the **setup** tasks required to work on a project.
 
-With **DevBuddy**, pushing a change on a project you never touched look like this:
+With **DevBuddy**, pushing a change to a project you have never touched looks like this:
 
 - `bud clone devbuddy/devbuddy`
 - `bud up`
@@ -44,7 +44,7 @@ supported. DevBuddy is still useful for languages without native support thanks 
 
 See the project config [documentation](docs/Config.md).
 
-### Tasks:
+### Tasks
 
 Python:
 - Python environment (pyenv + virtualenv)
@@ -71,17 +71,17 @@ Others:
 - Custom (conditional shell command)
 - Docker Compose (manage a docker-compose setup): **planned**
 
-### Features:
+### Features
 
-- Notification when important files (eg: `requirements.txt`) are updated locally
-  (eg: by `git pull`)
+- Notification when important files (e.g. `requirements.txt`) are updated locally
+  (e.g. by `git pull`)
 - A `help` command to guide a new developer based on `dev.yml`
-- A `upgrade` command to auto-upgrade **DevBuddy**
+- An `upgrade` command to auto-upgrade **DevBuddy**
 
-### Code hosting platform:
+### Supported code hosting platforms
 
-- Github
-- Gitlab
+- GitHub
+- GitLab
 - Bitbucket (with Git)
 
 ### Shell integration
@@ -110,7 +110,7 @@ $ brew install --HEAD devbuddy
 
 ### Go install
 
-Note: use this if your your PATH includes the GOBIN path.
+Note: use this if your PATH includes the GOBIN path.
 
 Latest release:
 ```bash
@@ -167,7 +167,7 @@ $ sudo install /tmp/bud /usr/local/bin/bud
 
 ## Setup
 
-★ Install the shell integration (in `~/.bash_profile`, or `~/.zshrc`):
+★ Install shell integration (in `~/.bash_profile` or `~/.zshrc`):
 ```bash
 eval "$(bud --shell-init --with-completion)"
 ```
@@ -179,13 +179,13 @@ type bud > /dev/null 2> /dev/null && eval "$(bud --shell-init --with-completion)
 
 ### Configuration
 
-If you usual work with repos from the same organization (like your personal one), you can set it as a default:
+If you usually work with repos from the same organization (like your personal one), you can set it as a default:
 
 ```
 export BUD_DEFAULT_ORG="google"
 ```
 
-Then you can use it directly to create, clone and jump to those repos:
+Then you can use it directly to create, clone, and jump to those repos:
 ```bash
 $ bud clone pytruth
 ```
@@ -217,7 +217,7 @@ open:
   staging: https://staging.myapp.com
   doc: https://godoc.org/github.com/org/myapp
 ```
-See DevBuddy own [dev.yml](dev.yml)
+See DevBuddy's own [dev.yml](dev.yml).
 
 ```bash
 $ bud
