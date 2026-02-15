@@ -8,7 +8,7 @@ import (
 )
 
 var openCmd = &cobra.Command{
-	Use:          "open [github|pullrequest]",
+	Use:          "open [pattern]",
 	Short:        "Open a link about your project",
 	RunE:         openRun,
 	Args:         zeroOrOneArg,

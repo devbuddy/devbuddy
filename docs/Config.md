@@ -3,16 +3,16 @@
 ## Example
 
 The file `dev.yml` must be placed at the root directory of your project.
-It should be commited to your repository and shared with everyone working on the project.
+It should be committed to your repository and shared with everyone working on the project.
 
 The `up` section describes the tasks that the `bud up` command will run.
 Some tasks prepare your environment to use a language like `python` or `go`.
-Other tasks ensure your environment is up to date like `pip` or `golang_dep`.
-The special `custom` task let you handle specific case needed for your project. See [Tasks](#tasks).
+Other tasks ensure your environment is up to date, like `pip` or `golang_dep`.
+The special `custom` task lets you handle specific cases needed for your project. See [Tasks](#tasks).
 
 The `commands` section describes the project commands like `bud test`. See [Project Commands](#project-commands).
 
-The `open` section describes the project links available through `bud open <name>`. See [Open Command](#open-command).
+The `open` section describes the project links available through `bud open <pattern>`. See [Open Command](#open-command).
 
 **`dev.yml`**:
 ```yaml
@@ -51,7 +51,7 @@ env:
   MEMCACHE_URL: localhost:11211
 ```
 
-The environment variables will be set as soon as you enter the project, they can be used in `custom` tasks, in
+The environment variables will be set as soon as you enter the project. They can be used in `custom` tasks, in
 the `commands` section and in your shell.
 
 ## Tasks
@@ -80,7 +80,7 @@ up:
 
 ### `python`
 
-This task will install the Python version (with PyEnv, which must be installed), create
+This task will install the Python version (with pyenv, which must be installed), create
 a virtualenv and activate it in your shell.
 
 ```yaml
@@ -105,9 +105,9 @@ up:
 
 This task will install a pip requirements file.
 
-A Python environment must be selected before.
+A Python environment must be selected first.
 
-Currently this task can't detect whether it should run or not. PR welcome!
+Currently this task cannot detect whether it should run. PR welcome!
 
 ```yaml
 up:
@@ -122,9 +122,9 @@ up:
 This task will install a [Pipfile](https://github.com/pypa/pipfile) with
 [Pipenv](https://github.com/pypa/pipenv).
 
-A Python environment must be selected before.
+A Python environment must be selected first.
 
-Currently this task can't detect whether it should run or not. PR welcome!
+Currently this task cannot detect whether it should run. PR welcome!
 
 ```yaml
 up:
@@ -164,7 +164,7 @@ up:
 ### `node`
 
 This task will download the Node distribution from `nodejs.org` and activate it in your shell.
-Optionally, it can also install the NodeJS dependencies.
+Optionally, it can also install the Node.js dependencies.
 
 ```yaml
 up:
@@ -194,7 +194,7 @@ up:
 
 ## Project commands
 
-The project can define custom command in `dev.yml` that can be called with: `bud <command>`. Additional arguments are
+The project can define custom commands in `dev.yml` that can be called with: `bud <command>`. Additional arguments are
 also passed to the command: `bud <command> <arg> <arg>...`.
 
 ```yaml
@@ -207,7 +207,7 @@ commands:
     run: script/run_all_linters
 ```
 
-`bud test` is not much shorter than calling `script/test` for example.
+`bud test` is not much shorter than calling `script/test`, for example.
 The idea is to introduce an indirection that will be easy to document and remember by being consistent across projects
 regardless of the programming language used (`rails test`? `pytest -v`? `npm test`? `go test ./...`?).
 
@@ -219,7 +219,7 @@ pkg/project/current.go:14:2:warning: unused variable or constant someVariable de
 
 ## Open Command
 
-The command `bud open <name>` will open a link about the project with the OS default handler (using `open`/`xdg-open`).
+The command `bud open <pattern>` opens a project link with the OS default handler (using `open`/`xdg-open`).
 
 ### Custom links
 
@@ -230,8 +230,12 @@ open:
   doc: https://godoc.org/github.com/org/myapp
 ```
 
-Tip: `dev open` is enough if there is only one link.
+Tip: `bud open` is enough if there is only one link.
 
-### Github links:
-- `github`/`gh`: open the Github source code page for your checked out branch
-- `pullrequest`/`pr`: open the Github pull-request page for your checked out branch
+Matching for custom links is fuzzy, so `bud open stg` can match `staging`.
+
+### GitHub links:
+- `github`/`gh`: open the GitHub source code page for your checked out branch
+- `pullrequest`/`pr`: open the GitHub pull-request page for your checked out branch
+
+Built-in GitHub link names are exact aliases only (no fuzzy matching).
