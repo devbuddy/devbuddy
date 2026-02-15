@@ -11,6 +11,13 @@ import (
 	"golang.org/x/term"
 )
 
+func runPassthrough(cmd *exec.Cmd) error {
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 func runWithPTY(cmd *exec.Cmd, outputWriter io.Writer) error {
 	ptmx, err := pty.Start(cmd)
 	if err != nil {
