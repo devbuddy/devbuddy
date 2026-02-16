@@ -14,6 +14,9 @@ pip:
 `)
 
 	require.Equal(t, "Task Pip (file1, file2) required_task=python actions=2", task.Describe())
+	require.Equal(t, "file1, file2", task.Info)
+	require.Equal(t, "python", task.RequiredTask)
+	require.Equal(t, 2, len(task.Actions))
 }
 
 func TestPipEmpty(t *testing.T) {

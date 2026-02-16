@@ -14,6 +14,9 @@ custom:
 `)
 
 	require.Equal(t, "Task Custom (custom-command) actions=1", task.Describe())
+	require.Equal(t, "custom-command", task.Info)
+	require.Equal(t, 1, len(task.Actions))
+	requireNoFeature(t, task)
 }
 
 func TestCustomName(t *testing.T) {
@@ -25,6 +28,9 @@ custom:
 `)
 
 	require.Equal(t, "Task Custom (NAMENAME) actions=1", task.Describe())
+	require.Equal(t, "NAMENAME", task.Info)
+	require.Equal(t, 1, len(task.Actions))
+	requireNoFeature(t, task)
 }
 
 func TestCustomWithBoolean(t *testing.T) {
