@@ -189,12 +189,12 @@ func TestRunnerFileWatcher(t *testing.T) {
 	r.sync(NewFeatureSet().With(NewFeatureInfo("envfile", envPath)))
 	require.Empty(t, watcher.getCallsAndReset())
 
-	// Modify the watched file → reactivation
+	// Modify the watched file → deactivate then reactivate
 	os.WriteFile(envPath, []byte("VAR=two"), 0644)
 
 	r = newRunner(testEnv, reg)
 	r.sync(NewFeatureSet().With(NewFeatureInfo("envfile", envPath)))
-	require.Equal(t, []string{"activate " + envPath}, watcher.getCallsAndReset())
+	require.Equal(t, []string{"deactivate " + envPath, "activate " + envPath}, watcher.getCallsAndReset())
 
 	// File unchanged again → no reactivation
 	r = newRunner(testEnv, reg)

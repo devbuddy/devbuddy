@@ -94,6 +94,30 @@ func TestEnvfileDeactivate(t *testing.T) {
 	require.False(t, ctx.Env.Has(envfileTrackedVarsKey))
 }
 
+func TestEnvfileDeactivateThenActivateUnsetsRemovedVars(t *testing.T) {
+	ctx := newTestContext()
+	dir := t.TempDir()
+	path := writeEnvFile(t, dir, "A=1\nB=2\n")
+
+	// First activation: sets A and B
+	_, err := envfile{}.Activate(ctx, path)
+	require.NoError(t, err)
+	require.Equal(t, "1", ctx.Env.Get("A"))
+	require.Equal(t, "2", ctx.Env.Get("B"))
+
+	// Modify .env: remove B
+	writeEnvFile(t, dir, "A=1\n")
+
+	// Deactivate then re-activate (what the runner does on file change)
+	envfile{}.Deactivate(ctx, path)
+	_, err = envfile{}.Activate(ctx, path)
+	require.NoError(t, err)
+
+	require.Equal(t, "1", ctx.Env.Get("A"))
+	require.False(t, ctx.Env.Has("B"))
+	require.Equal(t, "A", ctx.Env.Get(envfileTrackedVarsKey))
+}
+
 func TestEnvfileDeactivateNoopWhenNotActivated(t *testing.T) {
 	ctx := newTestContext()
 
