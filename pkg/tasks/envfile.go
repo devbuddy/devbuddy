@@ -10,7 +10,10 @@ func init() {
 }
 
 func parseEnvfile(config *api.TaskConfig, task *api.Task) error {
-	envfilePath := ".env"
+	envfilePath, err := config.GetStringPropertyAllowSingle("path")
+	if err != nil {
+		envfilePath = ".env"
+	}
 
 	check := func(ctx *context.Context) error {
 		return nil
