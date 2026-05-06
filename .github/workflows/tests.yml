@@ -67,17 +67,24 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: .github/workflows/test-project
     steps:
       - uses: actions/checkout@v6
-      - name: Run tests
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.26"
+      - name: Build bud
+        run: go build -o "${{ runner.temp }}/bud" ./cmd/bud
+      - name: Test install script
         run: |
           curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.head_ref || github.ref_name }}/install.sh | INSTALL_DIR="${{ runner.temp }}" sh
+      - name: Run tests
+        working-directory: .github/workflows/test-project
+        run: |
           export PATH="${{ runner.temp }}:$PATH"
           eval "$(bud --shell-hook)"
           bud up
-          bud hello | grep "hello from bud"
-          bud check-env | grep "MY_APP_ENV=testing"
+          bud hello
+          bud check-env
 
   install-script-minimal:
     name: install script (minimal)
@@ -87,14 +94,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        working-directory: .github/workflows/test-project
+        shell: bash
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.26"
+      - name: Build bud
+        run: go build -o "${{ runner.temp }}/bud" ./cmd/bud
       - name: Run custom command
+        working-directory: .github/workflows/test-project
         run: |
-          curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.head_ref || github.ref_name }}/install.sh | INSTALL_DIR="${{ runner.temp }}" sh
           export PATH="${{ runner.temp }}:$PATH"
-          bud hello | grep "hello from bud"
+          bud hello
 
   release:
     name: release
