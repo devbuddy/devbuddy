@@ -51,6 +51,7 @@ main() {
     fi
 
     chmod +x "$tmpfile"
+    mkdir -p "$INSTALL_DIR"
 
     if [ -w "$INSTALL_DIR" ]; then
         mv "$tmpfile" "${INSTALL_DIR}/bud"
