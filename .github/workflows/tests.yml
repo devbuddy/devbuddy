@@ -58,6 +58,26 @@ jobs:
       - run: docker pull $TEST_DOCKER_IMAGE
       - run: TEST_SHELL=zsh go test -cover -v ./tests
 
+  install-script:
+    name: install script
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run install script
+        run: |
+          INSTALL_DIR="$RUNNER_TEMP" sh install.sh
+          "$RUNNER_TEMP/bud" --version
+
+  install-script-macos:
+    name: install script (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run install script
+        run: |
+          INSTALL_DIR="$RUNNER_TEMP" sh install.sh
+          "$RUNNER_TEMP/bud" --version
+
   release:
     name: release
     needs: [linters, tests, tests-bash, tests-zsh]
