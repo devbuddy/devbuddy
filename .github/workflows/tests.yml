@@ -64,24 +64,47 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: /tmp/test-project
     steps:
       - uses: actions/checkout@v6
-      - name: Run install script
+      - name: Setup with DevBuddy
+        working-directory: ${{ github.workspace }}
         run: |
-          INSTALL_DIR="$RUNNER_TEMP" sh install.sh
-          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+          curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | INSTALL_DIR="${{ runner.temp }}" sh
+          echo "${{ runner.temp }}" >> $GITHUB_PATH
       - name: Verify binary
+        working-directory: ${{ github.workspace }}
         run: bud --version
-      - name: Run a custom command
+      - name: Create test project
+        working-directory: /tmp
         run: |
-          mkdir /tmp/test-project && cd /tmp/test-project
-          cat > dev.yml <<'EOF'
+          mkdir -p test-project
+          cat > test-project/dev.yml <<'EOF'
+          env:
+            MY_APP_ENV: testing
+
+          up:
+            - custom:
+                name: Create marker file
+                met?: test -f .devbuddy/marker
+                meet: mkdir -p .devbuddy && touch .devbuddy/marker
+
           commands:
             hello:
               desc: Say hello
               run: echo "hello from bud"
+            check-env:
+              desc: Verify environment is activated
+              run: echo "MY_APP_ENV=$MY_APP_ENV"
           EOF
+      - name: Run tests
+        run: |
+          bud up
+          eval "$(bud --shell-hook)"
           bud hello | grep "hello from bud"
+          bud check-env | grep "MY_APP_ENV=testing"
 
   release:
     name: release
