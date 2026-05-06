@@ -100,6 +100,30 @@ jobs:
           bud hello | grep "hello from bud"
           bud check-env | grep "MY_APP_ENV=testing"
 
+  install-script-minimal:
+    name: install script (minimal)
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Create test project
+        run: |
+          mkdir -p /tmp/test-project
+          cat > /tmp/test-project/dev.yml <<'EOF'
+          commands:
+            hello:
+              desc: Say hello
+              run: echo "hello from bud"
+          EOF
+      - name: Run custom command
+        working-directory: /tmp/test-project
+        run: |
+          curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.head_ref || github.ref_name }}/install.sh | INSTALL_DIR="${{ runner.temp }}" sh
+          export PATH="${{ runner.temp }}:$PATH"
+          bud hello | grep "hello from bud"
+
   release:
     name: release
     needs: [linters, tests, tests-bash, tests-zsh]
