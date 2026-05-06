@@ -112,24 +112,22 @@ Then `bud clone myrepo` is equivalent to `bud clone myorg/myrepo`.
 
 ## Using in CI
 
-DevBuddy can run your project commands in CI without full shell integration. The install script both installs the binary and activates the project environment via `eval "$(bud --shell-hook)"`. It's idempotent — on subsequent runs it skips the install and just activates.
+DevBuddy can run your project commands in CI without full shell integration. Install the binary, then activate the environment with `eval "$(bud --shell-hook)"` before running any `bud` command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh > /tmp/install-bud.sh
-sh /tmp/install-bud.sh        # install the binary
-bud up                         # setup project dependencies
-source /tmp/install-bud.sh    # activate the environment
-bud test                       # run project commands
+curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | sh
+eval "$(bud --shell-hook)"
+bud up
+bud test
 ```
 
 Example GitHub Actions step:
 ```yaml
 - name: Run tests
   run: |
-    curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh > /tmp/install-bud.sh
-    sh /tmp/install-bud.sh
+    curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | sh
+    eval "$(bud --shell-hook)"
     bud up
-    source /tmp/install-bud.sh
     bud test
 ```
 
