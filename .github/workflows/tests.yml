@@ -71,7 +71,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Test install script
         run: |
-          curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.head_ref || github.ref_name }}/install.sh | INSTALL_DIR="${{ runner.temp }}/released" sh
+          INSTALL_DIR="${{ runner.temp }}/released" sh install.sh
           "${{ runner.temp }}/released/bud" --version
       - uses: actions/setup-go@v6
         with:
