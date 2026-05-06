@@ -66,22 +66,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        working-directory: /tmp/test-project
+        shell: bash
     steps:
       - uses: actions/checkout@v6
-      - name: Setup with DevBuddy
-        working-directory: ${{ github.workspace }}
-        run: |
-          curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | INSTALL_DIR="${{ runner.temp }}" sh
-          echo "${{ runner.temp }}" >> $GITHUB_PATH
-      - name: Verify binary
-        working-directory: ${{ github.workspace }}
-        run: bud --version
       - name: Create test project
-        working-directory: /tmp
         run: |
-          mkdir -p test-project
-          cat > test-project/dev.yml <<'EOF'
+          mkdir -p /tmp/test-project
+          cat > /tmp/test-project/dev.yml <<'EOF'
           env:
             MY_APP_ENV: testing
 
@@ -100,9 +91,14 @@ jobs:
               run: echo "MY_APP_ENV=$MY_APP_ENV"
           EOF
       - name: Run tests
+        working-directory: /tmp/test-project
         run: |
+          curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.head_ref || github.ref_name }}/install.sh > /tmp/install-bud.sh
+          INSTALL_DIR="${{ runner.temp }}" sh /tmp/install-bud.sh
+          export PATH="${{ runner.temp }}:$PATH"
+          bud --version
           bud up
-          eval "$(bud --shell-hook)"
+          source /tmp/install-bud.sh
           bud hello | grep "hello from bud"
           bud check-env | grep "MY_APP_ENV=testing"
 

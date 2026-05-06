@@ -1,10 +1,13 @@
 #!/bin/sh
 set -eu
 
-# Install DevBuddy (bud) binary.
+# Install and activate DevBuddy (bud).
 #
 # Usage:
-#   curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | sh
+#   curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh > /tmp/install-bud.sh
+#   sh /tmp/install-bud.sh          # install the binary
+#   bud up                           # setup project dependencies
+#   source /tmp/install-bud.sh       # activate the environment
 #
 # Environment variables:
 #   VERSION      - version to install (e.g. "v0.15.0"), defaults to latest
@@ -33,7 +36,11 @@ get_latest_version() {
     curl -sSL -o /dev/null -w "%{url_effective}" "https://github.com/${REPO}/releases/latest" | grep -oE "[^/]+$"
 }
 
-main() {
+install_bud() {
+    if command -v bud > /dev/null 2>&1; then
+        return
+    fi
+
     OS=$(detect_os)
     ARCH=$(detect_arch)
     VERSION="${VERSION:-$(get_latest_version)}"
@@ -61,4 +68,5 @@ main() {
     echo "DevBuddy installed to ${INSTALL_DIR}/bud"
 }
 
-main
+install_bud
+eval "$("${INSTALL_DIR}/bud" --shell-hook)"
