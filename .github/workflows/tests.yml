@@ -60,23 +60,28 @@ jobs:
 
   install-script:
     name: install script
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
       - name: Run install script
         run: |
           INSTALL_DIR="$RUNNER_TEMP" sh install.sh
-          "$RUNNER_TEMP/bud" --version
-
-  install-script-macos:
-    name: install script (macOS)
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Run install script
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Verify binary
+        run: bud --version
+      - name: Run a custom command
         run: |
-          INSTALL_DIR="$RUNNER_TEMP" sh install.sh
-          "$RUNNER_TEMP/bud" --version
+          mkdir /tmp/test-project && cd /tmp/test-project
+          cat > dev.yml <<'EOF'
+          commands:
+            hello:
+              desc: Say hello
+              run: echo "hello from bud"
+          EOF
+          bud hello | grep "hello from bud"
 
   release:
     name: release

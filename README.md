@@ -57,6 +57,22 @@ See the full [task documentation](docs/Config.md) for details.
 
 ## Install
 
+### Quick install (CI-friendly)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | sh
+```
+
+Pin a specific version:
+```bash
+curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | VERSION=v0.15.0 sh
+```
+
+Choose a custom install directory (defaults to `/usr/local/bin`):
+```bash
+curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | INSTALL_DIR=./bin sh
+```
+
 ### Homebrew (macOS)
 
 ```bash
@@ -69,39 +85,6 @@ Requires Go and `GOPATH/bin` in your PATH:
 
 ```bash
 go install github.com/devbuddy/devbuddy/cmd/bud@latest
-```
-
-Or a specific version:
-```bash
-go install github.com/devbuddy/devbuddy/cmd/bud@v0.15.0
-```
-
-### Manual download
-
-Download the latest binary for your platform:
-
-```bash
-VERSION=$(curl -Ls -o /dev/null -w %{url_effective} "https://github.com/devbuddy/devbuddy/releases/latest" | grep -oE "[^/]+$")
-```
-
-Then download for your platform:
-```bash
-# macOS Apple Silicon
-curl -L "https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-darwin-arm64" > /tmp/bud
-
-# macOS Intel
-curl -L "https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-darwin-amd64" > /tmp/bud
-
-# Linux amd64
-curl -L "https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-linux-amd64" > /tmp/bud
-
-# Linux arm64
-curl -L "https://github.com/devbuddy/devbuddy/releases/download/${VERSION}/bud-linux-arm64" > /tmp/bud
-```
-
-Install:
-```bash
-sudo install /tmp/bud /usr/local/bin/bud
 ```
 
 ## Setup
@@ -126,6 +109,37 @@ export BUD_DEFAULT_ORG="myorg"
 ```
 
 Then `bud clone myrepo` is equivalent to `bud clone myorg/myrepo`.
+
+## Using in CI
+
+DevBuddy can run your project commands in CI without full shell integration. Install the binary, activate the environment, then run commands:
+
+```bash
+# Install
+curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | sh
+
+# Setup and activate environment
+bud up
+eval "$(bud --shell-hook)"
+
+# Run project commands
+bud test
+bud lint
+```
+
+Example GitHub Actions step:
+```yaml
+- name: Setup with DevBuddy
+  run: |
+    curl -sSL https://raw.githubusercontent.com/devbuddy/devbuddy/main/install.sh | INSTALL_DIR="${{ runner.temp }}" sh
+    echo "${{ runner.temp }}" >> $GITHUB_PATH
+
+- name: Run tests
+  run: |
+    bud up
+    eval "$(bud --shell-hook)"
+    bud test
+```
 
 ## Usage
 
