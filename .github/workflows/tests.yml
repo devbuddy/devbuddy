@@ -69,14 +69,15 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v6
+      - name: Test install script
+        run: |
+          curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.head_ref || github.ref_name }}/install.sh | INSTALL_DIR="${{ runner.temp }}/released" sh
+          "${{ runner.temp }}/released/bud" --version
       - uses: actions/setup-go@v6
         with:
           go-version: "1.26"
       - name: Build bud
         run: go build -o "${{ runner.temp }}/bud" ./cmd/bud
-      - name: Test install script
-        run: |
-          curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.head_ref || github.ref_name }}/install.sh | INSTALL_DIR="${{ runner.temp }}" sh
       - name: Run tests
         working-directory: .github/workflows/test-project
         run: |
