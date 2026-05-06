@@ -1,0 +1,16 @@
+env:
+  MY_APP_ENV: testing
+
+up:
+  - custom:
+      name: Create marker file
+      met?: test -f .devbuddy/marker
+      meet: mkdir -p .devbuddy && touch .devbuddy/marker
+
+commands:
+  hello:
+    desc: Say hello
+    run: echo "hello from bud"
+  check-env:
+    desc: Verify environment is activated
+    run: echo "MY_APP_ENV=$MY_APP_ENV"
