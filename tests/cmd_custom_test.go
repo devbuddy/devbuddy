@@ -90,7 +90,9 @@ func Test_Cmd_Custom_Exit_Code(t *testing.T) {
 	)
 	c.Cd(t, project.Path)
 
-	c.Run(t, "bud fail", context.ExitCode(42))
+	// bud reports the failure but normalizes the exit code to 1
+	lines := c.Run(t, "bud fail", context.ExitCode(1))
+	OutputContains(t, lines, "command failed with exit code 42")
 }
 
 func Test_Cmd_Custom_Always_Run_In_Project_Root(t *testing.T) {
