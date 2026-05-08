@@ -164,6 +164,43 @@ func TestPrefix(t *testing.T) {
 	require.Equal(t, "---line1\n---line2\n---line3\n", buf.String())
 }
 
+func TestPassthroughSucceeds(t *testing.T) {
+	exec := NewExecutor()
+
+	cmd := NewShell("echo passthrough-ok")
+	cmd.Passthrough = true
+	result := exec.Run(cmd)
+
+	require.NoError(t, result.Error)
+	require.Equal(t, 0, result.Code)
+}
+
+func TestPassthroughExitCode(t *testing.T) {
+	exec := NewExecutor()
+
+	cmd := NewShell("exit 42")
+	cmd.Passthrough = true
+	result := exec.Run(cmd)
+
+	require.NoError(t, result.LaunchError)
+	require.Equal(t, 42, result.Code)
+}
+
+func TestPassthroughWithoutTerminal(t *testing.T) {
+	exec := NewExecutor()
+
+	cmd := NewShell("tty")
+	cmd.Passthrough = true
+	result := exec.Run(cmd)
+
+	// tty prints "not a tty" and exits 1 when stdin is not a terminal.
+	// The important thing is that the command launches and runs — before the
+	// fix, runPassthrough would pass os.Stdin unconditionally, causing ioctl
+	// errors in the subprocess.
+	require.NoError(t, result.LaunchError)
+	require.Equal(t, 1, result.Code, "tty should exit 1 when stdin is not a terminal (go test has no TTY)")
+}
+
 func TestFilter(t *testing.T) {
 	exec := NewExecutor()
 	buf := &bytes.Buffer{}
