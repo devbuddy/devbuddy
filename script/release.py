@@ -187,7 +187,8 @@ def process(git: Git, releases: Releases, args: argparse.Namespace) -> None:
         raise AssertionError()
 
     print(f'Next version will be {version}')
-    input('Continue?')
+    if not args.yes:
+        input('Continue?')
 
     print(f'Creating commit and tag')
     if args.dryrun:
@@ -205,6 +206,7 @@ def process(git: Git, releases: Releases, args: argparse.Namespace) -> None:
 def make_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument('--dryrun', action='store_true')
+    parser.add_argument('--yes', '-y', action='store_true', help='skip confirmation prompt')
 
     sub = parser.add_subparsers(dest='action')
     sub.required = True
