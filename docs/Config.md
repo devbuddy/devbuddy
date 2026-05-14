@@ -179,6 +179,17 @@ up:
       npm: true
 ```
 
+### `ruby`
+
+This task will install the Ruby version (with rbenv, which is installed automatically via
+Homebrew if missing) and activate it in your shell. If a `Gemfile` is present, gems will
+be installed with `bundle install`.
+
+```yaml
+up:
+  - ruby: 3.3.0
+```
+
 ### `custom`
 
 This task will run a command if a condition is not met.
