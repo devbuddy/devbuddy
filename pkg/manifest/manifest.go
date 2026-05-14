@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
+	"github.com/goccy/go-yaml"
 
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
@@ -29,7 +29,7 @@ func (m *Manifest) commands() (map[string]*Command, error) {
 			continue
 		}
 
-		if p, ok := payload.(map[interface{}]interface{}); ok {
+		if p, ok := payload.(map[string]any); ok {
 			if run, ok := p["run"]; ok {
 				if runS, ok := run.(string); ok {
 					cmds[name] = &Command{Run: runS}
