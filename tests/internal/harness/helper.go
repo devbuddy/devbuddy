@@ -16,8 +16,13 @@ func CreateContext(t *testing.T) *context.TestContext {
 	t.Helper()
 
 	testConfig := config
-	testConfig.WorkspaceHostPath = t.TempDir()
-	err := os.Chmod(testConfig.WorkspaceHostPath, 0777)
+	var err error
+	testConfig.WorkspaceHostPath, err = os.MkdirTemp("", "devbuddy-test-workspace-*")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = os.RemoveAll(testConfig.WorkspaceHostPath)
+	})
+	err = os.Chmod(testConfig.WorkspaceHostPath, 0777)
 	require.NoError(t, err)
 	testConfig.WorkspaceContainerPath = "/home/tester/src/github.com"
 

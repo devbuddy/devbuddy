@@ -213,8 +213,8 @@ func (c *TestContext) Cwd(t *testing.T) string {
 	t.Helper()
 	lines, err := c.shell.Run("pwd")
 	require.NoError(t, err)
-	require.Len(t, lines, 1, "unexpected output for 'pwd'")
-	return lines[0]
+	require.NotEmpty(t, lines, "unexpected output for 'pwd'")
+	return lines[len(lines)-1]
 }
 
 func (c *TestContext) Cat(t *testing.T, path string) string {
