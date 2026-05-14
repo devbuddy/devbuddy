@@ -186,6 +186,8 @@ func (c *TestContext) Write(t *testing.T, path, content string) {
 	if hostPath, ok := c.hostPath(t, path); ok {
 		err := os.MkdirAll(filepath.Dir(hostPath), 0755)
 		require.NoError(t, err)
+		err = os.Chmod(filepath.Dir(hostPath), 0777)
+		require.NoError(t, err)
 
 		err = os.WriteFile(hostPath, []byte(content), 0644)
 		require.NoError(t, err)

@@ -3,6 +3,7 @@ package harness
 import (
 	"fmt"
 	"math/rand/v2"
+	"os"
 	"strings"
 	"testing"
 
@@ -16,7 +17,9 @@ func CreateContext(t *testing.T) *context.TestContext {
 
 	testConfig := config
 	testConfig.WorkspaceHostPath = t.TempDir()
-	testConfig.WorkspaceContainerPath = "/home/tester/src/github.com/orgname"
+	err := os.Chmod(testConfig.WorkspaceHostPath, 0777)
+	require.NoError(t, err)
+	testConfig.WorkspaceContainerPath = "/home/tester/src/github.com"
 
 	c, err := context.New(testConfig)
 	require.NoError(t, err)
