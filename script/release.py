@@ -167,8 +167,8 @@ class Releases:
 
 
 def process(git: Git, releases: Releases, args: argparse.Namespace) -> None:
-    if git.current_branch() != 'master':
-        raise Error('not on the master branch')
+    if git.current_branch() not in ('master', 'main'):
+        raise Error('not on the main branch')
 
     if not git.is_index_clean():
         raise Error('uncommited changes')
