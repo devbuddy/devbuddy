@@ -138,7 +138,7 @@ TEST_SHELL=zsh go test -v -count=1 ./tests
 ### Integration Test Architecture
 Integration tests run inside a Docker container (`ghcr.io/devbuddy/docker-testing`):
 - `TestMain()` cross-compiles a Linux binary, mounts it into the container
-- `TestContext` uses `github.com/devbuddy/expect` (PTY-based shell automation)
+- `TestContext` uses `tests/internal/expect` (PTY-based shell automation)
 - Tests create projects with dev.yml, run `bud` commands, assert output
 - Controlled by env vars: `TEST_SHELL` (bash/zsh), `TEST_DOCKER_IMAGE`
 - Docker image: Ubuntu 20.04 with pyenv, Python 3.9, build tools, git, zsh
@@ -167,7 +167,7 @@ The script creates a release commit + annotated tag + pushes to GitHub. CI build
 
 ## Dependencies
 - `github.com/spf13/cobra` - CLI framework
-- `github.com/devbuddy/expect` - PTY-based shell automation (custom fork)
+- `tests/internal/expect` - PTY-based shell automation (moved from `github.com/devbuddy/expect`)
 - `github.com/joho/godotenv` - .env file parsing
 - `github.com/logrusorgru/aurora` - Terminal colors
 - `github.com/sahilm/fuzzy` - Fuzzy matching (for `bud cd`)
