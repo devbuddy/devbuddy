@@ -14,7 +14,7 @@ The goal is not to preserve the current test form. The goal is to preserve and i
 - Keep enough real-environment coverage to prove the fast tests are not testing a fake world.
 - Move tests that do not need PTY, Docker, or remote servers into cheaper harnesses.
 - Avoid remote network calls in the default test suite.
-- Keep an opt-in path for running tests against real upstream servers.
+- Keep an opt-in setting for allowing runtime tests to call real upstream servers.
 - Move `github.com/devbuddy/expect` into this repository so shell-test infrastructure is easier to maintain.
 - Make each step incremental and reversible.
 
@@ -60,7 +60,7 @@ Prefer a non-PTY shell runner if it is reliable:
 
 Keep one PTY smoke test only if we still need proof that interactive prompt-hook behavior works in a real terminal session.
 
-### Offline Docker Runtime Tests
+### Docker Runtime Tests
 
 Docker should remain for Linux runtime behavior that depends on the target environment, installed tools, or distro assumptions.
 
@@ -75,17 +75,13 @@ The default Docker suite should avoid remote servers. It should use preseeded or
 
 These tests should prove DevBuddy's orchestration and activation behavior, not the availability of upstream services.
 
-### Opt-In Real Network Tests
+The same runtime tests should be able to run in a real-network mode. In that mode, fixture redirects are disabled and DevBuddy calls the normal upstream destinations.
 
-Add an explicit opt-in suite for tests that hit real upstream servers.
-
-Recommended controls:
+Recommended control:
 
 - `BUD_TEST_REAL_NETWORK=1`
-- Optional `realnet` build tag if useful
-- A separate CI job that runs manually or on a schedule
 
-These tests can verify real downloads and package installation against actual Go, Node, PyPI, npm, or other upstream services. They should not run by default on every pull request.
+This mode can verify real downloads and package installation against actual Go, Node, PyPI, npm, or other upstream services. It should not run by default on every pull request.
 
 ## Incremental Plan
 
@@ -96,7 +92,6 @@ Introduce clear test categories before moving tests:
 - `fast`
 - `shell`
 - `docker`
-- `realnet`
 
 This can start as package names, build tags, CI job names, or helper names. The important part is making the intended cost and environment visible.
 
@@ -166,7 +161,7 @@ If it handles bash and zsh reliably, migrate most shell tests to it. Keep a sing
 
 Move Go, Node, Python, pip, pipfile, and python develop coverage into Docker runtime tests with offline fixtures by default.
 
-Then add a real-network variant guarded by `BUD_TEST_REAL_NETWORK=1`.
+Then add `BUD_TEST_REAL_NETWORK=1` as a mode that lets those same tests call the normal upstream destinations.
 
 ### 8. Update CI
 
@@ -181,13 +176,13 @@ Normal pull request CI should run:
 Scheduled or manual CI should run:
 
 - Full Docker runtime tests
-- Real-network tests with `BUD_TEST_REAL_NETWORK=1`
+- Docker runtime tests with `BUD_TEST_REAL_NETWORK=1`
 
 ## Success Criteria
 
 - Most pull request feedback no longer depends on Docker, PTY, or remote servers.
 - The remaining shell tests directly cover shell integration behavior.
 - Runtime installation tests are deterministic by default.
-- Real upstream integration remains available when explicitly requested.
+- Real upstream integration remains available through an explicit runtime-test setting.
 - The local expect package can be modified alongside the test harness.
 - Coverage is easier to explain from the test name, package, or CI job.
