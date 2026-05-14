@@ -8,7 +8,7 @@ import (
 
 func TestTaskConfigIsHash(t *testing.T) {
 	config := &TaskConfig{
-		payload: map[interface{}]interface{}{},
+		payload: map[string]any{},
 	}
 
 	require.True(t, config.IsHash())
@@ -23,7 +23,7 @@ func TestTaskConfigIsHash(t *testing.T) {
 func TestTaskConfigProperty(t *testing.T) {
 	config := &TaskConfig{
 		name:    "test",
-		payload: map[interface{}]interface{}{"key": []interface{}{"one", "two"}},
+		payload: map[string]any{"key": []interface{}{"one", "two"}},
 	}
 
 	val, err := config.GetListOfStringsPropertyDefault("key", []string{})
@@ -51,7 +51,7 @@ func TestTaskConfigStringOrStringProperty(t *testing.T) {
 }
 
 func TestTaskConfigGetBooleanPropertyDefault(t *testing.T) {
-	payload := map[interface{}]interface{}{"flag": true}
+	payload := map[string]any{"flag": true}
 	config := &TaskConfig{name: "test", payload: payload}
 
 	val, present, err := config.GetBooleanProperty("flag")
@@ -66,7 +66,7 @@ func TestTaskConfigGetBooleanPropertyDefault(t *testing.T) {
 }
 
 func TestTaskConfigStringProperty(t *testing.T) {
-	value := map[interface{}]interface{}{"key": "val"}
+	value := map[string]any{"key": "val"}
 	config := &TaskConfig{name: "test", payload: value}
 
 	val, err := config.GetStringProperty("key")
@@ -91,7 +91,7 @@ func TestTaskConfigStringPropertyInvalid(t *testing.T) {
 	_, err = config.GetStringProperty("key1")
 	require.EqualError(t, err, `expecting a hash, found a string (thisisastring)`)
 
-	payload := map[interface{}]interface{}{"version": 3.6}
+	payload := map[string]any{"version": 3.6}
 	config = &TaskConfig{name: "test", payload: payload}
 	_, err = config.GetStringProperty("version")
 	require.EqualError(t, err, `key "version": expecting a string, found a float64 (3.6)`)

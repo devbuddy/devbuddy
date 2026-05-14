@@ -149,7 +149,7 @@ func (c *TaskConfig) getProperty(name string) (any, error) {
 		return nil, propertyNotFoundError{name: name}
 	}
 
-	properties, ok := c.payload.(map[any]any)
+	properties, ok := c.payload.(map[string]any)
 	if !ok {
 		return "", fmt.Errorf("expecting a hash, found a %T (%+v)", c.payload, c.payload)
 	}
