@@ -26,20 +26,30 @@ type CompletionScriptProvider interface {
 	GenZshCompletion(w io.Writer) error
 }
 
+type ShellOptions struct {
+	DeferInit bool
+}
+
 // Print prints the integration code for the user's shell
-func Print(withCompletion bool, completionScriptProvider CompletionScriptProvider) {
+func Print(withCompletion bool, completionScriptProvider CompletionScriptProvider, opts ShellOptions) {
 	shell, err := DetectShell()
 	if err != nil {
 		termui.HookShellDetectionError(err)
 		return
 	}
 
-	script := buildCompletionScript(shell, withCompletion, completionScriptProvider)
+	script := buildCompletionScript(shell, withCompletion, completionScriptProvider, opts)
 	fmt.Println(script)
 }
 
-func buildCompletionScript(shell ShellIdentity, withCompletion bool, completionScriptProvider CompletionScriptProvider) string {
-	buffer := bytes.NewBufferString(shellSource)
+func buildCompletionScript(shell ShellIdentity, withCompletion bool, completionScriptProvider CompletionScriptProvider, opts ShellOptions) string {
+	buffer := &bytes.Buffer{}
+
+	if opts.DeferInit {
+		buffer.WriteString("__bud_defer_init=1\n")
+	}
+
+	buffer.WriteString(shellSource)
 
 	switch shell {
 	case BASH:
