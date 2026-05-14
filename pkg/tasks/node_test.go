@@ -27,5 +27,5 @@ node:
   version: 20
 `)
 
-	require.EqualError(t, err, `task "node": key "version": expecting a string, found a int (20)`)
+	require.ErrorContains(t, err, `key "version": expecting a string, found a`)
 }

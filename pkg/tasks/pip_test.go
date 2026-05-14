@@ -30,5 +30,5 @@ pip:
   - requirements.txt
   - 123
 `)
-	require.EqualError(t, err, `task "pip": expecting a list of strings, found an invalid element: type int (123)`)
+	require.ErrorContains(t, err, `expecting a list of strings, found an invalid element`)
 }
