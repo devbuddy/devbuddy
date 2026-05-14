@@ -34,11 +34,6 @@ func FindLink(ctx *context.Context, linkName string) (url string, err error) {
 	}
 
 	if linkName == "" {
-		if len(man.Open) == 1 {
-			for _, url = range man.Open {
-				return url, nil
-			}
-		}
 		return helpers.NewGitRepo(ctx, ctx.Project.Path).BuildGithubURL()
 	}
 
