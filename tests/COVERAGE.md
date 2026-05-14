@@ -19,6 +19,10 @@ All tests in `tests/` currently run through the Docker + PTY harness. The
 `BUD_TEST_REAL_NETWORK=1` is set, the same runtime tests may call real upstream
 destinations instead of fixture or preseeded artifacts.
 
+GitHub Actions exposes this as a manual workflow option named
+`real_network`. Pull request CI sets `BUD_TEST_REAL_NETWORK=0`; the manual
+`Docker runtime tests (real network)` job sets it to `1`.
+
 ## Current Test Inventory
 
 | File | Current focus | Target label |
