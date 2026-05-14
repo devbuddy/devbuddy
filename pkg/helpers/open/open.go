@@ -39,7 +39,7 @@ func FindLink(ctx *context.Context, linkName string) (url string, err error) {
 				return url, nil
 			}
 		}
-		return "", fmt.Errorf("which link should I open?")
+		return helpers.NewGitRepo(ctx, ctx.Project.Path).BuildGithubURL()
 	}
 
 	link := project.FindBestLinkMatch(linkName, BuildIndex(man.Open))

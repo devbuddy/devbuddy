@@ -56,7 +56,7 @@ func Test_Cmd_Open_DefaultWhenSingleLink(t *testing.T) {
 	OutputEqual(t, []string{openedURL}, "https://docs.example.com")
 }
 
-func Test_Cmd_Open_RequiresNameWhenMultipleLinks(t *testing.T) {
+func Test_Cmd_Open_NoArgFallsBackToGithub(t *testing.T) {
 	c, p := CreateContextAndProject(t,
 		`open:`,
 		`  staging: https://staging.example.com`,
@@ -64,6 +64,7 @@ func Test_Cmd_Open_RequiresNameWhenMultipleLinks(t *testing.T) {
 	)
 	c.Cd(t, p.Path)
 
+	// No git remote configured, so it fails
 	lines := c.Run(t, "bud open", context.ExitCode(1))
-	OutputEqual(t, lines, "Error: which link should I open?")
+	OutputContains(t, lines, "failed to get the origin remote url")
 }
