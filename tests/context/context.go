@@ -94,6 +94,11 @@ func New(config Config) (*TestContext, error) {
 		return nil, fmt.Errorf("disabling echo mode: %w", err)
 	}
 
+	_, err = tc.run("umask 000")
+	if err != nil {
+		return nil, fmt.Errorf("configuring test shell umask: %w", err)
+	}
+
 	output, err := tc.run("echo $IN_DOCKER")
 	if err != nil {
 		return nil, err
