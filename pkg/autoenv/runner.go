@@ -183,6 +183,7 @@ func (r *runner) reactivateIfFilesChanged(featureInfo *FeatureInfo) {
 	for _, path := range watcher.WatchedFiles(featureInfo.Param) {
 		if changed, _ := r.fileTracker.HasChanged(path); changed {
 			r.ctx.UI.Debug("watched file changed: %s", path)
+			r.deactivateFeature(featureInfo)
 			r.activateFeature(featureInfo)
 			return
 		}
