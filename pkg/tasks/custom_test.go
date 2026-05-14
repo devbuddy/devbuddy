@@ -36,3 +36,21 @@ custom:
 
 	require.EqualError(t, err, `task "custom": key "met?": expecting a string, found a bool (false)`)
 }
+
+func TestCustomMissingMeet(t *testing.T) {
+	_, err := loadTestTask(t, `
+custom:
+  met?: test -e sentinel
+`)
+
+	require.EqualError(t, err, `task "custom": property "meet" not found`)
+}
+
+func TestCustomMissingMet(t *testing.T) {
+	_, err := loadTestTask(t, `
+custom:
+  meet: echo ok
+`)
+
+	require.EqualError(t, err, `task "custom": property "met?" not found`)
+}

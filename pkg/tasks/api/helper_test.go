@@ -19,6 +19,17 @@ func TestAsStringWithBoolean(t *testing.T) {
 	require.Error(t, err, "should err for a boolean")
 }
 
+func TestAsBool(t *testing.T) {
+	v, err := asBool(true)
+	require.NoError(t, err)
+	require.True(t, v)
+}
+
+func TestAsBoolInvalid(t *testing.T) {
+	_, err := asBool("not-a-bool")
+	require.EqualError(t, err, "expecting a boolean, found a string (not-a-bool)")
+}
+
 func TestAsListOfStrings(t *testing.T) {
 	val, err := asListOfStrings([]interface{}{})
 	require.NoError(t, err)
@@ -45,4 +56,8 @@ func TestAsListOfStringsInvalid(t *testing.T) {
 	_, err = asListOfStrings(false)
 	require.Error(t, err)
 	require.Equal(t, "expecting a list of strings, found a bool (false)", err.Error())
+
+	_, err = asListOfStrings([]interface{}{"one", 2})
+	require.Error(t, err)
+	require.Equal(t, "expecting a list of strings, found an invalid element: type int (2)", err.Error())
 }
