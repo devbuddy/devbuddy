@@ -187,11 +187,12 @@ func (ep *ExpectProcess) close(kill bool) error {
 	err := <-ep.readerError // waiting for the reader to close after calling cmd.Wait()
 	if err != nil {
 		ep.debugLine(fmt.Sprintf("readerError=%v", err))
-		if err == ErrProcessStopped {
+		switch {
+		case err == ErrProcessStopped:
 			err = nil
-		} else if !kill && strings.Contains(err.Error(), "exit status") { // non-zero exit code
+		case !kill && strings.Contains(err.Error(), "exit status"): // non-zero exit code
 			err = nil
-		} else if kill && strings.Contains(err.Error(), "signal:") {
+		case kill && strings.Contains(err.Error(), "signal:"):
 			err = nil
 		}
 	}

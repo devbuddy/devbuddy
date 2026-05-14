@@ -79,7 +79,7 @@ func (c *ShellExpect) debugLine(line string) {
 }
 
 func norm(s string) string {
-	return strings.Replace(s, "\r", "", -1)
+	return strings.ReplaceAll(s, "\r", "")
 }
 
 func trim(s string) string {
