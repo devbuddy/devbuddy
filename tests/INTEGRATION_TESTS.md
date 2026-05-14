@@ -61,6 +61,16 @@ shell environment, and unit tests cannot verify that. The integration tests prov
 
 ## Current Implementation
 
+### Coverage labels
+
+The current suite still runs through the Docker + PTY harness, but the intended
+coverage layers are tracked in [COVERAGE.md](COVERAGE.md). Use those labels when
+moving tests into faster harnesses:
+
+- `fast`: black-box `bud` binary behavior without Docker, PTY, or remote network
+- `shell`: real shell integration behavior for bash/zsh hooks, wrappers, and parent-shell mutation
+- `docker`: Linux runtime behavior that should continue to run in a container
+
 ### Architecture
 
 ```
