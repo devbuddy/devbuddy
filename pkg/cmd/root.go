@@ -8,6 +8,7 @@ import (
 	color "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 
+	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/helpers/debug"
 	"github.com/devbuddy/devbuddy/pkg/helpers/open"
 	"github.com/devbuddy/devbuddy/pkg/hook"
@@ -60,7 +61,11 @@ func build(version string) *cobra.Command {
 func rootRun(cmd *cobra.Command, _ []string) error {
 	if GetFlagBool(cmd, "shell-init") {
 		withCompletion := GetFlagBool(cmd, "with-completion")
-		integration.Print(withCompletion, cmd)
+		userCfg := config.LoadUserConfig()
+		opts := integration.ShellOptions{
+			DeferInit: userCfg.Shell.DeferInit,
+		}
+		integration.Print(withCompletion, cmd, opts)
 		return nil
 	}
 

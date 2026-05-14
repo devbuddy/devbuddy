@@ -35,6 +35,13 @@ bud() {
 __bud_prompt_command() {
     local previous_exit=$?
 
+    # When defer_init is enabled (e.g. for Powerlevel10k instant prompt), skip
+    # the first invocation entirely to avoid console output during shell init.
+    if [[ -n "${__bud_defer_init:-}" && -z "${__bud_hook_initialized:-}" ]]; then
+        __bud_hook_initialized=1
+        return ${previous_exit}
+    fi
+
     # In shell hook mode, the command will use stderr to print in the console
     # and stdout to mutate the shell (like activating a Python virtualenv)
 
