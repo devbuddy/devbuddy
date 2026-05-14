@@ -3,6 +3,7 @@ package autoenv
 import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
@@ -109,11 +110,11 @@ func (r *runner) sync(featureSet FeatureSet) {
 	}
 
 	if len(r.activated) > 0 {
-		names := make([]string, len(r.activated))
+		displays := make([]termui.Feature, len(r.activated))
 		for i, f := range r.activated {
-			names[i] = f.DisplayString()
+			displays[i] = f
 		}
-		r.ctx.UI.HookFeaturesActivated(names)
+		r.ctx.UI.HookFeaturesActivated(displays)
 	}
 	for _, f := range r.failed {
 		r.ctx.UI.HookFeatureFailure(f.Name, f.Param)

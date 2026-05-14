@@ -20,8 +20,8 @@ func TestFeatureInfoDisplayString(t *testing.T) {
 		param string
 		want  string
 	}{
-		{"python", "3.6.5", "python 3.6.5"},
-		{"golang", "1.13.1", "golang 1.13.1"},
+		{"python", "3.6.5", "python[3.6.5]"},
+		{"golang", "1.13.1", "golang[1.13.1]"},
 		{"env", `{"VAR":"val"}`, "env"},
 		{"env", "", "env"},
 	}
