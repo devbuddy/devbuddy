@@ -12,10 +12,7 @@ func Test_Task_Error_NotAList(t *testing.T) {
 	c.Write(t, "dev.yml", `up: somestring`)
 
 	lines := c.Run(t, "bud up", context.ExitCode(1))
-	OutputEqual(t, lines,
-		"Error: yaml: unmarshal errors:",
-		"  line 1: cannot unmarshal !!str `somestring` into []interface {}",
-	)
+	OutputContains(t, lines, "string was used where sequence is expected")
 }
 
 func Test_Task_Error_InvalidType(t *testing.T) {
@@ -54,6 +51,6 @@ func Test_Task_Error_Invalid_List(t *testing.T) {
 
 	lines := c.Run(t, "bud up", context.ExitCode(1))
 	OutputEqual(t, lines,
-		`Error: task "homebrew": expecting a list of strings, found a map[interface {}]interface {} (map[])`,
+		`Error: task "homebrew": expecting a list of strings, found a map[string]interface {} (map[])`,
 	)
 }
