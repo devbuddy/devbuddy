@@ -149,16 +149,21 @@ Integration tests run inside a Docker container (`ghcr.io/devbuddy/docker-testin
 GitHub Actions (`.github/workflows/tests.yml`):
 - golangci-lint, unit tests, bash integration, zsh integration (parallel)
 - Release job on version tags: `script/buildall` + GitHub Releases + Homebrew trigger
-- Go 1.24, golangci-lint v2.1.2
+- Go 1.26, golangci-lint v2.9.0
 
 ### Release Process
 ```bash
-python3 script/release.py release           # Minor bump (0.14.1 -> 0.15.0)
-python3 script/release.py patch             # Patch bump (0.14.1 -> 0.14.2)
-python3 script/release.py release-candidate # RC version
-python3 script/release.py --dryrun release  # Dry run
+python3 script/release.py --yes release           # Minor bump (0.15.0 -> 0.16.0)
+python3 script/release.py --yes patch             # Patch bump (0.15.0 -> 0.15.1)
+python3 script/release.py --yes release-candidate # RC version
+python3 script/release.py --dryrun --yes release  # Dry run
 ```
-The script creates a release commit + annotated tag + pushes to GitHub. CI builds binaries and publishes.
+The `--yes` (`-y`) flag skips the interactive confirmation prompt.
+
+The script creates a release commit + annotated tag + pushes to GitHub. CI then:
+1. Builds binaries for all platforms via `script/buildall`
+2. Creates a GitHub Release with the binaries attached
+3. Triggers the Homebrew tap update (requires valid `ACCESS_TOKEN` secret)
 
 ### Distribution
 - macOS: Homebrew (`devbuddy/homebrew-devbuddy`, auto-triggered on release)
@@ -173,7 +178,7 @@ The script creates a release commit + annotated tag + pushes to GitHub. CI build
 - `github.com/sahilm/fuzzy` - Fuzzy matching (for `bud cd`)
 - `github.com/mitchellh/go-ps` - Process detection (shell identification)
 - `github.com/dnaeon/go-vcr` - HTTP recording for tests
-- `gopkg.in/yaml.v2` - YAML parsing
+- `github.com/goccy/go-yaml` - YAML parsing
 
 ## Conventions
 - Version is set at build time via `-ldflags` (not in source)
