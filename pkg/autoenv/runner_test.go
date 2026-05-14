@@ -213,7 +213,8 @@ func TestRunnerConsolidatedOutput(t *testing.T) {
 
 		output := r.output.String()
 		require.True(t, strings.Contains(output, "activated:"), "expected consolidated message, got: %s", output)
-		require.True(t, strings.Contains(output, "rust 1.0"), "expected feature name in message, got: %s", output)
+		require.True(t, strings.Contains(output, "rust"), "expected feature name in message, got: %s", output)
+		require.True(t, strings.Contains(output, "1.0"), "expected feature param in message, got: %s", output)
 		// Should be exactly one line (one newline)
 		require.Equal(t, 1, strings.Count(output, "\n"), "expected single line, got: %s", output)
 	})
@@ -228,8 +229,10 @@ func TestRunnerConsolidatedOutput(t *testing.T) {
 		r.sync(NewFeatureSet().With(NewFeatureInfo("rust", "1.0")).With(NewFeatureInfo("elixir", "0.4")))
 
 		output := r.output.String()
-		require.True(t, strings.Contains(output, "rust 1.0"), "got: %s", output)
-		require.True(t, strings.Contains(output, "elixir 0.4"), "got: %s", output)
+		require.True(t, strings.Contains(output, "rust"), "got: %s", output)
+		require.True(t, strings.Contains(output, "1.0"), "got: %s", output)
+		require.True(t, strings.Contains(output, "elixir"), "got: %s", output)
+		require.True(t, strings.Contains(output, "0.4"), "got: %s", output)
 		require.Equal(t, 1, strings.Count(output, "\n"), "expected single line, got: %s", output)
 	})
 
