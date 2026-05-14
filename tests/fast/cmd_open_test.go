@@ -42,28 +42,14 @@ func Test_Cmd_Open_CustomLink_FuzzyMatch(t *testing.T) {
 	OutputEqual(t, []string{openedURL}, "https://staging.example.com")
 }
 
-func Test_Cmd_Open_DefaultWhenSingleLink(t *testing.T) {
+func Test_Cmd_Open_NoArgOpensGithub(t *testing.T) {
 	c, p := CreateContextAndProject(t,
 		`open:`,
 		`  docs: https://docs.example.com`,
 	)
-	installFakeXdgOpen(t, c)
 	c.Cd(t, p.Path)
 
-	c.Run(t, "bud open")
-
-	openedURL := waitAndReadOpenedURL(t, c)
-	OutputEqual(t, []string{openedURL}, "https://docs.example.com")
-}
-
-func Test_Cmd_Open_RequiresNameWhenMultipleLinks(t *testing.T) {
-	c, p := CreateContextAndProject(t,
-		`open:`,
-		`  staging: https://staging.example.com`,
-		`  docs: https://docs.example.com`,
-	)
-	c.Cd(t, p.Path)
-
+	// No git remote configured, so it fails
 	lines := c.Run(t, "bud open", context.ExitCode(1))
-	OutputEqual(t, lines, "Error: which link should I open?")
+	OutputContains(t, lines, "failed to get the origin remote url")
 }

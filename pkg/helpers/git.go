@@ -46,7 +46,8 @@ var githubRemotePatterns = []*regexp.Regexp{
 	regexp.MustCompile(`^https?://github\.com/([^/]+)/([^/.]+?)(?:\.git)?$`),
 }
 
-func (r *GitRepo) buildGithubURL() (string, error) {
+// BuildGithubURL returns the base GitHub URL (https://github.com/org/repo) from the git remote
+func (r *GitRepo) BuildGithubURL() (string, error) {
 	remoteURL, err := r.GetRemoteURL()
 	if err != nil {
 		return "", err
@@ -62,7 +63,7 @@ func (r *GitRepo) buildGithubURL() (string, error) {
 
 // BuildGithubProjectURL builds the Github page url from the git remote url for a specific branch
 func (r *GitRepo) BuildGithubProjectURL() (string, error) {
-	baseURL, err := r.buildGithubURL()
+	baseURL, err := r.BuildGithubURL()
 	if err != nil {
 		return "", err
 	}
@@ -75,7 +76,7 @@ func (r *GitRepo) BuildGithubProjectURL() (string, error) {
 
 // BuildGithubPullrequestURL builds the Github pullrequest  url from the git remote url for a specific branch
 func (r *GitRepo) BuildGithubPullrequestURL() (string, error) {
-	baseURL, err := r.buildGithubURL()
+	baseURL, err := r.BuildGithubURL()
 	if err != nil {
 		return "", err
 	}
