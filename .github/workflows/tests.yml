@@ -58,6 +58,44 @@ jobs:
       - run: docker pull $TEST_DOCKER_IMAGE
       - run: TEST_SHELL=zsh go test -cover -v ./tests
 
+  # TODO: enable after next release (released binary needs the ioctl fix)
+  # install-script:
+  #   name: install script
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   runs-on: ${{ matrix.os }}
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v6
+  #     - name: Install bud
+  #       run: |
+  #         sh install.sh
+  #         bud --version
+  #     - name: Run tests
+  #       working-directory: .github/workflows/test-project
+  #       run: |
+  #         eval "$(bud --shell-hook)"
+  #         bud up
+  #         bud hello
+  #         bud check-env
+
+  # install-script-minimal:
+  #   name: install script (minimal)
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - uses: actions/checkout@v6
+  #     - name: Install and run custom command
+  #       working-directory: .github/workflows/test-project
+  #       run: |
+  #         sh install.sh
+  #         bud hello
+
   release:
     name: release
     needs: [linters, tests, tests-bash, tests-zsh]
