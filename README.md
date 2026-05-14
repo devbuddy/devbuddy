@@ -41,7 +41,7 @@ See the full [task documentation](docs/Config.md) for details.
 
 - Automatic environment activation/deactivation as you `cd` between projects
 - Notification when important files (e.g. `requirements.txt`) are updated locally
-- Quick links with `bud open <name>` to jump to project URLs
+- `bud open` to jump to the GitHub repo page, or `bud open <name>` for project URLs
 - `bud clone` / `bud cd` for fast project navigation
 - Shell completion (bash and zsh)
 
