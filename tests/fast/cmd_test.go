@@ -39,5 +39,5 @@ func Test_Cmd_DebugInfo_Project(t *testing.T) {
 	c.Run(t, "touch dev.yml")
 
 	lines := c.Run(t, "bud --debug-info")
-	OutputContains(t, lines, "Project path: `/home/tester/poipoi`")
+	OutputContains(t, lines, "Project path: `"+c.Cwd(t)+"`")
 }

@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 const (
@@ -91,7 +89,7 @@ func Test_Cmd_Custom_Exit_Code(t *testing.T) {
 	c.Cd(t, project.Path)
 
 	// bud reports the failure but normalizes the exit code to 1
-	lines := c.Run(t, "bud fail", context.ExitCode(1))
+	lines := c.Run(t, "bud fail", ExitCode(1))
 	OutputContains(t, lines, "command failed with exit code 42")
 }
 

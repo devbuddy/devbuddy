@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/devbuddy/devbuddy/tests/context"
 )
 
 var customTaskDevYml = `
@@ -35,9 +33,9 @@ func Test_Task_Custom_Subdir(t *testing.T) {
 
 	// The command must work in a sub-dir, but run in the project root
 	c.Run(t, "mkdir subdir")
-	c.Run(t, "cd subdir")
+	c.Cd(t, "subdir")
 	c.Run(t, "bud up")
-	c.Run(t, "cd ..")
+	c.Cd(t, "..")
 
 	content := c.Cat(t, "sentinel")
 	require.Equal(t, "A", content)
@@ -52,14 +50,14 @@ func Test_Task_Custom_Fails(t *testing.T) {
 		`    meet: exit 1`,
 	)
 
-	lines := c.Run(t, "bud up", context.ExitCode(1))
+	lines := c.Run(t, "bud up", ExitCode(1))
 	OutputContains(t, lines, "Running: exit 1", `action "": failed to run: command failed with exit code 1`)
 }
 
 func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	c.Run(t, "export MYVAR=poipoi")
+	c.Setenv("MYVAR", "poipoi")
 
 	p := CreateProject(t, c,
 		`env:`,
@@ -98,7 +96,7 @@ func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
 func Test_Task_Custom_With_Env_Previously_Set_By_DevBuddy(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	c.Run(t, "export MYVAR=poipoi")
+	c.Setenv("MYVAR", "poipoi")
 
 	p := CreateProject(t, c,
 		`env:`,

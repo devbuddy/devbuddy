@@ -1,10 +1,6 @@
 package integration
 
-import (
-	"testing"
-
-	"github.com/devbuddy/devbuddy/tests/context"
-)
+import "testing"
 
 func Test_Cmd_Inspect(t *testing.T) {
 	c := CreateContextAndInit(t)
@@ -27,6 +23,6 @@ func Test_Cmd_Inspect(t *testing.T) {
 func Test_Cmd_Inspect_No_Manifest(t *testing.T) {
 	c := CreateContextAndInit(t)
 
-	lines := c.Run(t, "bud inspect", context.ExitCode(1))
+	lines := c.Run(t, "bud inspect", ExitCode(1))
 	OutputEqual(t, lines, "Error: project not found")
 }
