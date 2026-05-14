@@ -45,7 +45,7 @@ jobs:
         with:
           go-version: "1.26"
       - run: docker pull $TEST_DOCKER_IMAGE
-      - run: TEST_SHELL=bash go test -cover -v ./tests
+      - run: TEST_SHELL=bash go test -cover -v ./tests/...
 
   tests-zsh:
     name: zsh tests
@@ -56,7 +56,7 @@ jobs:
         with:
           go-version: "1.26"
       - run: docker pull $TEST_DOCKER_IMAGE
-      - run: TEST_SHELL=zsh go test -cover -v ./tests
+      - run: TEST_SHELL=zsh go test -cover -v ./tests/...
 
   # TODO: enable after next release (released binary needs the ioctl fix)
   # install-script:

@@ -76,7 +76,7 @@ moving tests into faster harnesses:
 ```
 Host machine (macOS or Linux CI)
   │
-  ├─ TestMain (tests/main_test.go)
+  ├─ TestMain (tests/{fast,shell,docker}/harness_test.go)
   │   ├─ Loads config from env vars (TEST_SHELL, TEST_DOCKER_IMAGE)
   │   └─ Cross-compiles a static Linux binary: GOOS=linux CGO_ENABLED=0
   │
@@ -98,7 +98,8 @@ Host machine (macOS or Linux CI)
 
 ### Key components
 
-**tests/main_test.go** — TestMain builds the Linux binary once before all tests run.
+**tests/{fast,shell,docker}/harness_test.go** — TestMain delegates to the shared harness,
+which builds the Linux binary once per test subpackage.
 
 **tests/context/** — TestContext wraps the Docker + PTY interaction:
 - `context.go`: New(), Run(), Write(), Cat(), Cd(), GetEnv(), Close()
@@ -106,7 +107,7 @@ Host machine (macOS or Linux CI)
 - `options.go`: Timeout() (default 5s), ExitCode() (default 0)
 - `strip_ansi.go`: strips ANSI escape codes from command output
 
-**tests/helper_test.go** — Test helpers:
+**tests/internal/harness/** — Shared TestMain and test helpers:
 - `CreateContext(t)` / `CreateContextAndInit(t)`: container lifecycle
 - `CreateProject(t, c, devYmlLines...)`: creates a project dir with dev.yml
 - `OutputContains(t, lines, ...)` / `OutputEqual(t, lines, ...)`: output assertions
@@ -176,8 +177,8 @@ func Test_Task_Go(t *testing.T) {
 `.github/workflows/tests.yml` runs four parallel jobs:
 1. `golangci-lint` — linting
 2. `go test ./pkg/...` — unit tests
-3. `TEST_SHELL=bash go test -v ./tests` — bash integration
-4. `TEST_SHELL=zsh go test -v ./tests` — zsh integration
+3. `TEST_SHELL=bash go test -v ./tests/...` — bash integration
+4. `TEST_SHELL=zsh go test -v ./tests/...` — zsh integration
 
 The release job depends on all four passing.
 

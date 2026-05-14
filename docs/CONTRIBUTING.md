@@ -45,8 +45,8 @@ Typical commands are `test`, `lint`, `clean`, and `release`.
 ### Run the integration tests
 
 ```shell
-~/src/github.com/devbuddy/devbuddy $ TEST_SHELL=bash go test -v -count=1 ./tests
-~/src/github.com/devbuddy/devbuddy $ TEST_SHELL=zsh go test -v -count=1 ./tests
+~/src/github.com/devbuddy/devbuddy $ TEST_SHELL=bash go test -v -count=1 ./tests/...
+~/src/github.com/devbuddy/devbuddy $ TEST_SHELL=zsh go test -v -count=1 ./tests/...
 ```
 
 Make sure Docker is running, and set `TEST_DOCKER_IMAGE` when needed.

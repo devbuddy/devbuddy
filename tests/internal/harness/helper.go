@@ -1,4 +1,4 @@
-package integration
+package harness
 
 import (
 	"fmt"
