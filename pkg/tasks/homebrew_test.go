@@ -12,7 +12,11 @@ homebrew:
   - file1
   - file2
 `)
+
 	require.Equal(t, "Task Homebrew (file1, file2) actions=2", task.Describe())
+	require.Equal(t, "file1, file2", task.Info)
+	require.Equal(t, 2, len(task.Actions))
+	requireNoFeature(t, task)
 }
 
 func TestHomebrewEmpty(t *testing.T) {

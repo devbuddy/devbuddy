@@ -14,6 +14,9 @@ apt:
 `)
 
 	require.Equal(t, "Task Apt (curl, git) actions=1", task.Describe())
+	require.Equal(t, "curl, git", task.Info)
+	require.Equal(t, 1, len(task.Actions))
+	requireNoFeature(t, task)
 }
 
 func TestAptEmpty(t *testing.T) {
