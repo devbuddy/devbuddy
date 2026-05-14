@@ -14,7 +14,11 @@ import (
 func CreateContext(t *testing.T) *context.TestContext {
 	t.Helper()
 
-	c, err := context.New(config)
+	testConfig := config
+	testConfig.WorkspaceHostPath = t.TempDir()
+	testConfig.WorkspaceContainerPath = "/home/tester/src/github.com/orgname"
+
+	c, err := context.New(testConfig)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
@@ -87,8 +91,6 @@ func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) 
 		c:    c,
 		Path: "/home/tester/src/github.com/orgname/" + name,
 	}
-
-	c.Run(t, "mkdir -p "+p.Path)
 
 	p.WriteDevYml(t, devYmlLines...)
 

@@ -7,9 +7,11 @@ import (
 )
 
 type Config struct {
-	ShellName   string
-	BinaryPath  string
-	DockerImage string
+	ShellName              string
+	BinaryPath             string
+	DockerImage            string
+	WorkspaceHostPath      string
+	WorkspaceContainerPath string
 }
 
 func LoadConfig() (Config, error) {
