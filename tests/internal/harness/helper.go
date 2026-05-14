@@ -25,6 +25,7 @@ func CreateContext(t *testing.T) *context.TestContext {
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
+		c.Run(t, "chmod -R a+rwX "+testConfig.WorkspaceContainerPath)
 		err := c.Close()
 		require.NoError(t, err)
 	})
