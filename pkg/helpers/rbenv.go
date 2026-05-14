@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"slices"
 	"strings"
@@ -13,6 +14,16 @@ import (
 type RbEnv struct {
 	ctx  *context.Context
 	root string
+}
+
+// RbEnvRoot returns the rbenv root directory using the same resolution as
+// rbenv itself: $RBENV_ROOT if set, otherwise $HOME/.rbenv. This avoids
+// shelling out to `rbenv root` for hot paths like shell-hook activation.
+func RbEnvRoot() string {
+	if root := os.Getenv("RBENV_ROOT"); root != "" {
+		return root
+	}
+	return path.Join(os.Getenv("HOME"), ".rbenv")
 }
 
 func NewRbEnv(ctx *context.Context) (*RbEnv, error) {

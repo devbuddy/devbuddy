@@ -1,6 +1,8 @@
 package features
 
 import (
+	"path"
+
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/utils"
@@ -17,11 +19,7 @@ func (ruby) Name() string {
 }
 
 func (ruby) Activate(ctx *context.Context, param string) (bool, error) {
-	rbEnv, err := helpers.NewRbEnv(ctx)
-	if err != nil {
-		return true, nil
-	}
-	binPath := rbEnv.BinPath(param)
+	binPath := path.Join(helpers.RbEnvRoot(), "versions", param, "bin")
 	if !utils.PathExists(binPath) {
 		return true, nil
 	}

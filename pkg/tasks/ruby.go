@@ -7,7 +7,6 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
-	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 const rubyTaskName = "ruby"
@@ -78,21 +77,11 @@ func parserRubyInstallRubyVersion(task *api.Task, version string) {
 
 func parserRubyBundleInstall(task *api.Task, version string) {
 	run := func(ctx *context.Context) error {
-		if !utils.PathExists("Gemfile") {
-			return nil
-		}
 		rbEnv, err := helpers.NewRbEnv(ctx)
 		if err != nil {
 			return err
 		}
 		bundle := rbEnv.Which(version, "bundle")
-		if !utils.PathExists(bundle) {
-			ctx.UI.TaskCommand(rbEnv.Which(version, "gem"), "install", "bundler")
-			result := ctx.Executor.Run(executor.New(rbEnv.Which(version, "gem"), "install", "bundler"))
-			if result.Error != nil {
-				return fmt.Errorf("failed to install bundler: %w", result.Error)
-			}
-		}
 		ctx.UI.TaskCommand("bundle", "install")
 		result := ctx.Executor.Run(executor.New(bundle, "install"))
 		if result.Error != nil {
