@@ -1,9 +1,10 @@
-package integration
+package harness
 
 import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -25,7 +26,13 @@ func TestMain(m *testing.M) {
 
 	fmt.Printf("Building linux binary\n")
 	start := time.Now()
-	cmd := exec.Command("go", "build", "-o", config.BinaryPath, "../cmd/bud")
+	repoRoot, err := findRepoRoot()
+	if err != nil {
+		fmt.Printf("Error finding repo root: %s\n", err)
+		os.Exit(1)
+	}
+	cmd := exec.Command("go", "build", "-o", config.BinaryPath, "./cmd/bud")
+	cmd.Dir = repoRoot
 	cmd.Env = append(os.Environ(), "GOOS=linux", "CGO_ENABLED=0")
 
 	cmdOutput, err := cmd.Output()
@@ -36,4 +43,23 @@ func TestMain(m *testing.M) {
 	fmt.Printf("Built in %s\n", time.Since(start))
 
 	os.Exit(m.Run())
+}
+
+func findRepoRoot() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", fmt.Errorf("go.mod not found from %s", dir)
+		}
+		dir = parent
+	}
 }

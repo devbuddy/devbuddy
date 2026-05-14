@@ -1,4 +1,4 @@
-package integration
+package harness
 
 import (
 	"fmt"
@@ -79,6 +79,8 @@ type Project struct {
 }
 
 func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) Project {
+	t.Helper()
+
 	name := fmt.Sprintf("project-%x", rand.Int32())
 
 	p := Project{
@@ -94,6 +96,8 @@ func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) 
 }
 
 func (p *Project) WriteDevYml(t *testing.T, devYmlLines ...string) {
+	t.Helper()
+
 	path := p.Path + "/dev.yml"
 	p.c.Write(t, path, strings.Join(devYmlLines, "\n"))
 }
