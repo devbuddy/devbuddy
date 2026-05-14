@@ -25,6 +25,7 @@ destinations instead of fixture or preseeded artifacts.
 | --- | --- | --- |
 | `tests/fast/cmd_test.go` | Help, version, and debug-info command output. | `fast` |
 | `tests/fast/cmd_inspect_test.go` | Manifest inspection and project-not-found error output. | `fast` |
+| `tests/fast/cmd_open_test.go` | Custom project links, fuzzy link matching, default link behavior, and missing-link-name errors. | `fast` |
 | `tests/fast/task_error_test.go` | Manifest and task parse errors from `bud up`. | `fast` |
 | `tests/fast/cmd_custom_test.go` | Custom command execution, output, env injection, stdin, exit-code normalization, project-root cwd. | `fast` |
 | `tests/fast/task_custom_test.go` | Custom task conditions, run/skip behavior, project-root cwd, task env behavior. | `fast` |
