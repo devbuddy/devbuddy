@@ -54,6 +54,20 @@ func TestFindLinkDefault(t *testing.T) {
 	require.Equal(t, "http://doc.com", url)
 }
 
+func TestFindLinkNoArgOpensGithub(t *testing.T) {
+	tmpdir := t.TempDir()
+	writer := test.Project(tmpdir)
+	writer.CreateGitRepo(t)
+	writer.Manifest().WriteString("open: {doc: http://doc.com, logs: http://logs}")
+
+	proj := project.NewFromPath(tmpdir)
+	ctx := newTestContext(proj)
+
+	url, err := FindLink(ctx, "")
+	require.NoError(t, err)
+	require.Equal(t, "https://github.com/org1/repo1", url)
+}
+
 func TestFindLinkGithub(t *testing.T) {
 	tmpdir := t.TempDir()
 	writer := test.Project(tmpdir)
