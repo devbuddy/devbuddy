@@ -54,6 +54,7 @@ func build(version string) *cobra.Command {
 	rootCmd.AddCommand(openCmd)
 	rootCmd.AddCommand(upCmd)
 	rootCmd.AddCommand(upgradeCmd)
+	rootCmd.AddCommand(worktreeCmd)
 
 	return rootCmd
 }
