@@ -187,3 +187,4 @@ The script creates a release commit + annotated tag + pushes to GitHub. CI then:
 - `.devbuddy/` directory stores per-project state (checksums, etc.)
 - `BUD_DEBUG=1` enables debug logging in both Go code and shell hooks
 - When creating or updating a pull request description for an issue-driven change, include a closing reference in this exact format: `Fixes: #<ISSUE-NUMBER>`
+- Do not add a `CODEX`, `Codex`, or `codex` prefix to pull request titles, branch names, or commit messages.
