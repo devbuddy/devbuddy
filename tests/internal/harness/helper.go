@@ -15,6 +15,18 @@ import (
 func CreateContext(t *testing.T) *context.TestContext {
 	t.Helper()
 
+	return createContext(t, false)
+}
+
+func CreatePTYContext(t *testing.T) *context.TestContext {
+	t.Helper()
+
+	return createContext(t, true)
+}
+
+func createContext(t *testing.T, usePTY bool) *context.TestContext {
+	t.Helper()
+
 	testConfig := config
 	var err error
 	testConfig.WorkspaceHostPath, err = os.MkdirTemp("", "devbuddy-test-workspace-*")
@@ -25,6 +37,7 @@ func CreateContext(t *testing.T) *context.TestContext {
 	err = os.Chmod(testConfig.WorkspaceHostPath, 0777)
 	require.NoError(t, err)
 	testConfig.WorkspaceContainerPath = "/home/tester/src/github.com"
+	testConfig.UsePTY = usePTY
 
 	c, err := context.New(testConfig)
 	require.NoError(t, err)
@@ -46,13 +59,21 @@ func CreateContextAndInit(t *testing.T) *context.TestContext {
 	return c
 }
 
-// CreateContextAndProject creates an initialized context, a project with the
-// given dev.yml content, and cd's into the project directory. This combines the
-// common 3-line boilerplate of CreateContextAndInit + CreateProject + Cd.
-func CreateContextAndProject(t *testing.T, devYmlLines ...string) (*context.TestContext, Project) {
+func CreatePTYContextAndInit(t *testing.T) *context.TestContext {
 	t.Helper()
 
-	c := CreateContextAndInit(t)
+	c := CreatePTYContext(t)
+	output := c.Run(t, `eval "$(bud --shell-init)"`)
+	require.Len(t, output, 0)
+	return c
+}
+
+// CreatePTYContextAndProject creates an initialized PTY context, a project with
+// the given dev.yml content, and cd's into the project directory.
+func CreatePTYContextAndProject(t *testing.T, devYmlLines ...string) (*context.TestContext, Project) {
+	t.Helper()
+
+	c := CreatePTYContextAndInit(t)
 	p := CreateProject(t, c, devYmlLines...)
 	c.Cd(t, p.Path)
 	return c, p

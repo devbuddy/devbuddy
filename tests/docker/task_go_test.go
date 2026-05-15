@@ -23,7 +23,7 @@ func main() {
 func Test_Task_Go(t *testing.T) {
 	// Test with Go 1.23.6
 	// Use sub-tests to avoid downloading the go runtime multiple times.
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	t.Run("installs_and_runs_go_modules", func(t *testing.T) {
 		p := CreateProject(t, c,

@@ -1,6 +1,7 @@
 package context
 
 import (
+	stdcontext "context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -16,6 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/devbuddy/devbuddy/tests/internal/expect"
+	"github.com/devbuddy/devbuddy/tests/internal/shellharness"
 )
 
 type TestContext struct {
@@ -23,6 +25,7 @@ type TestContext struct {
 	shell  interface {
 		Run(string) ([]string, error)
 	}
+	close                  func() error
 	workspaceHostPath      string
 	workspaceContainerPath string
 	debug                  bool
@@ -55,12 +58,15 @@ func New(config Config) (*TestContext, error) {
 
 	dockerCommand := []string{
 		dockerExec, "run",
-		"-ti",
 		"-v", config.BinaryPath + ":/usr/local/bin/bud",
 		"-e", "PROMPT=##\n",
 		"-e", "PS1=##\n",
 		"-e", "IN_DOCKER=yes",
 		"--rm",
+		"-i", // Keep STDIN open even if not attached
+	}
+	if config.UsePTY {
+		dockerCommand = append(dockerCommand, "-t") // Allocate a pseudo-TTY
 	}
 	if config.WorkspaceHostPath != "" && config.WorkspaceContainerPath != "" {
 		dockerCommand = append(dockerCommand, "-v", config.WorkspaceHostPath+":"+config.WorkspaceContainerPath)
@@ -68,33 +74,44 @@ func New(config Config) (*TestContext, error) {
 	dockerCommand = append(dockerCommand, "--entrypoint", shellPath, config.DockerImage)
 	dockerCommand = append(dockerCommand, args...)
 
-	e := expect.NewExpect(dockerCommand[0], dockerCommand[1:]...)
-	err := e.Start()
-	if err != nil {
-		return nil, fmt.Errorf("creating expect object: %w", err)
-	}
-
-	c := expect.NewShellExpect(e, "##\n")
-
-	err = c.Init() // expect the initial prompt
-	if err != nil {
-		return nil, fmt.Errorf("running initialization shell command: %w", err)
-	}
-
 	tc := &TestContext{
-		expect:                 e,
-		shell:                  c,
 		workspaceHostPath:      config.WorkspaceHostPath,
 		workspaceContainerPath: config.WorkspaceContainerPath,
 	}
-	tc.debugLine("Expect command: %q", dockerCommand)
 
-	_, err = tc.run("stty -echo")
-	if err != nil {
-		return nil, fmt.Errorf("disabling echo mode: %w", err)
+	if config.UsePTY {
+		e := expect.NewExpect(dockerCommand[0], dockerCommand[1:]...)
+		err := e.Start()
+		if err != nil {
+			return nil, fmt.Errorf("creating expect object: %w", err)
+		}
+
+		c := expect.NewShellExpect(e, "##\n")
+
+		err = c.Init() // expect the initial prompt
+		if err != nil {
+			return nil, fmt.Errorf("running initialization shell command: %w", err)
+		}
+
+		tc.expect = e
+		tc.shell = c
+		tc.close = e.Stop
+
+		_, err = tc.run("stty -echo")
+		if err != nil {
+			return nil, fmt.Errorf("disabling echo mode: %w", err)
+		}
+	} else {
+		runner, err := shellharness.Start(dockerCommand[0], dockerCommand[1:]...)
+		if err != nil {
+			return nil, fmt.Errorf("starting shell runner: %w", err)
+		}
+		tc.shell = pipeShell{runner: runner}
+		tc.close = runner.Close
 	}
+	tc.debugLine("Shell command: %q", dockerCommand)
 
-	_, err = tc.run("umask 000")
+	_, err := tc.run("umask 000")
 	if err != nil {
 		return nil, fmt.Errorf("configuring test shell umask: %w", err)
 	}
@@ -112,17 +129,21 @@ func New(config Config) (*TestContext, error) {
 
 func (c *TestContext) Verbose() {
 	c.debug = true
-	c.expect.Debug = false
+	if c.expect != nil {
+		c.expect.Debug = false
+	}
 }
 
 func (c *TestContext) Debug() {
 	c.debug = true
-	c.expect.Debug = true
+	if c.expect != nil {
+		c.expect.Debug = true
+	}
 }
 
 func (c *TestContext) Close() error {
 	c.debugLine("Stopping docker container")
-	err := c.expect.Stop()
+	err := c.close()
 	if err != nil {
 		c.debugLine("ERROR when stopping docker: %s", err)
 	}
@@ -144,35 +165,45 @@ func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 
 	var lines []string
 	var err error
+	var exitCode int
 
-	done := make(chan bool)
-	go func() {
-		lines, err = c.shell.Run(cmd)
-		close(done)
-	}()
-
-	select {
-	case <-done:
-		c.debugLine("command completed")
-	case <-time.After(opt.timeout):
-		excerpt := "no output yet"
-		if len(lines) > 0 {
-			excerpt = strings.Join(lines[:min(10, len(lines))], "\n")
+	if shell, ok := c.shell.(interface {
+		RunWithExitCode(string, time.Duration) ([]string, int, error)
+	}); ok {
+		lines, exitCode, err = shell.RunWithExitCode(cmd, opt.timeout)
+		if err != nil {
+			return nil, err
 		}
-		return nil, fmt.Errorf("timed out after %s running %q. output so far:\n%s", opt.timeout, cmd, excerpt)
-	}
+	} else {
+		done := make(chan bool)
+		go func() {
+			lines, err = c.shell.Run(cmd)
+			close(done)
+		}()
 
-	codeLines, err := c.shell.Run("echo $?")
-	if err != nil {
-		return nil, fmt.Errorf("getting exit code: %w", err)
-	}
-	if len(codeLines) == 0 {
-		return nil, fmt.Errorf("unexpected output when getting exit code: no output")
-	}
+		select {
+		case <-done:
+			c.debugLine("command completed")
+		case <-time.After(opt.timeout):
+			excerpt := "no output yet"
+			if len(lines) > 0 {
+				excerpt = strings.Join(lines[:min(10, len(lines))], "\n")
+			}
+			return nil, fmt.Errorf("timed out after %s running %q. output so far:\n%s", opt.timeout, cmd, excerpt)
+		}
 
-	exitCode, err := strconv.Atoi(codeLines[0])
-	if err != nil {
-		return nil, fmt.Errorf("unexpected exit code %s: %w", codeLines[0], err)
+		codeLines, err := c.shell.Run("echo $?")
+		if err != nil {
+			return nil, fmt.Errorf("getting exit code: %w", err)
+		}
+		if len(codeLines) == 0 {
+			return nil, fmt.Errorf("unexpected output when getting exit code: no output")
+		}
+
+		exitCode, err = strconv.Atoi(codeLines[0])
+		if err != nil {
+			return nil, fmt.Errorf("unexpected exit code %s: %w", codeLines[0], err)
+		}
 	}
 	if exitCode != opt.exitCode {
 		excerpt := "no output"
@@ -288,4 +319,24 @@ func (c *TestContext) debugLine(format string, a ...any) {
 		format = strings.TrimSuffix(format, "\n") + "\n"
 		fmt.Printf(format, a...)
 	}
+}
+
+type pipeShell struct {
+	runner *shellharness.Runner
+}
+
+func (s pipeShell) Run(command string) ([]string, error) {
+	lines, _, err := s.RunWithExitCode(command, 10*time.Second)
+	return lines, err
+}
+
+func (s pipeShell) RunWithExitCode(command string, timeout time.Duration) ([]string, int, error) {
+	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), timeout)
+	defer cancel()
+
+	result, err := s.runner.Run(ctx, command)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result.Lines, result.ExitCode, nil
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Task_Python_Develop(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	p := CreateProject(t, c,
 		`up:`,
@@ -40,7 +40,7 @@ func Test_Task_Python_Develop(t *testing.T) {
 }
 
 func Test_Task_Python_Develop_With_Extra_Packages(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	p := CreateProject(t, c,
 		`up:`,
@@ -59,7 +59,7 @@ func Test_Task_Python_Develop_With_Extra_Packages(t *testing.T) {
 }
 
 func Test_Task_Python_Develop_Without_Extra_Packages(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	p := CreateProject(t, c,
 		`up:`,

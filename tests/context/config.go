@@ -12,6 +12,7 @@ type Config struct {
 	DockerImage            string
 	WorkspaceHostPath      string
 	WorkspaceContainerPath string
+	UsePTY                 bool
 }
 
 func LoadConfig() (Config, error) {

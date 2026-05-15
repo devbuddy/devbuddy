@@ -8,7 +8,7 @@ import (
 )
 
 func Test_Cmd_Init(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	output := c.Run(t, "bud init default")
 	require.Equal(t, []string{

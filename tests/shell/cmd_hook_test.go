@@ -7,9 +7,9 @@ import (
 )
 
 func Test_Hook_Preserves_Previous_Exit_Code(t *testing.T) {
-	c := CreatePipeContextAndInit(t)
+	c := CreateContextAndInit(t)
 
-	p := CreatePipeProject(t, c,
+	p := CreateProject(t, c,
 		`up: []`,
 	)
 	c.Cd(t, p.Path)
@@ -19,11 +19,11 @@ func Test_Hook_Preserves_Previous_Exit_Code(t *testing.T) {
 }
 
 func Test_Hook_DeferInit_Skips_First_Invocation(t *testing.T) {
-	c := CreatePipeContext(t)
+	c := CreateContext(t)
 
 	// Create a project and cd into it BEFORE shell init.
 	// No PROMPT_COMMAND is set yet, so no hook fires during these steps.
-	p := CreatePipeProject(t, c,
+	p := CreateProject(t, c,
 		`env:`,
 		`  TESTVAR: hello`,
 	)
@@ -44,10 +44,10 @@ func Test_Hook_DeferInit_Skips_First_Invocation(t *testing.T) {
 }
 
 func Test_Hook_Without_DeferInit_Activates_Immediately(t *testing.T) {
-	c := CreatePipeContext(t)
+	c := CreateContext(t)
 
 	// Create a project and cd into it BEFORE shell init.
-	p := CreatePipeProject(t, c,
+	p := CreateProject(t, c,
 		`env:`,
 		`  TESTVAR: hello`,
 	)
