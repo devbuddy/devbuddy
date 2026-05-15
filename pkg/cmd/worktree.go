@@ -18,7 +18,6 @@ import (
 
 var worktreeCmd = &cobra.Command{
 	Use:          "tree",
-	Aliases:      []string{"wt", "worktree"},
 	Short:        "Manage git worktrees",
 	GroupID:      "devbuddy",
 	SilenceUsage: true,
@@ -41,11 +40,12 @@ var worktreeNewCmd = &cobra.Command{
 }
 
 var worktreeCdCmd = &cobra.Command{
-	Use:          "cd QUERY",
-	Short:        "Jump to a git worktree",
-	Args:         onlyOneArg,
-	RunE:         worktreeCdRun,
-	SilenceUsage: true,
+	Use:               "cd QUERY",
+	Short:             "Jump to a git worktree",
+	Args:              onlyOneArg,
+	RunE:              worktreeCdRun,
+	ValidArgsFunction: worktreeCdCompletions,
+	SilenceUsage:      true,
 }
 
 var worktreeSwitchCmd = &cobra.Command{
@@ -97,8 +97,9 @@ func worktreeListRun(_ *cobra.Command, args []string) error {
 		query = args[0]
 	}
 
-	for _, wt := range matchWorktrees(worktrees, query) {
-		printWorktree(ctx.Executor, wt)
+	rows := buildWorktreeRows(ctx.Executor, matchWorktrees(worktrees, query))
+	for _, line := range formatWorktreeRows(rows, true) {
+		fmt.Println(line)
 	}
 	return nil
 }
@@ -189,7 +190,7 @@ func worktreeSwitchRun(_ *cobra.Command, args []string) error {
 
 	wt := matches[0]
 	if query == "" && len(matches) > 1 {
-		selected, err := selectWorktree(matches)
+		selected, err := selectWorktree(ctx.Executor, matches)
 		if err != nil {
 			return err
 		}
@@ -268,12 +269,14 @@ type switchItem struct {
 	Worktree worktree.Worktree
 }
 
-func selectWorktree(worktrees []worktree.Worktree) (worktree.Worktree, error) {
-	items := make([]switchItem, 0, len(worktrees))
-	for _, wt := range worktrees {
+func selectWorktree(exec *executor.Executor, worktrees []worktree.Worktree) (worktree.Worktree, error) {
+	rows := buildWorktreeRows(exec, worktrees)
+	labels := formatWorktreeRows(rows, false)
+	items := make([]switchItem, 0, len(rows))
+	for i, row := range rows {
 		items = append(items, switchItem{
-			Label:    fmt.Sprintf("%s  %s", worktreeLabel(wt), wt.Path),
-			Worktree: wt,
+			Label:    labels[i],
+			Worktree: row.Worktree,
 		})
 	}
 
@@ -334,7 +337,24 @@ func mainWorktreePath(worktrees []worktree.Worktree, fallback string) string {
 	return fallback
 }
 
-func printWorktree(exec *executor.Executor, wt worktree.Worktree) {
+type worktreeRow struct {
+	Worktree worktree.Worktree
+	Branch   string
+	Head     string
+	State    string
+	Modified string
+	Path     string
+}
+
+func buildWorktreeRows(exec *executor.Executor, worktrees []worktree.Worktree) []worktreeRow {
+	rows := make([]worktreeRow, 0, len(worktrees))
+	for _, wt := range worktrees {
+		rows = append(rows, buildWorktreeRow(exec, wt))
+	}
+	return rows
+}
+
+func buildWorktreeRow(exec *executor.Executor, wt worktree.Worktree) worktreeRow {
 	head := wt.Head
 	if len(head) > 7 {
 		head = head[:7]
@@ -351,7 +371,93 @@ func printWorktree(exec *executor.Executor, wt worktree.Worktree) {
 		modified = info.ModTime().Format("2006-01-02")
 	}
 
-	fmt.Printf("%s  %s  %s  %s  %s\n", worktreeLabel(wt), head, state, modified, wt.Path)
+	return worktreeRow{
+		Worktree: wt,
+		Branch:   worktreeLabel(wt),
+		Head:     head,
+		State:    state,
+		Modified: modified,
+		Path:     wt.Path,
+	}
+}
+
+func formatWorktreeRows(rows []worktreeRow, includeHeader bool) []string {
+	allRows := rows
+	if includeHeader {
+		allRows = append([]worktreeRow{{
+			Branch:   "BRANCH",
+			Head:     "HEAD",
+			State:    "STATE",
+			Modified: "MODIFIED",
+			Path:     "PATH",
+		}}, rows...)
+	}
+
+	branchWidth := len("BRANCH")
+	headWidth := len("HEAD")
+	stateWidth := len("STATE")
+	modifiedWidth := len("MODIFIED")
+	for _, row := range rows {
+		branchWidth = max(branchWidth, len(row.Branch))
+		headWidth = max(headWidth, len(row.Head))
+		stateWidth = max(stateWidth, len(row.State))
+		modifiedWidth = max(modifiedWidth, len(row.Modified))
+	}
+
+	lines := make([]string, 0, len(allRows))
+	for _, row := range allRows {
+		lines = append(lines, fmt.Sprintf(
+			"%-*s  %-*s  %-*s  %-*s  %s",
+			branchWidth, row.Branch,
+			headWidth, row.Head,
+			stateWidth, row.State,
+			modifiedWidth, row.Modified,
+			row.Path,
+		))
+	}
+	return lines
+}
+
+func worktreeCdCompletions(_ *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	if len(args) > 0 {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	}
+
+	ctx, err := context.LoadWithProject()
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	}
+
+	worktrees, err := worktree.List(ctx.Executor, ctx.Project.Path)
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	}
+
+	completions := []string{}
+	seen := map[string]bool{}
+	for _, wt := range worktrees {
+		for _, candidate := range worktreeCompletionCandidates(wt) {
+			if seen[candidate] || !strings.HasPrefix(candidate, toComplete) {
+				continue
+			}
+			seen[candidate] = true
+			completions = append(completions, fmt.Sprintf("%s\t%s", candidate, wt.Path))
+		}
+	}
+	return completions, cobra.ShellCompDirectiveNoFileComp
+}
+
+func worktreeCompletionCandidates(wt worktree.Worktree) []string {
+	candidates := []string{}
+	if wt.Branch != "" {
+		candidates = append(candidates, wt.Branch)
+	}
+	base := filepath.Base(wt.Path)
+	candidates = append(candidates, base)
+	if name, ok := strings.CutPrefix(base, strings.Split(base, "--")[0]+"--"); ok {
+		candidates = append(candidates, name)
+	}
+	return candidates
 }
 
 func worktreeLabel(wt worktree.Worktree) string {

@@ -15,7 +15,7 @@ The existing clone path remains the main/default worktree. Additional worktrees 
 
 ## Key UX Changes
 
-- Add `bud tree` as the primary command group, with `bud wt` and `bud worktree` as aliases.
+- Add `bud tree` as the primary command group.
 - Keep `bud clone` unchanged by default. It still clones to the canonical repo path and jumps there.
 - Make `bud cd` worktree-aware so fuzzy navigation can jump to either the canonical project or a managed sibling worktree.
 - Add `bud tree list [query]` to show grouped worktrees with path, branch, HEAD short SHA, dirty state, and last modified time.
@@ -71,5 +71,5 @@ Non-interactive behavior should fail with a clear message and exact commands to 
 - The sibling layout is the default: `repo--<worktree-name>`.
 - Existing clones require no migration.
 - The current repo path is the default/main worktree.
-- `bud tree` is the preferred command, and `bud wt` plus `bud worktree` are aliases.
+- `bud tree` is the command namespace. Short aliases are intentionally out of scope for this PR.
 - v1 focuses on local Git worktree creation, navigation, cleanup, and branch-conflict help. It does not include remote PR automation or AI-agent metadata.

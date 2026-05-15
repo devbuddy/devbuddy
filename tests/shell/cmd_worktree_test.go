@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"strings"
 	"testing"
 
 	testcontext "github.com/devbuddy/devbuddy/tests/context"
@@ -21,10 +22,16 @@ func Test_Cmd_Worktree_New_And_Cd(t *testing.T) {
 
 	branch := c.Run(t, "git -C "+worktreePath+" branch --show-current")
 	require.Equal(t, []string{"feature-a"}, branch)
+	c.Run(t, "bud tree new agent-1 long-feature-branch")
 
 	c.Write(t, worktreePath+"/scratch.txt", "dirty\n")
-	output = c.Run(t, "bud tree list feature-a")
+	output = c.Run(t, "bud tree list")
+	OutputContains(t, output, "BRANCH", "HEAD", "STATE", "MODIFIED", "PATH")
 	OutputContains(t, output, "feature-a", "dirty", worktreePath)
+	assertPathColumnAligned(t, output)
+
+	output = c.Run(t, `bud __complete tree cd ""`)
+	OutputContains(t, output, "feature-a", "long-feature-branch")
 
 	output = c.Run(t, "bud cd feature-a")
 	OutputContains(t, output, "jumping to", "projname--feature-a")
@@ -81,6 +88,35 @@ func Test_Cmd_Tree_BranchConflict(t *testing.T) {
 
 	output := c.Run(t, "bud tree new duplicate feature-a", testcontext.ExitCode(1))
 	OutputContains(t, output, "branch feature-a is already checked out", worktreePath, "bud tree cd feature-a")
+}
+
+func Test_Cmd_Tree_Has_No_Short_Aliases(t *testing.T) {
+	c := CreateContext(t)
+
+	output := c.Run(t, "bud wt", testcontext.ExitCode(1))
+	OutputContains(t, output, `unknown command "wt"`)
+
+	output = c.Run(t, "bud worktree", testcontext.ExitCode(1))
+	OutputContains(t, output, `unknown command "worktree"`)
+}
+
+func assertPathColumnAligned(t *testing.T, lines []string) {
+	t.Helper()
+
+	pathColumn := -1
+	for _, line := range lines {
+		if !strings.Contains(line, "/home/tester/src") {
+			continue
+		}
+
+		column := strings.Index(line, "/home/tester/src")
+		if pathColumn == -1 {
+			pathColumn = column
+			continue
+		}
+		require.Equal(t, pathColumn, column, "path column should be aligned in line %q", line)
+	}
+	require.NotEqual(t, -1, pathColumn, "expected at least one worktree path")
 }
 
 func createGitProject(t *testing.T, c *testcontext.TestContext, path string) {
