@@ -7,9 +7,11 @@ import (
 	"strings"
 )
 
-func getPlatformNames() []string {
-	return []string{"github.com", "bitbucket.org"}
-}
+var (
+	reShort = regexp.MustCompile(`^([\w.~-]+)/([\w.-]+)$`)
+	reSSH   = regexp.MustCompile(`^git@([\w.-]+):([\w.~-]+)/([\w.-]+?)(?:\.git)?$`)
+	reHTTPS = regexp.MustCompile(`^https://([\w.-]+)/([\w.~-]+)/([\w.-]+?)(?:\.git)?$`)
+)
 
 type hostingInfo struct {
 	platform     string
@@ -19,27 +21,19 @@ type hostingInfo struct {
 	remoteURL string
 }
 
-func newHostingInfoByURL(url string) (*hostingInfo, error) {
+func newHostingInfoByURL(url string, defaultPlatform string) (*hostingInfo, error) {
 	url = strings.Trim(url, " ")
 
-	reGithubFull := regexp.MustCompile(`^([\w.-]+)/([\w.-]+)$`)
-	if match := reGithubFull.FindStringSubmatch(url); match != nil {
-		return newGithubHostingInfo("", match[1], match[2]), nil
+	if match := reShort.FindStringSubmatch(url); match != nil {
+		return newHostingInfoFromParts("", defaultPlatform, match[1], match[2]), nil
 	}
 
-	reGithubGitURL := regexp.MustCompile(`^git@github.com:([\w.-]+)/([\w.-]+).git$`)
-	if match := reGithubGitURL.FindStringSubmatch(url); match != nil {
-		return newGithubHostingInfo(url, match[1], match[2]), nil
+	if match := reSSH.FindStringSubmatch(url); match != nil {
+		return newHostingInfoFromParts(url, match[1], match[2], match[3]), nil
 	}
 
-	reGithubGitHTTPURL := regexp.MustCompile(`^https://github.com/([\w.-]+)/([\w.-]+).git$`)
-	if match := reGithubGitHTTPURL.FindStringSubmatch(url); match != nil {
-		return newGithubHostingInfo(url, match[1], match[2]), nil
-	}
-
-	reBitbucketGitURL := regexp.MustCompile(`^git@bitbucket.org:([\w.-]+)/([\w.-]+).git$`)
-	if match := reBitbucketGitURL.FindStringSubmatch(url); match != nil {
-		return newBitbucketHostingInfo(match[1], match[2]), nil
+	if match := reHTTPS.FindStringSubmatch(url); match != nil {
+		return newHostingInfoFromParts(url, match[1], match[2], match[3]), nil
 	}
 
 	return nil, fmt.Errorf("unrecognized project url: %s", url)
@@ -51,23 +45,14 @@ func newHostingInfoByPath(path string) *hostingInfo {
 	}
 }
 
-func newGithubHostingInfo(remoteURL, organisation, repository string) *hostingInfo {
+func newHostingInfoFromParts(remoteURL, platform, organisation, repository string) *hostingInfo {
 	if remoteURL == "" {
-		remoteURL = fmt.Sprintf("git@github.com:%s/%s.git", organisation, repository)
+		remoteURL = fmt.Sprintf("git@%s:%s/%s.git", platform, organisation, repository)
 	}
 	return &hostingInfo{
-		platform:     "github.com",
+		platform:     platform,
 		organisation: organisation,
 		repository:   repository,
 		remoteURL:    remoteURL,
-	}
-}
-
-func newBitbucketHostingInfo(organisation, repository string) *hostingInfo {
-	return &hostingInfo{
-		platform:     "bitbucket.org",
-		organisation: organisation,
-		repository:   repository,
-		remoteURL:    fmt.Sprintf("git@bitbucket.org:%s/%s.git", organisation, repository),
 	}
 }

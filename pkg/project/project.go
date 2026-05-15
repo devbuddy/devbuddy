@@ -26,7 +26,7 @@ func NewFromID(id string, conf *config.Config) (p *Project, err error) {
 		}
 	}
 
-	hosting, err := newHostingInfoByURL(id)
+	hosting, err := newHostingInfoByURL(id, conf.DefaultPlatform)
 	if err != nil {
 		return nil, err
 	}

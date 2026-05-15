@@ -103,13 +103,23 @@ type bud > /dev/null 2> /dev/null && eval "$(bud --shell-init --with-completion)
 
 ### Configuration
 
-If you usually work with repos from the same GitHub organization, set it as a default:
+DevBuddy reads `~/.config/devbuddy/config.yml` (respecting `$XDG_CONFIG_HOME`). All keys are optional.
 
-```bash
-export BUD_DEFAULT_ORG="myorg"
+```yaml
+# Default organization: "bud clone myrepo" becomes "bud clone myorg/myrepo"
+default_org: myorg
+
+# Default hosting platform (default: github.com)
+# Supported: github.com, gitlab.com, bitbucket.org, codeberg.org,
+#            git.sr.ht, any self-hosted Gitea/GitLab instance
+default_platform: gitlab.com
+
+shell:
+  defer_init: false
 ```
 
-Then `bud clone myrepo` is equivalent to `bud clone myorg/myrepo`.
+`bud clone` and `bud cd` accept short `org/repo` identifiers, full SSH URLs
+(`git@host:org/repo.git`), and full HTTPS URLs (`https://host/org/repo[.git]`).
 
 ## Using in CI
 

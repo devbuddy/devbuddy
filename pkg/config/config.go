@@ -7,11 +7,12 @@ import (
 
 // Config represents the user system and environment configuration
 type Config struct {
-	homeDir      string // the user home directory
-	DebugEnabled bool   // whether debug logging is activated
-	SourceDir    string // projects base directory
-	dataDir      string // directory managed by DevBuddy (languages distribs, virtualenvs...)
-	DefaultOrg   string // [optional] default repo organisation
+	homeDir         string // the user home directory
+	DebugEnabled    bool   // whether debug logging is activated
+	SourceDir       string // projects base directory
+	dataDir         string // directory managed by DevBuddy (languages distribs, virtualenvs...)
+	DefaultOrg      string // [optional] default repo organisation
+	DefaultPlatform string // default hosting platform (e.g. github.com)
 }
 
 func NewTestConfig() *Config {
@@ -28,13 +29,20 @@ func Load() (*Config, error) {
 	}
 
 	userDataDir := getXdgUserDataDir(homedir)
+	userCfg := LoadUserConfig()
+
+	defaultPlatform := userCfg.DefaultPlatform
+	if defaultPlatform == "" {
+		defaultPlatform = "github.com"
+	}
 
 	c := Config{
-		homeDir:      homedir,
-		DebugEnabled: debugEnabled(),
-		SourceDir:    filepath.Join(homedir, "src"),
-		dataDir:      filepath.Join(userDataDir, "bud"),
-		DefaultOrg:   os.Getenv("BUD_DEFAULT_ORG"),
+		homeDir:         homedir,
+		DebugEnabled:    debugEnabled(),
+		SourceDir:       filepath.Join(homedir, "src"),
+		dataDir:         filepath.Join(userDataDir, "bud"),
+		DefaultOrg:      userCfg.DefaultOrg,
+		DefaultPlatform: defaultPlatform,
 	}
 	return &c, nil
 }
