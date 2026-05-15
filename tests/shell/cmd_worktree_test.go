@@ -62,7 +62,7 @@ func Test_Cmd_Tree_Cd_Matches_Branch_When_Different_From_Worktree_Name(t *testin
 }
 
 func Test_Cmd_Tree_Switch_Interactive(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 	projectPath := "/home/tester/src/github.com/orgname/projname"
 	worktreePath := "/home/tester/src/github.com/orgname/projname--feature-a"
 
@@ -92,7 +92,7 @@ func Test_Cmd_Tree_BranchConflict(t *testing.T) {
 }
 
 func Test_Cmd_Tree_Prune_Asks_To_Delete_Inactive_Worktrees(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 	projectPath := "/home/tester/src/github.com/orgname/projname"
 	oldWorktreePath := "/home/tester/src/github.com/orgname/projname--old-branch"
 	recentWorktreePath := "/home/tester/src/github.com/orgname/projname--recent-branch"
@@ -146,15 +146,16 @@ func assertPathColumnAligned(t *testing.T, lines []string) {
 func createGitProject(t *testing.T, c *testcontext.TestContext, path string) {
 	t.Helper()
 
-	c.Run(t, "mkdir -p "+path)
-	c.Run(t, "git -C "+path+" init")
-	c.Run(t, "git -C "+path+" checkout -b main")
-	c.Run(t, "git -C "+path+" config user.email tester@example.com")
-	c.Run(t, "git -C "+path+" config user.name Tester")
+	// Write via host path first so the directory is created with host-side
+	// ownership before the container touches it (avoids chmod permission errors).
 	c.WriteLines(t, path+"/dev.yml",
 		"commands:",
 		"  where: pwd > pwd.txt",
 	)
+	c.Run(t, "git -C "+path+" init")
+	c.Run(t, "git -C "+path+" checkout -b main")
+	c.Run(t, "git -C "+path+" config user.email tester@example.com")
+	c.Run(t, "git -C "+path+" config user.name Tester")
 	c.Run(t, "git -C "+path+" add dev.yml")
 	c.Run(t, "git -C "+path+" commit -m init")
 }

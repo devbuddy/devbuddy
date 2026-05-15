@@ -220,10 +220,14 @@ func (c *TestContext) Write(t *testing.T, path, content string) {
 	t.Helper()
 
 	if hostPath, ok := c.hostPath(t, path); ok {
-		err := os.MkdirAll(filepath.Dir(hostPath), 0755)
+		dirPath := filepath.Dir(hostPath)
+		err := os.MkdirAll(dirPath, 0777)
 		require.NoError(t, err)
-		err = os.Chmod(filepath.Dir(hostPath), 0777)
-		require.NoError(t, err)
+		// chmod each directory from the leaf up to the workspace root so the
+		// container user can create sibling directories alongside host-created ones.
+		for current := dirPath; current != c.workspaceHostPath; current = filepath.Dir(current) {
+			require.NoError(t, os.Chmod(current, 0777))
+		}
 
 		err = os.WriteFile(hostPath, []byte(content), 0644)
 		require.NoError(t, err)
@@ -334,7 +338,7 @@ func (c *TestContext) WaitPrompt(t *testing.T) []string {
 		line, err := c.expect.Line()
 		require.NoError(t, err)
 
-		line = strings.Replace(line, "\r", "", -1)
+		line = strings.ReplaceAll(line, "\r", "")
 		if line == "##\n" {
 			return StripAnsiSlice(output)
 		}
