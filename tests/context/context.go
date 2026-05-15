@@ -221,17 +221,18 @@ func (c *TestContext) Write(t *testing.T, path, content string) {
 
 	if hostPath, ok := c.hostPath(t, path); ok {
 		dirPath := filepath.Dir(hostPath)
-		err := os.MkdirAll(dirPath, 0777)
-		require.NoError(t, err)
-		// chmod each directory from the leaf up to the workspace root so the
-		// container user can create sibling directories alongside host-created ones.
-		for current := dirPath; current != c.workspaceHostPath; current = filepath.Dir(current) {
-			require.NoError(t, os.Chmod(current, 0777))
+		if err := os.MkdirAll(dirPath, 0777); err == nil {
+			// chmod each dir from the leaf up to the workspace root so the container
+			// user can create siblings. May fail for container-created dirs (different
+			// owner on Linux) — best-effort only.
+			for current := dirPath; current != c.workspaceHostPath; current = filepath.Dir(current) {
+				_ = os.Chmod(current, 0777)
+			}
+			if err := os.WriteFile(hostPath, []byte(content), 0644); err == nil {
+				return
+			}
 		}
-
-		err = os.WriteFile(hostPath, []byte(content), 0644)
-		require.NoError(t, err)
-		return
+		// Fall through: directory owned by container user (Linux CI) — write via shell.
 	}
 
 	b64content := base64.StdEncoding.EncodeToString([]byte(content))
