@@ -8,6 +8,8 @@ import (
 )
 
 type Project = harness.Project
+type PipeContext = harness.PipeContext
+type PipeProject = harness.PipeProject
 
 func TestMain(m *testing.M) {
 	harness.TestMain(m)
@@ -27,6 +29,18 @@ func CreateContextAndProject(t *testing.T, devYmlLines ...string) (*context.Test
 
 func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) Project {
 	return harness.CreateProject(t, c, devYmlLines...)
+}
+
+func CreatePipeContext(t *testing.T) *PipeContext {
+	return harness.CreatePipeContext(t)
+}
+
+func CreatePipeContextAndInit(t *testing.T) *PipeContext {
+	return harness.CreatePipeContextAndInit(t)
+}
+
+func CreatePipeProject(t *testing.T, c *PipeContext, devYmlLines ...string) PipeProject {
+	return harness.CreatePipeProject(t, c, devYmlLines...)
 }
 
 func OutputContains(t *testing.T, lines []string, subStrings ...string) {

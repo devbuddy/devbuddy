@@ -62,6 +62,10 @@ func (r *Runner) Run(ctx context.Context, command string) (Result, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
+	// Commands run in a long-lived shell, so we cannot rely on process exit to
+	// know when one command is done. Append a unique sentinel after the user's
+	// command and read until that sentinel appears. The sentinel also carries
+	// "$?", which gives us the exit code without prompt parsing.
 	r.nextID++
 	sentinel := fmt.Sprintf("__BUD_SENTINEL_%d__", r.nextID)
 	wrapped := fmt.Sprintf("%s\nprintf '%%s %%s\\n' %s \"$?\"\n", command, strconv.Quote(sentinel))
@@ -90,6 +94,8 @@ func (r *Runner) Run(ctx context.Context, command string) (Result, error) {
 }
 
 func (r *Runner) Close() error {
+	// Closing stdin asks the shell to exit. Once the shell exits, cmd.Wait
+	// returns, stdout/stderr pipes close, and scanLines can drain and stop.
 	_ = r.stdin.Close()
 	select {
 	case err := <-r.done:
@@ -104,6 +110,10 @@ func scanLines(readers ...io.Reader) <-chan string {
 	var wg sync.WaitGroup
 	wg.Add(len(readers))
 	for _, reader := range readers {
+		// Each pipe gets its own scanner so stdout and stderr cannot block each
+		// other. The scanner loop stops when its pipe is closed, normally after
+		// Runner.Close closes stdin and the shell process exits. The waiter below
+		// closes the merged output channel only after every pipe scanner stops.
 		go func() {
 			defer wg.Done()
 			scanner := bufio.NewScanner(reader)
