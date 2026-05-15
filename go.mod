@@ -3,7 +3,7 @@ module github.com/devbuddy/devbuddy
 go 1.26.0
 
 require (
-	github.com/devbuddy/expect v0.1.0
+	github.com/creack/pty v1.1.24
 	github.com/dnaeon/go-vcr v1.2.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/joho/godotenv v1.5.1
@@ -18,7 +18,6 @@ require (
 
 require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
-	github.com/creack/pty v1.1.24 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

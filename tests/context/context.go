@@ -10,8 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devbuddy/expect"
 	"github.com/stretchr/testify/require"
+
+	"github.com/devbuddy/devbuddy/tests/internal/expect"
 )
 
 type TestContext struct {

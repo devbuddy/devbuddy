@@ -112,7 +112,7 @@ which builds the Linux binary once per test subpackage.
 - `CreateProject(t, c, devYmlLines...)`: creates a project dir with dev.yml
 - `OutputContains(t, lines, ...)` / `OutputEqual(t, lines, ...)`: output assertions
 
-**github.com/devbuddy/expect** — PTY-based shell automation library (custom fork of etcd's):
+**tests/internal/expect** — PTY-based shell automation library, moved from `github.com/devbuddy/expect`:
 - `ExpectProcess`: low-level PTY process (start, send, read lines, stop)
 - `ShellExpect`: sends commands, waits for prompt string, returns output
 - Prompt detection: reads lines until accumulated output ends with the prompt string
