@@ -199,6 +199,10 @@ up:
   - ruby  # reads .ruby-version
 ```
 
+If both an explicit version in `dev.yml` and a `.ruby-version` file are present and
+they disagree, DevBuddy warns on `bud up` and on shell activation, then proceeds with
+the `dev.yml` version. Remove one to silence the warning.
+
 #### Tradeoffs and limitations
 
 - **macOS-first install path.** Bootstrapping rbenv is done via `brew install rbenv`.

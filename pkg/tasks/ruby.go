@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
@@ -42,7 +40,7 @@ func resolveRubyVersion(config *api.TaskConfig) (string, error) {
 	}
 
 	if config.ProjectPath != "" {
-		v, readErr := readRubyVersionFile(filepath.Join(config.ProjectPath, ".ruby-version"))
+		v, readErr := helpers.ReadRubyVersionFile(config.ProjectPath)
 		if readErr == nil {
 			return v, nil
 		}
@@ -51,20 +49,6 @@ func resolveRubyVersion(config *api.TaskConfig) (string, error) {
 		}
 	}
 	return "", err
-}
-
-func readRubyVersionFile(path string) (string, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	version := strings.TrimSpace(string(data))
-	// Strip an optional engine prefix such as `ruby-3.3.0` written by some tools.
-	version = strings.TrimPrefix(version, "ruby-")
-	if version == "" {
-		return "", fmt.Errorf(".ruby-version is empty")
-	}
-	return version, nil
 }
 
 func parserRubyInstallRbenv(task *api.Task) {

@@ -4,12 +4,29 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"slices"
 	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 )
+
+// ReadRubyVersionFile reads a `.ruby-version` file and returns the version
+// string with any leading `ruby-` engine prefix stripped. Returns os.ErrNotExist
+// when the file is absent so callers can decide whether to treat that as fatal.
+func ReadRubyVersionFile(projectPath string) (string, error) {
+	data, err := os.ReadFile(filepath.Join(projectPath, ".ruby-version"))
+	if err != nil {
+		return "", err
+	}
+	version := strings.TrimSpace(string(data))
+	version = strings.TrimPrefix(version, "ruby-")
+	if version == "" {
+		return "", fmt.Errorf(".ruby-version is empty")
+	}
+	return version, nil
+}
 
 type RbEnv struct {
 	ctx  *context.Context
