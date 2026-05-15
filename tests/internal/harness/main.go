@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 	cmd.Dir = repoRoot
 	cmd.Env = append(os.Environ(), "GOOS=linux", "CGO_ENABLED=0")
 
-	cmdOutput, err := cmd.Output()
+	cmdOutput, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("Error when building binary: %s\n%s\n", err.Error(), string(cmdOutput))
 		os.Exit(1)
