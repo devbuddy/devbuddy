@@ -24,14 +24,14 @@ commands:
   integration:
     desc: Run the integration tests with Bash
     run: |
-      docker pull $TEST_DOCKER_IMAGE
-      TEST_SHELL=bash go test -v ./tests/...
+      docker pull -q $TEST_DOCKER_IMAGE
+      TEST_SHELL=bash go test -v -count=1 ./tests/...
 
   integration-zsh:
     desc: Run the integration tests with Zsh
     run: |
-      docker pull $TEST_DOCKER_IMAGE
-      TEST_SHELL=zsh go test -v ./tests/...
+      docker pull -q $TEST_DOCKER_IMAGE
+      TEST_SHELL=zsh go test -v -count=1 ./tests/...
 
   lint:
     desc: Lint the project

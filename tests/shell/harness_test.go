@@ -21,8 +21,16 @@ func CreateContextAndInit(t *testing.T) *context.TestContext {
 	return harness.CreateContextAndInit(t)
 }
 
-func CreateContextAndProject(t *testing.T, devYmlLines ...string) (*context.TestContext, Project) {
-	return harness.CreateContextAndProject(t, devYmlLines...)
+func CreatePTYContext(t *testing.T) *context.TestContext {
+	return harness.CreatePTYContext(t)
+}
+
+func CreatePTYContextAndInit(t *testing.T) *context.TestContext {
+	return harness.CreatePTYContextAndInit(t)
+}
+
+func CreatePTYContextAndProject(t *testing.T, devYmlLines ...string) (*context.TestContext, Project) {
+	return harness.CreatePTYContextAndProject(t, devYmlLines...)
 }
 
 func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) Project {

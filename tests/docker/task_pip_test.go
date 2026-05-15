@@ -8,7 +8,7 @@ import (
 )
 
 func Test_Task_Pip(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	p := CreateProject(t, c,
 		`up:`,

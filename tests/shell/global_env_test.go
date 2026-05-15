@@ -8,7 +8,7 @@ import (
 )
 
 func Test_Env(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	devYml := `env: {TESTVAR: TESTVALUE}`
 

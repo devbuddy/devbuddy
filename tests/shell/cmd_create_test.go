@@ -7,7 +7,7 @@ import (
 )
 
 func Test_Cmd_Create(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	output := c.Run(t, "bud create --template default orgname/projname")
 	require.Equal(t, []string{
@@ -28,7 +28,7 @@ func Test_Cmd_Create(t *testing.T) {
 }
 
 func Test_Cmd_Create_Already_Exists(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	c.Run(t, "mkdir -p /home/tester/src/github.com/orgname/projname")
 

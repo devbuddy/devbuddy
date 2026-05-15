@@ -7,7 +7,7 @@ import (
 )
 
 func Test_Env_EnvFile(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	c.Write(t, "dev.yml", `up: [envfile]`)
 	c.Write(t, ".env", `TESTVAR=FooBAr`)
@@ -27,7 +27,7 @@ func Test_Env_EnvFile(t *testing.T) {
 
 func Test_Env_EnvFile_In_Process(t *testing.T) {
 
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	c.WriteLines(t, "dev.yml",
 		`up:`,
@@ -44,7 +44,7 @@ func Test_Env_EnvFile_In_Process(t *testing.T) {
 
 func Test_Env_EnvFile_Changes(t *testing.T) {
 
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	c.Write(t, "dev.yml", `up: [envfile]`)
 	c.Write(t, ".env", `TESTVAR=one`)

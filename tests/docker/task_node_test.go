@@ -8,7 +8,7 @@ import (
 )
 
 func Test_Task_Node(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	p := CreateProject(t, c,
 		`up:`,
@@ -25,7 +25,7 @@ func Test_Task_Node(t *testing.T) {
 }
 
 func Test_Task_Node_Npm_Install(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := CreatePTYContextAndInit(t)
 
 	p := CreateProject(t, c,
 		`up:`,

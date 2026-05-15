@@ -7,7 +7,7 @@ import (
 )
 
 func Test_Cmd_Cd(t *testing.T) {
-	c := CreateContext(t)
+	c := CreatePTYContext(t)
 
 	c.Run(t, "mkdir -p /home/tester/src/github.com/orgname/projname")
 
@@ -23,7 +23,7 @@ func Test_Cmd_Cd(t *testing.T) {
 }
 
 func Test_Cmd_Cd_Matching(t *testing.T) {
-	c := CreateContext(t)
+	c := CreatePTYContext(t)
 
 	project1 := "/home/tester/src/github.com/devbuddy_tests/project"
 	project2 := "/home/tester/src/github.com/devbuddy_tests/project2"
