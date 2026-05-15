@@ -220,14 +220,19 @@ func (c *TestContext) Write(t *testing.T, path, content string) {
 	t.Helper()
 
 	if hostPath, ok := c.hostPath(t, path); ok {
-		err := os.MkdirAll(filepath.Dir(hostPath), 0755)
-		require.NoError(t, err)
-		err = os.Chmod(filepath.Dir(hostPath), 0777)
-		require.NoError(t, err)
-
-		err = os.WriteFile(hostPath, []byte(content), 0644)
-		require.NoError(t, err)
-		return
+		dirPath := filepath.Dir(hostPath)
+		if err := os.MkdirAll(dirPath, 0777); err == nil {
+			// chmod each dir from the leaf up to the workspace root so the container
+			// user can create siblings. May fail for container-created dirs (different
+			// owner on Linux) — best-effort only.
+			for current := dirPath; current != c.workspaceHostPath; current = filepath.Dir(current) {
+				_ = os.Chmod(current, 0777)
+			}
+			if err := os.WriteFile(hostPath, []byte(content), 0644); err == nil {
+				return
+			}
+		}
+		// Fall through: directory owned by container user (Linux CI) — write via shell.
 	}
 
 	b64content := base64.StdEncoding.EncodeToString([]byte(content))
@@ -312,6 +317,34 @@ func (c *TestContext) hostPath(t *testing.T, containerPath string) (string, bool
 		relPath = strings.TrimPrefix(absolutePath, workspaceRoot+"/")
 	}
 	return filepath.Join(c.workspaceHostPath, filepath.FromSlash(relPath)), true
+}
+
+func (c *TestContext) Send(t *testing.T, text string) {
+	t.Helper()
+	err := c.expect.Send(text)
+	require.NoError(t, err)
+}
+
+func (c *TestContext) Expect(t *testing.T, text string) string {
+	t.Helper()
+	line, err := c.expect.Expect(text)
+	require.NoError(t, err)
+	return StripAnsi(line)
+}
+
+func (c *TestContext) WaitPrompt(t *testing.T) []string {
+	t.Helper()
+	var output []string
+	for {
+		line, err := c.expect.Line()
+		require.NoError(t, err)
+
+		line = strings.ReplaceAll(line, "\r", "")
+		if line == "##\n" {
+			return StripAnsiSlice(output)
+		}
+		output = append(output, strings.TrimSuffix(line, "\n"))
+	}
 }
 
 func (c *TestContext) debugLine(format string, a ...any) {

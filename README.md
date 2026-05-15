@@ -43,6 +43,7 @@ See the full [task documentation](docs/Config.md) for details.
 - Notification when important files (e.g. `requirements.txt`) are updated locally
 - `bud open` to jump to the GitHub repo page, or `bud open <name>` for project URLs
 - `bud clone` / `bud cd` for fast project navigation
+- `bud tree` to create, navigate, and clean up Git worktrees
 - Shell completion (bash and zsh)
 
 ### Supported platforms
@@ -166,6 +167,29 @@ open:
 ```
 
 See DevBuddy's own [dev.yml](dev.yml) for a real-world example.
+
+## Git worktrees
+
+DevBuddy can manage Git worktrees beside your existing checkout. The normal clone remains the main worktree:
+
+```text
+~/src/github.com/org/repo
+~/src/github.com/org/repo--feature-a
+```
+
+Create and jump between worktrees from any checkout in the repository:
+
+```bash
+bud tree new feature-a
+bud tree cd feature-a
+bud tree switch
+```
+
+`bud tree new` creates the worktree and jumps into it. `bud tree prune` cleans stale Git worktree metadata and asks whether to delete each existing worktree that has not been touched for more than one week.
+
+`bud tree switch` opens an interactive selector with up/down keys and enter. Regular `bud cd` also understands managed worktree branches, so `bud cd feature-a` can jump to a worktree even when its directory is named for a different agent or task.
+
+If a branch is already checked out in another worktree, DevBuddy shows the existing path and a command to jump there instead of leaving you with Git's raw error.
 
 ## Contributing
 
