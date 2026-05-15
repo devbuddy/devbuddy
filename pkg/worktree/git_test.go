@@ -65,3 +65,17 @@ func TestAddExistingBranchBuildsGitCommand(t *testing.T) {
 	require.Equal(t, []string{"worktree", "add", "/src/github.com/acme/api--feature-a", "feature-a"}, runner.runCmds[0].Args)
 	require.Equal(t, "/src/github.com/acme/api", runner.runCmds[0].Cwd)
 }
+
+func TestIsDirtyRunsGitStatusShort(t *testing.T) {
+	runner := &runnerSpy{output: " M README.md\n"}
+	exec := &executor.Executor{Runner: runner}
+
+	got, err := IsDirty(exec, "/src/github.com/acme/api--feature-a")
+
+	require.NoError(t, err)
+	require.True(t, got)
+	require.Len(t, runner.captureCmds, 1)
+	require.Equal(t, "git", runner.captureCmds[0].Program)
+	require.Equal(t, []string{"status", "--short"}, runner.captureCmds[0].Args)
+	require.Equal(t, "/src/github.com/acme/api--feature-a", runner.captureCmds[0].Cwd)
+}

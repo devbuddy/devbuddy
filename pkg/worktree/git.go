@@ -1,6 +1,8 @@
 package worktree
 
 import (
+	"strings"
+
 	"github.com/devbuddy/devbuddy/pkg/executor"
 )
 
@@ -52,4 +54,15 @@ func BranchExists(exec *executor.Executor, repoPath, branch string) (bool, error
 		return false, result.Error
 	}
 	return true, nil
+}
+
+func IsDirty(exec *executor.Executor, path string) (bool, error) {
+	cmd := executor.New("git", "status", "--short")
+	cmd.Cwd = path
+
+	result := exec.Capture(cmd)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return strings.TrimSpace(result.Output) != "", nil
 }
