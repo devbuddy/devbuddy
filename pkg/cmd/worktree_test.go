@@ -34,3 +34,10 @@ func TestFormatWorktreeRowsAlignsColumns(t *testing.T) {
 	require.Contains(t, lines[0], "main")
 	require.Contains(t, lines[1], "long-feature-branch")
 }
+
+func TestWorktreeSwitchMenuTemplateAlignsInactiveRowsWithPandaMarker(t *testing.T) {
+	templates := worktreeSwitchTemplates()
+
+	require.Equal(t, "🐼 {{ .Label | cyan }}", templates.Active)
+	require.Equal(t, "   {{ .Label }}", templates.Inactive)
+}
