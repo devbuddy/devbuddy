@@ -9,7 +9,6 @@ import (
 	"github.com/sahilm/fuzzy"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
-	"github.com/devbuddy/devbuddy/pkg/utils"
 	wt "github.com/devbuddy/devbuddy/pkg/worktree"
 )
 
@@ -134,16 +133,15 @@ func projectFromWorktree(base *Project, path string, branch string) *Project {
 }
 
 func getAllProjects(sourceDir string) ([]*Project, error) {
+	platforms, err := listChildDir(sourceDir)
+	if err != nil {
+		return nil, err
+	}
+
 	var projects []*Project
 
-	for _, platform := range getPlatformNames() {
+	for _, platform := range platforms {
 		platformPath := filepath.Join(sourceDir, platform)
-		if !utils.PathExists(platformPath) {
-			continue
-		}
-
-		var orgPath string
-		var projPath string
 
 		orgs, err := listChildDir(platformPath)
 		if err != nil {
@@ -151,7 +149,7 @@ func getAllProjects(sourceDir string) ([]*Project, error) {
 		}
 
 		for _, org := range orgs {
-			orgPath = filepath.Join(platformPath, org)
+			orgPath := filepath.Join(platformPath, org)
 
 			repos, err := listChildDir(orgPath)
 			if err != nil {
@@ -159,7 +157,7 @@ func getAllProjects(sourceDir string) ([]*Project, error) {
 			}
 
 			for _, repo := range repos {
-				projPath = filepath.Join(orgPath, repo)
+				projPath := filepath.Join(orgPath, repo)
 
 				projects = append(projects, &Project{
 					hosting: &hostingInfo{

@@ -14,6 +14,8 @@ func TestLoadUserConfig_MissingFile(t *testing.T) {
 	cfg := LoadUserConfig()
 
 	require.Equal(t, false, cfg.Shell.DeferInit)
+	require.Equal(t, "", cfg.DefaultOrg)
+	require.Equal(t, "", cfg.DefaultPlatform)
 }
 
 func TestLoadUserConfig_ValidFile(t *testing.T) {
@@ -24,13 +26,15 @@ func TestLoadUserConfig_ValidFile(t *testing.T) {
 	require.NoError(t, os.MkdirAll(configDir, 0o755))
 	require.NoError(t, os.WriteFile(
 		filepath.Join(configDir, "config.yml"),
-		[]byte("shell:\n  defer_init: true\n"),
+		[]byte("shell:\n  defer_init: true\ndefault_org: myorg\ndefault_platform: gitlab.com\n"),
 		0o644,
 	))
 
 	cfg := LoadUserConfig()
 
 	require.Equal(t, true, cfg.Shell.DeferInit)
+	require.Equal(t, "myorg", cfg.DefaultOrg)
+	require.Equal(t, "gitlab.com", cfg.DefaultPlatform)
 }
 
 func TestLoadUserConfig_InvalidYAML(t *testing.T) {

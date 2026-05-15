@@ -8,7 +8,9 @@ import (
 )
 
 type UserConfig struct {
-	Shell ShellConfig `yaml:"shell"`
+	Shell           ShellConfig `yaml:"shell"`
+	DefaultOrg      string      `yaml:"default_org"`
+	DefaultPlatform string      `yaml:"default_platform"`
 }
 
 type ShellConfig struct {
