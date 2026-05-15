@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/manifoldco/promptui"
 	"github.com/sahilm/fuzzy"
@@ -149,7 +151,7 @@ func worktreeNewRun(_ *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("🐼  created worktree %s at %s\n", branch, path)
-	return nil
+	return integration.AddFinalizerCd(path)
 }
 
 func worktreeCdRun(_ *cobra.Command, args []string) error {
@@ -238,6 +240,30 @@ func worktreePruneRun(_ *cobra.Command, _ []string) error {
 
 	if err := worktree.Prune(ctx.Executor, ctx.Project.Path); err != nil {
 		return err
+	}
+
+	worktrees, err := worktree.List(ctx.Executor, ctx.Project.Path)
+	if err != nil {
+		return err
+	}
+
+	for _, wt := range inactiveWorktrees(worktrees, time.Now(), 7*24*time.Hour) {
+		prompt := promptui.Prompt{
+			Label:     fmt.Sprintf("Delete inactive worktree %s at %s", worktreeLabel(wt), wt.Path),
+			IsConfirm: true,
+		}
+
+		if _, err := prompt.Run(); err != nil {
+			if errors.Is(err, promptui.ErrAbort) {
+				continue
+			}
+			return err
+		}
+
+		if err := worktree.Remove(ctx.Executor, ctx.Project.Path, wt.Path); err != nil {
+			return err
+		}
+		fmt.Printf("🐼  removed inactive worktree %s\n", wt.Path)
 	}
 
 	fmt.Println("🐼  pruned stale worktree metadata")
@@ -339,6 +365,31 @@ func mainWorktreePath(worktrees []worktree.Worktree, fallback string) string {
 		}
 	}
 	return fallback
+}
+
+func inactiveWorktrees(worktrees []worktree.Worktree, now time.Time, maxAge time.Duration) []worktree.Worktree {
+	if len(worktrees) == 0 {
+		return nil
+	}
+
+	mainPath := mainWorktreePath(worktrees, "")
+	cutoff := now.Add(-maxAge)
+	var inactive []worktree.Worktree
+	for _, wt := range worktrees {
+		if filepath.Clean(wt.Path) == filepath.Clean(mainPath) {
+			continue
+		}
+
+		info, err := os.Stat(wt.Path)
+		if err != nil {
+			continue
+		}
+
+		if info.ModTime().Before(cutoff) {
+			inactive = append(inactive, wt)
+		}
+	}
+	return inactive
 }
 
 type worktreeRow struct {

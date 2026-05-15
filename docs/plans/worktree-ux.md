@@ -19,10 +19,10 @@ The existing clone path remains the main/default worktree. Additional worktrees 
 - Keep `bud clone` unchanged by default. It still clones to the canonical repo path and jumps there.
 - Make `bud cd` worktree-aware so fuzzy navigation can jump to either the canonical project or a managed sibling worktree.
 - Add `bud tree list [query]` to show grouped worktrees with path, branch, HEAD short SHA, dirty state, and last modified time.
-- Add `bud tree new <name> [branch]` to create `repo--<name>` from the current project repository.
+- Add `bud tree new <name> [branch]` to create `repo--<name>` from the current project repository and jump into it.
 - Add `bud tree cd <query>` to jump to a worktree by branch, worktree name, or fuzzy match, using the existing shell finalizer.
 - Add `bud tree switch [query]` to show an interactive up/down/enter selector and jump to the selected worktree.
-- Add `bud tree remove [query]` and `bud tree prune` for cleanup.
+- Add `bud tree remove [query]` and `bud tree prune` for cleanup. `prune` should also ask whether to delete each existing worktree that has not been touched for more than one week.
 
 ## Branch Conflict UX
 

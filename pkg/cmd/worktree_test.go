@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -40,4 +43,27 @@ func TestWorktreeSwitchMenuTemplateAlignsInactiveRowsWithPandaMarker(t *testing.
 
 	require.Equal(t, "🐼 {{ .Label | cyan }}", templates.Active)
 	require.Equal(t, "   {{ .Label }}", templates.Inactive)
+}
+
+func TestInactiveWorktreesSkipsMainAndRecentWorktrees(t *testing.T) {
+	dir := t.TempDir()
+	mainPath := filepath.Join(dir, "api")
+	oldPath := filepath.Join(dir, "api--old")
+	recentPath := filepath.Join(dir, "api--recent")
+	require.NoError(t, os.Mkdir(mainPath, 0755))
+	require.NoError(t, os.Mkdir(oldPath, 0755))
+	require.NoError(t, os.Mkdir(recentPath, 0755))
+
+	now := time.Date(2026, 5, 15, 12, 0, 0, 0, time.UTC)
+	require.NoError(t, os.Chtimes(mainPath, now.Add(-14*24*time.Hour), now.Add(-14*24*time.Hour)))
+	require.NoError(t, os.Chtimes(oldPath, now.Add(-8*24*time.Hour), now.Add(-8*24*time.Hour)))
+	require.NoError(t, os.Chtimes(recentPath, now.Add(-2*24*time.Hour), now.Add(-2*24*time.Hour)))
+
+	got := inactiveWorktrees([]worktree.Worktree{
+		{Path: mainPath, Branch: "main"},
+		{Path: oldPath, Branch: "old"},
+		{Path: recentPath, Branch: "recent"},
+	}, now, 7*24*time.Hour)
+
+	require.Equal(t, []worktree.Worktree{{Path: oldPath, Branch: "old"}}, got)
 }

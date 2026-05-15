@@ -19,6 +19,7 @@ func Test_Cmd_Worktree_New_And_Cd(t *testing.T) {
 	output := c.Run(t, "bud tree new feature-a")
 	OutputContains(t, output, "created worktree", "feature-a", worktreePath)
 	c.AssertExist(t, worktreePath+"/dev.yml")
+	require.Equal(t, worktreePath, c.Cwd(t))
 
 	branch := c.Run(t, "git -C "+worktreePath+" branch --show-current")
 	require.Equal(t, []string{"feature-a"}, branch)
@@ -88,6 +89,29 @@ func Test_Cmd_Tree_BranchConflict(t *testing.T) {
 
 	output := c.Run(t, "bud tree new duplicate feature-a", testcontext.ExitCode(1))
 	OutputContains(t, output, "branch feature-a is already checked out", worktreePath, "bud tree cd feature-a")
+}
+
+func Test_Cmd_Tree_Prune_Asks_To_Delete_Inactive_Worktrees(t *testing.T) {
+	c := CreateContextAndInit(t)
+	projectPath := "/home/tester/src/github.com/orgname/projname"
+	oldWorktreePath := "/home/tester/src/github.com/orgname/projname--old-branch"
+	recentWorktreePath := "/home/tester/src/github.com/orgname/projname--recent-branch"
+
+	createGitProject(t, c, projectPath)
+	c.Cd(t, projectPath)
+	c.Run(t, "bud tree new old-branch")
+	c.Cd(t, projectPath)
+	c.Run(t, "bud tree new recent-branch")
+	c.Cd(t, projectPath)
+	c.Run(t, "touch -d '8 days ago' "+oldWorktreePath)
+
+	c.Send(t, "bud tree prune\n")
+	c.Expect(t, "Delete inactive worktree old-branch")
+	c.Send(t, "y\r")
+	c.WaitPrompt(t)
+
+	c.Run(t, "test ! -e "+oldWorktreePath)
+	c.AssertExist(t, recentWorktreePath)
 }
 
 func Test_Cmd_Tree_Has_No_Short_Aliases(t *testing.T) {
