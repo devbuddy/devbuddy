@@ -15,8 +15,9 @@ func (e propertyNotFoundError) Error() string {
 
 // TaskConfig represents a task as defined in dev.yml
 type TaskConfig struct {
-	name    string
-	payload any
+	name        string
+	payload     any
+	ProjectPath string // root directory of the project. May be empty in tests.
 }
 
 func NewTaskConfig(definition any) (*TaskConfig, error) {

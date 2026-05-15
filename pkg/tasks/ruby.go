@@ -1,7 +1,11 @@
 package tasks
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
@@ -16,7 +20,7 @@ func init() {
 }
 
 func parserRuby(config *api.TaskConfig, task *api.Task) error {
-	version, err := config.GetStringPropertyAllowSingle("version")
+	version, err := resolveRubyVersion(config)
 	if err != nil {
 		return err
 	}
@@ -26,6 +30,41 @@ func parserRuby(config *api.TaskConfig, task *api.Task) error {
 	parserRubyInstallRubyVersion(task, version)
 	parserRubyBundleInstall(task, version)
 	return nil
+}
+
+// resolveRubyVersion returns the requested Ruby version. It accepts the version
+// from the dev.yml payload (string form or `version:` property) and falls back
+// to a `.ruby-version` file at the project root when neither is provided.
+func resolveRubyVersion(config *api.TaskConfig) (string, error) {
+	version, err := config.GetStringPropertyAllowSingle("version")
+	if err == nil {
+		return version, nil
+	}
+
+	if config.ProjectPath != "" {
+		v, readErr := readRubyVersionFile(filepath.Join(config.ProjectPath, ".ruby-version"))
+		if readErr == nil {
+			return v, nil
+		}
+		if !errors.Is(readErr, os.ErrNotExist) {
+			return "", fmt.Errorf("reading .ruby-version: %w", readErr)
+		}
+	}
+	return "", err
+}
+
+func readRubyVersionFile(path string) (string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	version := strings.TrimSpace(string(data))
+	// Strip an optional engine prefix such as `ruby-3.3.0` written by some tools.
+	version = strings.TrimPrefix(version, "ruby-")
+	if version == "" {
+		return "", fmt.Errorf(".ruby-version is empty")
+	}
+	return version, nil
 }
 
 func parserRubyInstallRbenv(task *api.Task) {
@@ -89,6 +128,9 @@ func parserRubyBundleInstall(task *api.Task, version string) {
 		}
 		return nil
 	}
+	// Either file changing should trigger a re-run: Gemfile when deps are
+	// added/removed, Gemfile.lock when versions are bumped (e.g. `bundle update`).
 	task.AddActionBuilder("install gems with bundler", run).
-		On(api.FileCondition("Gemfile"))
+		On(api.FileCondition("Gemfile")).
+		On(api.FileCondition("Gemfile.lock"))
 }

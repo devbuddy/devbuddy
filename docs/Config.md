@@ -183,12 +183,42 @@ up:
 
 This task will install the Ruby version (with rbenv, which is installed automatically via
 Homebrew if missing) and activate it in your shell. If a `Gemfile` is present, gems will
-be installed with `bundle install`.
+be installed with `bundle install`. Both `Gemfile` and `Gemfile.lock` are watched, so
+either changing will re-trigger the install.
+
+The Ruby version can be set explicitly in `dev.yml`, or omitted to read it from a
+`.ruby-version` file at the project root (an optional `ruby-` engine prefix is stripped):
 
 ```yaml
 up:
   - ruby: 3.3.0
 ```
+
+```yaml
+up:
+  - ruby  # reads .ruby-version
+```
+
+#### Tradeoffs and limitations
+
+- **macOS-first install path.** Bootstrapping rbenv is done via `brew install rbenv`.
+  On Linux, install rbenv yourself before running `bud up`; the task will detect it
+  and proceed.
+- **Native build dependencies are not installed.** `rbenv install` compiles Ruby from
+  source and needs system headers (`libssl-dev`, `libyaml-dev`, `libffi-dev`, etc. on
+  Linux; the Xcode command-line tools on macOS). If they're missing, `rbenv install`
+  will fail with its own error and you'll need to install them manually. Tracked in
+  [#547](https://github.com/devbuddy/devbuddy/issues/547).
+- **No shims, no `GEM_HOME`/`RUBYOPT`.** The autoenv feature simply prepends the
+  selected version's `bin/` directory to `PATH`, which is enough for `ruby`, `gem`,
+  `bundle`, and gem-installed executables. Tools that rely on rbenv shims or that
+  read `GEM_HOME`/`GEM_PATH` directly will not see a version-specific environment.
+- **Bundler is assumed to ship with Ruby.** Ruby 2.6 and later bundle Bundler in the
+  stdlib, so the task does not install it explicitly. Older Ruby versions are not
+  supported.
+- **Gems install into the rbenv version directory** rather than a per-project
+  `vendor/bundle`. If you want isolation, run `bundle config set --local path vendor/bundle`
+  in the project before `bud up`.
 
 ### `custom`
 
