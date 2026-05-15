@@ -27,7 +27,7 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 	}
 
 	for _, payload := range manifest.Up {
-		task, err = NewTaskFromPayload(payload)
+		task, err = newTaskFromPayloadInProject(payload, proj.Path)
 		if err != nil {
 			return nil, err
 		}
@@ -38,10 +38,15 @@ func GetTasksFromProject(proj *project.Project) (taskList []*Task, err error) {
 }
 
 func NewTaskFromPayload(payload any) (*Task, error) {
+	return newTaskFromPayloadInProject(payload, "")
+}
+
+func newTaskFromPayloadInProject(payload any, projectPath string) (*Task, error) {
 	taskConfig, err := NewTaskConfig(payload)
 	if err != nil {
 		return nil, fmt.Errorf("parsing task: %w", err)
 	}
+	taskConfig.ProjectPath = projectPath
 
 	taskDef := GetDefinitionOrUnknown(taskConfig.name)
 
