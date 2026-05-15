@@ -284,12 +284,7 @@ func selectWorktree(exec *executor.Executor, worktrees []worktree.Worktree) (wor
 		Label:        "Select worktree",
 		Items:        items,
 		HideSelected: true,
-		Templates: &promptui.SelectTemplates{
-			Label:    "{{ . }}",
-			Active:   "🐼 {{ .Label | cyan }}",
-			Inactive: "  {{ .Label }}",
-			Selected: "🐼 {{ .Label }}",
-		},
+		Templates:    worktreeSwitchTemplates(),
 	}
 
 	index, _, err := prompt.Run()
@@ -297,6 +292,15 @@ func selectWorktree(exec *executor.Executor, worktrees []worktree.Worktree) (wor
 		return worktree.Worktree{}, err
 	}
 	return items[index].Worktree, nil
+}
+
+func worktreeSwitchTemplates() *promptui.SelectTemplates {
+	return &promptui.SelectTemplates{
+		Label:    "{{ . }}",
+		Active:   "🐼 {{ .Label | cyan }}",
+		Inactive: "   {{ .Label }}",
+		Selected: "🐼 {{ .Label }}",
+	}
 }
 
 func matchWorktrees(worktrees []worktree.Worktree, query string) []worktree.Worktree {
