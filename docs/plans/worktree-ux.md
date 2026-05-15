@@ -15,13 +15,14 @@ The existing clone path remains the main/default worktree. Additional worktrees 
 
 ## Key UX Changes
 
-- Add `bud wt` as the primary command group, with `bud worktree` as an alias.
+- Add `bud tree` as the primary command group, with `bud wt` and `bud worktree` as aliases.
 - Keep `bud clone` unchanged by default. It still clones to the canonical repo path and jumps there.
 - Make `bud cd` worktree-aware so fuzzy navigation can jump to either the canonical project or a managed sibling worktree.
-- Add `bud wt list [query]` to show grouped worktrees with path, branch, HEAD short SHA, dirty state, and last modified time.
-- Add `bud wt new <name> [branch]` to create `repo--<name>` from the current project repository.
-- Add `bud wt cd [query]` to select and jump to a worktree, using the existing shell finalizer.
-- Add `bud wt remove [query]` and `bud wt prune` for cleanup.
+- Add `bud tree list [query]` to show grouped worktrees with path, branch, HEAD short SHA, dirty state, and last modified time.
+- Add `bud tree new <name> [branch]` to create `repo--<name>` from the current project repository.
+- Add `bud tree cd <query>` to jump to a worktree by branch, worktree name, or fuzzy match, using the existing shell finalizer.
+- Add `bud tree switch [query]` to show an interactive up/down/enter selector and jump to the selected worktree.
+- Add `bud tree remove [query]` and `bud tree prune` for cleanup.
 
 ## Branch Conflict UX
 
@@ -58,9 +59,10 @@ Non-interactive behavior should fail with a clear message and exact commands to 
 - Unit test sibling path derivation and worktree name sanitization.
 - Unit test branch occupancy detection.
 - Unit test project search with canonical repos and `repo--name` worktrees.
-- Integration test `bud wt new feature-a` creates `repo--feature-a`.
-- Integration test `bud wt cd feature-a` changes shell cwd through the existing finalizer.
-- Integration test `bud cd feature-a` jumps directly to a managed worktree.
+- Integration test `bud tree new feature-a` creates `repo--feature-a`.
+- Integration test `bud tree cd feature-a` changes shell cwd through the existing finalizer.
+- Integration test `bud tree switch` can select a worktree with down-arrow and enter.
+- Integration test `bud cd feature-a` jumps directly to a managed worktree branch, including when the branch name differs from the worktree directory suffix.
 - Integration test branch conflict output for interactive and non-interactive use.
 - Run shell finalizer coverage for both bash and zsh where integration coverage is added.
 
@@ -69,5 +71,5 @@ Non-interactive behavior should fail with a clear message and exact commands to 
 - The sibling layout is the default: `repo--<worktree-name>`.
 - Existing clones require no migration.
 - The current repo path is the default/main worktree.
-- `bud wt` is the preferred short command, and `bud worktree` is an alias.
+- `bud tree` is the preferred command, and `bud wt` plus `bud worktree` are aliases.
 - v1 focuses on local Git worktree creation, navigation, cleanup, and branch-conflict help. It does not include remote PR automation or AI-agent metadata.

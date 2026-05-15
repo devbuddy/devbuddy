@@ -13,8 +13,9 @@ import (
 
 // Project represents a project whether it exists locally or not
 type Project struct {
-	hosting *hostingInfo
-	Path    string // Local path of this project on disk
+	hosting        *hostingInfo
+	Path           string // Local path of this project on disk
+	WorktreeBranch string
 }
 
 // NewFromID creates an instance of Project from a short id like "org/name" or "name"
@@ -54,6 +55,9 @@ func (p *Project) Name() string {
 
 // FullName returns a logical id like platform:org/project
 func (p *Project) FullName() string {
+	if p.WorktreeBranch != "" {
+		return fmt.Sprintf("%s:%s/%s [%s]", p.hosting.platform, p.hosting.organisation, p.hosting.repository, p.WorktreeBranch)
+	}
 	return fmt.Sprintf("%s:%s/%s", p.hosting.platform, p.hosting.organisation, p.hosting.repository)
 }
 

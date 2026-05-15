@@ -314,6 +314,34 @@ func (c *TestContext) hostPath(t *testing.T, containerPath string) (string, bool
 	return filepath.Join(c.workspaceHostPath, filepath.FromSlash(relPath)), true
 }
 
+func (c *TestContext) Send(t *testing.T, text string) {
+	t.Helper()
+	err := c.expect.Send(text)
+	require.NoError(t, err)
+}
+
+func (c *TestContext) Expect(t *testing.T, text string) string {
+	t.Helper()
+	line, err := c.expect.Expect(text)
+	require.NoError(t, err)
+	return StripAnsi(line)
+}
+
+func (c *TestContext) WaitPrompt(t *testing.T) []string {
+	t.Helper()
+	var output []string
+	for {
+		line, err := c.expect.Line()
+		require.NoError(t, err)
+
+		line = strings.Replace(line, "\r", "", -1)
+		if line == "##\n" {
+			return StripAnsiSlice(output)
+		}
+		output = append(output, strings.TrimSuffix(line, "\n"))
+	}
+}
+
 func (c *TestContext) debugLine(format string, a ...any) {
 	if c.debug {
 		format = strings.TrimSuffix(format, "\n") + "\n"
