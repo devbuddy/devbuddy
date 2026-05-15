@@ -3,6 +3,7 @@ package harness
 import (
 	"fmt"
 	"math/rand/v2"
+	"os"
 	"strings"
 	"testing"
 
@@ -14,7 +15,18 @@ import (
 func CreateContext(t *testing.T) *context.TestContext {
 	t.Helper()
 
-	c, err := context.New(config)
+	testConfig := config
+	var err error
+	testConfig.WorkspaceHostPath, err = os.MkdirTemp("", "devbuddy-test-workspace-*")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = os.RemoveAll(testConfig.WorkspaceHostPath)
+	})
+	err = os.Chmod(testConfig.WorkspaceHostPath, 0777)
+	require.NoError(t, err)
+	testConfig.WorkspaceContainerPath = "/home/tester/src/github.com"
+
+	c, err := context.New(testConfig)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
@@ -87,8 +99,6 @@ func CreateProject(t *testing.T, c *context.TestContext, devYmlLines ...string) 
 		c:    c,
 		Path: "/home/tester/src/github.com/orgname/" + name,
 	}
-
-	c.Run(t, "mkdir -p "+p.Path)
 
 	p.WriteDevYml(t, devYmlLines...)
 

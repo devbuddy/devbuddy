@@ -4,7 +4,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -20,7 +23,9 @@ type TestContext struct {
 	shell  interface {
 		Run(string) ([]string, error)
 	}
-	debug bool
+	workspaceHostPath      string
+	workspaceContainerPath string
+	debug                  bool
 }
 
 func New(config Config) (*TestContext, error) {
@@ -56,9 +61,11 @@ func New(config Config) (*TestContext, error) {
 		"-e", "PS1=##\n",
 		"-e", "IN_DOCKER=yes",
 		"--rm",
-		"--entrypoint", shellPath,
-		config.DockerImage,
 	}
+	if config.WorkspaceHostPath != "" && config.WorkspaceContainerPath != "" {
+		dockerCommand = append(dockerCommand, "-v", config.WorkspaceHostPath+":"+config.WorkspaceContainerPath)
+	}
+	dockerCommand = append(dockerCommand, "--entrypoint", shellPath, config.DockerImage)
 	dockerCommand = append(dockerCommand, args...)
 
 	e := expect.NewExpect(dockerCommand[0], dockerCommand[1:]...)
@@ -75,15 +82,21 @@ func New(config Config) (*TestContext, error) {
 	}
 
 	tc := &TestContext{
-		expect: e,
-		shell:  c,
-		// t:      t,
+		expect:                 e,
+		shell:                  c,
+		workspaceHostPath:      config.WorkspaceHostPath,
+		workspaceContainerPath: config.WorkspaceContainerPath,
 	}
 	tc.debugLine("Expect command: %q", dockerCommand)
 
 	_, err = tc.run("stty -echo")
 	if err != nil {
 		return nil, fmt.Errorf("disabling echo mode: %w", err)
+	}
+
+	_, err = tc.run("umask 000")
+	if err != nil {
+		return nil, fmt.Errorf("configuring test shell umask: %w", err)
 	}
 
 	output, err := tc.run("echo $IN_DOCKER")
@@ -174,6 +187,18 @@ func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 
 func (c *TestContext) Write(t *testing.T, path, content string) {
 	t.Helper()
+
+	if hostPath, ok := c.hostPath(t, path); ok {
+		err := os.MkdirAll(filepath.Dir(hostPath), 0755)
+		require.NoError(t, err)
+		err = os.Chmod(filepath.Dir(hostPath), 0777)
+		require.NoError(t, err)
+
+		err = os.WriteFile(hostPath, []byte(content), 0644)
+		require.NoError(t, err)
+		return
+	}
+
 	b64content := base64.StdEncoding.EncodeToString([]byte(content))
 	_, err := c.shell.Run(fmt.Sprintf("echo %s | base64 --decode > %q", b64content, path))
 	require.NoError(t, err)
@@ -188,8 +213,8 @@ func (c *TestContext) Cwd(t *testing.T) string {
 	t.Helper()
 	lines, err := c.shell.Run("pwd")
 	require.NoError(t, err)
-	require.Len(t, lines, 1, "unexpected output for 'pwd'")
-	return lines[0]
+	require.NotEmpty(t, lines, "unexpected output for 'pwd'")
+	return lines[len(lines)-1]
 }
 
 func (c *TestContext) Cat(t *testing.T, path string) string {
@@ -231,6 +256,31 @@ func (c *TestContext) Cd(t *testing.T, path string) []string {
 	lines, err := c.shell.Run("cd " + strconv.Quote(path))
 	require.NoError(t, err)
 	return lines
+}
+
+func (c *TestContext) hostPath(t *testing.T, containerPath string) (string, bool) {
+	t.Helper()
+
+	if c.workspaceHostPath == "" || c.workspaceContainerPath == "" {
+		return "", false
+	}
+
+	absolutePath := containerPath
+	if !path.IsAbs(absolutePath) {
+		absolutePath = path.Join(c.Cwd(t), absolutePath)
+	}
+	absolutePath = path.Clean(absolutePath)
+
+	workspaceRoot := path.Clean(c.workspaceContainerPath)
+	if absolutePath != workspaceRoot && !strings.HasPrefix(absolutePath, workspaceRoot+"/") {
+		return "", false
+	}
+
+	relPath := "."
+	if absolutePath != workspaceRoot {
+		relPath = strings.TrimPrefix(absolutePath, workspaceRoot+"/")
+	}
+	return filepath.Join(c.workspaceHostPath, filepath.FromSlash(relPath)), true
 }
 
 func (c *TestContext) debugLine(format string, a ...any) {
