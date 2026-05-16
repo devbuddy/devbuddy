@@ -106,10 +106,8 @@ func Test_Cmd_Tree_Prune_Asks_To_Delete_Inactive_Worktrees(t *testing.T) {
 	c.Cd(t, projectPath)
 	c.Run(t, "touch -d '8 days ago' "+oldWorktreePath)
 
-	c.Send(t, "bud tree prune\n")
-	c.Expect(t, "Delete inactive worktree old-branch")
-	c.Send(t, "y\r")
-	c.WaitPrompt(t)
+	output := c.Run(t, "printf 'y\\n' | /usr/local/bin/bud tree prune")
+	harness.OutputContains(t, output, "Delete inactive worktree old-branch")
 
 	c.Run(t, "test ! -e "+oldWorktreePath)
 	c.AssertExist(t, recentWorktreePath)

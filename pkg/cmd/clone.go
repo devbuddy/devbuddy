@@ -1,13 +1,15 @@
 package cmd
 
 import (
-	"github.com/manifoldco/promptui"
+	"errors"
+
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/integration"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 var cloneCmd = &cobra.Command{
@@ -39,11 +41,13 @@ func cloneRun(_ *cobra.Command, args []string) error {
 	}
 
 	if !manifest.ExistsIn(proj.Path) {
-		prompt := promptui.Prompt{
-			Label:     "This project has no dev.yml. Create one",
-			IsConfirm: true,
+		confirmed, err := ctx.UI.Prompts().Confirm(ui.ConfirmRequest{
+			Label: "This project has no dev.yml. Create one",
+		})
+		if err != nil && !errors.Is(err, ui.ErrPromptCancelled) {
+			return err
 		}
-		if _, err := prompt.Run(); err == nil {
+		if confirmed {
 			if err := createManifest(ctx.UI, proj.Path, ""); err != nil {
 				return err
 			}
