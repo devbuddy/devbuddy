@@ -1,5 +1,7 @@
 package features
 
+import "sort"
+
 type Register map[string]Feature
 
 func (e Register) Register(feature Feature) {
@@ -17,5 +19,6 @@ func (e Register) Names() (names []string) {
 	for name := range e {
 		names = append(names, name)
 	}
+	sort.Strings(names)
 	return
 }
