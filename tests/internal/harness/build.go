@@ -30,9 +30,10 @@ func BuildLinuxBinary() (string, error) {
 }
 
 // BuildHostBinary compiles ./cmd/bud for the host platform with
-// `-X main.Version=devel` and returns the output path.
+// `-X main.Version=devel` and returns the output path. The binary basename is
+// "bud" so that adding its directory to PATH lets tests invoke `bud` directly.
 func BuildHostBinary() (string, error) {
-	path, err := tempBinaryPath("bud-host")
+	path, err := tempBinaryPath("bud")
 	if err != nil {
 		return "", err
 	}

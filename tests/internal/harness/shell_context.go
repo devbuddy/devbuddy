@@ -1,4 +1,4 @@
-package context
+package harness
 
 import (
 	"encoding/base64"
@@ -271,6 +271,11 @@ func (c *TestContext) Cd(t *testing.T, path string) []string {
 	lines, err := c.shellRun("cd " + strconv.Quote(path))
 	require.NoError(t, err)
 	return lines
+}
+
+// ProjectsDir returns the container path under which test projects are created.
+func (c *TestContext) ProjectsDir() string {
+	return "/home/tester/src/github.com"
 }
 
 func (c *TestContext) hostPath(t *testing.T, containerPath string) (string, bool) {

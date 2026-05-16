@@ -22,7 +22,7 @@ commands:
 func Test_Cmd_Custom(t *testing.T) {
 	c := harness.NewCLI(t)
 
-	harness.NewCLIProject(t, c, devYmlMyCmd)
+	harness.NewProject(t, c, devYmlMyCmd)
 
 	lines := c.Run(t, "bud mycmd")
 	harness.OutputEqual(t, lines, "🐼  running touch somefile")
@@ -34,7 +34,7 @@ func Test_Cmd_Custom(t *testing.T) {
 func Test_Cmd_Custom_Short_Syntax(t *testing.T) {
 	c := harness.NewCLI(t)
 
-	harness.NewCLIProject(t, c, devYmlMyCmdShort)
+	harness.NewProject(t, c, devYmlMyCmdShort)
 
 	lines := c.Run(t, "bud mycmd")
 	harness.OutputEqual(t, lines, "🐼  running touch somefile")
@@ -43,7 +43,7 @@ func Test_Cmd_Custom_Short_Syntax(t *testing.T) {
 func Test_Cmd_Custom_Envs_Are_Applied(t *testing.T) {
 	c := harness.NewCLI(t)
 
-	harness.NewCLIProject(t, c,
+	harness.NewProject(t, c,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`commands:`,
@@ -57,7 +57,7 @@ func Test_Cmd_Custom_Envs_Are_Applied(t *testing.T) {
 func Test_Cmd_Custom_With_Piped_Stdin(t *testing.T) {
 	c := harness.NewCLI(t)
 
-	harness.NewCLIProject(t, c, devYmlMyCmd)
+	harness.NewProject(t, c, devYmlMyCmd)
 
 	lines := c.Run(t, "echo '' | bud mycmd")
 	harness.OutputEqual(t, lines, "🐼  running touch somefile")
@@ -66,7 +66,7 @@ func Test_Cmd_Custom_With_Piped_Stdin(t *testing.T) {
 func Test_Cmd_Custom_Output(t *testing.T) {
 	c := harness.NewCLI(t)
 
-	harness.NewCLIProject(t, c,
+	harness.NewProject(t, c,
 		`commands:`,
 		`  greet: echo "hello world"`,
 	)
@@ -78,7 +78,7 @@ func Test_Cmd_Custom_Output(t *testing.T) {
 func Test_Cmd_Custom_Exit_Code(t *testing.T) {
 	c := harness.NewCLI(t)
 
-	harness.NewCLIProject(t, c,
+	harness.NewProject(t, c,
 		`commands:`,
 		`  fail: exit 42`,
 	)
@@ -91,7 +91,7 @@ func Test_Cmd_Custom_Exit_Code(t *testing.T) {
 func Test_Cmd_Custom_Always_Run_In_Project_Root(t *testing.T) {
 	c := harness.NewCLI(t)
 
-	harness.NewCLIProject(t, c, devYmlMyCmd)
+	harness.NewProject(t, c, devYmlMyCmd)
 	c.Run(t, "mkdir foobar")
 	c.Cd(t, "foobar")
 

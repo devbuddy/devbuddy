@@ -5,14 +5,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/devbuddy/devbuddy/tests/internal/context"
 )
 
 // OutputContains asserts that every substring appears in the joined output.
 func OutputContains(t *testing.T, lines []string, subStrings ...string) {
 	t.Helper()
-	text := context.StripAnsi(strings.Join(lines, "\n"))
+	text := StripAnsi(strings.Join(lines, "\n"))
 	for _, s := range subStrings {
 		require.Contains(t, text, s)
 	}
@@ -21,7 +19,7 @@ func OutputContains(t *testing.T, lines []string, subStrings ...string) {
 // OutputNotContains asserts that no substring appears in the joined output.
 func OutputNotContains(t *testing.T, lines []string, subStrings ...string) {
 	t.Helper()
-	text := context.StripAnsi(strings.Join(lines, "\n"))
+	text := StripAnsi(strings.Join(lines, "\n"))
 	for _, s := range subStrings {
 		require.NotContains(t, text, s)
 	}

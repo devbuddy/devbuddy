@@ -3,17 +3,13 @@ package harness
 import (
 	stdcontext "context"
 	"fmt"
-	"math/rand/v2"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/devbuddy/devbuddy/tests/internal/context"
 )
 
 var cliBinaryPath string
@@ -36,24 +32,6 @@ type CLIContext struct {
 	env     []string
 }
 
-// RunOption configures a single CLIContext.Run invocation.
-type RunOption func(*runOptions)
-
-type runOptions struct {
-	ExitCode int
-	Timeout  time.Duration
-}
-
-// ExitCode sets the expected exit code for a CLIContext.Run call.
-func ExitCode(code int) RunOption {
-	return func(o *runOptions) { o.ExitCode = code }
-}
-
-// Timeout sets the per-command timeout for a CLIContext.Run call.
-func Timeout(timeout time.Duration) RunOption {
-	return func(o *runOptions) { o.Timeout = timeout }
-}
-
 // NewCLI creates a host CLI context with a fresh temp HOME and work dir.
 func NewCLI(t *testing.T) *CLIContext {
 	t.Helper()
@@ -67,27 +45,18 @@ func NewCLI(t *testing.T) *CLIContext {
 	return &CLIContext{workDir: workDir, homeDir: homeDir, env: env}
 }
 
-// NewCLIProject creates a project directory with the given dev.yml content,
-// cd's into it, and returns its absolute path.
-func NewCLIProject(t *testing.T, c *CLIContext, devYmlLines ...string) string {
-	t.Helper()
-	name := fmt.Sprintf("project-%x", rand.Int32())
-	projectPath := filepath.Join(c.homeDir, "src", "github.com", "orgname", name)
-	c.WriteLines(t, filepath.Join(projectPath, "dev.yml"), devYmlLines...)
-	c.Cd(t, projectPath)
-	return projectPath
+// ProjectsDir returns the directory under which test projects are created.
+func (c *CLIContext) ProjectsDir() string {
+	return filepath.Join(c.homeDir, "src", "github.com")
 }
 
 // Run executes a shell command in the context's working directory.
-func (c *CLIContext) Run(t *testing.T, command string, optFns ...RunOption) []string {
+func (c *CLIContext) Run(t *testing.T, command string, optFns ...runOptionsFn) []string {
 	t.Helper()
 
-	opt := runOptions{ExitCode: 0, Timeout: 10 * time.Second}
-	for _, fn := range optFns {
-		fn(&opt)
-	}
+	opt := buildRunOptions(optFns)
 
-	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), opt.Timeout)
+	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), opt.timeout)
 	defer cancel()
 
 	finalizerFile := filepath.Join(t.TempDir(), "bud-finalizer")
@@ -97,7 +66,7 @@ func (c *CLIContext) Run(t *testing.T, command string, optFns ...RunOption) []st
 
 	output, err := cmd.CombinedOutput()
 	if ctx.Err() == stdcontext.DeadlineExceeded {
-		require.Failf(t, "command timed out", "timed out after %s running %q. output:\n%s", opt.Timeout, command, string(output))
+		require.Failf(t, "command timed out", "timed out after %s running %q. output:\n%s", opt.timeout, command, string(output))
 	}
 
 	exitCode := 0
@@ -108,7 +77,7 @@ func (c *CLIContext) Run(t *testing.T, command string, optFns ...RunOption) []st
 			require.NoError(t, err, "running command: %q", command)
 		}
 	}
-	require.Equal(t, opt.ExitCode, exitCode, "running command %q. output:\n%s", command, string(output))
+	require.Equal(t, opt.exitCode, exitCode, "running command %q. output:\n%s", command, string(output))
 
 	return splitLines(output)
 }
@@ -217,7 +186,7 @@ func splitLines(output []byte) []string {
 	if text == "" {
 		return nil
 	}
-	return strings.Split(context.StripAnsi(text), "\n")
+	return strings.Split(StripAnsi(text), "\n")
 }
 
 func canonicalTempDir(t *testing.T) string {

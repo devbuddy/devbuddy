@@ -3,7 +3,6 @@ package integration
 import (
 	"testing"
 
-	"github.com/devbuddy/devbuddy/tests/internal/context"
 	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +14,7 @@ func Test_Env(t *testing.T) {
 
 	c.Write(t, "dev.yml", devYml)
 
-	lines := c.Run(t, "bud up", context.ExitCode(0))
+	lines := c.Run(t, "bud up", harness.ExitCode(0))
 	harness.OutputEqual(t, lines, "◼︎ Env")
 
 	value := c.GetEnv(t, "TESTVAR")

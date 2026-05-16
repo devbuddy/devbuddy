@@ -10,7 +10,7 @@ import (
 func Test_Hook_Preserves_Previous_Exit_Code(t *testing.T) {
 	c := harness.NewDockerInit(t)
 
-	harness.NewDockerProject(t, c,
+	harness.NewProject(t, c,
 		`up: []`,
 	)
 
@@ -23,7 +23,7 @@ func Test_Hook_DeferInit_Skips_First_Invocation(t *testing.T) {
 
 	// Create a project and cd into it BEFORE shell init.
 	// No PROMPT_COMMAND is set yet, so no hook fires during these steps.
-	harness.NewDockerProject(t, c,
+	harness.NewProject(t, c,
 		`env:`,
 		`  TESTVAR: hello`,
 	)
@@ -46,7 +46,7 @@ func Test_Hook_Without_DeferInit_Activates_Immediately(t *testing.T) {
 	c := harness.NewDocker(t)
 
 	// Create a project and cd into it BEFORE shell init.
-	harness.NewDockerProject(t, c,
+	harness.NewProject(t, c,
 		`env:`,
 		`  TESTVAR: hello`,
 	)

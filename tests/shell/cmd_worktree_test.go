@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	testcontext "github.com/devbuddy/devbuddy/tests/internal/context"
 	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
@@ -88,7 +87,7 @@ func Test_Cmd_Tree_BranchConflict(t *testing.T) {
 	c.Cd(t, projectPath)
 	c.Run(t, "bud tree new feature-a")
 
-	output := c.Run(t, "bud tree new duplicate feature-a", testcontext.ExitCode(1))
+	output := c.Run(t, "bud tree new duplicate feature-a", harness.ExitCode(1))
 	harness.OutputContains(t, output, "branch feature-a is already checked out", worktreePath, "bud tree cd feature-a")
 }
 
@@ -118,10 +117,10 @@ func Test_Cmd_Tree_Prune_Asks_To_Delete_Inactive_Worktrees(t *testing.T) {
 func Test_Cmd_Tree_Has_No_Short_Aliases(t *testing.T) {
 	c := harness.NewDocker(t)
 
-	output := c.Run(t, "bud wt", testcontext.ExitCode(1))
+	output := c.Run(t, "bud wt", harness.ExitCode(1))
 	harness.OutputContains(t, output, `unknown command "wt"`)
 
-	output = c.Run(t, "bud worktree", testcontext.ExitCode(1))
+	output = c.Run(t, "bud worktree", harness.ExitCode(1))
 	harness.OutputContains(t, output, `unknown command "worktree"`)
 }
 
@@ -144,7 +143,7 @@ func assertPathColumnAligned(t *testing.T, lines []string) {
 	require.NotEqual(t, -1, pathColumn, "expected at least one worktree path")
 }
 
-func createGitProject(t *testing.T, c *testcontext.TestContext, path string) {
+func createGitProject(t *testing.T, c *harness.TestContext, path string) {
 	t.Helper()
 
 	// Write via host path first so the directory is created with host-side

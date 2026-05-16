@@ -9,7 +9,7 @@ import (
 func Test_Cmd_Inspect(t *testing.T) {
 	c := harness.NewCLI(t)
 
-	projectPath := harness.NewCLIProject(t, c,
+	projectPath := harness.NewProject(t, c,
 		`up:`,
 		`- node: '10.15.0'`,
 		`- pip: [requirements.txt]`,

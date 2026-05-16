@@ -29,7 +29,7 @@ func Test_Cmd_DebugInfo(t *testing.T) {
 
 	lines := c.Run(t, "bud --debug-info")
 	harness.OutputContains(t, lines, "**DevBuddy version**", "`devel`")
-	harness.OutputContains(t, lines, "harness.CLIProject not found.")
+	harness.OutputContains(t, lines, "Project not found.")
 }
 
 func Test_Cmd_DebugInfo_Project(t *testing.T) {
@@ -40,5 +40,5 @@ func Test_Cmd_DebugInfo_Project(t *testing.T) {
 	c.Run(t, "touch dev.yml")
 
 	lines := c.Run(t, "bud --debug-info")
-	harness.OutputContains(t, lines, "harness.CLIProject path: `"+c.Cwd(t)+"`")
+	harness.OutputContains(t, lines, "Project path: `"+c.Cwd(t)+"`")
 }

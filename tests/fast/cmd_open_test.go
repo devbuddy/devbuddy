@@ -44,7 +44,7 @@ func waitAndReadOpenedURL(t *testing.T, c *harness.CLIContext, path string) stri
 
 func Test_Cmd_Open_CustomLink_FuzzyMatch(t *testing.T) {
 	c := harness.NewCLI(t)
-	harness.NewCLIProject(t, c,
+	harness.NewProject(t, c,
 		`open:`,
 		`  staging: https://staging.example.com`,
 		`  docs: https://docs.example.com`,
@@ -59,7 +59,7 @@ func Test_Cmd_Open_CustomLink_FuzzyMatch(t *testing.T) {
 
 func Test_Cmd_Open_NoArgOpensGithub(t *testing.T) {
 	c := harness.NewCLI(t)
-	harness.NewCLIProject(t, c,
+	harness.NewProject(t, c,
 		`open:`,
 		`  docs: https://docs.example.com`,
 	)

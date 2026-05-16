@@ -6,14 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devbuddy/devbuddy/tests/internal/context"
 	"github.com/devbuddy/devbuddy/tests/internal/harness"
 )
 
 func Test_Task_Python_Develop(t *testing.T) {
 	c := harness.NewDockerPTYInit(t)
 
-	harness.NewDockerProject(t, c,
+	harness.NewProject(t, c,
 		`up:`,
 		`- python: 3.9.0`,
 		`- python_develop`,
@@ -23,7 +22,7 @@ func Test_Task_Python_Develop(t *testing.T) {
 
 	c.Write(t, "setup.py", generateTestSetupPy(42))
 
-	lines := c.Run(t, "bud up", context.Timeout(2*time.Minute))
+	lines := c.Run(t, "bud up", harness.Timeout(2*time.Minute))
 	harness.OutputContains(t, lines, "activated: python[3.9.0]")
 
 	lines = c.Run(t, "pip show devbuddy-test-pkg")
@@ -33,7 +32,7 @@ func Test_Task_Python_Develop(t *testing.T) {
 
 	c.Write(t, "setup.py", generateTestSetupPy(84))
 
-	c.Run(t, "bud up", context.Timeout(2*time.Minute))
+	c.Run(t, "bud up", harness.Timeout(2*time.Minute))
 
 	lines = c.Run(t, "pip show devbuddy-test-pkg")
 	harness.OutputContains(t, lines, "Version: 84")
@@ -42,7 +41,7 @@ func Test_Task_Python_Develop(t *testing.T) {
 func Test_Task_Python_Develop_With_Extra_Packages(t *testing.T) {
 	c := harness.NewDockerPTYInit(t)
 
-	harness.NewDockerProject(t, c,
+	harness.NewProject(t, c,
 		`up:`,
 		`- python: 3.9.0`,
 		`- python_develop:`,
@@ -51,7 +50,7 @@ func Test_Task_Python_Develop_With_Extra_Packages(t *testing.T) {
 
 	c.Write(t, "setup.py", generateTestSetupPy(1))
 
-	c.Run(t, "bud up", context.Timeout(2*time.Minute))
+	c.Run(t, "bud up", harness.Timeout(2*time.Minute))
 
 	lines := c.Run(t, "pip freeze")
 	harness.OutputContains(t, lines, "pkginfo==1.9.6")
@@ -60,7 +59,7 @@ func Test_Task_Python_Develop_With_Extra_Packages(t *testing.T) {
 func Test_Task_Python_Develop_Without_Extra_Packages(t *testing.T) {
 	c := harness.NewDockerPTYInit(t)
 
-	harness.NewDockerProject(t, c,
+	harness.NewProject(t, c,
 		`up:`,
 		`- python: 3.9.0`,
 		`- python_develop:`,
@@ -68,7 +67,7 @@ func Test_Task_Python_Develop_Without_Extra_Packages(t *testing.T) {
 
 	c.Write(t, "setup.py", generateTestSetupPy(1))
 
-	c.Run(t, "bud up", context.Timeout(2*time.Minute))
+	c.Run(t, "bud up", harness.Timeout(2*time.Minute))
 
 	lines := c.Run(t, "pip freeze")
 	harness.OutputNotContains(t, lines, "pkginfo==1.9.6")
