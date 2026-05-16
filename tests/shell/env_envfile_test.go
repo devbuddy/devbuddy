@@ -3,17 +3,18 @@ package integration
 import (
 	"testing"
 
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Env_EnvFile(t *testing.T) {
-	c := CreatePTYContextAndInit(t)
+	c := harness.NewDockerPTYInit(t)
 
 	c.Write(t, "dev.yml", `up: [envfile]`)
 	c.Write(t, ".env", `TESTVAR=FooBAr`)
 
 	lines := c.Run(t, "bud up")
-	OutputEqual(t, lines, "◼︎ EnvFile")
+	harness.OutputEqual(t, lines, "◼︎ EnvFile")
 
 	value := c.GetEnv(t, "TESTVAR")
 	require.Equal(t, "FooBAr", value)
@@ -26,8 +27,7 @@ func Test_Env_EnvFile(t *testing.T) {
 }
 
 func Test_Env_EnvFile_In_Process(t *testing.T) {
-
-	c := CreatePTYContextAndInit(t)
+	c := harness.NewDockerPTYInit(t)
 
 	c.WriteLines(t, "dev.yml",
 		`up:`,
@@ -43,8 +43,7 @@ func Test_Env_EnvFile_In_Process(t *testing.T) {
 }
 
 func Test_Env_EnvFile_Changes(t *testing.T) {
-
-	c := CreatePTYContextAndInit(t)
+	c := harness.NewDockerPTYInit(t)
 
 	c.Write(t, "dev.yml", `up: [envfile]`)
 	c.Write(t, ".env", `TESTVAR=one`)

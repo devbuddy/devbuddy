@@ -1,4 +1,4 @@
-package shellharness
+package context
 
 import (
 	"bufio"
@@ -12,7 +12,10 @@ import (
 	"time"
 )
 
-type Runner struct {
+// shellRunnerImpl drives a long-lived non-PTY shell over stdin/stdout pipes.
+// Commands cannot rely on process exit to delimit output, so each command is
+// followed by a unique sentinel that also carries the exit code.
+type shellRunnerImpl struct {
 	cmd    *exec.Cmd
 	stdin  io.WriteCloser
 	lines  <-chan string
@@ -21,12 +24,12 @@ type Runner struct {
 	nextID int
 }
 
-type Result struct {
+type runnerResult struct {
 	Lines    []string
 	ExitCode int
 }
 
-func Start(shellPath string, args ...string) (*Runner, error) {
+func startShellRunner(shellPath string, args ...string) (*shellRunnerImpl, error) {
 	cmd := exec.Command(shellPath, args...)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -50,7 +53,7 @@ func Start(shellPath string, args ...string) (*Runner, error) {
 		done <- cmd.Wait()
 	}()
 
-	return &Runner{
+	return &shellRunnerImpl{
 		cmd:   cmd,
 		stdin: stdin,
 		lines: scanLines(stdout, stderr),
@@ -58,44 +61,49 @@ func Start(shellPath string, args ...string) (*Runner, error) {
 	}, nil
 }
 
-func (r *Runner) Run(ctx context.Context, command string) (Result, error) {
+func (r *shellRunnerImpl) RunWithExitCode(command string, timeout time.Duration) ([]string, int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	result, err := r.run(ctx, command)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result.Lines, result.ExitCode, nil
+}
+
+func (r *shellRunnerImpl) run(ctx context.Context, command string) (runnerResult, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// Commands run in a long-lived shell, so we cannot rely on process exit to
-	// know when one command is done. Append a unique sentinel after the user's
-	// command and read until that sentinel appears. The sentinel also carries
-	// "$?", which gives us the exit code without prompt parsing.
 	r.nextID++
 	sentinel := fmt.Sprintf("__BUD_SENTINEL_%d__", r.nextID)
 	wrapped := fmt.Sprintf("%s\nprintf '%%s %%s\\n' %s \"$?\"\n", command, strconv.Quote(sentinel))
 	if _, err := io.WriteString(r.stdin, wrapped); err != nil {
-		return Result{}, fmt.Errorf("writing command: %w", err)
+		return runnerResult{}, fmt.Errorf("writing command: %w", err)
 	}
 
 	var output []string
 	for {
 		select {
 		case err := <-r.done:
-			return Result{}, fmt.Errorf("shell exited before sentinel: %w", err)
+			return runnerResult{}, fmt.Errorf("shell exited before sentinel: %w", err)
 		case <-ctx.Done():
-			return Result{}, ctx.Err()
+			return runnerResult{}, ctx.Err()
 		case line, ok := <-r.lines:
 			if !ok {
-				return Result{}, io.ErrUnexpectedEOF
+				return runnerResult{}, io.ErrUnexpectedEOF
 			}
 			exitCode, ok := parseSentinel(line, sentinel)
 			if ok {
-				return Result{Lines: output, ExitCode: exitCode}, nil
+				return runnerResult{Lines: output, ExitCode: exitCode}, nil
 			}
 			output = append(output, line)
 		}
 	}
 }
 
-func (r *Runner) Close() error {
-	// Closing stdin asks the shell to exit. Once the shell exits, cmd.Wait
-	// returns, stdout/stderr pipes close, and scanLines can drain and stop.
+func (r *shellRunnerImpl) Close() error {
 	_ = r.stdin.Close()
 	select {
 	case err := <-r.done:
@@ -110,16 +118,13 @@ func scanLines(readers ...io.Reader) <-chan string {
 	var wg sync.WaitGroup
 	wg.Add(len(readers))
 	for _, reader := range readers {
-		// Each pipe gets its own scanner so stdout and stderr cannot block each
-		// other. The scanner loop stops when its pipe is closed, normally after
-		// Runner.Close closes stdin and the shell process exits. The waiter below
-		// closes the merged output channel only after every pipe scanner stops.
 		go func() {
 			defer wg.Done()
 			scanner := bufio.NewScanner(reader)
 			for scanner.Scan() {
 				lines <- strings.TrimSuffix(scanner.Text(), "\r")
 			}
+			_ = scanner.Err()
 		}()
 	}
 	go func() {

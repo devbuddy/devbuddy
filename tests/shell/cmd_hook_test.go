@@ -3,31 +3,30 @@ package integration
 import (
 	"testing"
 
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Hook_Preserves_Previous_Exit_Code(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := harness.NewDockerInit(t)
 
-	p := CreateProject(t, c,
+	harness.NewDockerProject(t, c,
 		`up: []`,
 	)
-	c.Cd(t, p.Path)
 
 	lines := c.Run(t, "false; __bud_prompt_command; echo $?")
-	OutputEqual(t, lines, "1")
+	harness.OutputEqual(t, lines, "1")
 }
 
 func Test_Hook_DeferInit_Skips_First_Invocation(t *testing.T) {
-	c := CreateContext(t)
+	c := harness.NewDocker(t)
 
 	// Create a project and cd into it BEFORE shell init.
 	// No PROMPT_COMMAND is set yet, so no hook fires during these steps.
-	p := CreateProject(t, c,
+	harness.NewDockerProject(t, c,
 		`env:`,
 		`  TESTVAR: hello`,
 	)
-	c.Cd(t, p.Path)
 
 	// Source the init but unset PROMPT_COMMAND/precmd so we control hook calls manually.
 	c.Run(t, `__bud_defer_init=1; eval "$(bud --shell-init)"; unset PROMPT_COMMAND; precmd_functions=()`)
@@ -44,14 +43,13 @@ func Test_Hook_DeferInit_Skips_First_Invocation(t *testing.T) {
 }
 
 func Test_Hook_Without_DeferInit_Activates_Immediately(t *testing.T) {
-	c := CreateContext(t)
+	c := harness.NewDocker(t)
 
 	// Create a project and cd into it BEFORE shell init.
-	p := CreateProject(t, c,
+	harness.NewDockerProject(t, c,
 		`env:`,
 		`  TESTVAR: hello`,
 	)
-	c.Cd(t, p.Path)
 
 	// Source the init but unset PROMPT_COMMAND/precmd so we control hook calls.
 	c.Run(t, `eval "$(bud --shell-init)"; unset PROMPT_COMMAND; precmd_functions=()`)

@@ -4,23 +4,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devbuddy/devbuddy/tests/context"
+	"github.com/devbuddy/devbuddy/tests/internal/context"
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 )
 
 func Test_Task_Pipfile(t *testing.T) {
-	c := CreatePTYContextAndInit(t)
+	c := harness.NewDockerPTYInit(t)
 
-	p := CreateProject(t, c,
+	harness.NewDockerProject(t, c,
 		`up:`,
 		`- python: 3.9.0`,
 		`- pipfile`,
 	)
-	c.Cd(t, p.Path)
 
 	c.Write(t, "Pipfile", "[packages]\n\"pkginfo\" = \"==1.9.6\"\n")
 
 	c.Run(t, "bud up", context.Timeout(2*time.Minute))
 
 	lines := c.Run(t, "pip freeze")
-	OutputContains(t, lines, "pkginfo==1.9.6")
+	harness.OutputContains(t, lines, "pkginfo==1.9.6")
 }

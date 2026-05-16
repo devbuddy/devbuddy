@@ -1,7 +1,6 @@
 package context
 
 import (
-	stdcontext "context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -17,7 +16,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/devbuddy/devbuddy/tests/internal/expect"
-	"github.com/devbuddy/devbuddy/tests/internal/shellharness"
 )
 
 // defaultHelperTimeout caps shell helpers (Cwd, Cat, GetEnv, ...) that don't
@@ -112,11 +110,11 @@ func New(config Config) (*TestContext, error) {
 			return nil, fmt.Errorf("disabling echo mode: %w", err)
 		}
 	} else {
-		runner, err := shellharness.Start(dockerCommand[0], dockerCommand[1:]...)
+		runner, err := startShellRunner(dockerCommand[0], dockerCommand[1:]...)
 		if err != nil {
 			return nil, fmt.Errorf("starting shell runner: %w", err)
 		}
-		tc.shell = pipeShell{runner: runner}
+		tc.shell = runner
 		tc.close = runner.Close
 	}
 	tc.debugLine("Shell command: %q", dockerCommand)
@@ -333,21 +331,6 @@ func (c *TestContext) debugLine(format string, a ...any) {
 		format = strings.TrimSuffix(format, "\n") + "\n"
 		fmt.Printf(format, a...)
 	}
-}
-
-type pipeShell struct {
-	runner *shellharness.Runner
-}
-
-func (s pipeShell) RunWithExitCode(command string, timeout time.Duration) ([]string, int, error) {
-	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), timeout)
-	defer cancel()
-
-	result, err := s.runner.Run(ctx, command)
-	if err != nil {
-		return nil, 0, err
-	}
-	return result.Lines, result.ExitCode, nil
 }
 
 // ptyShell adapts expect.ShellExpect to shellRunner. expect.ShellExpect.Run is
