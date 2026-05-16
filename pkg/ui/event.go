@@ -24,6 +24,7 @@ const (
 	KindHookActivated     Kind = "hook_activated"
 	KindHookFeatureFailed Kind = "hook_feature_failed"
 	KindHookDevYMLChanged Kind = "hook_devyml_changed"
+	KindShellDetectError  Kind = "shell_detect_error"
 )
 
 type Field struct {
