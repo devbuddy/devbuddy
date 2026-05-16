@@ -22,6 +22,7 @@ var worktreeCmd = &cobra.Command{
 	Use:          "tree",
 	Short:        "Manage git worktrees",
 	GroupID:      "devbuddy",
+	RunE:         subcommandOnlyRun,
 	SilenceUsage: true,
 }
 
@@ -41,21 +42,13 @@ var worktreeNewCmd = &cobra.Command{
 	SilenceUsage: true,
 }
 
-var worktreeCdCmd = &cobra.Command{
-	Use:               "cd QUERY",
-	Short:             "Jump to a git worktree",
-	Args:              onlyOneArg,
-	RunE:              worktreeCdRun,
-	ValidArgsFunction: worktreeCdCompletions,
-	SilenceUsage:      true,
-}
-
 var worktreeSwitchCmd = &cobra.Command{
-	Use:          "switch [QUERY]",
-	Short:        "Select and jump to a git worktree",
-	Args:         zeroOrOneArg,
-	RunE:         worktreeSwitchRun,
-	SilenceUsage: true,
+	Use:               "switch [QUERY]",
+	Short:             "Select and jump to a git worktree",
+	Args:              zeroOrOneArg,
+	RunE:              worktreeSwitchRun,
+	ValidArgsFunction: worktreeSwitchCompletions,
+	SilenceUsage:      true,
 }
 
 var worktreeRemoveCmd = &cobra.Command{
@@ -77,7 +70,6 @@ var worktreePruneCmd = &cobra.Command{
 func init() {
 	worktreeCmd.AddCommand(worktreeListCmd)
 	worktreeCmd.AddCommand(worktreeNewCmd)
-	worktreeCmd.AddCommand(worktreeCdCmd)
 	worktreeCmd.AddCommand(worktreeSwitchCmd)
 	worktreeCmd.AddCommand(worktreeRemoveCmd)
 	worktreeCmd.AddCommand(worktreePruneCmd)
@@ -127,7 +119,7 @@ func worktreeNewRun(_ *cobra.Command, args []string) error {
 	}
 
 	if conflict := worktree.CheckedOutBranch(worktrees, branch); conflict != nil {
-		return fmt.Errorf("branch %s is already checked out at %s\nRun: bud tree cd %s", branch, conflict.Path, branch)
+		return fmt.Errorf("branch %s is already checked out at %s\nRun: bud tree switch %s", branch, conflict.Path, branch)
 	}
 
 	repoPath := mainWorktreePath(worktrees, ctx.Project.Path)
@@ -152,21 +144,6 @@ func worktreeNewRun(_ *cobra.Command, args []string) error {
 
 	fmt.Printf("🐼  created worktree %s at %s\n", branch, path)
 	return integration.AddFinalizerCd(path)
-}
-
-func worktreeCdRun(_ *cobra.Command, args []string) error {
-	ctx, err := context.LoadWithProject()
-	if err != nil {
-		return err
-	}
-
-	wt, err := findWorktree(ctx.Executor, ctx.Project.Path, args[0])
-	if err != nil {
-		return err
-	}
-
-	ctx.UI.JumpProject(worktreeLabel(wt))
-	return integration.AddFinalizerCd(wt.Path)
 }
 
 func worktreeSwitchRun(_ *cobra.Command, args []string) error {
@@ -275,19 +252,6 @@ func oneOrTwoArgs(_ *cobra.Command, args []string) error {
 		return fmt.Errorf("expecting one or two arguments")
 	}
 	return nil
-}
-
-func findWorktree(exec *executor.Executor, repoPath, query string) (worktree.Worktree, error) {
-	worktrees, err := worktree.List(exec, repoPath)
-	if err != nil {
-		return worktree.Worktree{}, err
-	}
-
-	matches := matchWorktrees(worktrees, query)
-	if len(matches) == 0 {
-		return worktree.Worktree{}, fmt.Errorf("no worktree found for %s", query)
-	}
-	return matches[0], nil
 }
 
 type switchItem struct {
@@ -473,7 +437,7 @@ func formatWorktreeRows(rows []worktreeRow, includeHeader bool) []string {
 	return lines
 }
 
-func worktreeCdCompletions(_ *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func worktreeSwitchCompletions(_ *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	if len(args) > 0 {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}

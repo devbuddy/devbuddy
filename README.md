@@ -191,13 +191,13 @@ Create and jump between worktrees from any checkout in the repository:
 
 ```bash
 bud tree new feature-a
-bud tree cd feature-a
+bud tree switch feature-a
 bud tree switch
 ```
 
 `bud tree new` creates the worktree and jumps into it. `bud tree prune` cleans stale Git worktree metadata and asks whether to delete each existing worktree that has not been touched for more than one week.
 
-`bud tree switch` opens an interactive selector with up/down keys and enter. Regular `bud cd` also understands managed worktree branches, so `bud cd feature-a` can jump to a worktree even when its directory is named for a different agent or task.
+`bud tree switch` jumps directly when given a query, or opens an interactive selector with up/down keys and enter when no query is provided. Regular `bud cd` also understands managed worktree branches, so `bud cd feature-a` can jump to a worktree even when its directory is named for a different agent or task.
 
 If a branch is already checked out in another worktree, DevBuddy shows the existing path and a command to jump there instead of leaving you with Git's raw error.
 
