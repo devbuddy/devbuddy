@@ -29,6 +29,13 @@ func noArgs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func subcommandOnlyRun(cmd *cobra.Command, args []string) error {
+	if len(args) > 0 {
+		return fmt.Errorf("unknown command %q for %q", args[0], cmd.CommandPath())
+	}
+	return cmd.Help()
+}
+
 func zeroOrOneArg(_ *cobra.Command, args []string) error {
 	if len(args) > 1 {
 		return fmt.Errorf("expecting zero or one argument")

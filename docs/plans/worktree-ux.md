@@ -20,8 +20,7 @@ The existing clone path remains the main/default worktree. Additional worktrees 
 - Make `bud cd` worktree-aware so fuzzy navigation can jump to either the canonical project or a managed sibling worktree.
 - Add `bud tree list [query]` to show grouped worktrees with path, branch, HEAD short SHA, dirty state, and last modified time.
 - Add `bud tree new <name> [branch]` to create `repo--<name>` from the current project repository and jump into it.
-- Add `bud tree cd <query>` to jump to a worktree by branch, worktree name, or fuzzy match, using the existing shell finalizer.
-- Add `bud tree switch [query]` to show an interactive up/down/enter selector and jump to the selected worktree.
+- Add `bud tree switch [query]` to jump to a worktree by branch, worktree name, or fuzzy match when a query is provided, or show an interactive up/down/enter selector when it is not.
 - Add `bud tree remove [query]` and `bud tree prune` for cleanup. `prune` should also ask whether to delete each existing worktree that has not been touched for more than one week.
 
 ## Branch Conflict UX
@@ -60,7 +59,7 @@ Non-interactive behavior should fail with a clear message and exact commands to 
 - Unit test branch occupancy detection.
 - Unit test project search with canonical repos and `repo--name` worktrees.
 - Integration test `bud tree new feature-a` creates `repo--feature-a`.
-- Integration test `bud tree cd feature-a` changes shell cwd through the existing finalizer.
+- Integration test `bud tree switch feature-a` changes shell cwd through the existing finalizer.
 - Integration test `bud tree switch` can select a worktree with down-arrow and enter.
 - Integration test `bud cd feature-a` jumps directly to a managed worktree branch, including when the branch name differs from the worktree directory suffix.
 - Integration test branch conflict output for interactive and non-interactive use.

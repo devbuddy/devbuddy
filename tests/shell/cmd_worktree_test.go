@@ -31,7 +31,7 @@ func Test_Cmd_Worktree_New_And_Cd(t *testing.T) {
 	harness.OutputContains(t, output, "feature-a", "dirty", worktreePath)
 	assertPathColumnAligned(t, output)
 
-	output = c.Run(t, `bud __complete tree cd ""`)
+	output = c.Run(t, `bud __complete tree switch ""`)
 	harness.OutputContains(t, output, "feature-a", "long-feature-branch")
 
 	output = c.Run(t, "bud cd feature-a")
@@ -39,7 +39,7 @@ func Test_Cmd_Worktree_New_And_Cd(t *testing.T) {
 	require.Equal(t, worktreePath, c.Cwd(t))
 
 	c.Cd(t, projectPath)
-	output = c.Run(t, "bud tree cd feature-a")
+	output = c.Run(t, "bud tree switch feature-a")
 	harness.OutputContains(t, output, "jumping to", "feature-a")
 	require.Equal(t, worktreePath, c.Cwd(t))
 
@@ -88,7 +88,7 @@ func Test_Cmd_Tree_BranchConflict(t *testing.T) {
 	c.Run(t, "bud tree new feature-a")
 
 	output := c.Run(t, "bud tree new duplicate feature-a", harness.ExitCode(1))
-	harness.OutputContains(t, output, "branch feature-a is already checked out", worktreePath, "bud tree cd feature-a")
+	harness.OutputContains(t, output, "branch feature-a is already checked out", worktreePath, "bud tree switch feature-a")
 }
 
 func Test_Cmd_Tree_Prune_Asks_To_Delete_Inactive_Worktrees(t *testing.T) {
