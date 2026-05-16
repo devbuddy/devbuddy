@@ -5,10 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
 
-func installFakeXdgOpen(t *testing.T, c *Context) string {
+func installFakeXdgOpen(t *testing.T, c *harness.CLIContext) string {
 	t.Helper()
 
 	binDir := c.Path("bin")
@@ -25,7 +26,7 @@ printf "%s\n" "$1" > ` + outputPath + `
 	return outputPath
 }
 
-func waitAndReadOpenedURL(t *testing.T, c *Context, path string) string {
+func waitAndReadOpenedURL(t *testing.T, c *harness.CLIContext, path string) string {
 	t.Helper()
 
 	deadline := time.Now().Add(15 * time.Second)
@@ -42,28 +43,28 @@ func waitAndReadOpenedURL(t *testing.T, c *Context, path string) string {
 }
 
 func Test_Cmd_Open_CustomLink_FuzzyMatch(t *testing.T) {
-	c, p := CreateContextAndProject(t,
+	c := harness.NewCLI(t)
+	harness.NewProject(t, c,
 		`open:`,
 		`  staging: https://staging.example.com`,
 		`  docs: https://docs.example.com`,
 	)
 	outputPath := installFakeXdgOpen(t, c)
-	c.Cd(t, p.Path)
 
 	c.Run(t, "bud open stg")
 
 	openedURL := waitAndReadOpenedURL(t, c, outputPath)
-	OutputEqual(t, []string{openedURL}, "https://staging.example.com")
+	harness.OutputEqual(t, []string{openedURL}, "https://staging.example.com")
 }
 
 func Test_Cmd_Open_NoArgOpensGithub(t *testing.T) {
-	c, p := CreateContextAndProject(t,
+	c := harness.NewCLI(t)
+	harness.NewProject(t, c,
 		`open:`,
 		`  docs: https://docs.example.com`,
 	)
-	c.Cd(t, p.Path)
 
 	// No git remote configured, so it fails
-	lines := c.Run(t, "bud open", ExitCode(1))
-	OutputContains(t, lines, "failed to get the origin remote url")
+	lines := c.Run(t, "bud open", harness.ExitCode(1))
+	harness.OutputContains(t, lines, "failed to get the origin remote url")
 }

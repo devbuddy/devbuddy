@@ -3,6 +3,7 @@ package integration
 import (
 	"testing"
 
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,7 +16,8 @@ up:
 `
 
 func Test_Task_Custom(t *testing.T) {
-	c, _ := CreateContextAndProject(t, customTaskDevYml)
+	c := harness.NewCLI(t)
+	harness.NewProject(t, c, customTaskDevYml)
 
 	// file does not exist -> task must run
 	c.Run(t, "bud up")
@@ -29,7 +31,8 @@ func Test_Task_Custom(t *testing.T) {
 }
 
 func Test_Task_Custom_Subdir(t *testing.T) {
-	c, _ := CreateContextAndProject(t, customTaskDevYml)
+	c := harness.NewCLI(t)
+	harness.NewProject(t, c, customTaskDevYml)
 
 	// The command must work in a sub-dir, but run in the project root
 	c.Run(t, "mkdir subdir")
@@ -42,7 +45,8 @@ func Test_Task_Custom_Subdir(t *testing.T) {
 }
 
 func Test_Task_Custom_Fails(t *testing.T) {
-	c, _ := CreateContextAndProject(t,
+	c := harness.NewCLI(t)
+	harness.NewProject(t, c,
 		`up:`,
 		`- custom:`,
 		`    name: TestCustom`,
@@ -50,16 +54,16 @@ func Test_Task_Custom_Fails(t *testing.T) {
 		`    meet: exit 1`,
 	)
 
-	lines := c.Run(t, "bud up", ExitCode(1))
-	OutputContains(t, lines, "Running: exit 1", `action "": failed to run: command failed with exit code 1`)
+	lines := c.Run(t, "bud up", harness.ExitCode(1))
+	harness.OutputContains(t, lines, "Running: exit 1", `action "": failed to run: command failed with exit code 1`)
 }
 
 func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := harness.NewCLI(t)
 
 	c.Setenv("MYVAR", "poipoi")
 
-	p := CreateProject(t, c,
+	harness.NewProject(t, c,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,
@@ -68,7 +72,6 @@ func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
 		`    met?: echo $MYVAR > somefile`,
 		`    meet: exit 0`,
 	)
-	c.Cd(t, p.Path)
 
 	c.Run(t, "bud up")
 
@@ -77,7 +80,8 @@ func Test_Task_Custom_With_Env_From_Shell(t *testing.T) {
 }
 
 func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
-	c, _ := CreateContextAndProject(t,
+	c := harness.NewCLI(t)
+	harness.NewProject(t, c,
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,
@@ -94,19 +98,18 @@ func Test_Task_Custom_With_Env_At_First_Run(t *testing.T) {
 }
 
 func Test_Task_Custom_With_Env_Previously_Set_By_DevBuddy(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := harness.NewCLI(t)
 
 	c.Setenv("MYVAR", "poipoi")
 
-	p := CreateProject(t, c,
+	harness.NewProject(t, c,
 		`env:`,
 		`  MYVAR: poipoi`,
 	)
-	c.Cd(t, p.Path)
 
 	c.Run(t, "bud up")
 
-	p.WriteDevYml(t,
+	c.WriteLines(t, "dev.yml",
 		`env:`,
 		`  MYVAR: poipoi`,
 		`up:`,

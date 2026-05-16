@@ -3,11 +3,12 @@ package integration
 import (
 	"testing"
 
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Cmd_Cd(t *testing.T) {
-	c := CreatePTYContext(t)
+	c := harness.NewDockerPTY(t)
 
 	c.Run(t, "mkdir -p /home/tester/src/github.com/orgname/projname")
 
@@ -23,7 +24,7 @@ func Test_Cmd_Cd(t *testing.T) {
 }
 
 func Test_Cmd_Cd_Matching(t *testing.T) {
-	c := CreatePTYContext(t)
+	c := harness.NewDockerPTY(t)
 
 	project1 := "/home/tester/src/github.com/devbuddy_tests/project"
 	project2 := "/home/tester/src/github.com/devbuddy_tests/project2"

@@ -1,7 +1,6 @@
-package context
+package harness
 
 import (
-	stdcontext "context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -17,7 +16,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/devbuddy/devbuddy/tests/internal/expect"
-	"github.com/devbuddy/devbuddy/tests/internal/shellharness"
 )
 
 // defaultHelperTimeout caps shell helpers (Cwd, Cat, GetEnv, ...) that don't
@@ -38,7 +36,6 @@ type TestContext struct {
 	close                  func() error
 	workspaceHostPath      string
 	workspaceContainerPath string
-	debug                  bool
 }
 
 func New(config Config) (*TestContext, error) {
@@ -112,15 +109,13 @@ func New(config Config) (*TestContext, error) {
 			return nil, fmt.Errorf("disabling echo mode: %w", err)
 		}
 	} else {
-		runner, err := shellharness.Start(dockerCommand[0], dockerCommand[1:]...)
+		runner, err := startShellRunner(dockerCommand[0], dockerCommand[1:]...)
 		if err != nil {
 			return nil, fmt.Errorf("starting shell runner: %w", err)
 		}
-		tc.shell = pipeShell{runner: runner}
+		tc.shell = runner
 		tc.close = runner.Close
 	}
-	tc.debugLine("Shell command: %q", dockerCommand)
-
 	_, err := tc.run("umask 000")
 	if err != nil {
 		return nil, fmt.Errorf("configuring test shell umask: %w", err)
@@ -137,27 +132,8 @@ func New(config Config) (*TestContext, error) {
 	return tc, nil
 }
 
-func (c *TestContext) Verbose() {
-	c.debug = true
-	if c.expect != nil {
-		c.expect.Debug = false
-	}
-}
-
-func (c *TestContext) Debug() {
-	c.debug = true
-	if c.expect != nil {
-		c.expect.Debug = true
-	}
-}
-
 func (c *TestContext) Close() error {
-	c.debugLine("Stopping docker container")
-	err := c.close()
-	if err != nil {
-		c.debugLine("ERROR when stopping docker: %s", err)
-	}
-	return err
+	return c.close()
 }
 
 func (c *TestContext) Run(t *testing.T, cmd string, optFns ...runOptionsFn) []string {
@@ -169,10 +145,6 @@ func (c *TestContext) Run(t *testing.T, cmd string, optFns ...runOptionsFn) []st
 
 func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) {
 	opt := buildRunOptions(optFns)
-
-	c.debugLine("Running command %q", cmd)
-	c.debugLine("Options: %+v", opt)
-
 	lines, exitCode, err := c.shell.RunWithExitCode(cmd, opt.timeout)
 	if err != nil {
 		return nil, err
@@ -275,6 +247,11 @@ func (c *TestContext) Cd(t *testing.T, path string) []string {
 	return lines
 }
 
+// ProjectsDir returns the container path under which test projects are created.
+func (c *TestContext) ProjectsDir() string {
+	return "/home/tester/src/github.com"
+}
+
 func (c *TestContext) hostPath(t *testing.T, containerPath string) (string, bool) {
 	t.Helper()
 
@@ -326,28 +303,6 @@ func (c *TestContext) WaitPrompt(t *testing.T) []string {
 		}
 		output = append(output, strings.TrimSuffix(line, "\n"))
 	}
-}
-
-func (c *TestContext) debugLine(format string, a ...any) {
-	if c.debug {
-		format = strings.TrimSuffix(format, "\n") + "\n"
-		fmt.Printf(format, a...)
-	}
-}
-
-type pipeShell struct {
-	runner *shellharness.Runner
-}
-
-func (s pipeShell) RunWithExitCode(command string, timeout time.Duration) ([]string, int, error) {
-	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), timeout)
-	defer cancel()
-
-	result, err := s.runner.Run(ctx, command)
-	if err != nil {
-		return nil, 0, err
-	}
-	return result.Lines, result.ExitCode, nil
 }
 
 // ptyShell adapts expect.ShellExpect to shellRunner. expect.ShellExpect.Run is

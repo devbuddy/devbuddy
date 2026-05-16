@@ -4,12 +4,12 @@ import (
 	"strings"
 	"testing"
 
-	testcontext "github.com/devbuddy/devbuddy/tests/context"
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Cmd_Worktree_New_And_Cd(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := harness.NewDockerInit(t)
 	projectPath := "/home/tester/src/github.com/orgname/projname"
 	worktreePath := "/home/tester/src/github.com/orgname/projname--feature-a"
 
@@ -17,7 +17,7 @@ func Test_Cmd_Worktree_New_And_Cd(t *testing.T) {
 	c.Cd(t, projectPath)
 
 	output := c.Run(t, "bud tree new feature-a")
-	OutputContains(t, output, "created worktree", "feature-a", worktreePath)
+	harness.OutputContains(t, output, "created worktree", "feature-a", worktreePath)
 	c.AssertExist(t, worktreePath+"/dev.yml")
 	require.Equal(t, worktreePath, c.Cwd(t))
 
@@ -27,20 +27,20 @@ func Test_Cmd_Worktree_New_And_Cd(t *testing.T) {
 
 	c.Write(t, worktreePath+"/scratch.txt", "dirty\n")
 	output = c.Run(t, "bud tree list")
-	OutputContains(t, output, "BRANCH", "HEAD", "STATE", "MODIFIED", "PATH")
-	OutputContains(t, output, "feature-a", "dirty", worktreePath)
+	harness.OutputContains(t, output, "BRANCH", "HEAD", "STATE", "MODIFIED", "PATH")
+	harness.OutputContains(t, output, "feature-a", "dirty", worktreePath)
 	assertPathColumnAligned(t, output)
 
 	output = c.Run(t, `bud __complete tree cd ""`)
-	OutputContains(t, output, "feature-a", "long-feature-branch")
+	harness.OutputContains(t, output, "feature-a", "long-feature-branch")
 
 	output = c.Run(t, "bud cd feature-a")
-	OutputContains(t, output, "jumping to", "projname--feature-a")
+	harness.OutputContains(t, output, "jumping to", "projname--feature-a")
 	require.Equal(t, worktreePath, c.Cwd(t))
 
 	c.Cd(t, projectPath)
 	output = c.Run(t, "bud tree cd feature-a")
-	OutputContains(t, output, "jumping to", "feature-a")
+	harness.OutputContains(t, output, "jumping to", "feature-a")
 	require.Equal(t, worktreePath, c.Cwd(t))
 
 	c.Run(t, "bud where")
@@ -48,7 +48,7 @@ func Test_Cmd_Worktree_New_And_Cd(t *testing.T) {
 }
 
 func Test_Cmd_Tree_Cd_Matches_Branch_When_Different_From_Worktree_Name(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := harness.NewDockerInit(t)
 	projectPath := "/home/tester/src/github.com/orgname/projname"
 	worktreePath := "/home/tester/src/github.com/orgname/projname--agent-1"
 
@@ -57,12 +57,12 @@ func Test_Cmd_Tree_Cd_Matches_Branch_When_Different_From_Worktree_Name(t *testin
 	c.Run(t, "bud tree new agent-1 feature-a")
 
 	output := c.Run(t, "bud cd feature-a")
-	OutputContains(t, output, "jumping to", "feature-a")
+	harness.OutputContains(t, output, "jumping to", "feature-a")
 	require.Equal(t, worktreePath, c.Cwd(t))
 }
 
 func Test_Cmd_Tree_Switch_Interactive(t *testing.T) {
-	c := CreatePTYContextAndInit(t)
+	c := harness.NewDockerPTYInit(t)
 	projectPath := "/home/tester/src/github.com/orgname/projname"
 	worktreePath := "/home/tester/src/github.com/orgname/projname--feature-a"
 
@@ -79,7 +79,7 @@ func Test_Cmd_Tree_Switch_Interactive(t *testing.T) {
 }
 
 func Test_Cmd_Tree_BranchConflict(t *testing.T) {
-	c := CreateContextAndInit(t)
+	c := harness.NewDockerInit(t)
 	projectPath := "/home/tester/src/github.com/orgname/projname"
 	worktreePath := "/home/tester/src/github.com/orgname/projname--feature-a"
 
@@ -87,12 +87,12 @@ func Test_Cmd_Tree_BranchConflict(t *testing.T) {
 	c.Cd(t, projectPath)
 	c.Run(t, "bud tree new feature-a")
 
-	output := c.Run(t, "bud tree new duplicate feature-a", testcontext.ExitCode(1))
-	OutputContains(t, output, "branch feature-a is already checked out", worktreePath, "bud tree cd feature-a")
+	output := c.Run(t, "bud tree new duplicate feature-a", harness.ExitCode(1))
+	harness.OutputContains(t, output, "branch feature-a is already checked out", worktreePath, "bud tree cd feature-a")
 }
 
 func Test_Cmd_Tree_Prune_Asks_To_Delete_Inactive_Worktrees(t *testing.T) {
-	c := CreatePTYContextAndInit(t)
+	c := harness.NewDockerPTYInit(t)
 	projectPath := "/home/tester/src/github.com/orgname/projname"
 	oldWorktreePath := "/home/tester/src/github.com/orgname/projname--old-branch"
 	recentWorktreePath := "/home/tester/src/github.com/orgname/projname--recent-branch"
@@ -115,13 +115,13 @@ func Test_Cmd_Tree_Prune_Asks_To_Delete_Inactive_Worktrees(t *testing.T) {
 }
 
 func Test_Cmd_Tree_Has_No_Short_Aliases(t *testing.T) {
-	c := CreateContext(t)
+	c := harness.NewDocker(t)
 
-	output := c.Run(t, "bud wt", testcontext.ExitCode(1))
-	OutputContains(t, output, `unknown command "wt"`)
+	output := c.Run(t, "bud wt", harness.ExitCode(1))
+	harness.OutputContains(t, output, `unknown command "wt"`)
 
-	output = c.Run(t, "bud worktree", testcontext.ExitCode(1))
-	OutputContains(t, output, `unknown command "worktree"`)
+	output = c.Run(t, "bud worktree", harness.ExitCode(1))
+	harness.OutputContains(t, output, `unknown command "worktree"`)
 }
 
 func assertPathColumnAligned(t *testing.T, lines []string) {
@@ -143,7 +143,7 @@ func assertPathColumnAligned(t *testing.T, lines []string) {
 	require.NotEqual(t, -1, pathColumn, "expected at least one worktree path")
 }
 
-func createGitProject(t *testing.T, c *testcontext.TestContext, path string) {
+func createGitProject(t *testing.T, c *harness.TestContext, path string) {
 	t.Helper()
 
 	// Write via host path first so the directory is created with host-side

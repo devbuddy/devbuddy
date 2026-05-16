@@ -3,12 +3,13 @@ package integration
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/goccy/go-yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_Cmd_Init(t *testing.T) {
-	c := CreatePTYContextAndInit(t)
+	c := harness.NewDockerPTYInit(t)
 
 	output := c.Run(t, "bud init default")
 	require.Equal(t, []string{

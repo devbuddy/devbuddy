@@ -3,19 +3,19 @@ package integration
 import (
 	"testing"
 
-	"github.com/devbuddy/devbuddy/tests/context"
+	"github.com/devbuddy/devbuddy/tests/internal/harness"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Env(t *testing.T) {
-	c := CreatePTYContextAndInit(t)
+	c := harness.NewDockerPTYInit(t)
 
 	devYml := `env: {TESTVAR: TESTVALUE}`
 
 	c.Write(t, "dev.yml", devYml)
 
-	lines := c.Run(t, "bud up", context.ExitCode(0))
-	OutputEqual(t, lines, "◼︎ Env")
+	lines := c.Run(t, "bud up", harness.ExitCode(0))
+	harness.OutputEqual(t, lines, "◼︎ Env")
 
 	value := c.GetEnv(t, "TESTVAR")
 	require.Equal(t, "TESTVALUE", value)
