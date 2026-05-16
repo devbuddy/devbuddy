@@ -110,14 +110,22 @@ func (c *CLIContext) Cd(t *testing.T, path string) []string {
 	return nil
 }
 
-// Setenv sets an env var for subsequent Run calls.
-func (c *CLIContext) Setenv(name, value string) {
-	c.setenv(name, value)
-}
-
 // PrependPath prepends a directory to PATH.
 func (c *CLIContext) PrependPath(path string) {
-	c.setenv("PATH", path+string(os.PathListSeparator)+c.getenv("PATH"))
+	c.Setenv("PATH", path+string(os.PathListSeparator)+c.getenv("PATH"))
+}
+
+// Setenv sets an env var for subsequent Run calls.
+func (c *CLIContext) Setenv(name, value string) {
+	prefix := name + "="
+	filtered := c.env[:0]
+	for _, entry := range c.env {
+		if !strings.HasPrefix(entry, prefix) {
+			filtered = append(filtered, entry)
+		}
+	}
+	c.env = filtered
+	c.env = append(c.env, prefix+value)
 }
 
 // Cat reads a file from the context, trimming a trailing newline.
@@ -166,18 +174,6 @@ func (c *CLIContext) getenv(name string) string {
 		}
 	}
 	return ""
-}
-
-func (c *CLIContext) setenv(name, value string) {
-	prefix := name + "="
-	filtered := c.env[:0]
-	for _, entry := range c.env {
-		if !strings.HasPrefix(entry, prefix) {
-			filtered = append(filtered, entry)
-		}
-	}
-	c.env = filtered
-	c.env = append(c.env, prefix+value)
 }
 
 func splitLines(output []byte) []string {

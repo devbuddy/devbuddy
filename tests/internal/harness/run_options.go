@@ -23,7 +23,7 @@ type runOptionsFn func(*runOptions)
 
 func buildRunOptions(fns []runOptionsFn) *runOptions {
 	options := &runOptions{
-		timeout: 5 * time.Second,
+		timeout: 10 * time.Second,
 	}
 	for _, fn := range fns {
 		fn(options)

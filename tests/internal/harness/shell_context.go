@@ -36,7 +36,6 @@ type TestContext struct {
 	close                  func() error
 	workspaceHostPath      string
 	workspaceContainerPath string
-	debug                  bool
 }
 
 func New(config Config) (*TestContext, error) {
@@ -117,8 +116,6 @@ func New(config Config) (*TestContext, error) {
 		tc.shell = runner
 		tc.close = runner.Close
 	}
-	tc.debugLine("Shell command: %q", dockerCommand)
-
 	_, err := tc.run("umask 000")
 	if err != nil {
 		return nil, fmt.Errorf("configuring test shell umask: %w", err)
@@ -135,27 +132,8 @@ func New(config Config) (*TestContext, error) {
 	return tc, nil
 }
 
-func (c *TestContext) Verbose() {
-	c.debug = true
-	if c.expect != nil {
-		c.expect.Debug = false
-	}
-}
-
-func (c *TestContext) Debug() {
-	c.debug = true
-	if c.expect != nil {
-		c.expect.Debug = true
-	}
-}
-
 func (c *TestContext) Close() error {
-	c.debugLine("Stopping docker container")
-	err := c.close()
-	if err != nil {
-		c.debugLine("ERROR when stopping docker: %s", err)
-	}
-	return err
+	return c.close()
 }
 
 func (c *TestContext) Run(t *testing.T, cmd string, optFns ...runOptionsFn) []string {
@@ -167,10 +145,6 @@ func (c *TestContext) Run(t *testing.T, cmd string, optFns ...runOptionsFn) []st
 
 func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) {
 	opt := buildRunOptions(optFns)
-
-	c.debugLine("Running command %q", cmd)
-	c.debugLine("Options: %+v", opt)
-
 	lines, exitCode, err := c.shell.RunWithExitCode(cmd, opt.timeout)
 	if err != nil {
 		return nil, err
@@ -328,13 +302,6 @@ func (c *TestContext) WaitPrompt(t *testing.T) []string {
 			return StripAnsiSlice(output)
 		}
 		output = append(output, strings.TrimSuffix(line, "\n"))
-	}
-}
-
-func (c *TestContext) debugLine(format string, a ...any) {
-	if c.debug {
-		format = strings.TrimSuffix(format, "\n") + "\n"
-		fmt.Printf(format, a...)
 	}
 }
 
