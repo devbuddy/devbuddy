@@ -283,6 +283,10 @@ func (c *TestContext) Send(t *testing.T, text string) {
 	require.NoError(t, err)
 }
 
+func (c *TestContext) ClearRawOutput() {
+	c.expect.ClearRaw()
+}
+
 func (c *TestContext) Expect(t *testing.T, text string) string {
 	t.Helper()
 	line, err := c.expect.Expect(text)
@@ -290,11 +294,18 @@ func (c *TestContext) Expect(t *testing.T, text string) string {
 	return StripAnsi(line)
 }
 
+func (c *TestContext) ExpectRaw(t *testing.T, text string) string {
+	t.Helper()
+	output, err := c.expect.ExpectRaw(text)
+	require.NoError(t, err)
+	return StripAnsi(output)
+}
+
 func (c *TestContext) WaitPrompt(t *testing.T) []string {
 	t.Helper()
 	var output []string
 	for {
-		line, err := c.expect.Line()
+		line, err := c.expect.LineTimeout(defaultHelperTimeout)
 		require.NoError(t, err)
 
 		line = strings.ReplaceAll(line, "\r", "")

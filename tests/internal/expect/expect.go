@@ -18,15 +18,16 @@
 package expect
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"syscall"
+	"time"
 
 	"github.com/creack/pty"
 	"golang.org/x/term"
@@ -46,6 +47,9 @@ type ExpectProcess struct {
 
 	readerLines chan string
 	readerError chan error
+	rawMu       sync.Mutex
+	rawOutput   string
+	rawSignal   chan struct{}
 
 	// StopSignal is the signal Stop sends to the process; defaults to SIGKILL.
 	StopSignal os.Signal
@@ -72,6 +76,7 @@ func NewExpectWithEnv(name string, args []string, env []string) *ExpectProcess {
 		StopSignal:  syscall.SIGKILL,
 		readerLines: make(chan string, 100),
 		readerError: make(chan error, 1),
+		rawSignal:   make(chan struct{}, 1),
 	}
 	ep.closed.Store(false)
 
@@ -94,9 +99,10 @@ func (ep *ExpectProcess) Start() (err error) {
 }
 
 func (ep *ExpectProcess) reader() {
-	r := bufio.NewReader(ep.pty)
+	var lineBuffer strings.Builder
+	readBuffer := make([]byte, 4096)
 	for {
-		line, err := r.ReadString('\n')
+		n, err := ep.pty.Read(readBuffer)
 		if err != nil {
 			// by calling cmd.Wait() here, we can return interesting errors from expect functions.
 			if cerr := ep.cmd.Wait(); cerr != nil {
@@ -109,18 +115,86 @@ func (ep *ExpectProcess) reader() {
 			break
 		}
 
-		if line != "" {
-			ep.debugLine(fmt.Sprintf("received %q", line))
-			ep.readerLines <- line
+		if n == 0 {
+			continue
+		}
+
+		chunk := string(readBuffer[:n])
+		ep.debugLine(fmt.Sprintf("received %q", chunk))
+		ep.recordRaw(chunk)
+
+		// Some interactive prompts redraw without newline delimiters. Keep raw
+		// output for those prompts, while still deriving lines for shell output.
+		lineBuffer.WriteString(chunk)
+		for {
+			line := lineBuffer.String()
+			index := strings.IndexByte(line, '\n')
+			if index == -1 {
+				break
+			}
+			ep.readerLines <- line[:index+1]
+			lineBuffer.Reset()
+			lineBuffer.WriteString(line[index+1:])
 		}
 	}
 
 	ep.debugLine("reader stopped")
 }
 
+func (ep *ExpectProcess) recordRaw(chunk string) {
+	ep.rawMu.Lock()
+	ep.rawOutput += chunk
+	if len(ep.rawOutput) > 65536 {
+		ep.rawOutput = ep.rawOutput[len(ep.rawOutput)-65536:]
+	}
+	ep.rawMu.Unlock()
+
+	select {
+	case ep.rawSignal <- struct{}{}:
+	default:
+	}
+}
+
+func (ep *ExpectProcess) ClearRaw() {
+	ep.rawMu.Lock()
+	ep.rawOutput = ""
+	ep.rawMu.Unlock()
+}
+
 func (ep *ExpectProcess) debugLine(line string) {
 	if ep.Debug {
 		fmt.Printf("%s[%d]: %v\n", ep.cmd.Path, ep.cmd.Process.Pid, line)
+	}
+}
+
+func (ep *ExpectProcess) ExpectRaw(s string) (string, error) {
+	return ep.ExpectRawFunc(func(txt string) bool { return strings.Contains(txt, s) })
+}
+
+func (ep *ExpectProcess) ExpectRawFunc(f func(string) bool) (string, error) {
+	if ep.closed.Load().(bool) {
+		return "", ErrAlreadyClosed
+	}
+
+	timeout := time.NewTimer(10 * time.Second)
+	defer timeout.Stop()
+
+	for {
+		ep.rawMu.Lock()
+		seen := ep.rawOutput
+		ep.rawMu.Unlock()
+		if f(seen) {
+			return seen, nil
+		}
+
+		select {
+		case err := <-ep.readerError:
+			ep.debugLine(fmt.Sprintf("readerError=%v", err))
+			return "", err
+		case <-ep.rawSignal:
+		case <-timeout.C:
+			return "", fmt.Errorf("timed out waiting for raw output after 10s; saw %q", seen)
+		}
 	}
 }
 
@@ -151,6 +225,23 @@ func (ep *ExpectProcess) Expect(s string) (string, error) {
 // Line returns one line.
 func (ep *ExpectProcess) Line() (string, error) {
 	return ep.ExpectFunc(func(txt string) bool { return true })
+}
+
+func (ep *ExpectProcess) LineTimeout(timeout time.Duration) (string, error) {
+	done := make(chan struct{})
+	var line string
+	var err error
+	go func() {
+		line, err = ep.Line()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return line, err
+	case <-time.After(timeout):
+		return "", fmt.Errorf("timed out waiting for line after %s", timeout)
+	}
 }
 
 // Stop kills the expect process and waits for it to exit.
