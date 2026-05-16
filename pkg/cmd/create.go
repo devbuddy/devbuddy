@@ -6,7 +6,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/integration"
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 var createCmd = &cobra.Command{
@@ -28,7 +28,7 @@ func createRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	ui := termui.New(cfg)
+	ui := ui.NewTerminal(cfg.DebugEnabled)
 
 	proj, err := project.NewFromID(args[0], cfg)
 	if err != nil {

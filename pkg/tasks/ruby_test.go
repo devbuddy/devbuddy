@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
-	"github.com/stretchr/testify/require"
 	yaml "github.com/goccy/go-yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRubyOk(t *testing.T) {

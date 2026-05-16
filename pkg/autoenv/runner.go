@@ -3,7 +3,7 @@ package autoenv
 import (
 	"github.com/devbuddy/devbuddy/pkg/autoenv/features"
 	"github.com/devbuddy/devbuddy/pkg/context"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
@@ -110,7 +110,7 @@ func (r *runner) sync(featureSet FeatureSet) {
 	}
 
 	if len(r.activated) > 0 {
-		displays := make([]termui.Feature, len(r.activated))
+		displays := make([]ui.Feature, len(r.activated))
 		for i, f := range r.activated {
 			displays[i] = f
 		}

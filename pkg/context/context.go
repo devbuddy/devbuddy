@@ -5,7 +5,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 // Context is the interface to the calling execution context
@@ -13,7 +13,7 @@ type Context struct {
 	Cfg      *config.Config
 	Project  *project.Project
 	Env      *env.Env
-	UI       *termui.UI
+	UI       *ui.UI
 	Executor *executor.Executor
 }
 
@@ -24,7 +24,7 @@ func Load(hookMode bool) (*Context, error) {
 		return nil, err
 	}
 
-	ui := termui.New(cfg)
+	ui := ui.NewTerminal(cfg.DebugEnabled)
 	if hookMode {
 		ui.SetOutputToStderr()
 	}

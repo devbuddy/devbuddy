@@ -4,13 +4,13 @@ import (
 	"testing"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 
 	"github.com/stretchr/testify/require"
 )
 
 func newStateManager(env *env.Env) *StateManager {
-	_, ui := termui.NewTesting(false)
+	_, ui := ui.NewBufferedTesting(false)
 	return &StateManager{env: env, UI: ui}
 }
 

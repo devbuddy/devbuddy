@@ -5,13 +5,13 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	envpkg "github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 
 	"github.com/stretchr/testify/require"
 )
 
 func newTestContext() *context.Context {
-	_, ui := termui.NewTesting(false)
+	_, ui := ui.NewBufferedTesting(false)
 	return &context.Context{
 		Env: envpkg.New([]string{}),
 		UI:  ui,

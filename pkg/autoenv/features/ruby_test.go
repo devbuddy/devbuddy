@@ -8,14 +8,14 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/context"
 	envpkg "github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 
 	"github.com/stretchr/testify/require"
 )
 
 func newRubyTestContext(t *testing.T, projectPath string) (*context.Context, func() string) {
 	t.Helper()
-	buf, ui := termui.NewTesting(false)
+	buf, ui := ui.NewBufferedTesting(false)
 	ctx := &context.Context{
 		Env:     envpkg.New([]string{}),
 		UI:      ui,

@@ -11,7 +11,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/project"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 
 	"github.com/stretchr/testify/require"
@@ -60,7 +60,7 @@ func newRunner(env *env.Env, reg *features.Register) *runner {
 }
 
 func newRunnerWithProject(env *env.Env, reg *features.Register, projectPath string) *runnerWithOutput {
-	buf, ui := termui.NewTesting(false)
+	buf, ui := ui.NewBufferedTesting(false)
 	state := &StateManager{env, ui}
 	checksums, _ := state.GetFileChecksums()
 	return &runnerWithOutput{

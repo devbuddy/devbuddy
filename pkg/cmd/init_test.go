@@ -7,13 +7,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 func TestCreateManifestPromptsForTemplate(t *testing.T) {
 	projectPath := t.TempDir()
-	_, cmdUI := termui.NewTesting(false)
+	_, cmdUI := ui.NewBufferedTesting(false)
 	prompts := &ui.FakePrompts{SelectValue: "go"}
 	cmdUI.SetPrompts(prompts)
 
@@ -28,7 +27,7 @@ func TestCreateManifestPromptsForTemplate(t *testing.T) {
 
 func TestCreateManifestPromptCancellationSkipsManifest(t *testing.T) {
 	projectPath := t.TempDir()
-	_, cmdUI := termui.NewTesting(false)
+	_, cmdUI := ui.NewBufferedTesting(false)
 	cmdUI.SetPrompts(&ui.FakePrompts{SelectErr: ui.ErrPromptCancelled})
 
 	err := createManifest(cmdUI, projectPath, "")
