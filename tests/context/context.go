@@ -20,11 +20,21 @@ import (
 	"github.com/devbuddy/devbuddy/tests/internal/shellharness"
 )
 
+// defaultHelperTimeout caps shell helpers (Cwd, Cat, GetEnv, ...) that don't
+// take a per-call timeout. The PTY path was previously unbounded; pipeShell
+// previously hardcoded 10s. Settle on the same value for both.
+const defaultHelperTimeout = 10 * time.Second
+
+// shellRunner is the unified interface both the PTY and pipe shells implement.
+// Run is exit-code-agnostic (returns nil even on non-zero exit); only callers
+// that care should use RunWithExitCode.
+type shellRunner interface {
+	RunWithExitCode(cmd string, timeout time.Duration) ([]string, int, error)
+}
+
 type TestContext struct {
-	expect *expect.ExpectProcess
-	shell  interface {
-		Run(string) ([]string, error)
-	}
+	expect                 *expect.ExpectProcess
+	shell                  shellRunner
 	close                  func() error
 	workspaceHostPath      string
 	workspaceContainerPath string
@@ -86,15 +96,15 @@ func New(config Config) (*TestContext, error) {
 			return nil, fmt.Errorf("creating expect object: %w", err)
 		}
 
-		c := expect.NewShellExpect(e, "##\n")
+		sh := expect.NewShellExpect(e, "##\n")
 
-		err = c.Init() // expect the initial prompt
+		err = sh.Init() // expect the initial prompt
 		if err != nil {
 			return nil, fmt.Errorf("running initialization shell command: %w", err)
 		}
 
 		tc.expect = e
-		tc.shell = c
+		tc.shell = &ptyShell{sh: sh}
 		tc.close = e.Stop
 
 		_, err = tc.run("stty -echo")
@@ -163,47 +173,9 @@ func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 	c.debugLine("Running command %q", cmd)
 	c.debugLine("Options: %+v", opt)
 
-	var lines []string
-	var err error
-	var exitCode int
-
-	if shell, ok := c.shell.(interface {
-		RunWithExitCode(string, time.Duration) ([]string, int, error)
-	}); ok {
-		lines, exitCode, err = shell.RunWithExitCode(cmd, opt.timeout)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		done := make(chan bool)
-		go func() {
-			lines, err = c.shell.Run(cmd)
-			close(done)
-		}()
-
-		select {
-		case <-done:
-			c.debugLine("command completed")
-		case <-time.After(opt.timeout):
-			excerpt := "no output yet"
-			if len(lines) > 0 {
-				excerpt = strings.Join(lines[:min(10, len(lines))], "\n")
-			}
-			return nil, fmt.Errorf("timed out after %s running %q. output so far:\n%s", opt.timeout, cmd, excerpt)
-		}
-
-		codeLines, err := c.shell.Run("echo $?")
-		if err != nil {
-			return nil, fmt.Errorf("getting exit code: %w", err)
-		}
-		if len(codeLines) == 0 {
-			return nil, fmt.Errorf("unexpected output when getting exit code: no output")
-		}
-
-		exitCode, err = strconv.Atoi(codeLines[0])
-		if err != nil {
-			return nil, fmt.Errorf("unexpected exit code %s: %w", codeLines[0], err)
-		}
+	lines, exitCode, err := c.shell.RunWithExitCode(cmd, opt.timeout)
+	if err != nil {
+		return nil, err
 	}
 	if exitCode != opt.exitCode {
 		excerpt := "no output"
@@ -214,6 +186,14 @@ func (c *TestContext) run(cmd string, optFns ...runOptionsFn) ([]string, error) 
 	}
 
 	return StripAnsiSlice(lines), nil
+}
+
+// shellRun is the exit-code-agnostic path used by the small helpers below
+// (Cat, Cwd, GetEnv, ...). Their commands are simple enough that a non-zero
+// exit either can't happen or is intentionally ignored.
+func (c *TestContext) shellRun(cmd string) ([]string, error) {
+	lines, _, err := c.shell.RunWithExitCode(cmd, defaultHelperTimeout)
+	return lines, err
 }
 
 func (c *TestContext) Write(t *testing.T, path, content string) {
@@ -236,7 +216,7 @@ func (c *TestContext) Write(t *testing.T, path, content string) {
 	}
 
 	b64content := base64.StdEncoding.EncodeToString([]byte(content))
-	_, err := c.shell.Run(fmt.Sprintf("echo %s | base64 --decode > %q", b64content, path))
+	_, err := c.shellRun(fmt.Sprintf("echo %s | base64 --decode > %q", b64content, path))
 	require.NoError(t, err)
 }
 
@@ -247,7 +227,7 @@ func (c *TestContext) WriteLines(t *testing.T, path string, lines ...string) {
 
 func (c *TestContext) Cwd(t *testing.T) string {
 	t.Helper()
-	lines, err := c.shell.Run("pwd")
+	lines, err := c.shellRun("pwd")
 	require.NoError(t, err)
 	require.NotEmpty(t, lines, "unexpected output for 'pwd'")
 	return lines[len(lines)-1]
@@ -255,21 +235,22 @@ func (c *TestContext) Cwd(t *testing.T) string {
 
 func (c *TestContext) Cat(t *testing.T, path string) string {
 	t.Helper()
-	lines, err := c.shell.Run("cat " + strconv.Quote(path))
+	lines, err := c.shellRun("cat " + strconv.Quote(path))
 	require.NoError(t, err)
 	return strings.Join(lines, "\n")
 }
 
 func (c *TestContext) Ls(t *testing.T, path string) []string {
 	t.Helper()
-	lines, err := c.shell.Run("ls -1 " + strconv.Quote(path))
+	lines, err := c.shellRun("ls -1 " + strconv.Quote(path))
 	require.NoError(t, err)
 	return lines
 }
 
 func (c *TestContext) AssertExist(t *testing.T, path string) {
 	t.Helper()
-	_, err := c.shell.Run("test -e " + strconv.Quote(path))
+	// Use run() so a non-zero exit (file missing) becomes a test failure.
+	_, err := c.run("test -e " + strconv.Quote(path))
 	require.NoError(t, err, "expected file %s to exist", path)
 }
 
@@ -281,7 +262,7 @@ func (c *TestContext) AssertContains(t *testing.T, path, expected string) {
 
 func (c *TestContext) GetEnv(t *testing.T, name string) string {
 	t.Helper()
-	lines, err := c.shell.Run("echo ${" + name + "}")
+	lines, err := c.shellRun("echo ${" + name + "}")
 	require.NoError(t, err)
 	require.Len(t, lines, 1)
 	return lines[0]
@@ -289,7 +270,7 @@ func (c *TestContext) GetEnv(t *testing.T, name string) string {
 
 func (c *TestContext) Cd(t *testing.T, path string) []string {
 	t.Helper()
-	lines, err := c.shell.Run("cd " + strconv.Quote(path))
+	lines, err := c.shellRun("cd " + strconv.Quote(path))
 	require.NoError(t, err)
 	return lines
 }
@@ -358,11 +339,6 @@ type pipeShell struct {
 	runner *shellharness.Runner
 }
 
-func (s pipeShell) Run(command string) ([]string, error) {
-	lines, _, err := s.RunWithExitCode(command, 10*time.Second)
-	return lines, err
-}
-
 func (s pipeShell) RunWithExitCode(command string, timeout time.Duration) ([]string, int, error) {
 	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), timeout)
 	defer cancel()
@@ -372,4 +348,52 @@ func (s pipeShell) RunWithExitCode(command string, timeout time.Duration) ([]str
 		return nil, 0, err
 	}
 	return result.Lines, result.ExitCode, nil
+}
+
+// ptyShell adapts expect.ShellExpect to shellRunner. expect.ShellExpect.Run is
+// blocking with no built-in timeout, so we run it in a goroutine and bail out
+// on timer expiry. On timeout the goroutine remains blocked until TestContext
+// teardown kills the underlying process — accepted leak, bounded to test
+// lifetime.
+type ptyShell struct {
+	sh *expect.ShellExpect
+}
+
+func (p *ptyShell) RunWithExitCode(command string, timeout time.Duration) ([]string, int, error) {
+	lines, err := p.runWithTimeout(command, timeout)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	codeLines, err := p.runWithTimeout("echo $?", timeout)
+	if err != nil {
+		return nil, 0, fmt.Errorf("getting exit code: %w", err)
+	}
+	if len(codeLines) == 0 {
+		return nil, 0, fmt.Errorf("unexpected output when getting exit code: no output")
+	}
+	exitCode, err := strconv.Atoi(codeLines[0])
+	if err != nil {
+		return nil, 0, fmt.Errorf("unexpected exit code %q: %w", codeLines[0], err)
+	}
+	return lines, exitCode, nil
+}
+
+func (p *ptyShell) runWithTimeout(command string, timeout time.Duration) ([]string, error) {
+	type result struct {
+		lines []string
+		err   error
+	}
+	out := make(chan result, 1)
+	go func() {
+		lines, err := p.sh.Run(command)
+		out <- result{lines, err}
+	}()
+
+	select {
+	case r := <-out:
+		return r.lines, r.err
+	case <-time.After(timeout):
+		return nil, fmt.Errorf("timed out after %s running %q", timeout, command)
+	}
 }
