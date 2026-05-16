@@ -37,3 +37,13 @@ func TestRegister(t *testing.T) {
 	env = reg.Get("nope")
 	require.Nil(t, env, "unknown feature: nope")
 }
+
+func TestRegisterNamesAreSorted(t *testing.T) {
+	reg := Register{}
+
+	reg.Register(testFeature("rust"))
+	reg.Register(testFeature("elixir"))
+	reg.Register(testFeature("golang"))
+
+	require.Equal(t, []string{"elixir", "golang", "rust"}, reg.Names())
+}
