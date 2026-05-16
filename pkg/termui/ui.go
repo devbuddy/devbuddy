@@ -39,17 +39,26 @@ func New(cfg *config.Config) *UI {
 
 func NewTesting(debugEnabled bool) (*bytes.Buffer, *UI) {
 	buffer := bytes.NewBufferString("")
+	_, recorder := baseui.NewTesting()
 	return buffer, &UI{
 		out:          buffer,
 		err:          buffer,
 		debugEnabled: debugEnabled,
-		recorder:     baseui.New(),
+		recorder:     recorder,
 		renderer:     baseui.PlainRenderer{},
 	}
 }
 
 func (u *UI) Events() []baseui.Event {
 	return u.recorder.Events()
+}
+
+func (u *UI) Prompts() baseui.Prompts {
+	return u.recorder.Prompts()
+}
+
+func (u *UI) SetPrompts(prompts baseui.Prompts) {
+	u.recorder.SetPrompts(prompts)
 }
 
 func (u *UI) record(event baseui.Event) {

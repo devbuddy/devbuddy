@@ -15,6 +15,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/integration"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 	"github.com/devbuddy/devbuddy/pkg/worktree"
 )
 
@@ -169,7 +170,10 @@ func worktreeSwitchRun(_ *cobra.Command, args []string) error {
 
 	wt := matches[0]
 	if query == "" && len(matches) > 1 {
-		selected, err := selectWorktree(ctx.Executor, matches)
+		selected, err := selectWorktree(ctx.UI.Prompts(), ctx.Executor, matches)
+		if errors.Is(err, ui.ErrPromptCancelled) {
+			return nil
+		}
 		if err != nil {
 			return err
 		}
@@ -254,43 +258,32 @@ func oneOrTwoArgs(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-type switchItem struct {
-	Label    string
-	Worktree worktree.Worktree
-}
-
-func selectWorktree(exec *executor.Executor, worktrees []worktree.Worktree) (worktree.Worktree, error) {
+func selectWorktree(prompts ui.Prompts, exec *executor.Executor, worktrees []worktree.Worktree) (worktree.Worktree, error) {
 	rows := buildWorktreeRows(exec, worktrees)
 	labels := formatWorktreeRows(rows, false)
-	items := make([]switchItem, 0, len(rows))
+	options := make([]ui.SelectOption, 0, len(rows))
+	byPath := map[string]worktree.Worktree{}
 	for i, row := range rows {
-		items = append(items, switchItem{
-			Label:    labels[i],
-			Worktree: row.Worktree,
+		options = append(options, ui.SelectOption{
+			Value: row.Worktree.Path,
+			Label: labels[i],
 		})
+		byPath[row.Worktree.Path] = row.Worktree
 	}
 
-	prompt := promptui.Select{
-		Label:        "Select worktree",
-		Items:        items,
-		HideSelected: true,
-		Templates:    worktreeSwitchTemplates(),
-	}
-
-	index, _, err := prompt.Run()
+	path, err := prompts.Select(ui.SelectRequest{
+		Label:   "Select worktree",
+		Options: options,
+	})
 	if err != nil {
 		return worktree.Worktree{}, err
 	}
-	return items[index].Worktree, nil
-}
 
-func worktreeSwitchTemplates() *promptui.SelectTemplates {
-	return &promptui.SelectTemplates{
-		Label:    "{{ . }}",
-		Active:   "🐼 {{ .Label | cyan }}",
-		Inactive: "   {{ .Label }}",
-		Selected: "🐼 {{ .Label }}",
+	wt, ok := byPath[path]
+	if !ok {
+		return worktree.Worktree{}, fmt.Errorf("selected worktree no longer exists: %s", path)
 	}
+	return wt, nil
 }
 
 func matchWorktrees(worktrees []worktree.Worktree, query string) []worktree.Worktree {

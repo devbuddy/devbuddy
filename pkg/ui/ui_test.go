@@ -23,3 +23,14 @@ func TestUIEventsReturnsCopy(t *testing.T) {
 
 	require.Equal(t, []Event{{Kind: KindWarning, Text: "careful"}}, ui.Events())
 }
+
+func TestNewTestingInstallsFakePrompts(t *testing.T) {
+	prompts, ui := NewTesting()
+
+	prompts.SelectValue = "feature-a"
+	got, err := ui.Prompts().Select(SelectRequest{Label: "Select"})
+
+	require.NoError(t, err)
+	require.Equal(t, "feature-a", got)
+	require.Len(t, prompts.SelectRequests, 1)
+}

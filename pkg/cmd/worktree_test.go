@@ -9,6 +9,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 	"github.com/devbuddy/devbuddy/pkg/worktree"
 )
 
@@ -38,11 +40,46 @@ func TestFormatWorktreeRowsAlignsColumns(t *testing.T) {
 	require.Contains(t, lines[1], "long-feature-branch")
 }
 
-func TestWorktreeSwitchMenuTemplateAlignsInactiveRowsWithPandaMarker(t *testing.T) {
-	templates := worktreeSwitchTemplates()
+func TestSelectWorktreeUsesPromptOptions(t *testing.T) {
+	dir := t.TempDir()
+	firstPath := filepath.Join(dir, "api")
+	secondPath := filepath.Join(dir, "api--feature-a")
+	require.NoError(t, os.Mkdir(firstPath, 0755))
+	require.NoError(t, os.Mkdir(secondPath, 0755))
 
-	require.Equal(t, "🐼 {{ .Label | cyan }}", templates.Active)
-	require.Equal(t, "   {{ .Label }}", templates.Inactive)
+	prompts := &ui.FakePrompts{SelectValue: secondPath}
+	exec := &executor.Executor{Runner: worktreeRunner{}}
+
+	got, err := selectWorktree(prompts, exec, []worktree.Worktree{
+		{Path: firstPath, Branch: "main", Head: "111111111111"},
+		{Path: secondPath, Branch: "feature-a", Head: "222222222222"},
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, secondPath, got.Path)
+	require.Len(t, prompts.SelectRequests, 1)
+	require.Equal(t, "Select worktree", prompts.SelectRequests[0].Label)
+	require.Equal(t, []ui.SelectOption{
+		{Value: firstPath, Label: prompts.SelectRequests[0].Options[0].Label},
+		{Value: secondPath, Label: prompts.SelectRequests[0].Options[1].Label},
+	}, prompts.SelectRequests[0].Options)
+	require.Contains(t, prompts.SelectRequests[0].Options[0].Label, "main")
+	require.Contains(t, prompts.SelectRequests[0].Options[1].Label, "feature-a")
+}
+
+func TestSelectWorktreeReturnsPromptCancellation(t *testing.T) {
+	dir := t.TempDir()
+	worktreePath := filepath.Join(dir, "api")
+	require.NoError(t, os.Mkdir(worktreePath, 0755))
+
+	prompts := &ui.FakePrompts{SelectErr: ui.ErrPromptCancelled}
+	exec := &executor.Executor{Runner: worktreeRunner{}}
+
+	_, err := selectWorktree(prompts, exec, []worktree.Worktree{
+		{Path: worktreePath, Branch: "main", Head: "111111111111"},
+	})
+
+	require.ErrorIs(t, err, ui.ErrPromptCancelled)
 }
 
 func TestInactiveWorktreesSkipsMainAndRecentWorktrees(t *testing.T) {
@@ -66,4 +103,14 @@ func TestInactiveWorktreesSkipsMainAndRecentWorktrees(t *testing.T) {
 	}, now, 7*24*time.Hour)
 
 	require.Equal(t, []worktree.Worktree{{Path: oldPath, Branch: "old"}}, got)
+}
+
+type worktreeRunner struct{}
+
+func (worktreeRunner) Run(*executor.Command) *executor.Result {
+	return &executor.Result{}
+}
+
+func (worktreeRunner) Capture(*executor.Command) *executor.Result {
+	return &executor.Result{}
 }
