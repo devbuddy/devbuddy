@@ -209,7 +209,7 @@ func worktreeRemoveRun(_ *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("🐼  removed worktree %s\n", wt.Path)
-	return nil
+	return integration.AddFinalizerCd(repoPath)
 }
 
 func worktreePruneRun(_ *cobra.Command, _ []string) error {
