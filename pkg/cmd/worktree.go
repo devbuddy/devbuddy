@@ -52,9 +52,9 @@ var worktreeSwitchCmd = &cobra.Command{
 }
 
 var worktreeRemoveCmd = &cobra.Command{
-	Use:          "remove QUERY",
+	Use:          "remove [QUERY]",
 	Short:        "Remove a git worktree",
-	Args:         onlyOneArg,
+	Args:         zeroOrOneArg,
 	RunE:         worktreeRemoveRun,
 	SilenceUsage: true,
 }
@@ -193,13 +193,31 @@ func worktreeRemoveRun(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	matches := matchWorktrees(worktrees, args[0])
-	if len(matches) == 0 {
-		return fmt.Errorf("no worktree found for %s", args[0])
+
+	repoPath := mainWorktreePath(worktrees, ctx.Project.Path)
+
+	var wt worktree.Worktree
+	if len(args) == 0 {
+		removable := removableWorktrees(worktrees, repoPath)
+		if len(removable) == 0 {
+			return fmt.Errorf("no worktree available to remove")
+		}
+		selected, err := selectWorktree(ctx.UI.Prompts(), ctx.Executor, removable)
+		if errors.Is(err, ui.ErrPromptCancelled) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		wt = selected
+	} else {
+		matches := matchWorktrees(worktrees, args[0])
+		if len(matches) == 0 {
+			return fmt.Errorf("no worktree found for %s", args[0])
+		}
+		wt = matches[0]
 	}
 
-	wt := matches[0]
-	repoPath := mainWorktreePath(worktrees, ctx.Project.Path)
 	if filepath.Clean(wt.Path) == filepath.Clean(repoPath) {
 		return fmt.Errorf("refusing to remove the main worktree: %s", wt.Path)
 	}
@@ -322,6 +340,17 @@ func mainWorktreePath(worktrees []worktree.Worktree, fallback string) string {
 		}
 	}
 	return fallback
+}
+
+func removableWorktrees(worktrees []worktree.Worktree, mainPath string) []worktree.Worktree {
+	removable := make([]worktree.Worktree, 0, len(worktrees))
+	for _, wt := range worktrees {
+		if filepath.Clean(wt.Path) == filepath.Clean(mainPath) {
+			continue
+		}
+		removable = append(removable, wt)
+	}
+	return removable
 }
 
 func inactiveWorktrees(worktrees []worktree.Worktree, now time.Time, maxAge time.Duration) []worktree.Worktree {
