@@ -6,14 +6,14 @@
 
 **Architecture:** Introduce a small UI facade that records intent-level events and delegates final text formatting to renderers. Production code uses a terminal renderer and real prompts; tests use a plain renderer and fake prompts so command behavior can be asserted without ANSI stripping, Docker, or PTY automation unless the test is explicitly about shell integration.
 
-**Tech Stack:** Go, Cobra, existing `pkg/context`, existing `pkg/termui` compatibility surface, `github.com/charmbracelet/huh` for prompts behind an internal interface, existing `script/test` and shell integration tests.
+**Tech Stack:** Go, Cobra, existing `pkg/context`, existing `pkg/termui` compatibility surface, `github.com/AlecAivazis/survey/v2` for select prompts behind an internal interface, simple DevBuddy-owned line prompts for confirmations, existing `script/test` and shell integration tests.
 
 ---
 
 ## Constraints
 
 - Keep behavior and visible output stable unless a task explicitly says otherwise.
-- Do not expose Charmbracelet types outside the prompt adapter. Commands and tasks should depend on DevBuddy-owned request/result structs.
+- Do not expose third-party prompt types outside the prompt adapter. Commands and tasks should depend on DevBuddy-owned request/result structs.
 - Prefer plain unit tests for UI decisions. Keep PTY tests only for shell-finalizer and real prompt smoke coverage.
 - Use `docs/plans/` for follow-up plans.
 - Do not remove `termui` in the first PR; migrate behind a compatibility layer first.
@@ -24,7 +24,7 @@
 - Create `pkg/ui/renderer.go`: renderer interface, plain renderer, terminal renderer, color policy.
 - Create `pkg/ui/ui.go`: production/testing constructors, writers, emitted event storage, and high-level UI methods.
 - Create `pkg/ui/prompts.go`: prompt request/result types and prompt interface.
-- Create `pkg/ui/huh_prompts.go`: production prompt adapter using `huh`, added after the prompt interface exists.
+- Create `pkg/ui/survey_prompts.go`: production prompt adapter using `survey` for selection and a simple line-based confirmation prompt.
 - Create `pkg/ui/fake_prompts.go`: testing prompt implementation.
 - Modify `pkg/termui/*`: make `termui.UI` a compatibility wrapper over `pkg/ui.UI`.
 - Modify `pkg/context/context.go`: construct the new UI once and pass it through the existing context field.
@@ -37,8 +37,10 @@
 1. **PR 1: UI event core and termui compatibility.** Add `pkg/ui`, keep output stable, and add event assertions for existing unit tests.
 2. **PR 2: ANSI policy centralization.** Move color rendering into `pkg/ui.Renderer`, default tests to plain output, and reduce ANSI stripping.
 3. **PR 3: Prompt interface and fake prompts.** Add DevBuddy-owned prompt interfaces and migrate worktree selection logic to use prompt requests in unit-testable code.
-4. **PR 4: Replace promptui with huh adapter.** Use `huh` only behind `pkg/ui.Prompts`, verify ESC cancel and keep one PTY smoke test.
+4. **PR 4: Replace promptui worktree selector with survey adapter.** Use `survey` only behind `pkg/ui.Prompts`, verify ESC cancel and keep one PTY smoke test.
 5. **PR 5: Migrate remaining prompts and remove promptui.** Move `init` template selection and `clone` confirmation, then drop `promptui`.
+6. **PR 6: Move the UI method surface into `pkg/ui`.** Put output writers, debug gating, high-level UI methods, and hook feature rendering on `pkg/ui.UI`; leave `pkg/termui` as aliases/shims.
+7. **PR 7: Switch call sites to `pkg/ui` and remove `pkg/termui`.** Migrate imports in context, tasks, commands, autoenv, integration, and tests; delete the compatibility package once no production code imports it.
 
 Each PR should be based on the previous branch and opened as a stacked PR. After each push, monitor GitHub Actions until CI passes before starting the next PR.
 
@@ -600,79 +602,98 @@ Expected: CI passes before starting PR 4.
 
 ---
 
-## PR 4: huh Prompt Adapter For Worktree Switch
+## PR 4: Survey Prompt Adapter For Worktree Switch
 
 **Branch:** `ui-runtime-huh-worktree`, based on `ui-runtime-prompts`.
+
+Note: this branch name was created before the prompt adapter pivot. The merged implementation uses `survey` for select prompts. A trial `huh` adapter was rejected because importing it caused terminal probing output during command startup in CI.
 
 **Files:**
 - Modify: `go.mod`
 - Modify: `go.sum`
-- Create: `pkg/ui/huh_prompts.go`
+- Create: `pkg/ui/survey_prompts.go`
 - Modify: `pkg/ui/ui.go`
 - Modify: `pkg/cmd/worktree.go`
 - Modify: `tests/shell/cmd_worktree_test.go`
 
-- [ ] **Step 1: Add `huh` dependency**
+- [ ] **Step 1: Add `survey` dependency**
 
 Run:
 
 ```bash
-go get github.com/charmbracelet/huh@v1.0.0
+go get github.com/AlecAivazis/survey/v2@v2.3.7
 ```
 
 Expected: `go.mod` and `go.sum` update.
 
 - [ ] **Step 2: Implement production prompts**
 
-Create `pkg/ui/huh_prompts.go`:
+Create `pkg/ui/survey_prompts.go`:
 
 ```go
 package ui
 
 import (
+	"bufio"
 	"errors"
+	"fmt"
+	"io"
+	"os"
+	"strings"
 
-	"github.com/charmbracelet/huh"
+	survey "github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
-type HuhPrompts struct{}
+type SurveyPrompts struct{}
 
-func (HuhPrompts) Select(req SelectRequest) (string, error) {
+func (SurveyPrompts) Select(req SelectRequest) (string, error) {
 	var selected string
-	options := make([]huh.Option[string], 0, len(req.Options))
+	labels := make([]string, 0, len(req.Options))
+	values := map[string]string{}
 	for _, opt := range req.Options {
-		options = append(options, huh.NewOption(opt.Label, opt.Value))
+		labels = append(labels, opt.Label)
+		values[opt.Label] = opt.Value
 	}
-	err := huh.NewSelect[string]().
-		Title(req.Label).
-		Options(options...).
-		Value(&selected).
-		Run()
-	if errors.Is(err, huh.ErrUserAborted) {
+	err := survey.AskOne(&survey.Select{
+		Message: req.Label,
+		Options: labels,
+	}, &selected)
+	if errors.Is(err, terminal.InterruptErr) {
 		return "", ErrPromptCancelled
 	}
-	return selected, err
+	if err != nil {
+		return "", err
+	}
+	return values[selected], nil
 }
 
-func (HuhPrompts) Confirm(req ConfirmRequest) (bool, error) {
-	var confirmed bool
-	err := huh.NewConfirm().
-		Title(req.Label).
-		Value(&confirmed).
-		Run()
-	if errors.Is(err, huh.ErrUserAborted) {
-		return false, ErrPromptCancelled
+func (SurveyPrompts) Confirm(req ConfirmRequest) (bool, error) {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Fprintf(os.Stderr, "%s (y/N): ", req.Label)
+		answer, err := reader.ReadString('\n')
+		fmt.Fprintln(os.Stderr)
+		if err != nil && !errors.Is(err, io.EOF) {
+			return false, err
+		}
+
+		switch strings.ToLower(strings.TrimSpace(answer)) {
+		case "y", "yes":
+			return true, nil
+		case "", "n", "no":
+			return false, nil
+		}
 	}
-	return confirmed, err
 }
 ```
 
-- [ ] **Step 3: Use HuhPrompts in production**
+- [ ] **Step 3: Use SurveyPrompts in production**
 
 Modify `pkg/ui.New`:
 
 ```go
-prompts: HuhPrompts{},
+prompts: SurveyPrompts{},
 ```
 
 Keep `NewTesting` on `FakePrompts`.
@@ -712,7 +733,7 @@ func Test_Cmd_Tree_Switch_Escape_Cancels(t *testing.T) {
 }
 ```
 
-If `huh` renders a different title string, adjust `c.Expect` to the actual stable visible text.
+If `survey` renders a different title string, adjust `c.Expect` to the actual stable visible text.
 
 - [ ] **Step 6: Verify**
 
@@ -733,9 +754,9 @@ Run:
 
 ```bash
 git add go.mod go.sum pkg/ui pkg/cmd/worktree.go tests/shell/cmd_worktree_test.go
-git commit -m "Use huh for worktree switch prompt"
+git commit -m "Use survey for worktree switch prompt"
 git push -u origin ui-runtime-huh-worktree
-gh pr create --base ui-runtime-prompts --head ui-runtime-huh-worktree --title "Use huh for worktree switch prompt" --body-file /tmp/ui-runtime-huh-worktree-pr.md
+gh pr create --base ui-runtime-prompts --head ui-runtime-huh-worktree --title "Use survey for worktree switch prompt" --body-file /tmp/ui-runtime-huh-worktree-pr.md
 gh pr checks --watch --interval 10
 ```
 
@@ -807,9 +828,205 @@ Expected: CI passes.
 
 ---
 
+## PR 6: Move UI Method Surface Into pkg/ui
+
+**Branch:** `ui-runtime-ui-methods`, based on `ui-runtime-remove-promptui`.
+
+**Files:**
+- Modify: `pkg/ui/ui.go`
+- Create: `pkg/ui/output.go`
+- Create: `pkg/ui/hook.go`
+- Create: `pkg/ui/task.go`
+- Modify: `pkg/termui/ui.go`
+- Modify: `pkg/termui/hook.go`
+- Modify: `pkg/termui/task.go`
+- Modify: `pkg/termui/ui_test.go`
+- Modify: focused tests under `pkg/ui` and `pkg/termui`
+
+- [ ] **Step 1: Move writer-backed emission into `pkg/ui`**
+
+Extend `pkg/ui.UI` so it owns the output writer, error writer, debug flag, renderer, events, and prompts. Keep event recording behavior unchanged:
+
+```go
+type UI struct {
+	out          io.Writer
+	err          io.Writer
+	debugEnabled bool
+	renderer     Renderer
+	events       []Event
+	prompts      Prompts
+}
+```
+
+Add constructors that preserve the existing production and test behavior:
+
+```go
+func New() *UI {
+	return &UI{
+		out:      os.Stdout,
+		err:      os.Stderr,
+		renderer: TerminalRenderer{},
+		prompts:  SurveyPrompts{},
+	}
+}
+
+func NewTerminal(debugEnabled bool) *UI {
+	u := New()
+	u.debugEnabled = debugEnabled
+	return u
+}
+
+func NewTesting() (*FakePrompts, *UI) {
+	_, ui := NewBufferedTesting(false)
+	return ui.prompts.(*FakePrompts), ui
+}
+
+func NewBufferedTesting(debugEnabled bool) (*bytes.Buffer, *UI) {
+	buffer := bytes.NewBufferString("")
+	prompts := &FakePrompts{}
+	return buffer, &UI{
+		out:          buffer,
+		err:          buffer,
+		debugEnabled: debugEnabled,
+		renderer:     PlainRenderer{},
+		prompts:      prompts,
+	}
+}
+```
+
+- [ ] **Step 2: Move high-level UI methods into `pkg/ui`**
+
+Move the current methods from `pkg/termui/ui.go` and `pkg/termui/task.go` onto `pkg/ui.UI`: `SetOutputToStderr`, `Debug`, `Warningf`, `CommandHeader`, `CommandRun`, `CommandActed`, `ProjectExists`, `JumpProject`, `TaskHeader`, `TaskCommand`, `TaskShell`, `TaskActed`, `TaskAlreadyOk`, `TaskError`, `TaskErrorf`, `TaskWarning`, `TaskActionHeader`, `ActionHeader`, `ActionNotice`, and `ActionDone`.
+
+Keep rendered text stable by emitting the same `Event` values as the compatibility wrapper emits today.
+
+- [ ] **Step 3: Move hook feature rendering into `pkg/ui`**
+
+Move the `Feature` interface and hook methods into `pkg/ui/hook.go`:
+
+```go
+type Feature interface {
+	FeatureName() string
+	FeatureParam() string
+}
+```
+
+Move `HookFeaturesActivated`, `HookFeatureFailure`, `HookDevYmlChanged`, and `HookShellDetectionError` to `pkg/ui`. `HookShellDetectionError` should keep writing terminal-rendered output to stderr.
+
+- [ ] **Step 4: Collapse `pkg/termui` into aliases and shims**
+
+Replace the `termui.UI` implementation with a type alias and constructor wrappers:
+
+```go
+type UI = baseui.UI
+type Feature = baseui.Feature
+
+func New(cfg *config.Config) *UI {
+	return baseui.NewTerminal(cfg.DebugEnabled)
+}
+
+func NewTesting(debugEnabled bool) (*bytes.Buffer, *UI) {
+	return baseui.NewBufferedTesting(debugEnabled)
+}
+```
+
+Keep `termui.Fprintf` as a shim to `ui.Fprintf`, and keep `termui.HookShellDetectionError` as a shim to `ui.HookShellDetectionError`.
+
+- [ ] **Step 5: Verify and open PR 6**
+
+Run:
+
+```bash
+go test -count=1 ./pkg/ui ./pkg/termui ./pkg/context ./pkg/autoenv ./pkg/tasks/taskengine
+script/test
+script/lint
+```
+
+Expected: PASS.
+
+Commit and open the stacked PR:
+
+```bash
+git add pkg/ui pkg/termui
+git commit -m "Move UI methods into runtime"
+git push -u origin ui-runtime-ui-methods
+gh pr create --base ui-runtime-remove-promptui --head ui-runtime-ui-methods --title "Move UI methods into runtime" --body-file /tmp/ui-runtime-ui-methods-pr.md
+gh pr checks --watch --interval 10
+```
+
+Expected: CI passes before starting PR 7.
+
+---
+
+## PR 7: Switch Call Sites To pkg/ui And Remove termui
+
+**Branch:** `ui-runtime-remove-termui`, based on `ui-runtime-ui-methods`.
+
+**Files:**
+- Modify: `pkg/context/context.go`
+- Modify: `pkg/tasks/api/task_context.go`
+- Modify: `pkg/autoenv/state.go`
+- Modify: `pkg/autoenv/runner.go`
+- Modify: `pkg/cmd/init.go`
+- Modify: `pkg/cmd/cd.go`
+- Modify: `pkg/cmd/create.go`
+- Modify: `pkg/executor/executor.go`
+- Modify: `pkg/integration/integration.go`
+- Modify: tests importing `pkg/termui`
+- Delete: `pkg/termui/`
+
+- [ ] **Step 1: Switch shared context types**
+
+Change `pkg/context.Context.UI`, `pkg/tasks/api.TaskContext.UI`, and `pkg/autoenv.State.UI` from `*termui.UI` to `*ui.UI`. Constructors should call `ui.NewTerminal(cfg.DebugEnabled)`.
+
+- [ ] **Step 2: Switch command and helper imports**
+
+Replace `termui.New`, `termui.NewTesting`, `termui.Fprintf`, and `termui.HookShellDetectionError` call sites with `ui.NewTerminal`, `ui.NewTesting`, `ui.Fprintf`, and `ui.HookShellDetectionError`.
+
+- [ ] **Step 3: Switch feature interface references**
+
+Replace `termui.Feature` references with `ui.Feature`.
+
+- [ ] **Step 4: Delete `pkg/termui`**
+
+Run:
+
+```bash
+rg -n "pkg/termui|termui\\." pkg tests
+```
+
+Expected: no references remain. Then delete `pkg/termui`.
+
+- [ ] **Step 5: Verify and open PR 7**
+
+Run:
+
+```bash
+go test -count=1 ./pkg/...
+script/test
+script/lint
+TEST_DOCKER_IMAGE="ghcr.io/devbuddy/docker-testing:sha-7fd13f4" TEST_SHELL=bash go test -run 'Test_Cmd_(Init|Tree_Switch|Tree_Prune)' -count=1 ./tests/shell
+TEST_DOCKER_IMAGE="ghcr.io/devbuddy/docker-testing:sha-7fd13f4" TEST_SHELL=zsh go test -run 'Test_Cmd_(Init|Tree_Switch|Tree_Prune)' -count=1 ./tests/shell
+```
+
+Expected: PASS.
+
+Commit and open the stacked PR:
+
+```bash
+git add pkg tests
+git commit -m "Remove termui compatibility package"
+git push -u origin ui-runtime-remove-termui
+gh pr create --base ui-runtime-ui-methods --head ui-runtime-remove-termui --title "Remove termui compatibility package" --body-file /tmp/ui-runtime-remove-termui-pr.md
+gh pr checks --watch --interval 10
+```
+
+Expected: CI passes.
+
+---
+
 ## Final Cleanup After Stack Merges
 
-- Remove `pkg/termui` only after all call sites use `pkg/ui` directly.
 - Revisit `tests/internal/harness/StripAnsi`; keep it only for PTY/shell integration tests that may include external command ANSI output.
 - Update `ROADMAP.md` to mark terminal I/O extraction as underway or complete after the final PR lands.
 - Consider adding `BUD_COLOR=auto|always|never` only after the renderer split is stable.
