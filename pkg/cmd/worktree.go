@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/manifoldco/promptui"
 	"github.com/sahilm/fuzzy"
 	"github.com/spf13/cobra"
 
@@ -229,16 +228,17 @@ func worktreePruneRun(_ *cobra.Command, _ []string) error {
 	}
 
 	for _, wt := range inactiveWorktrees(worktrees, time.Now(), 7*24*time.Hour) {
-		prompt := promptui.Prompt{
-			Label:     fmt.Sprintf("Delete inactive worktree %s at %s", worktreeLabel(wt), wt.Path),
-			IsConfirm: true,
+		confirmed, err := ctx.UI.Prompts().Confirm(ui.ConfirmRequest{
+			Label: fmt.Sprintf("Delete inactive worktree %s at %s", worktreeLabel(wt), wt.Path),
+		})
+		if errors.Is(err, ui.ErrPromptCancelled) {
+			continue
 		}
-
-		if _, err := prompt.Run(); err != nil {
-			if errors.Is(err, promptui.ErrAbort) {
-				continue
-			}
+		if err != nil {
 			return err
+		}
+		if !confirmed {
+			continue
 		}
 
 		if err := worktree.Remove(ctx.Executor, ctx.Project.Path, wt.Path); err != nil {

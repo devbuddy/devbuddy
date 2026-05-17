@@ -1,7 +1,12 @@
 package ui
 
 import (
+	"bufio"
 	"errors"
+	"fmt"
+	"io"
+	"os"
+	"strings"
 
 	survey "github.com/AlecAivazis/survey/v2"
 	"github.com/AlecAivazis/survey/v2/terminal"
@@ -32,12 +37,20 @@ func (SurveyPrompts) Select(req SelectRequest) (string, error) {
 }
 
 func (SurveyPrompts) Confirm(req ConfirmRequest) (bool, error) {
-	var confirmed bool
-	err := survey.AskOne(&survey.Confirm{
-		Message: req.Label,
-	}, &confirmed)
-	if errors.Is(err, terminal.InterruptErr) {
-		return false, ErrPromptCancelled
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Fprintf(os.Stderr, "%s (y/N): ", req.Label)
+		answer, err := reader.ReadString('\n')
+		fmt.Fprintln(os.Stderr)
+		if err != nil && !errors.Is(err, io.EOF) {
+			return false, err
+		}
+
+		switch strings.ToLower(strings.TrimSpace(answer)) {
+		case "y", "yes":
+			return true, nil
+		case "", "n", "no":
+			return false, nil
+		}
 	}
-	return confirmed, err
 }

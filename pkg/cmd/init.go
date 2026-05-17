@@ -1,15 +1,16 @@
 package cmd
 
 import (
+	"errors"
 	"os"
 	"slices"
 
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
 	"github.com/devbuddy/devbuddy/pkg/termui"
+	baseui "github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 var initCmd = &cobra.Command{
@@ -46,17 +47,24 @@ func createManifest(ui *termui.UI, projectPath string, templateName string) erro
 	templates := manifest.ListTemplates()
 
 	if templateName == "" || !slices.Contains(templates, templateName) {
-		prompt := promptui.Select{
-			Label:        "Select a template",
-			Items:        templates,
-			HideSelected: true,
+		options := make([]baseui.SelectOption, 0, len(templates))
+		for _, template := range templates {
+			options = append(options, baseui.SelectOption{
+				Value: template,
+				Label: template,
+			})
 		}
 
-		_, result, err := prompt.Run()
+		result, err := ui.Prompts().Select(baseui.SelectRequest{
+			Label:   "Select a template",
+			Options: options,
+		})
+		if errors.Is(err, baseui.ErrPromptCancelled) {
+			return nil
+		}
 		if err != nil {
 			return err
 		}
-
 		templateName = result
 	}
 
