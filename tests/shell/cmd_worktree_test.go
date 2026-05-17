@@ -70,8 +70,9 @@ func Test_Cmd_Tree_Switch_Interactive(t *testing.T) {
 	c.Cd(t, projectPath)
 	c.Run(t, "bud tree new feature-a")
 
+	c.ClearRawOutput()
 	c.Send(t, "bud tree switch\n")
-	c.Expect(t, "Select worktree")
+	c.ExpectRaw(t, "Select worktree")
 	c.Send(t, "\x1b[B\r")
 	c.WaitPrompt(t)
 

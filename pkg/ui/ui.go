@@ -6,7 +6,7 @@ type UI struct {
 }
 
 func New() *UI {
-	return &UI{prompts: PromptUIPrompts{}}
+	return &UI{prompts: SurveyPrompts{}}
 }
 
 func NewTesting() (*FakePrompts, *UI) {
