@@ -38,14 +38,12 @@ Steps:
 - Keep the Homebrew dispatch after the GitHub Release publication.
 - Remove the old tag-triggered release job from `tests.yml`.
 
-### Task 3: Local Trigger Script And Docs
+### Task 3: Release Docs
 
 **Files:**
-- Replace: `script/release.py` with `script/release`
 - Modify: `CLAUDE.md`
 
 Steps:
-- Replace the local tag-creating Python script with a wrapper around `gh workflow run release.yml`.
-- Document the new agent-friendly trigger commands.
-- Verify the wrapper dry-run/help path works.
+- Remove local release commands and wrappers.
+- Document the agent-friendly `gh workflow run release.yml` trigger commands.
 - Run formatting and focused tests.

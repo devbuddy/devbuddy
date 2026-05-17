@@ -94,7 +94,6 @@ script/
   test                    # Run unit tests (./pkg/...)
   lint                    # Run golangci-lint
   buildall                # Cross-compile for all platforms
-  release                 # Dispatch the GitHub release workflow
   install-dev.sh          # Build and install to GOPATH/bin
 tests/                    # Integration tests (Docker-based)
   context/                # TestContext: orchestrates Docker container with shell
@@ -174,18 +173,16 @@ GitHub Actions:
 - Go 1.26, golangci-lint v2.9.0
 
 ### Release Process
-```bash
-script/release minor              # Minor bump (0.16.0 -> 0.17.0)
-script/release patch              # Patch bump (0.16.0 -> 0.16.1)
-script/release rc                 # Next release candidate
-script/release custom v0.17.0     # Explicit version
-script/release --dry-run patch    # Print the workflow command
-```
-`script/release` only dispatches the GitHub workflow. The workflow computes or validates the version, runs release validation, creates the annotated tag, builds binaries via `script/buildall`, creates a GitHub Release with generated notes and attached binaries, and triggers the Homebrew tap update for stable releases.
+The GitHub release workflow is the release authority. It computes or validates the version, runs release validation, creates the annotated tag, builds binaries via `script/buildall`, creates a GitHub Release with generated notes and attached binaries, and triggers the Homebrew tap update for stable releases.
 
 Coding agents can trigger releases directly with:
 ```bash
 gh workflow run release.yml --repo devbuddy/devbuddy --ref main -f kind=patch
+```
+
+For custom versions:
+```bash
+gh workflow run release.yml --repo devbuddy/devbuddy --ref main -f kind=custom -f version=v0.17.0
 ```
 
 The Homebrew tap update requires a valid `ACCESS_TOKEN` secret.

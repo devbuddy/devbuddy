@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 
 	color "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -95,7 +97,24 @@ func Execute(version string) {
 	if err := rootCmd.Execute(); err != nil {
 		if !errors.Is(err, errTasksFailed) {
 			fmt.Fprintln(os.Stderr, color.Red("Error:"), err)
+			if isUnknownCommandError(err) {
+				fmt.Fprintf(os.Stderr, "Run '%s --help' for usage.\n", unknownCommandPath(err, rootCmd.CommandPath()))
+			}
 		}
 		os.Exit(1)
 	}
+}
+
+var unknownCommandPathRE = regexp.MustCompile(` for "([^"]+)"`)
+
+func isUnknownCommandError(err error) bool {
+	return strings.HasPrefix(err.Error(), "unknown command ")
+}
+
+func unknownCommandPath(err error, fallback string) string {
+	match := unknownCommandPathRE.FindStringSubmatch(err.Error())
+	if match == nil {
+		return fallback
+	}
+	return match[1]
 }
