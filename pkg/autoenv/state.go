@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 const autoEnvVariableName = "__BUD_AUTOENV"
@@ -36,7 +36,7 @@ type StateData struct {
 // StateManager remember the current state of the features (whether they are active)
 type StateManager struct {
 	env *env.Env
-	UI  *termui.UI
+	UI  *ui.UI
 }
 
 func (s *StateManager) read() (*StateData, error) {

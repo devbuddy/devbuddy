@@ -58,7 +58,7 @@ Benefits:
 
 Once the executor is a plain struct, introduce a `Runtime` or `Env` service:
 
-1. Extract terminal I/O from `termui` into the service
+1. Extract terminal I/O from `pkg/ui` into the service
 2. Move env var tracking (`pkg/env/`) behind the service
 3. Move state store (`pkg/helpers/store/`) behind the service
 4. Move filesystem operations behind the service

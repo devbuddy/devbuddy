@@ -9,8 +9,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/config"
 	"github.com/devbuddy/devbuddy/pkg/manifest"
-	"github.com/devbuddy/devbuddy/pkg/termui"
-	baseui "github.com/devbuddy/devbuddy/pkg/ui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 var initCmd = &cobra.Command{
@@ -33,33 +32,33 @@ func initRun(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	ui := termui.New(cfg)
+	cmdUI := ui.NewTerminal(cfg.DebugEnabled)
 
 	projectPath, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 
-	return createManifest(ui, projectPath, templateName)
+	return createManifest(cmdUI, projectPath, templateName)
 }
 
-func createManifest(ui *termui.UI, projectPath string, templateName string) error {
+func createManifest(cmdUI *ui.UI, projectPath string, templateName string) error {
 	templates := manifest.ListTemplates()
 
 	if templateName == "" || !slices.Contains(templates, templateName) {
-		options := make([]baseui.SelectOption, 0, len(templates))
+		options := make([]ui.SelectOption, 0, len(templates))
 		for _, template := range templates {
-			options = append(options, baseui.SelectOption{
+			options = append(options, ui.SelectOption{
 				Value: template,
 				Label: template,
 			})
 		}
 
-		result, err := ui.Prompts().Select(baseui.SelectRequest{
+		result, err := cmdUI.Prompts().Select(ui.SelectRequest{
 			Label:   "Select a template",
 			Options: options,
 		})
-		if errors.Is(err, baseui.ErrPromptCancelled) {
+		if errors.Is(err, ui.ErrPromptCancelled) {
 			return nil
 		}
 		if err != nil {
@@ -72,7 +71,7 @@ func createManifest(ui *termui.UI, projectPath string, templateName string) erro
 		return err
 	}
 
-	ui.ActionHeader("Created dev.yml with template " + templateName)
-	ui.ActionNotice("Open dev.yml to adjust for your needs.")
+	cmdUI.ActionHeader("Created dev.yml with template " + templateName)
+	cmdUI.ActionNotice("Open dev.yml to adjust for your needs.")
 	return nil
 }

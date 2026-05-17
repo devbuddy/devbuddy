@@ -12,8 +12,8 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/env"
 	"github.com/devbuddy/devbuddy/pkg/executor"
-	"github.com/devbuddy/devbuddy/pkg/termui"
 	"github.com/devbuddy/devbuddy/pkg/test"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 func TestUpgraderLatestRelease(t *testing.T) {
@@ -31,9 +31,10 @@ func TestUpgraderLatestRelease(t *testing.T) {
 
 	client := &http.Client{Transport: r}
 
+	cfg := config.NewTestConfig()
 	ctx := &context.Context{
-		Cfg:      config.NewTestConfig(),
-		UI:       termui.New(config.NewTestConfig()),
+		Cfg:      cfg,
+		UI:       ui.NewTerminal(cfg.DebugEnabled),
 		Env:      env.New([]string{}),
 		Executor: executor.NewExecutor(),
 	}

@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
@@ -34,7 +34,7 @@ type ShellOptions struct {
 func Print(withCompletion bool, completionScriptProvider CompletionScriptProvider, opts ShellOptions) {
 	shell, err := DetectShell()
 	if err != nil {
-		termui.HookShellDetectionError(err)
+		ui.HookShellDetectionError(err)
 		return
 	}
 

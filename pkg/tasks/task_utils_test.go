@@ -5,8 +5,8 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/autoenv"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
-	"github.com/stretchr/testify/require"
 	yaml "github.com/goccy/go-yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func loadTestTask(t *testing.T, payload string) (*api.Task, error) {

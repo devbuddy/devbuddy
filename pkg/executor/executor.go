@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/devbuddy/devbuddy/pkg/env"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 // Runner is the mock point for command execution.
@@ -143,7 +143,7 @@ func printPipe(wg *sync.WaitGroup, pipe io.Reader, prefix string, filters []stri
 		if shouldSuppressLine(line, filters) {
 			continue
 		}
-		termui.Fprintf(w, "%s%s\n", prefix, line)
+		ui.Fprintf(w, "%s%s\n", prefix, line)
 	}
 }
 

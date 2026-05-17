@@ -10,7 +10,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
-	"github.com/devbuddy/devbuddy/pkg/termui"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 )
 
 func dummyTask(name string) *api.Task {
@@ -66,7 +66,7 @@ func newTaskWithAction(name string, action api.TaskAction) *api.Task {
 }
 
 func setupTaskTesting() (*context.Context, *bytes.Buffer) {
-	buf, ui := termui.NewTesting(false)
+	buf, ui := ui.NewBufferedTesting(false)
 
 	ctx := &context.Context{
 		Project:  project.NewFromPath("/src/myproject"),
