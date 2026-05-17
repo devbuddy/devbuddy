@@ -1,0 +1,125 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: Release kind
+        required: true
+        type: choice
+        options:
+          - minor
+          - patch
+          - rc
+          - custom
+      version:
+        description: Custom version, for example v0.17.0
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  TEST_DOCKER_IMAGE: ghcr.io/devbuddy/docker-testing:sha-7fd13f4
+
+jobs:
+  release:
+    name: release
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.26"
+          cache: false
+
+      - name: Compute version
+        id: version
+        run: |
+          version="$(git tag --list 'v*' | go run ./cmd/release-version -kind '${{ inputs.kind }}' -version '${{ inputs.version }}')"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Release version: $version"
+
+      - name: Verify tag does not exist remotely
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ steps.version.outputs.version }}"; then
+            echo "Tag ${{ steps.version.outputs.version }} already exists on origin" >&2
+            exit 1
+          fi
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.9.0
+
+      - name: go test
+        run: go test -timeout 10s -cover ./pkg/... ./internal/...
+
+      - name: fast CLI tests
+        run: go test -cover -v ./tests/fast
+
+      - name: Pull test image
+        run: docker pull "$TEST_DOCKER_IMAGE"
+
+      - name: bash tests
+        run: TEST_SHELL=bash go test -cover -v ./tests/shell
+
+      - name: zsh tests
+        run: TEST_SHELL=zsh go test -cover -v ./tests/shell
+
+      - name: Tasks runtime tests
+        run: TEST_SHELL=bash go test -cover -v ./tests/tasks
+
+      - name: Create local release tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.version }}" -m "Release ${{ steps.version.outputs.version }}"
+
+      - name: Build artifacts
+        run: script/buildall
+
+      - name: Print artifacts
+        run: |
+          ls -l dist
+          grep . dist/*.sha256
+
+      - name: Push release tag
+        run: git push origin "${{ steps.version.outputs.version }}"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          if [[ "${{ inputs.kind }}" == "rc" || "${{ steps.version.outputs.version }}" == *"-rc."* ]]; then
+            prerelease="--prerelease"
+          fi
+          gh release create "${{ steps.version.outputs.version }}" \
+            --target "$GITHUB_SHA" \
+            --title "${{ steps.version.outputs.version }}" \
+            --generate-notes \
+            $prerelease \
+            dist/*
+
+      - name: Trigger action in homebrew-devbuddy
+        if: ${{ inputs.kind != 'rc' && !contains(steps.version.outputs.version, '-rc.') }}
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          gh api repos/devbuddy/homebrew-devbuddy/dispatches --method POST --input - <<EOF
+          {
+            "event_type": "upgrade",
+            "client_payload": {
+              "message": {
+                "version": "${{ steps.version.outputs.version }}",
+                "revision": "${{ github.sha }}"
+              }
+            }
+          }
+          EOF

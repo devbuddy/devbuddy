@@ -70,7 +70,7 @@ script/
   test                    # Run unit tests (./pkg/...)
   lint                    # Run golangci-lint
   buildall                # Cross-compile for all platforms
-  release.py              # Release automation (version bump, tag, push)
+  release                 # Dispatch the GitHub release workflow
   install-dev.sh          # Build and install to GOPATH/bin
 tests/                    # Integration tests (Docker-based)
   context/                # TestContext: orchestrates Docker container with shell
@@ -143,27 +143,28 @@ Integration tests run inside a Docker container (`ghcr.io/devbuddy/docker-testin
 - Controlled by env vars: `TEST_SHELL` (bash/zsh), `TEST_DOCKER_IMAGE`
 - Docker image: Ubuntu 20.04 with pyenv, Python 3.9, build tools, git, zsh
 
-**Note:** `dev.yml` references `TEST_DOCKER_IMAGE: ghcr.io/devbuddy/docker-testing:sha-7fd13f4` but CI uses `sha-f11e362`. These may need syncing.
-
 ### CI/CD
-GitHub Actions (`.github/workflows/tests.yml`):
-- golangci-lint, unit tests, bash integration, zsh integration (parallel)
-- Release job on version tags: `script/buildall` + GitHub Releases + Homebrew trigger
+GitHub Actions:
+- `.github/workflows/tests.yml`: golangci-lint, unit tests, bash integration, zsh integration, task integration
+- `.github/workflows/release.yml`: manually triggered release authority
 - Go 1.26, golangci-lint v2.9.0
 
 ### Release Process
 ```bash
-python3 script/release.py --yes release           # Minor bump (0.15.0 -> 0.16.0)
-python3 script/release.py --yes patch             # Patch bump (0.15.0 -> 0.15.1)
-python3 script/release.py --yes release-candidate # RC version
-python3 script/release.py --dryrun --yes release  # Dry run
+script/release minor              # Minor bump (0.16.0 -> 0.17.0)
+script/release patch              # Patch bump (0.16.0 -> 0.16.1)
+script/release rc                 # Next release candidate
+script/release custom v0.17.0     # Explicit version
+script/release --dry-run patch    # Print the workflow command
 ```
-The `--yes` (`-y`) flag skips the interactive confirmation prompt.
+`script/release` only dispatches the GitHub workflow. The workflow computes or validates the version, runs release validation, creates the annotated tag, builds binaries via `script/buildall`, creates a GitHub Release with generated notes and attached binaries, and triggers the Homebrew tap update for stable releases.
 
-The script creates a release commit + annotated tag + pushes to GitHub. CI then:
-1. Builds binaries for all platforms via `script/buildall`
-2. Creates a GitHub Release with the binaries attached
-3. Triggers the Homebrew tap update (requires valid `ACCESS_TOKEN` secret)
+Coding agents can trigger releases directly with:
+```bash
+gh workflow run release.yml --repo devbuddy/devbuddy --ref main -f kind=patch
+```
+
+The Homebrew tap update requires a valid `ACCESS_TOKEN` secret.
 
 ### Distribution
 - macOS: Homebrew (`devbuddy/homebrew-devbuddy`, auto-triggered on release)
