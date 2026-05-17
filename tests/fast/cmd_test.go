@@ -24,6 +24,28 @@ func Test_Cmd_Version(t *testing.T) {
 	require.Equal(t, []string{"bud version devel"}, lines)
 }
 
+func Test_Cmd_UnknownCommand_ShowsHelpHint(t *testing.T) {
+	c := harness.NewCLI(t)
+
+	lines := c.Run(t, "bud does-not-exist", harness.ExitCode(1))
+
+	harness.OutputContains(t, lines,
+		`Error: unknown command "does-not-exist" for "bud"`,
+		`Run 'bud --help' for usage.`,
+	)
+}
+
+func Test_Cmd_UnknownNestedCommand_ShowsNestedHelpHint(t *testing.T) {
+	c := harness.NewCLI(t)
+
+	lines := c.Run(t, "bud tree does-not-exist", harness.ExitCode(1))
+
+	harness.OutputContains(t, lines,
+		`Error: unknown command "does-not-exist" for "bud tree"`,
+		`Run 'bud tree --help' for usage.`,
+	)
+}
+
 func Test_Cmd_DebugInfo(t *testing.T) {
 	c := harness.NewCLI(t)
 
