@@ -1,5 +1,6 @@
 # DevBuddy config file
-# See https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md
+# Run `bud --doc` to learn how to use dev.yml and bud.
+# Full reference: https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md
 
 env:
   ENV: development
