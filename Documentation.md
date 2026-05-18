@@ -195,9 +195,10 @@ up:
 ### `ruby`
 
 This task will install the Ruby version (with rbenv, which is installed automatically via
-Homebrew if missing) and activate it in your shell. If a `Gemfile` is present, gems will
-be installed with `bundle install`. Both `Gemfile` and `Gemfile.lock` are watched, so
-either changing will re-trigger the install.
+Homebrew if missing) and activate it in your shell. If a `Gemfile` is present, DevBuddy
+configures Bundler to install gems into `vendor/bundle`, then runs `bundle install`.
+Both `Gemfile` and `Gemfile.lock` are watched, so either changing will re-trigger the
+install.
 
 The Ruby version can be set explicitly in `dev.yml`, or omitted to read it from a
 `.ruby-version` file at the project root (an optional `ruby-` engine prefix is stripped):
@@ -233,9 +234,9 @@ the `dev.yml` version. Remove one to silence the warning.
 - **Bundler is assumed to ship with Ruby.** Ruby 2.6 and later bundle Bundler in the
   stdlib, so the task does not install it explicitly. Older Ruby versions are not
   supported.
-- **Gems install into the rbenv version directory** rather than a per-project
-  `vendor/bundle`. If you want isolation, run `bundle config set --local path vendor/bundle`
-  in the project before `bud up`.
+- **Gems install into `vendor/bundle`.** DevBuddy writes this through Bundler's local
+  project config (`bundle config set --local path vendor/bundle`). Add `vendor/bundle`
+  to `.gitignore` if your project does not already ignore it.
 
 ### `custom`
 

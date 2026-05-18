@@ -5,7 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/devbuddy/devbuddy/pkg/config"
+	"github.com/devbuddy/devbuddy/pkg/context"
+	"github.com/devbuddy/devbuddy/pkg/env"
+	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 	yaml "github.com/goccy/go-yaml"
 	"github.com/stretchr/testify/require"
 )
@@ -72,4 +78,52 @@ func TestRubyInvalid(t *testing.T) {
 	_, err := loadTestTask(t, `ruby: 3`)
 
 	require.Error(t, err, "buildFromDefinition() should have failed")
+}
+
+func TestRubyBundleInstallUsesProjectLocalBundlePath(t *testing.T) {
+	task := ensureLoadTestTask(t, `ruby: 3.3.0`)
+	runner := &rubyRunner{}
+	_, testUI := ui.NewBufferedTesting(false)
+	ctx := &context.Context{
+		Cfg:     config.NewTestConfig(),
+		Env:     env.New([]string{}),
+		UI:      testUI,
+		Project: project.NewFromPath("/project"),
+		Executor: &executor.Executor{
+			Runner: runner,
+			Cwd:    "/project",
+			Env:    env.New([]string{}),
+		},
+	}
+
+	err := task.Actions[2].Run(ctx)
+
+	require.NoError(t, err)
+	require.Equal(t, []string{
+		"capture rbenv root",
+		"run /rbenv/versions/3.3.0/bin/bundle config set --local path vendor/bundle",
+		"run /rbenv/versions/3.3.0/bin/bundle install",
+	}, runner.commands)
+}
+
+type rubyRunner struct {
+	commands []string
+}
+
+func (r *rubyRunner) Run(cmd *executor.Command) *executor.Result {
+	r.commands = append(r.commands, "run "+rubyCommandString(cmd))
+	return &executor.Result{}
+}
+
+func (r *rubyRunner) Capture(cmd *executor.Command) *executor.Result {
+	r.commands = append(r.commands, "capture "+rubyCommandString(cmd))
+	return &executor.Result{Output: "/rbenv\n"}
+}
+
+func rubyCommandString(cmd *executor.Command) string {
+	result := cmd.Program
+	for _, arg := range cmd.Args {
+		result += " " + arg
+	}
+	return result
 }
