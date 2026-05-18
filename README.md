@@ -35,7 +35,7 @@ DevBuddy manages environments and dependencies through tasks defined in `dev.yml
 - **Env files** — load variables from `.env` files
 - **Custom tasks** — conditional shell commands (met?/meet pattern)
 
-See the full [task documentation](docs/Config.md) for details.
+See the full [task documentation](Documentation.md) for details.
 
 ## Features
 
