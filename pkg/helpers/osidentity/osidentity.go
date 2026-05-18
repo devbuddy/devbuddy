@@ -11,6 +11,11 @@ func NewMacOSForTest() *Identity {
 	return &Identity{"darwin", ""}
 }
 
+// NewDebianForTest returns new debian-like linux identity
+func NewDebianForTest() *Identity {
+	return &Identity{"linux", "debian"}
+}
+
 // IsDebianLike returns true if current platform behave like debian (including ubuntu)
 func (i *Identity) IsDebianLike() bool {
 	return i.platform == "linux" && i.release == "debian"

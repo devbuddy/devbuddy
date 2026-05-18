@@ -56,6 +56,17 @@ the `commands` section and in your shell.
 
 ## Tasks
 
+Some language tasks compile runtimes from source. On macOS, DevBuddy checks for
+the Xcode command-line tools before starting those compilers. If they're missing,
+DevBuddy runs `xcode-select --install`, then asks you to complete Apple's installer
+dialog and re-run `bud up`.
+
+DevBuddy also checks Xcode first-launch setup with `xcodebuild -checkFirstLaunchStatus`.
+If setup is incomplete and `bud up` is running in an interactive terminal, DevBuddy runs
+`sudo xcodebuild -runFirstLaunch`. That command installs required Xcode components and
+accepts the Xcode/SDK license. In non-interactive sessions, DevBuddy prints the command
+for you to run manually.
+
 ### `apt`
 
 This task will install the Debian packages specified if DevBuddy is running on Debian.
@@ -80,8 +91,10 @@ up:
 
 ### `python`
 
-This task will install the Python version (with pyenv, which must be installed), create
-a virtualenv and activate it in your shell.
+This task will install the Python version with pyenv, create a virtualenv, and
+activate it in your shell. If pyenv is missing, DevBuddy installs it with Homebrew.
+On macOS, DevBuddy checks for the Xcode command-line tools before invoking
+`pyenv install`.
 
 ```yaml
 up:
@@ -208,11 +221,11 @@ the `dev.yml` version. Remove one to silence the warning.
 - **macOS-first install path.** Bootstrapping rbenv is done via `brew install rbenv`.
   On Linux, install rbenv yourself before running `bud up`; the task will detect it
   and proceed.
-- **Native build dependencies are not installed.** `rbenv install` compiles Ruby from
+- **Native build dependencies are partly guided.** `rbenv install` compiles Ruby from
   source and needs system headers (`libssl-dev`, `libyaml-dev`, `libffi-dev`, etc. on
-  Linux; the Xcode command-line tools on macOS). If they're missing, `rbenv install`
-  will fail with its own error and you'll need to install them manually. Tracked in
-  [#547](https://github.com/devbuddy/devbuddy/issues/547).
+  Linux; the Xcode command-line tools on macOS). DevBuddy handles the macOS check
+  described above; Linux system packages still need to be handled through `apt:` or
+  installed manually.
 - **No shims, no `GEM_HOME`/`RUBYOPT`.** The autoenv feature simply prepends the
   selected version's `bin/` directory to `PATH`, which is enough for `ruby`, `gem`,
   `bundle`, and gem-installed executables. Tools that rely on rbenv shims or that

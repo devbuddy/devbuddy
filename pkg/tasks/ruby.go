@@ -86,6 +86,9 @@ func parserRubyInstallRubyVersion(task *api.Task, version string) {
 		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
+		if err := helpers.EnsureXcodeCommandLineTools(ctx); err != nil {
+			return err
+		}
 		ctx.UI.TaskCommand("rbenv", "install", version)
 		result := ctx.Executor.Run(executor.New("rbenv", "install", version))
 		if result.Error != nil {
