@@ -44,6 +44,7 @@ func build(version string) *cobra.Command {
 
 	rootCmd.Flags().Bool("debug-info", false, "Print some debug information")
 	rootCmd.Flags().Bool("report-issue", false, "Create an issue about DevBuddy on Github")
+	rootCmd.Flags().Bool("doc", false, "Print guidance for humans and coding agents")
 
 	rootCmd.Flags().Bool("shell-hook", false, "Shell prompt hook")
 	if err := rootCmd.Flags().MarkHidden("shell-hook"); err != nil {
@@ -64,6 +65,10 @@ func build(version string) *cobra.Command {
 }
 
 func rootRun(cmd *cobra.Command, _ []string) error {
+	if GetFlagBool(cmd, "doc") {
+		return printBudDoc(cmd.OutOrStdout())
+	}
+
 	if GetFlagBool(cmd, "shell-init") {
 		withCompletion := GetFlagBool(cmd, "with-completion")
 		userCfg := config.LoadUserConfig()

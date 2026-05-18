@@ -1,5 +1,5 @@
 # DevBuddy config file
-# See https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md
+# Run `bud --doc` to learn how to use dev.yml and bud.
 
 env:
   ENV: development
@@ -31,4 +31,4 @@ commands:
     run: go test ./... -cover
 
 open:
-  devbuddy: https://github.com/devbuddy/devbuddy/blob/master/docs/Config.md#config-devyml
+  devbuddy: https://github.com/devbuddy/devbuddy/blob/main/Documentation.md
