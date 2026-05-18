@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/helpers/open"
 	"github.com/devbuddy/devbuddy/pkg/hook"
 	"github.com/devbuddy/devbuddy/pkg/integration"
+	"github.com/devbuddy/devbuddy/pkg/updatecheck"
 )
 
 // errTasksFailed is returned by `bud up` when one or more tasks fail.
@@ -93,6 +95,7 @@ func rootRun(cmd *cobra.Command, _ []string) error {
 func Execute(version string) {
 	rootCmd := build(version)
 	buildCustomCommands(rootCmd)
+	updateCheck := maybeStartUpdateCheck(os.Args, version, os.Stderr, defaultStartUpdateCheck)
 
 	if err := rootCmd.Execute(); err != nil {
 		if !errors.Is(err, errTasksFailed) {
@@ -101,8 +104,34 @@ func Execute(version string) {
 				fmt.Fprintf(os.Stderr, "Run '%s --help' for usage.\n", unknownCommandPath(err, rootCmd.CommandPath()))
 			}
 		}
+		finishUpdateCheck(updateCheck)
 		os.Exit(1)
 	}
+	finishUpdateCheck(updateCheck)
+}
+
+type updateCheckFinisher interface {
+	Finish()
+}
+
+type updateCheckStarter func(version string, out io.Writer) updateCheckFinisher
+
+func maybeStartUpdateCheck(args []string, version string, out io.Writer, start updateCheckStarter) updateCheckFinisher {
+	if !updatecheck.ShouldRunForArgs(args) {
+		return nil
+	}
+	return start(version, out)
+}
+
+func finishUpdateCheck(check updateCheckFinisher) {
+	if check != nil {
+		check.Finish()
+	}
+}
+
+func defaultStartUpdateCheck(version string, out io.Writer) updateCheckFinisher {
+	checker := updatecheck.New(version, out)
+	return checker.Start()
 }
 
 var unknownCommandPathRE = regexp.MustCompile(` for "([^"]+)"`)

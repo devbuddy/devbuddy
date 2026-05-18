@@ -35,6 +35,10 @@ See `ROADMAP.md` for the product and technical direction. Consult it before maki
 
 Write implementation plans in `docs/plans/`. Keep plans concrete enough to execute incrementally, with file paths, validation commands, and PR-sized steps.
 
+## Product Design Notes
+
+When the user gives product design directives or user-facing behavior guidelines, record them in `docs/design.md` as part of the development process. Keep the document concise and occasionally consolidate it by reviewing existing notes, removing duplication, and resolving ambiguity.
+
 ## Project Structure
 
 ```
