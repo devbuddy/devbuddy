@@ -2,11 +2,14 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
+	"io"
 
 	"github.com/spf13/cobra"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 	"github.com/devbuddy/devbuddy/pkg/updatecheck"
 )
 
@@ -31,8 +34,7 @@ func upgradeRun(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	plan := updatecheck.UpgradePlan(commandVersion(cmd), release.Version)
-	return runUpgradePlan(ctx.Executor, plan)
+	return runUpgrade(ctx.Executor, ctx.UI.Prompts(), cmd.OutOrStdout(), commandVersion(cmd), *release)
 }
 
 func commandVersion(cmd *cobra.Command) string {
@@ -41,6 +43,41 @@ func commandVersion(cmd *cobra.Command) string {
 
 type upgradeExecutor interface {
 	Run(cmd *executor.Command) *executor.Result
+}
+
+func runUpgrade(runner upgradeExecutor, prompts ui.Prompts, out io.Writer, currentVersion string, release updatecheck.Release) error {
+	currentDisplay := displayVersion(currentVersion)
+	fmt.Fprintf(out, "Current version: %s\n", currentDisplay)
+	fmt.Fprintf(out, "Latest version:  %s\n", release.Version)
+
+	if currentDisplay == release.Version {
+		fmt.Fprintln(out, "DevBuddy is already at the latest version.")
+		return nil
+	}
+
+	confirmed, err := prompts.Confirm(ui.ConfirmRequest{Label: fmt.Sprintf("Upgrade DevBuddy to %s now", release.Version)})
+	if errors.Is(err, ui.ErrPromptCancelled) {
+		fmt.Fprintln(out, "Upgrade cancelled.")
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if !confirmed {
+		fmt.Fprintln(out, "Upgrade cancelled.")
+		return nil
+	}
+
+	plan := updatecheck.UpgradePlan(currentVersion, release.Version)
+	return runUpgradePlan(runner, plan)
+}
+
+func displayVersion(version string) string {
+	info := updatecheck.ParseVersion(version)
+	if info.Version != "" {
+		return info.Version
+	}
+	return version
 }
 
 func runUpgradePlan(runner upgradeExecutor, plan updatecheck.Plan) error {
