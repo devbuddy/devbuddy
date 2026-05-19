@@ -32,8 +32,7 @@ func ensureXcodeCommandLineTools(ctx *context.Context, osIdent *osidentity.Ident
 	}
 
 	ctx.UI.Warningf(xcodeCLTInstallMessage)
-	ctx.UI.TaskCommand("xcode-select", "--install")
-	result = ctx.Executor.Run(executor.New("xcode-select", "--install"))
+	result = ctx.RunTaskCommand(executor.New("xcode-select", "--install"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to start Xcode Command Line Tools installer: %w", result.Error)
 	}
@@ -52,8 +51,7 @@ func ensureXcodeFirstLaunch(ctx *context.Context, interactive bool) error {
 	}
 
 	ctx.UI.Warningf("Xcode first-launch setup is required. DevBuddy will run `sudo xcodebuild -runFirstLaunch`; this installs required Xcode components and accepts the Xcode/SDK license.")
-	ctx.UI.TaskCommand("sudo", "xcodebuild", "-runFirstLaunch")
-	result = ctx.Executor.Run(executor.New("sudo", "xcodebuild", "-runFirstLaunch"))
+	result = ctx.RunTaskCommand(executor.New("sudo", "xcodebuild", "-runFirstLaunch"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run Xcode first-launch setup: %w", result.Error)
 	}

@@ -7,8 +7,22 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/project"
+	"github.com/devbuddy/devbuddy/pkg/ui"
 	"github.com/stretchr/testify/require"
 )
+
+type taskCommandRunnerSpy struct {
+	runCmd *executor.Command
+}
+
+func (s *taskCommandRunnerSpy) Run(cmd *executor.Command) *executor.Result {
+	s.runCmd = cmd
+	return &executor.Result{}
+}
+
+func (s *taskCommandRunnerSpy) Capture(cmd *executor.Command) *executor.Result {
+	return &executor.Result{}
+}
 
 func withCwd(t *testing.T, path string) {
 	t.Helper()
@@ -52,4 +66,25 @@ func TestLoadWithProject_ReturnsProjectNotFound(t *testing.T) {
 	ctx, err := LoadWithProject()
 	require.ErrorIs(t, err, project.ErrProjectNotFound)
 	require.Nil(t, ctx)
+}
+
+func TestRunTaskCommand_DisplaysAndRunsSameCommand(t *testing.T) {
+	_, testingUI := ui.NewTesting()
+	runner := &taskCommandRunnerSpy{}
+	ctx := &Context{
+		UI:       testingUI,
+		Executor: &executor.Executor{Runner: runner},
+	}
+	cmd := executor.New("pip", "install", "-r", "requirements.txt").AddOutputFilter("already satisfied")
+
+	result := ctx.RunTaskCommand(cmd)
+
+	require.NoError(t, result.Error)
+	require.Same(t, cmd, runner.runCmd)
+
+	events := testingUI.Events()
+	require.Len(t, events, 1)
+	require.Equal(t, ui.KindTaskCommand, events[0].Kind)
+	require.Equal(t, "pip", events[0].Text)
+	require.Equal(t, []ui.Field{ui.F("args", "install -r requirements.txt")}, events[0].Fields)
 }

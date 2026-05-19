@@ -16,8 +16,7 @@ func init() {
 
 func parserPipfile(config *api.TaskConfig, task *api.Task) error {
 	installPipfile := func(ctx *context.Context) error {
-		ctx.UI.TaskCommand("pip", "install", "--require-virtualenv", "pipenv")
-		result := ctx.Executor.Run(executor.New("pip", "install", "--require-virtualenv", "pipenv"))
+		result := ctx.RunTaskCommand(executor.New("pip", "install", "--require-virtualenv", "pipenv"))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install pipenv: %w", result.Error)
 		}
@@ -40,8 +39,7 @@ func parserPipfile(config *api.TaskConfig, task *api.Task) error {
 		On(api.FuncCondition(installPipfileNeeded))
 
 	runPipfileInstall := func(ctx *context.Context) error {
-		ctx.UI.TaskCommand("pipenv", "install", "--system", "--dev")
-		result := ctx.Executor.Run(executor.New("pipenv", "install", "--system", "--dev").AddEnvVar("PIPENV_QUIET", "1"))
+		result := ctx.RunTaskCommand(executor.New("pipenv", "install", "--system", "--dev").AddEnvVar("PIPENV_QUIET", "1"))
 		if result.Error != nil {
 			return fmt.Errorf("pipenv failed: %w", result.Error)
 		}

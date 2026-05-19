@@ -60,8 +60,7 @@ func parserRubyInstallRbenv(task *api.Task) {
 		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
-		ctx.UI.TaskCommand("brew", "install", "rbenv")
-		result := ctx.Executor.Run(executor.New("brew", "install", "rbenv").AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
+		result := ctx.RunTaskCommand(executor.New("brew", "install", "rbenv").AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install rbenv: %w", result.Error)
 		}
@@ -89,8 +88,7 @@ func parserRubyInstallRubyVersion(task *api.Task, version string) {
 		if err := helpers.EnsureXcodeCommandLineTools(ctx); err != nil {
 			return err
 		}
-		ctx.UI.TaskCommand("rbenv", "install", version)
-		result := ctx.Executor.Run(executor.New("rbenv", "install", version))
+		result := ctx.RunTaskCommand(executor.New("rbenv", "install", version))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install the required ruby version: %w", result.Error)
 		}

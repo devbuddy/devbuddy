@@ -61,15 +61,13 @@ func (a *aptInstall) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (a *aptInstall) Run(ctx *context.Context) error {
-	ctx.UI.TaskCommand("sudo", "apt-get", "update")
-	result := ctx.Executor.Run(executor.New("sudo", "apt-get", "update"))
+	result := ctx.RunTaskCommand(executor.New("sudo", "apt-get", "update"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get update: %w", result.Error)
 	}
 
 	args := append([]string{"install", "--no-install-recommends", "-y"}, a.missingPackageNames...)
-	ctx.UI.TaskCommand("sudo", append([]string{"apt-get"}, args...)...)
-	result = ctx.Executor.Run(executor.New("sudo", append([]string{"apt-get"}, args...)...))
+	result = ctx.RunTaskCommand(executor.New("sudo", append([]string{"apt-get"}, args...)...))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run apt-get install: %w", result.Error)
 	}
