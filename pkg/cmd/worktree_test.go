@@ -7,11 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
+	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/project"
 	"github.com/devbuddy/devbuddy/pkg/ui"
 	"github.com/devbuddy/devbuddy/pkg/worktree"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFormatWorktreeRowsAlignsColumns(t *testing.T) {
@@ -113,4 +114,63 @@ func (worktreeRunner) Run(*executor.Command) *executor.Result {
 
 func (worktreeRunner) Capture(*executor.Command) *executor.Result {
 	return &executor.Result{}
+}
+
+func TestWorktreeRemoveRun(t *testing.T) {
+	dir := t.TempDir()
+	mainPath := filepath.Join(dir, "api")
+	otherPath := filepath.Join(dir, "api--feat")
+	require.NoError(t, os.Mkdir(mainPath, 0755))
+	require.NoError(t, os.Mkdir(otherPath, 0755))
+
+	worktrees := []worktree.Worktree{
+		{Path: mainPath, Branch: "main"},
+		{Path: otherPath, Branch: "feat"},
+	}
+
+	t.Run("refuses to remove main worktree", func(t *testing.T) {
+		_, buf := ui.NewBufferedTesting(false)
+		ctx := &context.Context{
+			Project:  &project.Project{Path: mainPath},
+			Executor: &executor.Executor{Runner: worktreeRunner{}},
+			UI:       buf,
+		}
+
+		args := []string{"main"}
+		err := runWorktreeRemove(ctx, args, func(*executor.Executor, string) ([]worktree.Worktree, error) {
+			return worktrees, nil
+		})
+
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "refusing to remove the main worktree")
+	})
+}
+
+func TestWorktreeRemoveRunSuccess(t *testing.T) {
+	dir := t.TempDir()
+	mainPath := filepath.Join(dir, "api")
+	otherPath := filepath.Join(dir, "api--feat")
+	require.NoError(t, os.Mkdir(mainPath, 0755))
+	require.NoError(t, os.Mkdir(otherPath, 0755))
+
+	worktrees := []worktree.Worktree{
+		{Path: mainPath, Branch: "main"},
+		{Path: otherPath, Branch: "feat"},
+	}
+
+	_, buf := ui.NewBufferedTesting(false)
+	ctx := &context.Context{
+		Project:  &project.Project{Path: mainPath},
+		Executor: &executor.Executor{Runner: worktreeRunner{}},
+		UI:       buf,
+	}
+	os.Setenv("BUD_FINALIZER_FILE", filepath.Join(dir, "finalizer"))
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "finalizer"), []byte(""), 0644))
+
+	args := []string{"feat"}
+	err := runWorktreeRemove(ctx, args, func(*executor.Executor, string) ([]worktree.Worktree, error) {
+		return worktrees, nil
+	})
+
+	require.NoError(t, err)
 }

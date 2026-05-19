@@ -189,7 +189,15 @@ func worktreeRemoveRun(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	worktrees, err := worktree.List(ctx.Executor, ctx.Project.Path)
+	return runWorktreeRemove(ctx, args, worktree.List)
+}
+
+func runWorktreeRemove(
+	ctx *context.Context,
+	args []string,
+	listWorktrees func(*executor.Executor, string) ([]worktree.Worktree, error),
+) error {
+	worktrees, err := listWorktrees(ctx.Executor, ctx.Project.Path)
 	if err != nil {
 		return err
 	}
@@ -227,7 +235,9 @@ func worktreeRemoveRun(_ *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("🐼  removed worktree %s\n", wt.Path)
-	return integration.AddFinalizerCd(repoPath)
+	mainWt := mainWorktree(worktrees)
+	ctx.UI.JumpProject(worktreeLabel(mainWt))
+	return integration.AddFinalizerCd(mainWt.Path)
 }
 
 func worktreePruneRun(_ *cobra.Command, _ []string) error {
@@ -333,13 +343,21 @@ func worktreeExactMatch(wt worktree.Worktree, query string) bool {
 	return wt.Branch == query || base == query || strings.HasSuffix(base, "--"+query)
 }
 
-func mainWorktreePath(worktrees []worktree.Worktree, fallback string) string {
+func mainWorktree(worktrees []worktree.Worktree) worktree.Worktree {
 	for _, wt := range worktrees {
 		if !wt.Bare {
-			return wt.Path
+			return wt
 		}
 	}
-	return fallback
+	return worktree.Worktree{}
+}
+
+func mainWorktreePath(worktrees []worktree.Worktree, fallback string) string {
+	wt := mainWorktree(worktrees)
+	if wt.Path == "" {
+		return fallback
+	}
+	return wt.Path
 }
 
 func removableWorktrees(worktrees []worktree.Worktree, mainPath string) []worktree.Worktree {
