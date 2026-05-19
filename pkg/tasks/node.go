@@ -38,8 +38,7 @@ func parseNode(config *api.TaskConfig, task *api.Task) error {
 			ctx.UI.TaskWarning("No package.json found.")
 			return nil
 		}
-		ctx.UI.TaskCommand("npm", "install", "--no-progress")
-		return ctx.Executor.Run(executor.New("npm", "install", "--no-progress")).Error
+		return ctx.RunTaskCommand(executor.New("npm", "install", "--no-progress")).Error
 	}
 	task.AddActionBuilder("install dependencies with NPM", npmInstall).
 		On(api.FileCondition("package.json"))

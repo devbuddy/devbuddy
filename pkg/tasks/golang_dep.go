@@ -37,8 +37,7 @@ func (p *golangDepInstall) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (p *golangDepInstall) Run(ctx *context.Context) error {
-	ctx.UI.TaskCommand("go", "get", "-u", "github.com/golang/dep/cmd/dep")
-	result := ctx.Executor.Run(executor.New("go", "get", "-u", "github.com/golang/dep/cmd/dep"))
+	result := ctx.RunTaskCommand(executor.New("go", "get", "-u", "github.com/golang/dep/cmd/dep"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to install Go GolangDep: %w", result.Error)
 	}
@@ -82,8 +81,7 @@ func (p *golangDepEnsure) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (p *golangDepEnsure) Run(ctx *context.Context) error {
-	ctx.UI.TaskCommand("dep", "ensure")
-	result := ctx.Executor.Run(executor.New("dep", "ensure"))
+	result := ctx.RunTaskCommand(executor.New("dep", "ensure"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run dep ensure: %w", result.Error)
 	}

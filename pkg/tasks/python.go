@@ -41,8 +41,7 @@ func parserPythonInstallPyenv(task *api.Task, version string) {
 		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
-		ctx.UI.TaskCommand("brew", "install", "pyenv")
-		result := ctx.Executor.Run(executor.New("brew", "install", "pyenv").AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
+		result := ctx.RunTaskCommand(executor.New("brew", "install", "pyenv").AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install pyenv: %w", result.Error)
 		}
@@ -70,8 +69,7 @@ func parserPythonInstallPythonVersion(task *api.Task, version string) {
 		if err := helpers.EnsureXcodeCommandLineTools(ctx); err != nil {
 			return err
 		}
-		ctx.UI.TaskCommand("pyenv", "install", version)
-		result := ctx.Executor.Run(executor.New("pyenv", "install", version))
+		result := ctx.RunTaskCommand(executor.New("pyenv", "install", version))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install the required python version: %w", result.Error)
 		}
@@ -97,8 +95,7 @@ func parserPythonInstallVirtualenv(task *api.Task, version string) {
 		if err != nil {
 			return err
 		}
-		ctx.UI.TaskCommand(pyEnv.Which(version, "python"), "-m", "pip", "install", "virtualenv")
-		result := ctx.Executor.Run(executor.New(pyEnv.Which(version, "python"), "-m", "pip", "install", "virtualenv"))
+		result := ctx.RunTaskCommand(executor.New(pyEnv.Which(version, "python"), "-m", "pip", "install", "virtualenv"))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install virtualenv: %w", result.Error)
 		}
@@ -127,8 +124,7 @@ func parserPythonCreateVirtualenv(task *api.Task, version string) {
 		if err != nil {
 			return err
 		}
-		ctx.UI.TaskCommand(pyEnv.Which(version, "virtualenv"), venv.Path())
-		result := ctx.Executor.Run(executor.New(pyEnv.Which(version, "virtualenv"), venv.Path()))
+		result := ctx.RunTaskCommand(executor.New(pyEnv.Which(version, "virtualenv"), venv.Path()))
 		if result.Error != nil {
 			return fmt.Errorf("failed to create the virtualenv: %w", result.Error)
 		}

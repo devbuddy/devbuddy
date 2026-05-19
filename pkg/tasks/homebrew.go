@@ -50,8 +50,7 @@ func (b *brewInstall) Needed(ctx *context.Context) *api.ActionResult {
 }
 
 func (b *brewInstall) Run(ctx *context.Context) error {
-	ctx.UI.TaskCommand("brew", "install", b.formula)
-	result := ctx.Executor.Run(executor.New("brew", "install", b.formula).AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
+	result := ctx.RunTaskCommand(executor.New("brew", "install", b.formula).AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
 	if result.Error != nil {
 		return fmt.Errorf("failed to run brew install: %w", result.Error)
 	}

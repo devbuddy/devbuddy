@@ -26,8 +26,7 @@ func parserPythonDevelop(config *api.TaskConfig, task *api.Task) error {
 	pipArgs := []string{"install", "--require-virtualenv", "-e", pipTarget}
 
 	pipInstall := func(ctx *context.Context) error {
-		ctx.UI.TaskCommand("pip", pipArgs...)
-		result := ctx.Executor.Run(executor.New("pip", pipArgs...).AddOutputFilter("already satisfied"))
+		result := ctx.RunTaskCommand(executor.New("pip", pipArgs...).AddOutputFilter("already satisfied"))
 		if result.Error != nil {
 			return fmt.Errorf("Pip failed: %w", result.Error)
 		}
