@@ -156,6 +156,8 @@ up:
   - python: 3.12.0
   - pip:
     - requirements.txt
+  # For pyproject.toml / uv.lock projects, use:
+  # - uv
   - homebrew:
     - curl
   - custom:

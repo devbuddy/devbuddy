@@ -26,6 +26,8 @@ up:
   #   - requirements.txt
   #   - tests/requirements.txt
   # - python_develop
+  # For pyproject.toml / uv.lock projects:
+  # - uv
 
   # Custom task:
   # - custom:
