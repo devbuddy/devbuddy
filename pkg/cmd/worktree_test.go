@@ -137,7 +137,7 @@ func TestWorktreeRemoveRun(t *testing.T) {
 		}
 
 		args := []string{"main"}
-		err := __worktreeRemoveRun(ctx, args, func(*executor.Executor, string) ([]worktree.Worktree, error) {
+		err := runWorktreeRemove(ctx, args, func(*executor.Executor, string) ([]worktree.Worktree, error) {
 			return worktrees, nil
 		})
 
@@ -168,23 +168,9 @@ func TestWorktreeRemoveRunSuccess(t *testing.T) {
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "finalizer"), []byte(""), 0644))
 
 	args := []string{"feat"}
-	err := __worktreeRemoveRun(ctx, args, func(*executor.Executor, string) ([]worktree.Worktree, error) {
+	err := runWorktreeRemove(ctx, args, func(*executor.Executor, string) ([]worktree.Worktree, error) {
 		return worktrees, nil
 	})
 
 	require.NoError(t, err)
-}
-
-type worktreeRunner struct{}
-
-func (worktreeRunner) Run(*executor.Command) *executor.Result {
-	return &executor.Result{}
-}
-
-func (worktreeRunner) Capture(*executor.Command) *executor.Result {
-	return &executor.Result{}
-}
-
-func (worktreeRunner) Capture(*executor.Command) *executor.Result {
-	return &executor.Result{}
 }

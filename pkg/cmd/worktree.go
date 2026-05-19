@@ -189,7 +189,15 @@ func worktreeRemoveRun(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	worktrees, err := worktree.List(ctx.Executor, ctx.Project.Path)
+	return runWorktreeRemove(ctx, args, worktree.List)
+}
+
+func runWorktreeRemove(
+	ctx *context.Context,
+	args []string,
+	listWorktrees func(*executor.Executor, string) ([]worktree.Worktree, error),
+) error {
+	worktrees, err := listWorktrees(ctx.Executor, ctx.Project.Path)
 	if err != nil {
 		return err
 	}
