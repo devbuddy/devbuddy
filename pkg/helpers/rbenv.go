@@ -10,6 +10,7 @@ import (
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 // ReadRubyVersionFile reads a `.ruby-version` file and returns the version
@@ -29,8 +30,9 @@ func ReadRubyVersionFile(projectPath string) (string, error) {
 }
 
 type RbEnv struct {
-	ctx  *context.Context
-	root string
+	ctx     *context.Context
+	command string
+	root    string
 }
 
 // RbEnvRoot returns the rbenv root directory using the same resolution as
@@ -44,11 +46,24 @@ func RbEnvRoot() string {
 }
 
 func NewRbEnv(ctx *context.Context) (*RbEnv, error) {
-	result := ctx.Executor.CaptureAndTrim(executor.New("rbenv", "root"))
-	if result.Error != nil {
-		return nil, fmt.Errorf("Command 'rbenv root' failed: %w", result.Error)
+	command := "rbenv"
+	result := ctx.Executor.CaptureAndTrim(executor.New(command, "root"))
+	if result.Error != nil && utils.PathExists(sourceRbEnvCommand()) {
+		command = sourceRbEnvCommand()
+		result = ctx.Executor.CaptureAndTrim(executor.New(command, "root"))
 	}
-	return &RbEnv{ctx: ctx, root: result.Output}, nil
+	if result.Error != nil {
+		return nil, fmt.Errorf("Command '%s root' failed: %w", command, result.Error)
+	}
+	return &RbEnv{ctx: ctx, command: command, root: result.Output}, nil
+}
+
+func sourceRbEnvCommand() string {
+	return path.Join(RbEnvRoot(), "bin", "rbenv")
+}
+
+func (r *RbEnv) Command() string {
+	return r.command
 }
 
 func (r *RbEnv) VersionInstalled(version string) (bool, error) {
@@ -60,7 +75,7 @@ func (r *RbEnv) VersionInstalled(version string) (bool, error) {
 }
 
 func (r *RbEnv) listVersions() ([]string, error) {
-	result := r.ctx.Executor.Capture(executor.New("rbenv", "versions", "--bare", "--skip-aliases"))
+	result := r.ctx.Executor.Capture(executor.New(r.command, "versions", "--bare", "--skip-aliases"))
 	if result.Error != nil {
 		return nil, fmt.Errorf("failed to run rbenv versions: %w", result.Error)
 	}

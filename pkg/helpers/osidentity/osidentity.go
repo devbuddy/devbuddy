@@ -16,6 +16,11 @@ func NewDebianForTest() *Identity {
 	return &Identity{"linux", "debian"}
 }
 
+// NewLinuxForTest returns new linux identity with the given release variant.
+func NewLinuxForTest(release string) *Identity {
+	return &Identity{"linux", release}
+}
+
 // IsDebianLike returns true if current platform behave like debian (including ubuntu)
 func (i *Identity) IsDebianLike() bool {
 	return i.platform == "linux" && i.release == "debian"

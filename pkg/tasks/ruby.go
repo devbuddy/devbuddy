@@ -4,11 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/devbuddy/devbuddy/pkg/context"
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
+	"github.com/devbuddy/devbuddy/pkg/helpers/osidentity"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
+	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 const rubyTaskName = "ruby"
@@ -53,20 +57,87 @@ func resolveRubyVersion(config *api.TaskConfig) (string, error) {
 
 func parserRubyInstallRbenv(task *api.Task) {
 	needed := func(ctx *context.Context) *api.ActionResult {
-		_, err := helpers.NewRbEnv(ctx)
+		rbEnv, err := helpers.NewRbEnv(ctx)
 		if err != nil {
 			return api.Needed("rbenv is not installed: %s", err)
+		}
+		hasRubyBuild, err := rbenvHasInstallCommand(ctx, rbEnv)
+		if err != nil {
+			return api.Failed("failed to inspect rbenv commands: %s", err)
+		}
+		if !hasRubyBuild {
+			return api.Needed("ruby-build is not installed")
 		}
 		return api.NotNeeded()
 	}
 	run := func(ctx *context.Context) error {
-		result := ctx.RunTaskCommand(executor.New("brew", "install", "rbenv").AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
-		if result.Error != nil {
-			return fmt.Errorf("failed to install rbenv: %w", result.Error)
-		}
-		return nil
+		return installRbenv(ctx, osidentity.Detect())
 	}
 	task.AddActionBuilder("install rbenv", run).On(api.FuncCondition(needed))
+}
+
+func rbenvHasInstallCommand(ctx *context.Context, rbEnv *helpers.RbEnv) (bool, error) {
+	result := ctx.Executor.Capture(executor.New(rbEnv.Command(), "commands"))
+	if result.Error != nil {
+		return false, result.Error
+	}
+	for _, command := range strings.Split(result.Output, "\n") {
+		if strings.TrimSpace(command) == "install" {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func installRbenv(ctx *context.Context, osIdent *osidentity.Identity) error {
+	switch {
+	case osIdent.IsMacOS():
+		return installRbenvWithHomebrew(ctx)
+	case osIdent.IsDebianLike():
+		return installRbenvWithApt(ctx)
+	default:
+		return installRbenvFromGit(ctx)
+	}
+}
+
+func installRbenvWithHomebrew(ctx *context.Context) error {
+	result := ctx.RunTaskCommand(executor.New("brew", "install", "rbenv", "ruby-build").AddEnvVar("HOMEBREW_NO_AUTO_UPDATE", "1"))
+	if result.Error != nil {
+		return fmt.Errorf("failed to install rbenv: %w", result.Error)
+	}
+	return nil
+}
+
+func installRbenvWithApt(ctx *context.Context) error {
+	result := ctx.RunTaskCommand(executor.New("sudo", "apt-get", "update"))
+	if result.Error != nil {
+		return fmt.Errorf("failed to run apt-get update: %w", result.Error)
+	}
+
+	result = ctx.RunTaskCommand(executor.New("sudo", "apt-get", "install", "--no-install-recommends", "-y", "rbenv", "ruby-build"))
+	if result.Error != nil {
+		return fmt.Errorf("failed to install rbenv: %w", result.Error)
+	}
+	return nil
+}
+
+func installRbenvFromGit(ctx *context.Context) error {
+	root := helpers.RbEnvRoot()
+	if !utils.PathExists(root) {
+		result := ctx.RunTaskCommand(executor.New("git", "clone", "https://github.com/rbenv/rbenv.git", root))
+		if result.Error != nil {
+			return fmt.Errorf("failed to clone rbenv: %w", result.Error)
+		}
+	}
+
+	rubyBuildPath := filepath.Join(root, "plugins", "ruby-build")
+	if !utils.PathExists(rubyBuildPath) {
+		result := ctx.RunTaskCommand(executor.New("git", "clone", "https://github.com/rbenv/ruby-build.git", rubyBuildPath))
+		if result.Error != nil {
+			return fmt.Errorf("failed to clone ruby-build: %w", result.Error)
+		}
+	}
+	return nil
 }
 
 func parserRubyInstallRubyVersion(task *api.Task, version string) {
@@ -88,7 +159,11 @@ func parserRubyInstallRubyVersion(task *api.Task, version string) {
 		if err := helpers.EnsureXcodeCommandLineTools(ctx); err != nil {
 			return err
 		}
-		result := ctx.RunTaskCommand(executor.New("rbenv", "install", version))
+		rbEnv, err := helpers.NewRbEnv(ctx)
+		if err != nil {
+			return fmt.Errorf("cannot use rbenv: %w", err)
+		}
+		result := ctx.RunTaskCommand(executor.New(rbEnv.Command(), "install", version))
 		if result.Error != nil {
 			return fmt.Errorf("failed to install the required ruby version: %w", result.Error)
 		}
@@ -106,13 +181,11 @@ func parserRubyBundleInstall(task *api.Task, version string) {
 			return err
 		}
 		bundle := rbEnv.Which(version, "bundle")
-		ctx.UI.TaskCommand("bundle", "config", "set", "--local", "path", "vendor/bundle")
-		result := ctx.Executor.Run(executor.New(bundle, "config", "set", "--local", "path", "vendor/bundle"))
+		result := ctx.RunTaskCommand(executor.New(bundle, "config", "set", "--local", "path", "vendor/bundle"))
 		if result.Error != nil {
 			return fmt.Errorf("bundle config failed: %w", result.Error)
 		}
-		ctx.UI.TaskCommand("bundle", "install")
-		result = ctx.Executor.Run(executor.New(bundle, "install"))
+		result = ctx.RunTaskCommand(executor.New(bundle, "install"))
 		if result.Error != nil {
 			return fmt.Errorf("bundle install failed: %w", result.Error)
 		}
