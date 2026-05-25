@@ -106,8 +106,13 @@ func parserRubyBundleInstall(task *api.Task, version string) {
 			return err
 		}
 		bundle := rbEnv.Which(version, "bundle")
+		ctx.UI.TaskCommand("bundle", "config", "set", "--local", "path", "vendor/bundle")
+		result := ctx.Executor.Run(executor.New(bundle, "config", "set", "--local", "path", "vendor/bundle"))
+		if result.Error != nil {
+			return fmt.Errorf("bundle config failed: %w", result.Error)
+		}
 		ctx.UI.TaskCommand("bundle", "install")
-		result := ctx.Executor.Run(executor.New(bundle, "install"))
+		result = ctx.Executor.Run(executor.New(bundle, "install"))
 		if result.Error != nil {
 			return fmt.Errorf("bundle install failed: %w", result.Error)
 		}
