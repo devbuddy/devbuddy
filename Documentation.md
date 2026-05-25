@@ -145,6 +145,37 @@ up:
   - pipfile
 ```
 
+### `uv`
+
+This task installs `uv` in the selected Python virtualenv if needed, then runs
+`uv sync --active --inexact` so `uv` syncs the project into the DevBuddy-managed
+virtualenv instead of creating a separate `.venv`.
+
+A Python environment must be selected first. The project must have a
+`pyproject.toml`; `uv.lock` is tracked when present.
+
+```yaml
+up:
+  - python: 3.13.7
+  - uv
+```
+
+Dependency groups, extras, and lockfile-only installs can be requested:
+
+```yaml
+up:
+  - python: 3.13.7
+  - uv:
+      groups:
+        - dev
+      extras:
+        - postgres
+      frozen: true
+```
+
+Set `exact: true` to omit `--inexact` and let `uv sync` remove packages that are
+not declared by the project.
+
 ### `go`
 
 This task will download the Go distribution from `dl.google.com/go` and activate it

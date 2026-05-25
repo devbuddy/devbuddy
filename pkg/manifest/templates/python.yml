@@ -19,6 +19,8 @@ up:
     - requirements.txt
     - tests/requirements.txt
   - python_develop
+  # For pyproject.toml / uv.lock projects, replace pip/python_develop with:
+  # - uv
 
   # - custom:
   #     name: Create the local tmp directory
