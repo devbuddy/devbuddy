@@ -9,7 +9,6 @@ import (
 	"github.com/devbuddy/devbuddy/pkg/executor"
 	"github.com/devbuddy/devbuddy/pkg/helpers"
 	"github.com/devbuddy/devbuddy/pkg/tasks/api"
-	"github.com/devbuddy/devbuddy/pkg/utils"
 )
 
 const pythonTaskName = "python"
@@ -27,7 +26,6 @@ func parserPython(config *api.TaskConfig, task *api.Task) error {
 
 	parserPythonInstallPyenv(task, version)
 	parserPythonInstallPythonVersion(task, version)
-	parserPythonInstallVirtualenv(task, version)
 	parserPythonCreateVirtualenv(task, version)
 	return nil
 }
@@ -78,32 +76,6 @@ func parserPythonInstallPythonVersion(task *api.Task, version string) {
 	task.AddActionBuilder("install Python version with PyEnv", run).On(api.FuncCondition(needed))
 }
 
-func parserPythonInstallVirtualenv(task *api.Task, version string) {
-	needed := func(ctx *context.Context) *api.ActionResult {
-		pyEnv, err := helpers.NewPyEnv(ctx)
-		if err != nil {
-			return api.Failed("cannot use pyenv: %s", err)
-		}
-		installed := utils.PathExists(pyEnv.Which(version, "virtualenv"))
-		if !installed {
-			return api.Needed("virtualenv is not installed")
-		}
-		return api.NotNeeded()
-	}
-	run := func(ctx *context.Context) error {
-		pyEnv, err := helpers.NewPyEnv(ctx)
-		if err != nil {
-			return err
-		}
-		result := ctx.RunTaskCommand(executor.New(pyEnv.Which(version, "python"), "-m", "pip", "install", "virtualenv"))
-		if result.Error != nil {
-			return fmt.Errorf("failed to install virtualenv: %w", result.Error)
-		}
-		return nil
-	}
-	task.AddActionBuilder("install virtualenv", run).On(api.FuncCondition(needed))
-}
-
 func parserPythonCreateVirtualenv(task *api.Task, version string) {
 	needed := func(ctx *context.Context) *api.ActionResult {
 		name := helpers.VirtualenvName(ctx.Project, version)
@@ -124,7 +96,8 @@ func parserPythonCreateVirtualenv(task *api.Task, version string) {
 		if err != nil {
 			return err
 		}
-		result := ctx.RunTaskCommand(executor.New(pyEnv.Which(version, "virtualenv"), venv.Path()))
+		pythonCmd := pyEnv.Which(version, "python")
+		result := ctx.RunTaskCommand(executor.New(pythonCmd, "-m", "venv", venv.Path()))
 		if result.Error != nil {
 			return fmt.Errorf("failed to create the virtualenv: %w", result.Error)
 		}
