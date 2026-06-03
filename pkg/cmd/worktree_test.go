@@ -128,49 +128,105 @@ func TestWorktreeRemoveRun(t *testing.T) {
 		{Path: otherPath, Branch: "feat"},
 	}
 
-	t.Run("refuses to remove main worktree", func(t *testing.T) {
+	newCtx := func(t *testing.T, projectPath string, prompts ui.Prompts) (*context.Context, string) {
+		t.Helper()
 		_, buf := ui.NewBufferedTesting(false)
+		buf.SetPrompts(prompts)
 		ctx := &context.Context{
-			Project:  &project.Project{Path: mainPath},
+			Project:  &project.Project{Path: projectPath},
 			Executor: &executor.Executor{Runner: worktreeRunner{}},
 			UI:       buf,
 		}
+		finalizer := filepath.Join(t.TempDir(), "finalizer")
+		require.NoError(t, os.WriteFile(finalizer, []byte(""), 0644))
+		t.Setenv("BUD_FINALIZER_FILE", finalizer)
+		return ctx, finalizer
+	}
 
-		args := []string{"main"}
-		err := runWorktreeRemove(ctx, args, func(*executor.Executor, string) ([]worktree.Worktree, error) {
-			return worktrees, nil
-		})
+	listFn := func(*executor.Executor, string) ([]worktree.Worktree, error) {
+		return worktrees, nil
+	}
+
+	t.Run("refuses to remove the main worktree", func(t *testing.T) {
+		prompts := &ui.FakePrompts{ConfirmValue: true}
+		ctx, _ := newCtx(t, mainPath, prompts)
+
+		err := runWorktreeRemove(ctx, []string{"main"}, listFn)
 
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "refusing to remove the main worktree")
-	})
-}
-
-func TestWorktreeRemoveRunSuccess(t *testing.T) {
-	dir := t.TempDir()
-	mainPath := filepath.Join(dir, "api")
-	otherPath := filepath.Join(dir, "api--feat")
-	require.NoError(t, os.Mkdir(mainPath, 0755))
-	require.NoError(t, os.Mkdir(otherPath, 0755))
-
-	worktrees := []worktree.Worktree{
-		{Path: mainPath, Branch: "main"},
-		{Path: otherPath, Branch: "feat"},
-	}
-
-	_, buf := ui.NewBufferedTesting(false)
-	ctx := &context.Context{
-		Project:  &project.Project{Path: mainPath},
-		Executor: &executor.Executor{Runner: worktreeRunner{}},
-		UI:       buf,
-	}
-	os.Setenv("BUD_FINALIZER_FILE", filepath.Join(dir, "finalizer"))
-	require.NoError(t, os.WriteFile(filepath.Join(dir, "finalizer"), []byte(""), 0644))
-
-	args := []string{"feat"}
-	err := runWorktreeRemove(ctx, args, func(*executor.Executor, string) ([]worktree.Worktree, error) {
-		return worktrees, nil
+		require.Empty(t, prompts.ConfirmRequests, "confirmation should not be asked for the main worktree")
 	})
 
-	require.NoError(t, err)
+	t.Run("defaults to the current worktree", func(t *testing.T) {
+		prompts := &ui.FakePrompts{ConfirmValue: true}
+		ctx, _ := newCtx(t, otherPath, prompts)
+
+		err := runWorktreeRemove(ctx, nil, listFn)
+
+		require.NoError(t, err)
+		require.Len(t, prompts.ConfirmRequests, 1)
+		require.Contains(t, prompts.ConfirmRequests[0].Label, "feat")
+		require.Contains(t, prompts.ConfirmRequests[0].Label, otherPath)
+	})
+
+	t.Run("errors when defaulting from the main worktree", func(t *testing.T) {
+		prompts := &ui.FakePrompts{ConfirmValue: true}
+		ctx, _ := newCtx(t, mainPath, prompts)
+
+		err := runWorktreeRemove(ctx, nil, listFn)
+
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "refusing to remove the main worktree")
+		require.Empty(t, prompts.ConfirmRequests)
+	})
+
+	t.Run("errors when current directory is not a tracked worktree", func(t *testing.T) {
+		unknownPath := filepath.Join(dir, "api--unknown")
+		require.NoError(t, os.Mkdir(unknownPath, 0755))
+		prompts := &ui.FakePrompts{ConfirmValue: true}
+		ctx, _ := newCtx(t, unknownPath, prompts)
+
+		err := runWorktreeRemove(ctx, nil, listFn)
+
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "not a git worktree")
+		require.Empty(t, prompts.ConfirmRequests)
+	})
+
+	t.Run("removes the worktree matched by query after confirmation", func(t *testing.T) {
+		prompts := &ui.FakePrompts{ConfirmValue: true}
+		ctx, _ := newCtx(t, mainPath, prompts)
+
+		err := runWorktreeRemove(ctx, []string{"feat"}, listFn)
+
+		require.NoError(t, err)
+		require.Len(t, prompts.ConfirmRequests, 1)
+		require.Contains(t, prompts.ConfirmRequests[0].Label, "feat")
+	})
+
+	t.Run("aborts when the user declines confirmation", func(t *testing.T) {
+		prompts := &ui.FakePrompts{ConfirmValue: false}
+		ctx, finalizer := newCtx(t, mainPath, prompts)
+
+		err := runWorktreeRemove(ctx, []string{"feat"}, listFn)
+
+		require.NoError(t, err)
+		require.Len(t, prompts.ConfirmRequests, 1)
+		content, readErr := os.ReadFile(finalizer)
+		require.NoError(t, readErr)
+		require.Empty(t, content, "no finalizer should be written when the removal is aborted")
+	})
+
+	t.Run("aborts when the confirmation prompt is cancelled", func(t *testing.T) {
+		prompts := &ui.FakePrompts{ConfirmErr: ui.ErrPromptCancelled}
+		ctx, finalizer := newCtx(t, mainPath, prompts)
+
+		err := runWorktreeRemove(ctx, []string{"feat"}, listFn)
+
+		require.NoError(t, err)
+		content, readErr := os.ReadFile(finalizer)
+		require.NoError(t, readErr)
+		require.Empty(t, content)
+	})
 }

@@ -206,18 +206,11 @@ func runWorktreeRemove(
 
 	var wt worktree.Worktree
 	if len(args) == 0 {
-		removable := removableWorktrees(worktrees, repoPath)
-		if len(removable) == 0 {
-			return fmt.Errorf("no worktree available to remove")
+		current, ok := findWorktreeByPath(worktrees, ctx.Project.Path)
+		if !ok {
+			return fmt.Errorf("current directory is not a git worktree: %s", ctx.Project.Path)
 		}
-		selected, err := selectWorktree(ctx.UI.Prompts(), ctx.Executor, removable)
-		if errors.Is(err, ui.ErrPromptCancelled) {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		wt = selected
+		wt = current
 	} else {
 		matches := matchWorktrees(worktrees, args[0])
 		if len(matches) == 0 {
@@ -230,6 +223,19 @@ func runWorktreeRemove(
 		return fmt.Errorf("refusing to remove the main worktree: %s", wt.Path)
 	}
 
+	confirmed, err := ctx.UI.Prompts().Confirm(ui.ConfirmRequest{
+		Label: fmt.Sprintf("Remove worktree %s at %s", worktreeLabel(wt), wt.Path),
+	})
+	if errors.Is(err, ui.ErrPromptCancelled) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if !confirmed {
+		return nil
+	}
+
 	if err := worktree.Remove(ctx.Executor, ctx.Project.Path, wt.Path); err != nil {
 		return err
 	}
@@ -238,6 +244,16 @@ func runWorktreeRemove(
 	mainWt := mainWorktree(worktrees)
 	ctx.UI.JumpProject(worktreeLabel(mainWt))
 	return integration.AddFinalizerCd(mainWt.Path)
+}
+
+func findWorktreeByPath(worktrees []worktree.Worktree, path string) (worktree.Worktree, bool) {
+	target := filepath.Clean(path)
+	for _, wt := range worktrees {
+		if filepath.Clean(wt.Path) == target {
+			return wt, true
+		}
+	}
+	return worktree.Worktree{}, false
 }
 
 func worktreePruneRun(_ *cobra.Command, _ []string) error {
@@ -358,17 +374,6 @@ func mainWorktreePath(worktrees []worktree.Worktree, fallback string) string {
 		return fallback
 	}
 	return wt.Path
-}
-
-func removableWorktrees(worktrees []worktree.Worktree, mainPath string) []worktree.Worktree {
-	removable := make([]worktree.Worktree, 0, len(worktrees))
-	for _, wt := range worktrees {
-		if filepath.Clean(wt.Path) == filepath.Clean(mainPath) {
-			continue
-		}
-		removable = append(removable, wt)
-	}
-	return removable
 }
 
 func inactiveWorktrees(worktrees []worktree.Worktree, now time.Time, maxAge time.Duration) []worktree.Worktree {
