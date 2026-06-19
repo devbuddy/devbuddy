@@ -14,7 +14,7 @@ jobs:
     name: golangci-lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-go@v6
         with:
           go-version: '1.26'
@@ -28,7 +28,7 @@ jobs:
     name: go test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-go@v6
         with:
           go-version: "1.26"
@@ -38,7 +38,7 @@ jobs:
     name: fast CLI tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-go@v6
         with:
           go-version: "1.26"
@@ -48,7 +48,7 @@ jobs:
     name: bash tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-go@v6
         with:
           go-version: "1.26"
@@ -59,7 +59,7 @@ jobs:
     name: zsh tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-go@v6
         with:
           go-version: "1.26"
@@ -70,7 +70,7 @@ jobs:
     name: Tasks runtime tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-go@v6
         with:
           go-version: "1.26"
@@ -88,7 +88,7 @@ jobs:
   #     run:
   #       shell: bash
   #   steps:
-  #     - uses: actions/checkout@v6
+  #     - uses: actions/checkout@v7
   #     - name: Install bud
   #       run: |
   #         sh install.sh
@@ -108,7 +108,7 @@ jobs:
   #       os: [ubuntu-latest, macos-latest]
   #   runs-on: ${{ matrix.os }}
   #   steps:
-  #     - uses: actions/checkout@v6
+  #     - uses: actions/checkout@v7
   #     - name: Install and run custom command
   #       working-directory: .github/workflows/test-project
   #       run: |
